@@ -27,10 +27,9 @@ services:
         networks:
             - transcenet
 
-
     back:
         container_name: back
-        build:        
+        build:
             dockerfile: Dockerfile
             context: ./back
         env_file: ./.env
@@ -40,6 +39,9 @@ services:
             - transcenet
         depends_on:
             - dev-db
+        ports:
+            - "5555:5555"
+            - "3333:3333"
 
     dev-db:
         container_name: dev-db
@@ -48,7 +50,7 @@ services:
             - "5432:5432"
         env_file: ./.env
         networks:
-            - transcenet    
+            - transcenet
         restart: always
 
 volumes:
@@ -66,7 +68,7 @@ volumes:
             type: 'none'
             device: '$PWD/back'
             o: bind
-    
+
 networks:
   transcenet:
     driver: bridge
