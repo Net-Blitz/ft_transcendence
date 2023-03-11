@@ -12,5 +12,5 @@
     "arrowParens": "always",
     "endOfLine": "lf",
     "embeddedLanguageFormatting": "off",
-    "singleAttributePerLine": false,
+    "singleAttributePerLine": false
 }
