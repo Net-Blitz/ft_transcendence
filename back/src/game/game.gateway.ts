@@ -5,13 +5,6 @@ import { SocketUser } from "./dto";
 import * as jwt from 'jsonwebtoken'
 import { Game } from "@prisma/client";
 
-function getRandomDirection() {
-	const range = 0.70;
-	let first = (Math.random() * range - range / 2) * Math.PI;
-	let second = Math.random() * range - range / 2;
-	second = (second + (1 - (range / 2)) * Math.sign(second)) * Math.PI ;
-	return Math.random() > 0.5 ? first : second;
-}
 
 const GameRatio = 0.5;
 class Rooms {
@@ -33,13 +26,13 @@ class Rooms {
 	player_speed: number;
 	player_width: number;
 	constructor() {
-
+		
 		this.ball_x = 0.5;
 		this.ball_y = 0.5;
 		this.ball_speed_x = 0.018 * GameRatio;
 		this.ball_speed_y = 0.018;
 		this.ball_size = 0.05;
-		this.ball_direction = getRandomDirection();
+		this.ball_direction = this.getRandomDirection();
 		
 		this.player1_x = 0.006;
 		this.player1_y = 0.5;
@@ -54,16 +47,24 @@ class Rooms {
 		this.player_width = 0.015;
 		this.player_speed = 0.05;
 	}
-
+	
 	resetBall() {
 		this.ball_x = 0.5;
 		this.ball_y = 0.5;
-		this.ball_direction = getRandomDirection();
+		this.ball_direction = this.getRandomDirection();
 		this.ball_speed_x = 0.018 * GameRatio;
 		this.ball_speed_y = 0.018;
 		this.ball_size = 0.05;
 	}
-
+	
+	getRandomDirection() {
+		const range = 0.70;
+		let first = (Math.random() * range - range / 2) * Math.PI;
+		let second = Math.random() * range - range / 2;
+		second = (second + (1 - (range / 2)) * Math.sign(second)) * Math.PI ;
+		return Math.random() > 0.5 ? first : second;
+	}
+	
 	accelerate() {
 		this.ball_speed_x *= 1.1;
 		this.ball_speed_y *= 1.1;
@@ -72,8 +73,7 @@ class Rooms {
 
 @WebSocketGateway({namespace:"game", cors: {origin: "*"}})
 export class GameGateway {
-	constructor(private prisma: PrismaService) {
-	}
+	constructor(private prisma: PrismaService) {}
 	
 	@WebSocketServer()
 	server: Server;

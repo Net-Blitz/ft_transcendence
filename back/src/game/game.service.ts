@@ -1,6 +1,6 @@
-import { Injectable, UseFilters } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateGameDto, GameState, UpdateGameDto } from './dto';
+import { CreateGameDto, GameState } from './dto';
 
 @Injectable()
 export class GameService {
@@ -60,80 +60,4 @@ export class GameService {
 			return ;
 		return game ;
 	}
-
-//	async startGame(gameId: number) {
-//		return this.prisma.game.update({
-//			where: {
-//				id: gameId,
-//			},
-//			data: {
-//				state: 'PLAYING',
-//			}
-//		});
-//	}
-
-//	async endGame(gameId: number) {
-//		const game = await this.prisma.game.findUnique({
-//			where: {
-//				id: gameId,
-//			}
-//		});
-
-//		if (!game || game.state !== "PLAYING") //gerer proprement les doubles deco
-//			return 	;
-
-//		if (game.score1 > game.score2)
-//		{
-//			await this.prisma.user.update({
-//				where: { id: game.user1Id },
-//				data: { wins: { increment: 1 } }
-//			});
-		
-//			await this.prisma.user.update({
-//				where: { id: game.user2Id },
-//				data: { losses: { increment: 1 } }
-//			});
-//		}
-//		else if (game.score1 < game.score2)
-//		{
-//			await this.prisma.user.update({
-//				where: { id: game.user1Id },
-//				data: { losses: { increment: 1 } }
-//			});
-		
-//			await this.prisma.user.update({
-//				where: { id: game.user2Id },
-//				data: { wins: { increment: 1 } }
-//			});
-//		}
-
-//		return this.prisma.game.update({
-//			where: {
-//				id: gameId,
-//			},
-//			data: {
-//				state: 'ENDED',
-//			}
-//		});
-//	}
-
-//	async updateGame(gameId: number, dto: UpdateGameDto) {
-//		const game = await this.prisma.game.findUnique({
-//			where: {
-//				id: gameId,
-//			}
-//		});
-
-//		if (!game || game.state !== "PLAYING")
-//			return 	;
-//		return this.prisma.game.update({
-//			where: {
-//				id: gameId,
-//			},
-//			data: {
-//				score1: dto.score1,
-//				score2: dto.score2,
-//			}
-//		});
-//	}
 }
