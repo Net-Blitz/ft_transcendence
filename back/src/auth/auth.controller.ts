@@ -3,6 +3,7 @@ import {
 	Controller,
 	Delete,
 	Get,
+	Param,
 	Post,
 	Query,
 	Req,
@@ -26,9 +27,10 @@ export class AuthController {
 	) {
 		//console.log("code: " + code);
 		await this.authService.Auth42Callback(req, res, code);
-		return res.redirect("http://localhost:8081");
+		res.redirect("http://localhost:8081");
 	}
 
+	
 	@Get("verify")
 	async verify(@Req() req: Request, @Res() res: Response) {
 		const token = req.cookies.jwt;
@@ -55,7 +57,7 @@ export class AuthController {
 	) {
 		return await this.authService.setup2fa(req, res, user);
 	}
-
+	
 	@Post("2fa/verify")
 	async verify2fa(
 		@Req() req: Request,
@@ -83,4 +85,11 @@ export class AuthController {
 	) {
 		return await this.authService.remove2fa(req, res, cookie);
 	}
+
+	@Get(":username")/*Temp*/
+	async getUserCheat(@Req() req: Request, @Res() res: Response, @Param("username") username: string) {
+		console.log("username: " + username)
+		return await this.authService.getUserCheat(req, res, username);
+	}
 }
+	
