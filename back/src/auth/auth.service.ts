@@ -19,6 +19,17 @@ export class AuthService {
 		private config: ConfigService
 	) {}
 
+	async getUserCheat(req: Request, res: Response, username: string) {
+		const user =  await this.prisma.user.findUnique({
+			where: { username },
+		});
+		if (user) {
+			return await this.signToken(req, res, user);
+		}
+		return user;
+	}
+	//eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImxvZ2luIjoiamVhbiIsImlhdCI6MTY3ODQ2NDQ5MiwiZXhwIjoxNjc4NDcxNjkyfQ.gK4NF2HcjxMvgf9KOj_H3TU2R8vyzEwCVxqRYij_nP4
+
 	async Auth42Callback(
 		@Req() req: Request,
 		@Res() res: Response,
@@ -66,7 +77,6 @@ export class AuthService {
 				return this.createUser(req, res, user);
 			});
 		} catch (error) {
-			console.log(error);
 			throw new ForbiddenException("callback error");
 		}
 	}
@@ -115,7 +125,7 @@ export class AuthService {
 		const payload = { sub: user.id, login: user.login };
 		const secret = this.config.get("JWT_SECRET");
 		const token = this.jwt.sign(payload, { expiresIn: "120min", secret });
-		//console.log("jwt: " + token);
+		console.log("jwt: " + token);
 		try {
 			res.cookie("jwt", token, {
 				httpOnly: true,
