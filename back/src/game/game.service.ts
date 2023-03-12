@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UseFilters } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateGameDto, GameState, UpdateGameDto } from './dto';
 
@@ -45,7 +45,7 @@ export class GameService {
 				login: userLogin,
 			}
 		});
-		if (!user || user.state !== "PLAYING")
+		if (!user)
 			return ;
 		const game = await this.prisma.game.findFirst({
 			where: {
@@ -58,24 +58,6 @@ export class GameService {
 		});
 		if (!game)
 			return ;
-		await this.prisma.game.update({
-			where: {
-				id: game.id,
-			},
-			data: {
-				playerConnected: { increment: 1 },
-			}
-		});
-
-		if (game.playerConnected === 2)
-			return await this.prisma.game.update({
-					where: {
-						id: game.id,
-					},
-					data: {
-						state: "PLAYING",
-					}
-				});
 		return game ;
 	}
 

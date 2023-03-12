@@ -50,11 +50,13 @@ function Game() {
 			}
 			if (player1) {
 				player1.style.height = (gameDiv.offsetHeight) * gameState.player1_size + 'px';
+				player1.style.width = (gameDiv.offsetWidth) * gameState.player_width + 'px';
 				player1.style.top = (gameDiv.offsetHeight - player1.offsetHeight) * gameState.player1_y + 'px';
 				player1.style.left = (gameDiv.offsetWidth - player1.offsetWidth) * gameState.player1_x + 'px';
 			}
 			if (player2) {
 				player2.style.height = (gameDiv.offsetHeight) * gameState.player2_size + 'px';
+				player2.style.width = (gameDiv.offsetWidth) * gameState.player_width + 'px';
 				player2.style.top = (gameDiv.offsetHeight - player2.offsetHeight) * gameState.player2_y + 'px';
 				player2.style.left = (gameDiv.offsetWidth - player2.offsetWidth) * gameState.player2_x + 'px';
 			}
@@ -91,9 +93,9 @@ function Game() {
 		<div>
 			<h1>Gaming</h1>
 			<div id="Game">
+				<span id="ball"></span>
 				<span id="player1"></span>
 				<span id="player2"></span>
-				<span id="ball"></span>
 				<span id="score1">0</span>
 				<span id="score2">0</span>
 			</div>

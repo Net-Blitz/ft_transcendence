@@ -31,12 +31,13 @@ class Rooms {
 	player2_size: number;
 	player2_score: number;
 	player_speed: number;
+	player_width: number;
 	constructor() {
 
 		this.ball_x = 0.5;
 		this.ball_y = 0.5;
-		this.ball_speed_x = 0.012 * GameRatio;
-		this.ball_speed_y = 0.012;
+		this.ball_speed_x = 0.018 * GameRatio;
+		this.ball_speed_y = 0.018;
 		this.ball_size = 0.05;
 		this.ball_direction = getRandomDirection();
 		
@@ -50,6 +51,7 @@ class Rooms {
 		this.player2_size = 0.3;
 		this.player2_score = 0;
 		
+		this.player_width = 0.015;
 		this.player_speed = 0.05;
 	}
 
@@ -57,29 +59,89 @@ class Rooms {
 		this.ball_x = 0.5;
 		this.ball_y = 0.5;
 		this.ball_direction = getRandomDirection();
-		this.ball_speed_x = 0.012 * GameRatio;
-		this.ball_speed_y = 0.012;
+		this.ball_speed_x = 0.018 * GameRatio;
+		this.ball_speed_y = 0.018;
 		this.ball_size = 0.05;
+	}
+
+	accelerate() {
+		this.ball_speed_x *= 1.1;
+		this.ball_speed_y *= 1.1;
 	}
 }
 
 @WebSocketGateway({namespace:"game", cors: {origin: "*"}})
 export class GameGateway {
-	constructor(private prisma: PrismaService) {}
+	constructor(private prisma: PrismaService) {
+	}
 	
 	@WebSocketServer()
 	server: Server;
 	
 	ConnectedSockets: SocketUser[] = [];
 	GamePlaying = [];
+
+	ballMarge = 0.05; //need to be < ball_size / 2
 	
 	async sleep(ms: number) {
 		return new Promise(resolve => setTimeout(resolve, ms));
 	}
 	
+	private getY(x: number, y: number, direction: number, x2: number) {
+		return y + (x2 - x) * Math.tan(direction);
+	}
+
+	private getBallDirectionBounce(gameState: Rooms, y: number) {
+		let percent = (y - gameState.player1_y) / gameState.player1_size;
+		gameState.accelerate();
+		return Math.PI / 2 * percent;
+	}
+	
+	private getBallDirectionBounce2(gameState: Rooms, y: number) {
+		let percent = (y - gameState.player2_y) / gameState.player2_size;
+		gameState.accelerate();
+		console.log(percent);
+		return Math.PI - Math.PI / 2 * percent;
+		
+	}
+
+	private checkBounce(gameState: Rooms, increment_x: number) {
+		let y : number;
+		let ballY : number;
+		let playerY : number;
+		if (gameState.ball_direction > Math.PI / 2 || gameState.ball_direction < -Math.PI / 2) {
+			if (gameState.ball_x > gameState.player1_x + gameState.player_width && gameState.ball_x + increment_x <= gameState.player1_x + gameState.player_width) {
+				y = this.getY(gameState.ball_x, gameState.ball_y, gameState.ball_direction, gameState.player1_x + gameState.player_width);
+				ballY = gameState.ball_y - (gameState.ball_size * (gameState.ball_y - 0.5));
+				playerY = gameState.player1_y - (gameState.player1_size * (gameState.player1_y - 0.5));
+				if ( (ballY + this.ballMarge > playerY - gameState.player1_size / 2 && ballY + this.ballMarge < playerY + gameState.player1_size / 2) 
+					|| (ballY - this.ballMarge > playerY - gameState.player1_size / 2 && ballY - this.ballMarge < playerY + gameState.player1_size / 2) ) {
+					gameState.ball_direction = this.getBallDirectionBounce(gameState, y);
+					increment_x = Math.abs(increment_x) - Math.abs(gameState.ball_x - gameState.player1_x - gameState.player_width);
+				}
+			}
+		}
+		else if (gameState.ball_direction < Math.PI / 2 && gameState.ball_direction > -Math.PI / 2) {
+			if (gameState.ball_x < gameState.player2_x - gameState.player_width  && gameState.ball_x + increment_x >= gameState.player2_x - gameState.player_width) {
+				y = this.getY(gameState.ball_x, gameState.ball_y, gameState.ball_direction, gameState.player2_x - gameState.player_width);
+				ballY = gameState.ball_y - (gameState.ball_size * (gameState.ball_y - 0.5));
+				playerY = gameState.player2_y - (gameState.player2_size * (gameState.player2_y - 0.5));
+				if ( (ballY + this.ballMarge > playerY - gameState.player2_size / 2 && ballY + this.ballMarge < playerY + gameState.player2_size / 2) 
+					|| (ballY - this.ballMarge > playerY - gameState.player2_size / 2 && ballY - this.ballMarge < playerY + gameState.player2_size / 2)) {
+					gameState.ball_direction = this.getBallDirectionBounce2(gameState, y);
+					increment_x = (Math.abs(increment_x) - Math.abs(gameState.ball_x - gameState.player2_x + gameState.player_width));
+				}
+			}
+		}
+		gameState.ball_x += increment_x;
+	}
+		
 	private async moveBall(gameState: Rooms, room: number) {
-		gameState.ball_x += gameState.ball_speed_x * Math.cos(gameState.ball_direction) ;
-		gameState.ball_y += gameState.ball_speed_y * Math.sin(gameState.ball_direction);
+		let increment_x = gameState.ball_speed_x * Math.cos(gameState.ball_direction);
+		let increment_y = gameState.ball_speed_y * Math.sin(gameState.ball_direction);
+		this.checkBounce(gameState, increment_x);
+		gameState.ball_y += increment_y;
+
 		if (gameState.ball_y < 0 || gameState.ball_y > 1) {
 			gameState.ball_direction = -gameState.ball_direction;
 			if (gameState.ball_y < 0)
@@ -87,10 +149,11 @@ export class GameGateway {
 			else
 				gameState.ball_y = 2 - gameState.ball_y;
 		}
-		if (gameState.ball_x < 0 || gameState.ball_x > 1) {
+		if ((gameState.ball_x < 0 && (gameState.ball_direction > Math.PI / 2 || gameState.ball_direction < -Math.PI / 2))
+			|| (gameState.ball_x > 1 && gameState.ball_direction < Math.PI / 2 && gameState.ball_direction > -Math.PI / 2)) {
 			if (gameState.ball_x < 0)
 				gameState.player2_score++;
-			else
+			else if (gameState.ball_x > 1)
 				gameState.player1_score++;
 			gameState.resetBall();
 			await this.prisma.game.update({
@@ -102,7 +165,6 @@ export class GameGateway {
 					score2: gameState.player2_score
 				}
 			})
-			//this.server.to("game-" + room).emit("scoreUpdate", {player1_score: gameState.player1_score, player2_score: gameState.player2_score});
 		}
 	}
 	
@@ -146,10 +208,18 @@ export class GameGateway {
 		let gameState = new Rooms();
 		let end = false;
 
+		console.log("start game");
+
+		await this.prisma.game.update({
+			where: { id: room },
+			data: { state: "PLAYING"}
+		})
+
 		while (this.ConnectedSockets.findIndex((socket) => socket.roomName === "game-" + room && socket.state === "player1") === -1 ||
 				this.ConnectedSockets.findIndex((socket) => socket.roomName === "game-" + room && socket.state === "player2") === -1) {
 			await this.sleep(1000);
 		}
+		console.log("real game");
 		await this.prisma.game.update({
 			where: { id: room },
 			data: { score1: 0, score2: 0, state: "PLAYING"}
@@ -171,41 +241,44 @@ export class GameGateway {
 		})
 
 		//set win/loss/stats
-		await this.prisma.user.update({
-			where: { id: game.user1Id },
-			data: { state: "ONLINE"}
-		})
-		
-		await this.prisma.user.update({
-			where: { id: game.user2Id },
-			data: { state: "ONLINE"}
-		})
+		if (gameState.player1_score > gameState.player2_score)
+		{
+			await this.prisma.user.update({
+				where: { id: game.user1Id },
+				data: { state: "ONLINE", wins: { increment: 1 } }})
+			await this.prisma.user.update({
+				where: { id: game.user2Id },
+				data: { state: "ONLINE", losses: { increment: 1 } }})
+		}
+		else
+		{
+			await this.prisma.user.update({
+				where: { id: game.user2Id },
+				data: { state: "ONLINE",wins: { increment: 1 } }})
+			await this.prisma.user.update({
+				where: { id: game.user1Id },
+				data: { state: "ONLINE", losses: { increment: 1 } }})
+		}
 		//disconnect all socket to the room associated and navigate to the end page
-		this.server.to("game-" + room).emit("endGame", {player1_score: gameState.player1_score, player2_score: gameState.player2_score});
+		this.server.to("game-" + room).emit("close", {player1_score: gameState.player1_score, player2_score: gameState.player2_score});
 	}
 
 	private async checkAndSave(client: Socket) { //I don'know how to redirect the user if request doesnt match
 		const cookies = client.handshake.headers.cookie; //maybe trhow an error
 		const token = cookies.split("jwt=")[1].split(";")[0];
 		const userCookie = JSON.parse(atob(token.split(".")[1]));
-		jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-			if (err)
-				return ;
-		});
+		jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => { if (err) return ; });
 
 		if (!client.handshake.query || !client.handshake.query.room)
-			return ;
-		const query = client.handshake.query.room;
-		const room = parseInt(query[0])
-
-		const user = await this.prisma.user.findUnique({where: {login: userCookie.login}
-		});
-
+		return ;
+		const query = client.handshake.query.room.toString();
+		const room = parseInt(query)
+		
+		const user = await this.prisma.user.findUnique({where: {login: userCookie.login}});
 		if (!user)
-			return;
-
+		return;
+		
 		const game = await this.prisma.game.findUnique({where: {id: room}});
-
 		if (!game || game.state == "ENDED")
 			return;
 
