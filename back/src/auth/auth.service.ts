@@ -91,8 +91,9 @@ export class AuthService {
 			});
 			if (existingUser && existingUser.twoFactor === true) {
 				return res.redirect(
-					"http://localhost:8081/login/2fa?login=" + user.login
+					"http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_GLOBAL") + "/login/2fa?login=" + user.login
 				);
+				// return res.redirect("http://localhost:8080/login/2fa?login=" + user.login)
 			}
 			if (existingUser) {
 				return this.signToken(req, res, existingUser);
@@ -135,7 +136,7 @@ export class AuthService {
 		} catch (error) {
 			throw new ForbiddenException("Sign token error");
 		}
-		//return res.redirect("http://localhost:8081");
+		//return res.redirect("http://localhost:8080");
 		return { access_token: token };
 	}
 
