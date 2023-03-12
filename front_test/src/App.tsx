@@ -7,6 +7,8 @@ import Dashboard from './components/Dashboard';
 import SearchUser from './components/SearchUser';
 import DoubleAuth from './components/DoubleAuth';
 import Login2fa from './components/Login2fa';
+import Lobby from './components/Lobby';
+import Game from './components/Game';
 
 function App(this: any) {
 	return (
@@ -18,6 +20,8 @@ function App(this: any) {
 				<Route path="/" element={<PrivateRoute><Hello /></PrivateRoute>} />
 				<Route path="/search" element={<PrivateRoute><SearchUser /></PrivateRoute>} />
 				<Route path="/2fa" element={<PrivateRoute><DoubleAuth /></PrivateRoute>} />
+				<Route path="/lobby" element={<PrivateRoute><Lobby /></PrivateRoute>} />
+				<Route path="/game" element={<PrivateRoute><Game /></PrivateRoute>} />
 			</Routes>
 		</BrowserRouter>
 	);

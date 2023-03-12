@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Post } from "@nestjs/common";
 import { QueueService } from "./queue.service";
-import { GetUser } from "src/auth/decorator";
+import { GetCookie } from "src/auth/decorator";
 import { AddQueueDto } from "./dto";
 import { GameService } from "src/game/game.service";
 
@@ -14,17 +14,18 @@ export class QueueController {
 	}
 
 	@Post("add")
-	async addToQueue(@GetUser("login") userLogin: string, @Body() dto: AddQueueDto) {
+	async addToQueue(@GetCookie("login") userLogin: string, @Body() dto: AddQueueDto) {
+		console.log(userLogin)
 		return this.queueService.addToQueue(userLogin, dto);
 	}
 
 	@Delete("remove")
-	async removeFromQueue(@GetUser("login") userLogin: string) {
+	async removeFromQueue(@GetCookie("login") userLogin: string) {
 		return this.queueService.removeFromQueue(userLogin);
 	}
 
 	@Get("match") /* Temp route */
-	async match(@GetUser("login") userLogin: string) {
+	async match(@GetCookie("login") userLogin: string) {
 		const match = await this.queueService.match(userLogin);
 		if (match)
 		{

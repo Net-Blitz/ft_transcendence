@@ -16,6 +16,16 @@ function Hello() {
 		});
 		navigate("/login");
 	};
+	const handleGame = () => {
+		axios.post("http://localhost:3333/queue/add", {mode: "1v1"}, { withCredentials: true })
+		.then((res) => {
+			console.log(res);
+			navigate("/lobby");
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+	};
 	return (
 		<div>
 			<h1>Hello</h1>
@@ -24,6 +34,7 @@ function Hello() {
 			<button onClick={handleLogout}>Logout</button>
 			<button onClick={() => navigate("/search")}>SearchUser</button>
 			<button onClick={() => navigate("/2fa")}>2FA</button>
+			<button onClick={handleGame}>JoinGame</button>
 		</div>
 	);
 };

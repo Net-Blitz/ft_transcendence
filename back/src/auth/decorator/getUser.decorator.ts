@@ -14,6 +14,8 @@ export const GetCookie = createParamDecorator(
 		const userCookie: CookieDto = JSON.parse(atob(token.split(".")[1]));
 		try {
 			if (jwt.verify(token, process.env.JWT_SECRET)) {
+				if (data)
+					return userCookie[data];
 				return userCookie;
 			}
 		} catch (err) {
@@ -36,6 +38,8 @@ export const GetUser = createParamDecorator(
 						headers: { Cookie: "jwt=" + token },
 					}
 				);
+				if (data)
+					return user.data[data];
 				return user.data;
 			}
 		} catch (err) {
