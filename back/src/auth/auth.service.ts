@@ -81,7 +81,7 @@ export class AuthService {
 			});
 			if (existingUser && existingUser.twoFactor === true) {
 				return res.redirect(
-					"http://localhost:8080/login/2fa?login=" + user.login
+					"http://localhost:8081/login/2fa?login=" + user.login
 				);
 			}
 			if (existingUser) {
@@ -125,7 +125,7 @@ export class AuthService {
 		} catch (error) {
 			throw new ForbiddenException("Sign token error");
 		}
-		//return res.redirect("http://localhost:8080");
+		//return res.redirect("http://localhost:8081");
 		return { access_token: token };
 	}
 

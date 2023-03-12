@@ -26,7 +26,7 @@ export class AuthController {
 	) {
 		//console.log("code: " + code);
 		await this.authService.Auth42Callback(req, res, code);
-		return res.redirect("http://localhost:8080");
+		return res.redirect("http://localhost:8081");
 	}
 
 	@Get("verify")
