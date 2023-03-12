@@ -27,7 +27,7 @@ export class AuthController {
 	) {
 		//console.log("code: " + code);
 		await this.authService.Auth42Callback(req, res, code);
-		res.redirect("http://localhost:8080");
+		res.redirect("http://localhost:8081");
 	}
 
 	

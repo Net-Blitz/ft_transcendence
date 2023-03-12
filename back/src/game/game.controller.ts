@@ -1,13 +1,13 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Req } from '@nestjs/common';
 import { GameService } from './game.service';
-import { GetUser } from 'src/auth/decorator';
+import { GetCookie } from 'src/auth/decorator';
 
 @Controller("games")
 export class GameController {
 	constructor(private gameService: GameService) {}
 	
 	@Get("connect")
-	async connectToGame(@GetUser("login") userLogin: string) {
+	async connectToGame(@GetCookie("login") userLogin: string) {
 		return this.gameService.connectToGame(userLogin);
 	}
 
