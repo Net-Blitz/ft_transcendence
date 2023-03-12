@@ -13,10 +13,11 @@ import { Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
 import { GetCookie, GetUser } from "./decorator";
 import { CookieDto } from "./decorator/cookie.dto";
+import { ConfigService } from "@nestjs/config";
 
 @Controller("auth")
 export class AuthController {
-	constructor(private authService: AuthService) {}
+	constructor(private authService: AuthService, private config: ConfigService) {}
 
 	@Get("callback")
 	async auth42Callback(
@@ -24,9 +25,10 @@ export class AuthController {
 		@Res() res: Response,
 		@Query("code") code: string
 	) {
-		//console.log("code: " + code);
+		console.log("HOST: ", this.config.get("HOST_T"))
 		await this.authService.Auth42Callback(req, res, code);
-		return res.redirect("http://localhost:8081");
+		return res.redirect("http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_GLOBAL"));
+		// return res.redirect("http://localhost:8080/");
 	}
 
 	@Get("verify")

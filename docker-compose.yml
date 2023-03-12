@@ -7,35 +7,22 @@ services:
             context: ./nginx
         ports:
             - "8080:8080"
-            - "8081:8081"
         env_file: ./.env
         networks:
             - transcenet
         depends_on:
             - front
-            - front_test
             - back
         restart: always
 
     front:
-        container_name: front
+        container_name: ${FRONT}
         build:
+            context: ./${FRONT}
             dockerfile: Dockerfile
-            context: ./front
         env_file: ./.env
         volumes:
-            - frontVolume:/app/
-        networks:
-            - transcenet
-
-    front_test:
-        container_name: front_test
-        build:
-            dockerfile: Dockerfile
-            context: ./front_test
-        env_file: ./.env
-        volumes:
-            - front_testVolume:/app/
+            - ${FRONT}Volume:/app/
         networks:
             - transcenet
 
@@ -73,7 +60,7 @@ volumes:
             type: 'none'
             device: '$PWD/front'
             o: bind
-
+    
     front_testVolume:
         driver: local
         driver_opts:
