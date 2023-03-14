@@ -1,0 +1,31 @@
+/*	BACKGROUND	*/
+.background_log {
+	position: absolute;
+	z-index: 1;
+	top: 0;
+	left: 0;
+}
+
+/*	AUTH	*/
+.auth_log {
+	position: absolute;
+	z-index: 2;
+	top:20%;
+	right:10%;
+	width: 25%;
+	height: 27%;
+}
+
+/* MOBILE */
+
+@media screen and (max-width: 820px) {
+	
+	.auth_log {
+		width:90%;
+		right: 5%;
+		left:5%;
+		top:5%;
+		align-items: center;
+	}
+
+}
