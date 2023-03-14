@@ -3,7 +3,6 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { Request, Response } from "express";
 import { UpdateUserDto } from "./dto";
 import { AuthService } from "src/auth/auth.service";
-import { create } from "domain";
 
 @Injectable()
 export class UserService {
@@ -88,12 +87,20 @@ export class UserService {
 		if (!friend) {
 			return res.status(404).json({ message: "Friend not found" });
 		}
-
+		if (user.id === friend.id) {
+			return res.status(400).json({ message: "You can't add yourself" });
+		}
 		try {
 			await this.prisma.friendsRelation.create({
 				data: {
 					friendId: friend.id,
 					friendwithId: user.id,
+				},
+			});
+			await this.prisma.friendsRelation.create({
+				data: {
+					friendId: user.id,
+					friendwithId: friend.id,
 				},
 			});
 		} catch (e) {

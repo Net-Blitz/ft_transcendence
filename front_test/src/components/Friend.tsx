@@ -15,41 +15,110 @@ interface User {
 }
 
 function Friend() {
+	const [userInfo, setUserInfo] = useState<User>();
 	const [users, setUsers] = useState<User[]>([]);
+	const [friends, setFriends] = useState<User[]>([]);
+
+	const fetchUsers = async () => {
+		try {
+			const response = await axios.get<User[]>(
+				"http://localhost:3333/users/login",
+				{ withCredentials: true }
+			);
+			setUsers(response.data);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+	const fetchFriends = async () => {
+		try {
+			const response = await axios.get<User[]>(
+				"http://localhost:3333/users/friends",
+				{ withCredentials: true }
+			);
+			setFriends(response.data);
+		} catch (error) {
+			console.error(error);
+		}
+	};
 
 	useEffect(() => {
-		const fetchUsers = async () => {
-			try {
-				const response = await axios.get<User[]>(
-					"http://localhost:3333/users/login",
-					{ withCredentials: true }
-				);
-				setUsers(response.data);
-			} catch (error) {
-				console.error(error);
-			}
+		const fetchData = async () => {
+			const response = await axios.get("http://localhost:3333/users/me", {
+				withCredentials: true,
+			});
+			setUserInfo(response.data);
 		};
+
+		fetchData();
 		fetchUsers();
+		fetchFriends();
 	}, []);
 
 	const AddFriend = async (username: string) => {
-		console.log("friend: " + username);
 		try {
 			const response = await axios.post(
 				"http://localhost:3333/users/addfriend/" + username,
+				{},
 				{ withCredentials: true }
 			);
+			fetchUsers();
+			fetchFriends();
 			console.log(response.data);
 		} catch (error) {
 			console.error(error);
 		}
 	};
 
+	const RemoveFriend = async (username: string) => {
+		try {
+			const response = await axios.post(
+				"http://localhost:3333/users/removefriend/" + username,
+				{},
+				{ withCredentials: true }
+			);
+			fetchUsers();
+			fetchFriends();
+			console.log(response.data);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const filteredUsers = users.filter(
+		(users) =>
+			users.id !== userInfo?.id &&
+			!friends.some((friend) => friend.id === users.id)
+	);
+
 	return (
 		<div>
+			<h1>List of friends</h1>
+			<ul>
+				{friends.map((friend) => (
+					<li key={friend.id}>
+						<div className="friend-info">
+							<img
+								className="friend-img"
+								src={friend.avatar}
+								alt="avatar"
+							/>
+							<span className="friend-username">
+								{friend.username}
+							</span>
+						</div>
+						<button
+							className="add-friend"
+							onClick={() => RemoveFriend(friend.login)}
+						>
+							Remove friend
+						</button>
+					</li>
+				))}
+			</ul>
 			<h1>List of users</h1>
 			<ul>
-				{users.map((user) => (
+				{filteredUsers.map((user) => (
 					<li key={user.id}>
 						<div className="friend-info">
 							<img
@@ -60,7 +129,6 @@ function Friend() {
 							<span className="friend-username">
 								{user.username}
 							</span>
-							<span className="friend-elo">Elo: {user.elo}</span>
 						</div>
 						<button
 							className="add-friend"
