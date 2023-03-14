@@ -3,6 +3,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { Request, Response } from "express";
 import { UpdateUserDto } from "./dto";
 import { AuthService } from "src/auth/auth.service";
+import { create } from "domain";
 
 @Injectable()
 export class UserService {
@@ -37,6 +38,11 @@ export class UserService {
 		return res.status(200).json(user);
 	}
 
+	async GetAllUser(@Req() req: Request, @Res() res: Response) {
+		const users = await this.prisma.user.findMany();
+		return res.status(200).json(users);
+	}
+
 	async UpdateUser(
 		@Req() req: Request,
 		@Res() res: Response,
@@ -63,5 +69,99 @@ export class UserService {
 	Logout(@Req() req: Request, @Res() res: Response) {
 		res.clearCookie("jwt", { httpOnly: true });
 		return res.status(200).json({ message: "Logged out" });
+	}
+
+	async AddFriend(
+		@Param("login") login: string,
+		@Req() req: Request,
+		@Res() res: Response
+	) {
+		const user = await this.getUser(req);
+		const friend = await this.prisma.user.findUnique({
+			where: {
+				login: login,
+			},
+		});
+		if (!user) {
+			return res.status(404).json({ message: "User not found" });
+		}
+		if (!friend) {
+			return res.status(404).json({ message: "Friend not found" });
+		}
+
+		try {
+			await this.prisma.friendsRelation.create({
+				data: {
+					friendId: friend.id,
+					friendwithId: user.id,
+				},
+			});
+		} catch (e) {
+			return res.status(400).json({ message: "Friend already added" });
+		}
+
+		return res.status(200).json({ message: "Friend added" });
+	}
+
+	async RemoveFriend(
+		@Param("login") login: string,
+		@Req() req: Request,
+		@Res() res: Response
+	) {
+		const user = await this.getUser(req);
+		const friend = await this.prisma.user.findUnique({
+			where: {
+				login: login,
+			},
+		});
+		if (!user) {
+			return res.status(404).json({ message: "User not found" });
+		}
+		if (!friend) {
+			return res.status(404).json({ message: "Friend not found" });
+		}
+
+		try {
+			await this.prisma.friendsRelation.delete({
+				where: {
+					friendId_friendwithId: {
+						friendId: friend.id,
+						friendwithId: user.id,
+					},
+				},
+			});
+		} catch (e) {
+			return res.status(400).json({ message: "Friend not found" });
+		}
+
+		return res.status(200).json({ message: "Friend removed" });
+	}
+
+	async GetFriends(@Req() req: Request, @Res() res: Response) {
+		const user = await this.getUser(req);
+		if (!user) {
+			return res.status(404).json({ message: "User not found" });
+		}
+
+		const friends = await this.prisma.user.findUnique({
+			where: {
+				login: user.login,
+			},
+			include: {
+				friendwith: true,
+			},
+		});
+
+		const friendsList = [];
+		for (let i = 0; i < friends.friendwith.length; i++) {
+			const friend = await this.prisma.user.findUnique({
+				where: {
+					id: friends.friendwith[i].friendId,
+				},
+			});
+			friendsList[i] = friend;
+		}
+
+		return res.status(200).json(friendsList);
 	}
 }
