@@ -1,0 +1,38 @@
+/*	GLOBAL	*/
+.authstart_wrapper, .auth2fa_wrapper {
+	height: 100%;
+	width: 100%;
+	
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	
+	background-color: #F9DA49;
+	border-radius: 30px;
+}
+
+/*	START	*/
+.authstart_wrapper .title_wrapper {
+	margin-bottom: 60px;
+}
+
+.authstart_wrapper .button_wrapper {
+	height: 14%;
+	width: 74%;
+}
+
+/*	2FA	*/
+
+.auth2fa_wrapper .title_wrapper {
+	margin-bottom: 40px;
+}
+
+.auth2fa_wrapper .input_wrapper {
+	margin-bottom: 30px;
+}
+
+.auth2fa_wrapper .button_wrapper {
+	height: 14%;
+	width: 74%;
+}
