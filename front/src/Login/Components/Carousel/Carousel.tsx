@@ -1,80 +1,61 @@
-import React, {useState} from 'react';
-import { FaArrowAltCircleRight, FaArrowAltCircleLeft } from 'react-icons/fa'
-import './Carousel.css';
+import React, { useEffect, useState } from 'react';
 import { AvatarData } from '../Background/Background';
+import './Carousel.css';
 
-interface contentCarou {
-	first: string | any;
-	second: string | any;
-	third: string | any;
-};
+const Carousel = () => {
+	/*	FILES	*/
+	const avatar = AvatarData;
+	/*	HOOK settings	*/
+	const [currentIndex, setCurrentIndex] = useState(0);
+	const [length, setLenght] = useState(avatar.length);
 
-function findImg(index: number): contentCarou {
-	let result: contentCarou = {
-		first: null,
-		second: null,
-		third: null
+	useEffect(() => {
+		setLenght(avatar.length);
+	}, avatar);
+
+	const prev = () => {
+		if (currentIndex !== 0)
+			setCurrentIndex(currentIndex - 1);
 	};
-	let length: number = AvatarData.length;
-	let prev: number = -1;
-	let next: number = -1;
 
-	result.second = AvatarData[index];
-	if (index + 1 < length)
-		next = index + 1;
-	else
-		next = 0;
-	if (index - 1 >= 0)
-		prev = index - 1;
-	else
-		prev = length - 1;
-	if (prev === next)
-	{
-		if (prev === 1)
-			prev = -1;
+	const next = () => {
+		if (currentIndex + 1 < length)
+			setCurrentIndex(currentIndex + 1);
+	}
+
+	const renderAvatar = (index: number, setting: string) => {
+		if (index < 0 || index >= length)
+		{
+			return (
+				<div
+					className={`avatar ${setting} empty`}
+				></div>
+			);
+		}
 		else
-			next = -1;
-	}
-	console.log('length is ' + length);
-	console.log('prev is ' + prev);
-	console.log('index is ' + index);
-	console.log('next is ' + next);
-	return (result);
-}
-
-export default function Carousel() {
-	const [current, setCurrent] = useState(0);
-	const length = AvatarData.length;
-
-	const nextSlide = () => {
-		setCurrent(current === length - 1 ? 0 : current + 1);
-	}
-
-	const prevSlide = () => {
-		setCurrent(current === 0 ? length - 1 : current - 1);
+		{
+			return (
+				<div
+					className={`avatar ${setting}`}
+					style={{
+						backgroundImage: `url(${avatar[index].avatar})`,
+						backgroundPosition: "center",
+						backgroundSize: "cover"
+					}}
+					onClick={setting === 'left' ? prev : setting === 'right' ? next : undefined}
+				></div>
+			);
+		}
 	}
 
 	return (
-		<div className='Carousel'>
-			<FaArrowAltCircleLeft className='left-arrow' onClick={prevSlide}/>
-			{AvatarData.map((slide, index, elements) => {
-				let prev :number;
-				if (current === index)
-					findImg(index);
+		<div className='carousel-wrapper'>
+			{renderAvatar(currentIndex - 1, "left")}
+			{renderAvatar(currentIndex, "")}
+			{renderAvatar(currentIndex + 1, "right")}
 
-				return (
-					<div 
-					className={index === current ? 'slide active' : 'slide'} 
-					key={index}
-					>
-						{index === current && (
-							<img src={slide.avatar} alt="avatar etudiant 42" className='avatar'/>
-						)}
-					</div>
-				);
-			})}
-			<FaArrowAltCircleRight className='right-arrow' onClick={nextSlide}/>
 		</div>
 	);
-}
+};
 
+export default Carousel;
