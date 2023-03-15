@@ -1,10 +1,28 @@
 import React from 'react';
 import './Background.css';
+
+/*	RESSOURCES	*/
 import BackgroundImg from './Ressources/background.png';
 import img_lgiband from './Ressources/lgiband.png';
 import img_gkehren from './Ressources/gkehren.png';
 import img_jbach from './Ressources/jbach.png';
 import img_genouf from './Ressources/genouf.png';
+
+export const AvatarData = [
+	{
+		avatar: img_genouf
+	},
+	{
+		avatar: img_lgiband
+	},
+	{
+		avatar: img_gkehren
+	},
+	{
+		avatar: img_jbach,
+	},
+];
+
 
 export default function Background() {
 	return (

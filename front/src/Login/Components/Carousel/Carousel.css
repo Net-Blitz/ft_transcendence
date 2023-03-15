@@ -1,0 +1,26 @@
+.Carousel {
+	position: relative;
+	height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.avatar {
+	height: 20vh;
+	border-radius: 10px;
+}
+
+.left-arrow, .right-arrow {
+	font-size: 3rem;
+	color: #000;
+	z-index: 10;
+	cursor: pointer;
+	user-select: none;
+}
+
+.slide.active {
+	opacity: 1;
+	transition-duration: 1s;
+	transform: scale(1.08);
+}
