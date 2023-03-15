@@ -4,6 +4,7 @@ import { ConfigModule } from "@nestjs/config";
 import { PrismaModule } from "./prisma/prisma.module";
 import { UserModule } from "./user/user.module";
 import { JwtModule } from "@nestjs/jwt";
+import { FriendModule } from './friend/friend.module';
 
 @Module({
 	imports: [
@@ -15,6 +16,7 @@ import { JwtModule } from "@nestjs/jwt";
 			secret: process.env.JWT_SECRET,
 			signOptions: { expiresIn: "120min" },
 		}),
+		FriendModule,
 	],
 })
 export class AppModule {}

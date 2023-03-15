@@ -38,8 +38,9 @@ model User {
 model FriendsRelation {
     friendId     Int
     friendwithId Int
-    friend       User @relation("friend", fields: [friendId], references: [id])
-    friendwith   User @relation("friendwith", fields: [friendwithId], references: [id])
+    friend       User   @relation("friend", fields: [friendId], references: [id])
+    friendwith   User   @relation("friendwith", fields: [friendwithId], references: [id])
+    status       String @default("PENDING")
 
     @@id([friendId, friendwithId])
 }

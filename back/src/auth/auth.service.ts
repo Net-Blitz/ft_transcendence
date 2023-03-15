@@ -20,7 +20,7 @@ export class AuthService {
 	) {}
 
 	async getUserCheat(req: Request, res: Response, username: string) {
-		const user =  await this.prisma.user.findUnique({
+		const user = await this.prisma.user.findUnique({
 			where: { username },
 		});
 		if (user) {
@@ -91,7 +91,12 @@ export class AuthService {
 			});
 			if (existingUser && existingUser.twoFactor === true) {
 				return res.redirect(
-					"http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_GLOBAL") + "/login/2fa?login=" + user.login
+					"http://" +
+						this.config.get("HOST_T") +
+						":" +
+						this.config.get("PORT_GLOBAL") +
+						"/login/2fa?login=" +
+						user.login
 				);
 				// return res.redirect("http://localhost:8080/login/2fa?login=" + user.login)
 			}

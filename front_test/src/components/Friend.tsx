@@ -18,6 +18,7 @@ function Friend() {
 	const [userInfo, setUserInfo] = useState<User>();
 	const [users, setUsers] = useState<User[]>([]);
 	const [friends, setFriends] = useState<User[]>([]);
+	const [pending, setPending] = useState<User[]>([]);
 
 	const fetchUsers = async () => {
 		try {
@@ -32,11 +33,12 @@ function Friend() {
 	};
 	const fetchFriends = async () => {
 		try {
-			const response = await axios.get<User[]>(
-				"http://localhost:3333/users/friends",
+			const response = await axios.get(
+				"http://localhost:3333/friend/friends",
 				{ withCredentials: true }
 			);
-			setFriends(response.data);
+			setFriends(response.data.friendsList);
+			setPending(response.data.pendingList);
 		} catch (error) {
 			console.error(error);
 		}
@@ -58,7 +60,7 @@ function Friend() {
 	const AddFriend = async (username: string) => {
 		try {
 			const response = await axios.post(
-				"http://localhost:3333/users/addfriend/" + username,
+				"http://localhost:3333/friend/add/" + username,
 				{},
 				{ withCredentials: true }
 			);
@@ -73,7 +75,37 @@ function Friend() {
 	const RemoveFriend = async (username: string) => {
 		try {
 			const response = await axios.post(
-				"http://localhost:3333/users/removefriend/" + username,
+				"http://localhost:3333/friend/remove/" + username,
+				{},
+				{ withCredentials: true }
+			);
+			fetchUsers();
+			fetchFriends();
+			console.log(response.data);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const AcceptFriend = async (username: string) => {
+		try {
+			const response = await axios.patch(
+				"http://localhost:3333/friend/accept/" + username,
+				{},
+				{ withCredentials: true }
+			);
+			fetchUsers();
+			fetchFriends();
+			console.log(response.data);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const DeclineFriend = async (username: string) => {
+		try {
+			const response = await axios.patch(
+				"http://localhost:3333/friend/decline/" + username,
 				{},
 				{ withCredentials: true }
 			);
@@ -88,7 +120,8 @@ function Friend() {
 	const filteredUsers = users.filter(
 		(users) =>
 			users.id !== userInfo?.id &&
-			!friends.some((friend) => friend.id === users.id)
+			!friends.some((friend) => friend.id === users.id) &&
+			!pending.some((pending) => pending.id === users.id)
 	);
 
 	return (
@@ -112,6 +145,35 @@ function Friend() {
 							onClick={() => RemoveFriend(friend.login)}
 						>
 							Remove friend
+						</button>
+					</li>
+				))}
+			</ul>
+			<h1>List of Requests</h1>
+			<ul>
+				{pending.map((friend) => (
+					<li key={friend.id}>
+						<div className="friend-info">
+							<img
+								className="friend-img"
+								src={friend.avatar}
+								alt="avatar"
+							/>
+							<span className="friend-username">
+								{friend.username}
+							</span>
+						</div>
+						<button
+							className="add-friend"
+							onClick={() => AcceptFriend(friend.login)}
+						>
+							Accept
+						</button>
+						<button
+							className="add-friend"
+							onClick={() => DeclineFriend(friend.login)}
+						>
+							Reject
 						</button>
 					</li>
 				))}

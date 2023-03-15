@@ -1,13 +1,4 @@
-import {
-	Body,
-	Controller,
-	Get,
-	Param,
-	Post,
-	Put,
-	Req,
-	Res,
-} from "@nestjs/common";
+import { Body, Controller, Get, Param, Put, Req, Res } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { Request, Response } from "express";
 import { UpdateUserDto } from "./dto";
@@ -47,28 +38,5 @@ export class UserController {
 	@Get("logout")
 	Logout(@Req() req: Request, @Res() res: Response) {
 		return this.userService.Logout(req, res);
-	}
-
-	@Post("addfriend/:login")
-	async AddFriend(
-		@Param("login") login: string,
-		@Req() req: Request,
-		@Res() res: Response
-	) {
-		return this.userService.AddFriend(login, req, res);
-	}
-
-	@Post("removefriend/:login")
-	async RemoveFriend(
-		@Param("login") login: string,
-		@Req() req: Request,
-		@Res() res: Response
-	) {
-		return this.userService.RemoveFriend(login, req, res);
-	}
-
-	@Get("friends")
-	async GetFriends(@Req() req: Request, @Res() res: Response) {
-		return this.userService.GetFriends(req, res);
 	}
 }
