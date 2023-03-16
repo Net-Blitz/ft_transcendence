@@ -3,11 +3,13 @@ import './Button.css';
 
 interface ButtonProps {
 	content: string;
+	bottom: string;
 }
 
-export default function Button({content} : ButtonProps) {
+export default function Button({content, bottom} : ButtonProps) {
 	return (
-		<div className='button_wrapper'>
+		<div 
+			className={bottom === 'true' ? 'button_wrapper bottom' : 'button_wrapper'}>
 			<button>{content}</button>
 		</div>
 	);

@@ -15,6 +15,7 @@ export function AuthStart() {
 			/>
 			<Button
 				content='Login with 42'
+				bottom='false'
 			/>
 		</div>
 	);
@@ -33,6 +34,7 @@ export function Auth2fa() {
 			/>
 			<Button
 				content='Login with 42'
+				bottom='false'
 			/>
 		</div>
 	);
@@ -52,6 +54,7 @@ export function AuthNameAvatar() {
 			<Carousel/>
 			<Button
 				content='Continue'
+				bottom='true'
 			/>
 		</div>
 	);

@@ -2,14 +2,14 @@
 .authstart_wrapper, .auth2fa_wrapper, .authnameavatar_wrapper {
 	position: absolute;
 	z-index: 2;
-	top:20%;
-	right:10%;
+	top: 12%;
+	right: 15%;
 	width: 25%;
+	min-width: 400px;
 	
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	justify-content: center;
 	
 	background-color: #F9DA49;
 	border-radius: 30px;
@@ -17,43 +17,48 @@
 
 /*	START	*/
 .authstart_wrapper {
-	height: 27%;
+	height: 304px;
 }
 
 .authstart_wrapper .title_wrapper {
-	margin-bottom: 60px;
+	margin-top: 60px;
+	margin-bottom: 81px;
 }
 
 /*	2FA	*/
 .auth2fa_wrapper {
-	height: 36%;
+	height: 406px;
 }
 
 .auth2fa_wrapper .title_wrapper {
-	margin-bottom: 40px;
+	margin-top: 60px;
+	margin-bottom: 61px;
 }
 
 .auth2fa_wrapper .input_wrapper {
-	margin-bottom: 30px;
+	margin-bottom: 61px;
 }
 
 /*	Name & Avatar	*/
 .authnameavatar_wrapper {
-	height: 57%;
+	height: 636px;
 }
 
 .authnameavatar_wrapper .title_wrapper {
+	margin-top: 60px;
 	width: 62%;
 	margin-bottom: 10px;
 }
 
 .authnameavatar_wrapper .input_wrapper {
-	margin-bottom: 8px;
+	margin-top: 30px;
+	margin-bottom: 36px;
 }
 
 .authnameavatar_wrapper .carousel-wrapper {
-	height: 38%;
-	width: 86%;
+	height: 242px;
+	width: 98%;
+	margin-bottom: 24px;
 }
 
 /* MOBILE */

@@ -22,7 +22,7 @@
 }
 
 .empty {
-	background-color: #D9D9D9;
+	background-color: #F9DA49;
 }
 
 .left, .right {
@@ -37,6 +37,7 @@
 	border: 1px solid #F9DA49;
 	border-radius: 10px;
 
+	font-size: 15px;
 	font-family: 'Poppins', sans-serif;
 	color: #F9DA49;
 	font-weight: 300px;
