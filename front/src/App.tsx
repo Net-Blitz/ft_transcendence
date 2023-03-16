@@ -8,6 +8,7 @@ function App(this: any) {
 			{/*	LOGIN	*/}
 			<Route path='/start' element={<Login/>} />
 			<Route path='/2fa' element={<Login/>} />
+			<Route path='/name&avatar' element={<Login/>} />
 		</Routes>
 	);
 }

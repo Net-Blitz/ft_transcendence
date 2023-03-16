@@ -5,39 +5,3 @@
 	top: 0;
 	left: 0;
 }
-
-/*	AUTH	*/
-
-/*	START	*/
-.login_auth_start {
-	position: absolute;
-	z-index: 2;
-	top:20%;
-	right:10%;
-	width: 25%;
-	height: 27%;
-}
-
-/*	2FA	*/
-.login_auth_2fa {
-	position: absolute;
-	z-index: 2;
-	top:20%;
-	right:10%;
-	width: 25%;
-	height: 36%;
-}
-
-/* MOBILE */
-
-@media screen and (max-width: 820px) {
-	
-	.login_auth_start {
-		width:90%;
-		right: 5%;
-		left:5%;
-		top:5%;
-		align-items: center;
-	}
-
-}

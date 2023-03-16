@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { AvatarData } from '../Background/Background';
+import { AvatarData } from '../../Background/Background';
 import './Carousel.css';
 
 const Carousel = () => {
@@ -50,10 +50,12 @@ const Carousel = () => {
 
 	return (
 		<div className='carousel-wrapper'>
-			{renderAvatar(currentIndex - 1, "left")}
-			{renderAvatar(currentIndex, "")}
-			{renderAvatar(currentIndex + 1, "right")}
-
+			<div className='carousel-element'>
+				{renderAvatar(currentIndex - 1, "left")}
+				{renderAvatar(currentIndex, "")}
+				{renderAvatar(currentIndex + 1, "right")}
+			</div>
+			<button>Download your avatar</button>
 		</div>
 	);
 };
