@@ -6,9 +6,9 @@ import Title from './Title/Title';
 import Button from './Button/Button';
 import Carousel from './Carousel/Carousel';
 
-export function AuthStart() {
+export const AuthStart = () => {
 	return (
-		<div className='authstart_wrapper'>
+		<div className='authstart-wrapper'>
 			<Title
 				title='Welcome'
 				subtitle=''
@@ -21,9 +21,9 @@ export function AuthStart() {
 	);
 }
 
-export function Auth2fa() {
+export const Auth2fa = () => {
 	return (
-		<div className='auth2fa_wrapper'>
+		<div className='auth2fa-wrapper'>
 			<Title
 				title='Welcome'
 				subtitle=''
@@ -41,9 +41,9 @@ export function Auth2fa() {
 	);
 }
 
-export function AuthNameAvatar() {
+export const AuthNameAvatar = () => {
 	return (
-		<div className='authnameavatar_wrapper'>
+		<div className='authnameavatar-wrapper'>
 			<Title
 				title='Welcome'
 				subtitle='please enter your pseudo and choose your avatar'

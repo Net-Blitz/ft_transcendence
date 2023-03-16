@@ -1,5 +1,5 @@
 /*	GLOBAL	*/
-.authstart_wrapper, .auth2fa_wrapper, .authnameavatar_wrapper {
+.authstart-wrapper, .auth2fa-wrapper, .authnameavatar-wrapper {
 	position: absolute;
 	z-index: 2;
 	top: 12%;
@@ -16,46 +16,46 @@
 }
 
 /*	START	*/
-.authstart_wrapper {
+.authstart-wrapper {
 	height: 304px;
 }
 
-.authstart_wrapper .title_wrapper {
+.authstart-wrapper .title-wrapper {
 	margin-top: 60px;
 	margin-bottom: 81px;
 }
 
 /*	2FA	*/
-.auth2fa_wrapper {
+.auth2fa-wrapper {
 	height: 406px;
 }
 
-.auth2fa_wrapper .title_wrapper {
+.auth2fa-wrapper .title-wrapper {
 	margin-top: 60px;
 	margin-bottom: 61px;
 }
 
-.auth2fa_wrapper .input_wrapper {
+.auth2fa-wrapper .input-wrapper {
 	margin-bottom: 61px;
 }
 
 /*	Name & Avatar	*/
-.authnameavatar_wrapper {
+.authnameavatar-wrapper {
 	height: 636px;
 }
 
-.authnameavatar_wrapper .title_wrapper {
+.authnameavatar-wrapper .title-wrapper {
 	margin-top: 60px;
 	width: 62%;
 	margin-bottom: 10px;
 }
 
-.authnameavatar_wrapper .input_wrapper {
+.authnameavatar-wrapper .input-wrapper {
 	margin-top: 30px;
 	margin-bottom: 36px;
 }
 
-.authnameavatar_wrapper .carousel-wrapper {
+.authnameavatar-wrapper .carousel-wrapper {
 	height: 242px;
 	width: 98%;
 	margin-bottom: 24px;
@@ -65,7 +65,7 @@
 
 @media screen and (max-width: 820px) {
 
-	.authstart_wrapper, .auth2fa_wrapper, .authnameavatar_wrapper {
+	.authstart-wrapper, .auth2fa-wrapper, .authnameavatar-wrapper {
 		width:90%;
 		right: 5%;
 		left:5%;

@@ -1,17 +1,17 @@
-.title_wrapper {
+.title-wrapper {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 }
 
-.title_wrapper h1 {
+.title-wrapper h1 {
 	margin: 0;
 	font-size: 40px;
 	font-weight: 400px;
 	font-family: 'YesevaOne', sans-serif;
 }
 
-.title_wrapper p {
+.title-wrapper p {
 	font-family: 'Poppins', sans-serif;
 	font-weight: 400px;
 	margin-top: 5px;

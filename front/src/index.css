@@ -16,18 +16,18 @@ code {
 
 /* YesevaOne */
 @font-face {
-	font-family: "YesevaOne";
-	src: local("YesevaOne-Regular"), url('fonts/YesevaOne-Regular.ttf') format(truetype);
+	font-family: 'YesevaOne';
+	src: local('YesevaOne-Regular'), url('fonts/YesevaOne-Regular.ttf') format(truetype);
 }
 
 /* Poppins */
 @font-face {
-	font-family: "Poppins";
-	src: local("Poppins-Regular"), url('fonts/Poppins/Poppins-Regular.ttf') format(truetype);
+	font-family: 'Poppins';
+	src: local('Poppins-Regular'), url('fonts/Poppins/Poppins-Regular.ttf') format(truetype);
 }
 @font-face {
-	font-family: "Poppins";
+	font-family: 'Poppins';
   font-weight: 300;
-	src: local("Poppins-Light"), url('fonts/Poppins/Poppins-Light.ttf') format(truetype);
+	src: local('Poppins-Light'), url('fonts/Poppins/Poppins-Light.ttf') format(truetype);
 }
   

@@ -1,7 +1,8 @@
 import React from 'react';
 import './Input.css';
-import Padlock from './padlock.jpg'
-import IdCard from './id_card.jpg'
+/*	RESSOURCES	*/
+import Padlock from './Ressources/padlock.jpg'
+import IdCard from './Ressources/id_card.jpg'
 
 interface InputProps {
 	input_title: string;
@@ -9,9 +10,9 @@ interface InputProps {
 	icon: string;
 }
 
-export default function Input({input_title, placeholder, icon} : InputProps) {
+const Input = ({input_title, placeholder, icon} : InputProps) => {
 	return (
-		<div className='input_wrapper'>
+		<div className='input-wrapper'>
 			<div><img 
 					src={icon === 'id_card' ? IdCard : Padlock} 
 					alt='cadenas' />
@@ -23,3 +24,4 @@ export default function Input({input_title, placeholder, icon} : InputProps) {
 		</div>
 	);
 }
+export default Input;

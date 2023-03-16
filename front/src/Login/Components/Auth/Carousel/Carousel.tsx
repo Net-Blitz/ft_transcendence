@@ -39,8 +39,8 @@ const Carousel = () => {
 					className={`avatar ${setting}`}
 					style={{
 						backgroundImage: `url(${avatar[index].avatar})`,
-						backgroundPosition: "center",
-						backgroundSize: "cover"
+						backgroundPosition: 'center',
+						backgroundSize: 'cover'
 					}}
 					onClick={setting === 'left' ? prev : setting === 'right' ? next : undefined}
 				></div>
@@ -51,9 +51,9 @@ const Carousel = () => {
 	return (
 		<div className='carousel-wrapper'>
 			<div className='carousel-element'>
-				{renderAvatar(currentIndex - 1, "left")}
-				{renderAvatar(currentIndex, "")}
-				{renderAvatar(currentIndex + 1, "right")}
+				{renderAvatar(currentIndex - 1, 'left')}
+				{renderAvatar(currentIndex, '')}
+				{renderAvatar(currentIndex + 1, 'right')}
 			</div>
 			<button>Download your avatar</button>
 		</div>

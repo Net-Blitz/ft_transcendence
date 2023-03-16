@@ -1,9 +1,9 @@
-.button_wrapper {
+.button-wrapper {
 	height: 56px;
 	width: 74%;
 }
 
-.button_wrapper button {
+.button-wrapper button {
 	all: unset;
 	cursor: pointer;
 	text-align: center;

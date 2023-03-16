@@ -6,11 +6,13 @@ interface ButtonProps {
 	bottom: string;
 }
 
-export default function Button({content, bottom} : ButtonProps) {
+const Button = ({content, bottom} : ButtonProps) => {
 	return (
 		<div 
-			className={bottom === 'true' ? 'button_wrapper bottom' : 'button_wrapper'}>
+			className={bottom === 'true' ? 'button-wrapper bottom' : 'button-wrapper'}>
 			<button>{content}</button>
 		</div>
 	);
 }
+
+export default Button;
