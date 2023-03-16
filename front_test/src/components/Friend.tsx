@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import "./Dashboard.css";
+import { Link } from "react-router-dom";
 
 interface User {
 	avatar: string;
@@ -57,6 +58,9 @@ function Friend() {
 		fetchData();
 		fetchUsers();
 		fetchFriends();
+
+		const interval = setInterval(fetchFriends, 5000);
+		return () => clearInterval(interval);
 	}, []);
 
 	const AddFriend = async (username: string) => {
@@ -134,14 +138,16 @@ function Friend() {
 				{friends.map((friend) => (
 					<li key={friend.id}>
 						<div className="friend-info">
-							<img
-								className="friend-img"
-								src={friend.avatar}
-								alt="avatar"
-							/>
-							<span className="friend-username">
-								{friend.username}
-							</span>
+							<Link to={"/profile/" + friend.login}>
+								<img
+									className="friend-img"
+									src={friend.avatar}
+									alt="avatar"
+								/>
+								<span className="friend-username">
+									{friend.username}
+								</span>
+							</Link>
 						</div>
 						<button
 							className="add-friend"
@@ -157,14 +163,16 @@ function Friend() {
 				{pending.map((friend) => (
 					<li key={friend.id}>
 						<div className="friend-info">
-							<img
-								className="friend-img"
-								src={friend.avatar}
-								alt="avatar"
-							/>
-							<span className="friend-username">
-								{friend.username}
-							</span>
+							<Link to={"/profile/" + friend.login}>
+								<img
+									className="friend-img"
+									src={friend.avatar}
+									alt="avatar"
+								/>
+								<span className="friend-username">
+									{friend.username}
+								</span>
+							</Link>
 						</div>
 						<button
 							className="add-friend"
@@ -186,14 +194,16 @@ function Friend() {
 				{demands.map((friend) => (
 					<li key={friend.id}>
 						<div className="friend-info">
-							<img
-								className="friend-img"
-								src={friend.avatar}
-								alt="avatar"
-							/>
-							<span className="friend-username">
-								{friend.username}
-							</span>
+							<Link to={"/profile/" + friend.login}>
+								<img
+									className="friend-img"
+									src={friend.avatar}
+									alt="avatar"
+								/>
+								<span className="friend-username">
+									{friend.username}
+								</span>
+							</Link>
 						</div>
 						<h3>Waiting</h3>
 					</li>
@@ -204,14 +214,16 @@ function Friend() {
 				{filteredUsers.map((user) => (
 					<li key={user.id}>
 						<div className="friend-info">
-							<img
-								className="friend-img"
-								src={user.avatar}
-								alt="avatar"
-							/>
-							<span className="friend-username">
-								{user.username}
-							</span>
+							<Link to={"/profile/" + user.login}>
+								<img
+									className="friend-img"
+									src={user.avatar}
+									alt="avatar"
+								/>
+								<span className="friend-username">
+									{user.username}
+								</span>
+							</Link>
 						</div>
 						<button
 							className="add-friend"

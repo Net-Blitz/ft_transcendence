@@ -27,7 +27,7 @@ li {
 	object-fit: cover;
 }
 
-.friend-info {
+.friend-info a {
 	display: flex;
 	align-items: center;
 }

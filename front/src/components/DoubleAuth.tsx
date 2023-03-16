@@ -8,12 +8,16 @@ function DoubleAuth() {
 
 	async function generateQRCode() {
 		try {
-			const { data } = await axios.post("http://localhost:3333/auth/2fa/setup", {}, {
-				withCredentials: true,
-			});
+			const { data } = await axios.post(
+				"http://localhost:3333/auth/2fa/setup",
+				{},
+				{
+					withCredentials: true,
+				}
+			);
 			setQrCodeUrl(data.otpAuthUrl);
 		} catch (error) {
-			console.log(error);
+			//console.log(error);
 		}
 	}
 
@@ -24,9 +28,9 @@ function DoubleAuth() {
 				{ verificationCode },
 				{ withCredentials: true }
 			);
-			console.log(data);
+			//console.log(data);
 		} catch (error) {
-			console.log(error);
+			//console.log(error);
 		}
 	}
 
@@ -40,7 +44,9 @@ function DoubleAuth() {
 				onChange={(e) => setVerificationCode(e.target.value)}
 				placeholder="Entrez le code de vérification ici"
 			/>
-			<button onClick={verify2fa}>Vérifier le code de vérification</button>
+			<button onClick={verify2fa}>
+				Vérifier le code de vérification
+			</button>
 		</div>
 	);
 }

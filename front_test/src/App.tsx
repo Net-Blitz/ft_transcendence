@@ -10,6 +10,7 @@ import Login2fa from "./components/Login2fa";
 import Lobby from "./components/Lobby";
 import Game from "./components/Game";
 import Friend from "./components/Friend";
+import Profile from "./components/Profile";
 
 function App(this: any) {
 	return (
@@ -22,6 +23,14 @@ function App(this: any) {
 					element={
 						<PrivateRoute>
 							<Dashboard />
+						</PrivateRoute>
+					}
+				/>
+				<Route
+					path="/profile/:username"
+					element={
+						<PrivateRoute>
+							<Profile />
 						</PrivateRoute>
 					}
 				/>

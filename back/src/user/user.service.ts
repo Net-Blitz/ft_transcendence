@@ -47,7 +47,7 @@ export class UserService {
 		@Res() res: Response,
 		@Body() updateUserDto: UpdateUserDto
 	) {
-		console.log(updateUserDto);
+		//console.log(updateUserDto);
 		const user = await this.getUser(req);
 		if (!user) {
 			return res.status(404).json({ message: `User not found` });

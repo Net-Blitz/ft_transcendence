@@ -52,7 +52,7 @@ export class AuthService {
 				return this.getUserInfo(req, res, response.data.access_token);
 			});
 		} catch (error) {
-			console.log(error);
+			//console.log(error);
 			throw new ForbiddenException("callback error");
 		}
 	}
@@ -122,7 +122,7 @@ export class AuthService {
 					return this.signToken(req, res, existingUser);
 				}
 			}
-			console.log(error);
+			//console.log(error);
 			throw new ForbiddenException("prisma error");
 		}
 	}
