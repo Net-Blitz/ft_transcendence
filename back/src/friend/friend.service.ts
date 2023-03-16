@@ -1,5 +1,5 @@
-import { Injectable, Param, Req, Res } from "@nestjs/common";
-import { Request, Response } from "express";
+import { Injectable, Param, Res } from "@nestjs/common";
+import { Response } from "express";
 import { GetUser } from "src/auth/decorator";
 import { PrismaService } from "src/prisma/prisma.service";
 
@@ -9,7 +9,6 @@ export class FriendService {
 
 	async AddFriend(
 		@Param("login") login: string,
-		@Req() req: Request,
 		@Res() res: Response,
 		@GetUser() user: any
 	) {
@@ -38,6 +37,7 @@ export class FriendService {
 				data: {
 					friendId: friend.id,
 					friendwithId: user.id,
+					status: "DEMAND",
 				},
 			});
 		} catch (e) {
@@ -49,7 +49,6 @@ export class FriendService {
 
 	async RemoveFriend(
 		@Param("login") login: string,
-		@Req() req: Request,
 		@Res() res: Response,
 		@GetUser() user: any
 	) {
@@ -91,7 +90,6 @@ export class FriendService {
 
 	async AcceptFriend(
 		@Param("login") login: string,
-		@Req() req: Request,
 		@Res() res: Response,
 		@GetUser() user: any
 	) {
@@ -108,6 +106,26 @@ export class FriendService {
 		}
 
 		try {
+			const friendRelation = await this.prisma.friendsRelation.findUnique(
+				{
+					where: {
+						friendId_friendwithId: {
+							friendId: user.id,
+							friendwithId: friend.id,
+						},
+					},
+				}
+			);
+
+			if (
+				friendRelation.friendId === user.id &&
+				friendRelation.status === "PENDING"
+			) {
+				return res
+					.status(400)
+					.json({ message: "You can't accept your own request" });
+			}
+
 			await this.prisma.friendsRelation.update({
 				where: {
 					friendId_friendwithId: {
@@ -131,15 +149,16 @@ export class FriendService {
 				},
 			});
 		} catch (e) {
-			return res.status(400).json({ message: "Friend not found" });
+			return res
+				.status(400)
+				.json({ message: "Friend relation not found" });
 		}
 
-		return res.status(200).json({ message: "Friend accepted" });
+		return res.status(200).json({ message: "Friend relation accepted" });
 	}
 
 	async DeclineFriend(
 		@Param("login") login: string,
-		@Req() req: Request,
 		@Res() res: Response,
 		@GetUser() user: any
 	) {
@@ -173,17 +192,15 @@ export class FriendService {
 				},
 			});
 		} catch (e) {
-			return res.status(400).json({ message: "Friend not found" });
+			return res
+				.status(400)
+				.json({ message: "Friend relation not found" });
 		}
 
-		return res.status(200).json({ message: "Friend rejected" });
+		return res.status(200).json({ message: "Friend relation rejected" });
 	}
 
-	async GetFriends(
-		@Req() req: Request,
-		@Res() res: Response,
-		@GetUser() user: any
-	) {
+	async GetFriends(@Res() res: Response, @GetUser() user: any) {
 		if (!user) {
 			return res.status(404).json({ message: "User not found" });
 		}
@@ -197,10 +214,16 @@ export class FriendService {
 			},
 		});
 
+		if (!friends) {
+			return res.status(404).json({ message: "friends not found" });
+		}
+
 		const friendsList = [];
 		const pendingList = [];
+		const demandList = [];
 		let j = 0;
 		let k = 0;
+		let l = 0;
 		for (let i = 0; i < friends.friendwith.length; i++) {
 			const friend = await this.prisma.user.findUnique({
 				where: {
@@ -213,8 +236,11 @@ export class FriendService {
 			} else if (friends.friendwith[i].status === "PENDING") {
 				pendingList[k] = friend;
 				k++;
+			} else if (friends.friendwith[i].status === "DEMAND") {
+				demandList[l] = friend;
+				l++;
 			}
 		}
-		return res.status(200).json({ friendsList, pendingList });
+		return res.status(200).json({ friendsList, pendingList, demandList });
 	}
 }

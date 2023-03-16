@@ -19,6 +19,7 @@ function Friend() {
 	const [users, setUsers] = useState<User[]>([]);
 	const [friends, setFriends] = useState<User[]>([]);
 	const [pending, setPending] = useState<User[]>([]);
+	const [demands, setDemand] = useState<User[]>([]);
 
 	const fetchUsers = async () => {
 		try {
@@ -39,6 +40,7 @@ function Friend() {
 			);
 			setFriends(response.data.friendsList);
 			setPending(response.data.pendingList);
+			setDemand(response.data.demandList);
 		} catch (error) {
 			console.error(error);
 		}
@@ -121,7 +123,8 @@ function Friend() {
 		(users) =>
 			users.id !== userInfo?.id &&
 			!friends.some((friend) => friend.id === users.id) &&
-			!pending.some((pending) => pending.id === users.id)
+			!pending.some((pending) => pending.id === users.id) &&
+			!demands.some((demand) => demand.id === users.id)
 	);
 
 	return (
@@ -175,6 +178,24 @@ function Friend() {
 						>
 							Reject
 						</button>
+					</li>
+				))}
+			</ul>
+			<h1>List of demands</h1>
+			<ul>
+				{demands.map((friend) => (
+					<li key={friend.id}>
+						<div className="friend-info">
+							<img
+								className="friend-img"
+								src={friend.avatar}
+								alt="avatar"
+							/>
+							<span className="friend-username">
+								{friend.username}
+							</span>
+						</div>
+						<h3>Waiting</h3>
 					</li>
 				))}
 			</ul>
