@@ -31,6 +31,7 @@ export function Auth2fa() {
 			<Input 
 				input_title='Generated code' 
 				placeholder='enter the generated code'
+				icon= 'padlock'
 			/>
 			<Button
 				content='Login with 42'
@@ -50,6 +51,7 @@ export function AuthNameAvatar() {
 			<Input 
 				input_title='Pseudo' 
 				placeholder='enter your pseudo'
+				icon= 'id_card'
 			/>
 			<Carousel/>
 			<Button
