@@ -1,3 +1,8 @@
+.button_wrapper {
+	height: 46px;
+	width: 74%;
+}
+
 .button_wrapper button {
 	all: unset;
 	cursor: pointer;

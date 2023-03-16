@@ -1,9 +1,10 @@
 import React from 'react';
 import './Auth.css';
-import Button from './Button/Button';
 /*	COMPONENTS	*/
 import Input from './Input/Input';
 import Title from './Title/Title';
+import Button from './Button/Button';
+import Carousel from './Carousel/Carousel';
 
 export function AuthStart() {
 	return (
@@ -32,6 +33,25 @@ export function Auth2fa() {
 			/>
 			<Button
 				content='Login with 42'
+			/>
+		</div>
+	);
+}
+
+export function AuthNameAvatar() {
+	return (
+		<div className='authnameavatar_wrapper'>
+			<Title
+				title='Welcome'
+				subtitle='please enter your pseudo and choose your avatar'
+			/>
+			<Input 
+				input_title='Pseudo' 
+				placeholder='enter your pseudo'
+			/>
+			<Carousel/>
+			<Button
+				content='Continue'
 			/>
 		</div>
 	);

@@ -7,10 +7,10 @@ interface TitleProps {
 }
 
 export default function Title({title, subtitle} : TitleProps){
-	console.log(subtitle.length);
 	return (
 		<div className='title_wrapper'>
 			<h1>{title}</h1>
+			{subtitle.length !== 0 ? <p>{subtitle}</p> : null}
 		</div>
 	);
 }
