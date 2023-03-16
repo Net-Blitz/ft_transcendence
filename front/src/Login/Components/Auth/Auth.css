@@ -1,5 +1,5 @@
 /*	GLOBAL	*/
-.authstart-wrapper, .auth2fa-wrapper, .authnameavatar-wrapper {
+.authstart-wrapper, .auth2fa-wrapper, .authnameavatar-wrapper, .authnameno2fa-wrapper {
 	position: absolute;
 	z-index: 2;
 	top: 12%;
@@ -59,6 +59,20 @@
 	height: 242px;
 	width: 98%;
 	margin-bottom: 24px;
+}
+
+/* No 2FA	*/
+.authnameno2fa-wrapper {
+	height: 338px;
+	width: 32%;
+}
+
+.authnameno2fa-wrapper .title-wrapper {
+	margin-top: 60px;
+}
+
+.authnameno2fa-wrapper .bottom {
+	top:91%
 }
 
 /* MOBILE */

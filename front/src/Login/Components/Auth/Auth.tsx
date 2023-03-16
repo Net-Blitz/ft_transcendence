@@ -5,6 +5,7 @@ import Input from './Input/Input';
 import Title from './Title/Title';
 import Button from './Button/Button';
 import Carousel from './Carousel/Carousel';
+import Toggle from './Toggle/Toggle';
 
 export const AuthStart = () => {
 	return (
@@ -54,6 +55,22 @@ export const AuthNameAvatar = () => {
 				icon= 'id_card'
 			/>
 			<Carousel/>
+			<Button
+				content='Continue'
+				bottom='true'
+			/>
+		</div>
+	);
+}
+
+export const AuthNo2fa = () => {
+	return (
+		<div className='authnameno2fa-wrapper'>
+			<Title
+				title='Welcome'
+				subtitle='please enter your pseudo and choose your avatar'
+			/>
+			<Toggle/>
 			<Button
 				content='Continue'
 				bottom='true'
