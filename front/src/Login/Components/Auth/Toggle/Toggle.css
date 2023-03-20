@@ -18,8 +18,8 @@
 	height: 39px;
 	
 	background-color: black;
-	box-shadow: 3px 3px 2px rgba(0, 0, 0, 0.14);
-	border-radius: 20px 0 0 20px;
+	/* box-shadow: 3px 3px 2px rgba(0, 0, 0, 0.14); */
+	border-radius: 20px 20px 20px 20px;
 }
 
 .toggle-wrapper #no, .toggle-wrapper #yes {
@@ -28,11 +28,11 @@
 	font-weight: 500;
 }
 
-#no {
+.toggle-wrapper #no {
 	color: white;
 }
 
-#yes {
+.toggle-wrapper #yes {
 	padding-left: 26px;
 	color: #F9DA49;
 }
