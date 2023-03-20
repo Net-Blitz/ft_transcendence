@@ -2,7 +2,7 @@ import React from 'react';
 import './Login.css';
 /*	COMPONENTS	*/
 import Background from './Components/Background/Background';
-import { AuthStart, Auth2fa, AuthNameAvatar, AuthNo2fa } from './Components/Auth/Auth';
+import { AuthStart, Auth2fa, AuthNameAvatar, Auth2faConfig } from './Components/Auth/Auth';
 
 interface LoginPages {
 	[key: string]: JSX.Element;
@@ -13,7 +13,7 @@ const Login = () => {
 		'/start': <AuthStart/>,
 		'/2fa': <Auth2fa/>,
 		'/name&avatar': <AuthNameAvatar/>,
-		'/no2fa': <AuthNo2fa/>
+		'/2faconfig': <Auth2faConfig/>
 	}
 
 	return(

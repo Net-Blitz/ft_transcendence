@@ -1,9 +1,13 @@
 import React, {useState} from 'react'
 import './Toggle.css'
 
-const Toggle = () => {
+interface ToggleProps {
+	statusState: boolean;
+	setStatusState: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const Toggle = ({statusState, setStatusState} : ToggleProps) => {
 	/*	HOOK settings	*/
-	const [buttonState, setButtonState] = useState(true);
 	const [firstElement, setFirstElement] = useState('No');
 	const [secondElement, setSecondElement] = useState('Yes');
 
@@ -11,9 +15,9 @@ const Toggle = () => {
 		const part_one = document.querySelector<HTMLElement>('.toggle-wrapper .button-element');
 		const part_two = document.querySelector<HTMLElement>('.toggle-wrapper #yes');
 
-		if (buttonState)
+		if (!statusState)
 		{
-			setButtonState(false);
+			setStatusState(true);
 			setFirstElement('Yes');
 			setSecondElement('No');
 			if (part_one)
@@ -23,7 +27,7 @@ const Toggle = () => {
 		}
 		else
 		{
-			setButtonState(true);
+			setStatusState(false);
 			setFirstElement('No');
 			setSecondElement('Yes');
 			if (part_one)

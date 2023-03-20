@@ -1,5 +1,5 @@
 /*	GLOBAL	*/
-.authstart-wrapper, .auth2fa-wrapper, .authnameavatar-wrapper, .authnameno2fa-wrapper {
+.authstart-wrapper, .auth2fa-wrapper, .authnameavatar-wrapper, .auth2faconfig-yes-wrapper, .auth2faconfig-no-wrapper {
 	position: absolute;
 	z-index: 2;
 	top: 12%;
@@ -61,22 +61,50 @@
 	margin-bottom: 24px;
 }
 
-/* No 2FA	*/
-.authnameno2fa-wrapper {
-	height: 338px;
+/*	2FA	Config	*/
+
+/*	YES	*/
+.auth2faconfig-yes-wrapper {
+	height: 713px;
 	width: 32%;
 }
 
-.authnameno2fa-wrapper .title-wrapper {
+.auth2faconfig-yes-wrapper .title-wrapper {
 	margin-top: 60px;
 }
 
-.authnameno2fa-wrapper .toggle-wrapper {
+.auth2faconfig-yes-wrapper .toggle-wrapper {
+	margin-top: 27px;
+}
+
+.auth2faconfig-yes-wrapper .qrcode-wrapper {
+	margin-top: 62px;
+}
+
+.auth2faconfig-yes-wrapper .input-wrapper {
+	margin-top: 30px;
+}
+
+.auth2faconfig-yes-wrapper .button-wrapper {
+	margin-top: 50px;
+}
+
+/*	NO	*/
+.auth2faconfig-no-wrapper {
+	height: 360px;
+	width: 32%;
+}
+
+.auth2faconfig-no-wrapper .title-wrapper{
+	margin-top: 60px;
+}
+
+.auth2faconfig-no-wrapper .toggle-wrapper {
 	margin-top: 55px;
 }
 
-.authnameno2fa-wrapper .bottom {
-	top:91%
+.auth2faconfig-no-wrapper .bottom {
+	top: 90%;
 }
 
 /* MOBILE */

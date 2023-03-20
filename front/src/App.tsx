@@ -11,7 +11,7 @@ function App(this: any) {
 			<Route path='/start' element={<Login/>} />
 			<Route path='/2fa' element={<Login/>} />
 			<Route path='/name&avatar' element={<Login/>} />
-			<Route path='/no2fa' element={<Login/>} />
+			<Route path='/2faconfig' element={<Login/>} />
 		</Routes>
 	);
 }
