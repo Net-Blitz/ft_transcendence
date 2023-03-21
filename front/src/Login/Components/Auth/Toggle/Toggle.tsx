@@ -60,9 +60,6 @@ const Toggle = ({statusState, setStatusState} : ToggleProps) => {
 		  	part_two.style.transform = 'translateX(0px)';
 		};
 		window.addEventListener('resize', handleResize);
-		return () => {
-		  window.removeEventListener('resize', handleResize);
-		};
 	  }, []);
 	
 	return (
