@@ -52,4 +52,16 @@
 	.carousel-wrapper button{
 		font-size:12px;
 	}
+	.carousel-element {
+		height: 100%;
+	}
+	/* .avatar{
+		min-width:100px;
+	} */
+}
+
+@media screen and (min-width:562px) and  (max-width: 819px) {
+	.carousel-element{
+		width: 65%;
+	}
 }

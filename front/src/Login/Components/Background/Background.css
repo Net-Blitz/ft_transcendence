@@ -7,8 +7,9 @@
 	background-repeat: no-repeat;
 	background-size: 100%;
 	background-position: bottom;
-	min-height: 600px;
+	min-height: 720px;
 	min-width: 700px;
+	/* background-attachment:fixed; */
 }
 
 .logo-mobile img{

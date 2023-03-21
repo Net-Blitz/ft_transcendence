@@ -1,6 +1,7 @@
 .button-wrapper {
 	height: 50px;
 	width: 74%;
+	/* padding-top: 30px; */
 }
 
 .button-wrapper:hover button {

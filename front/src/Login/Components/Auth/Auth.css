@@ -137,6 +137,9 @@
 		margin:auto;
 		min-width: 300px;
 	}
+	.authnameavatar-wrapper{
+		height: 490px;
+	}
 	.auth2fa-wrapper{
 		top:32%;
 	}
@@ -164,11 +167,21 @@
 	}
 }
 
+/* Ipad */
 @media screen and (min-width:562px) and  (max-width: 819px) {
-	.authstart-wrapper, .auth2fa-wrapper, .authnameavatar-wrapper, .auth2faconfig-yes-wrapper, .auth2faconfig-no-wrapper  {
+	.authnameavatar-wrapper, .auth2faconfig-yes-wrapper, .auth2faconfig-no-wrapper  {
 		top:30%;
 	}
-	.auth2faconfig-yes-wrapper{
+	.authstart-wrapper{
+		top:50%;
+	}
+	.auth2fa-wrapper{
+		top:40%;
+	}
+	/* .auth2faconfig-yes-wrapper{
 		height: 600px;
+	} */
+	.authnameavatar-wrapper{
+		height: 490px;
 	}
 }
