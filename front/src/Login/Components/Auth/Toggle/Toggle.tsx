@@ -46,18 +46,14 @@ const Toggle = ({statusState, setStatusState} : ToggleProps) => {
 		}
 	} 
 	
+	// reset the toggle state and styles when the window size changes
 	useEffect(() => {
 		const handleResize = () => {
-		  // reset the toggle state and styles when the window size changes
 		  setStatusState(false);
 		  setFirstElement('No');
 		  setSecondElement('Yes');
-		  const part_one = document.querySelector<HTMLElement>(
-			'.toggle-wrapper .button-element'
-		  );
-		  const part_two = document.querySelector<HTMLElement>(
-			'.toggle-wrapper #yes'
-		  );
+		  const part_one = document.querySelector<HTMLElement>('.toggle-wrapper .button-element');
+		  const part_two = document.querySelector<HTMLElement>('.toggle-wrapper #yes');
 		  if (part_one) 
 			part_one.style.transform = 'translateX(0px)';
 		  if (part_two) 
