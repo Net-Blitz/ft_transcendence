@@ -4,72 +4,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { SocketUser } from "./dto";
 import * as jwt from 'jsonwebtoken'
 import { Game } from "@prisma/client";
-
-
-const GameRatio = 0.5;
-class Rooms {
-	
-	ball_x: number;
-	ball_y: number;
-	ball_speed_x: number;
-	ball_speed_y: number;
-	ball_size: number;
-	ball_direction: number;
-	player1_x: number;
-	player1_y: number;
-	player1_size: number;
-	player1_score: number;
-	player2_x: number;
-	player2_y: number;
-	player2_size: number;
-	player2_score: number;
-	player_speed: number;
-	player_width: number;
-	constructor() {
-		
-		this.ball_x = 0.5;
-		this.ball_y = 0.5;
-		this.ball_speed_x = 0.018 * GameRatio;
-		this.ball_speed_y = 0.018;
-		this.ball_size = 0.05;
-		this.ball_direction = this.getRandomDirection();
-		
-		this.player1_x = 0.006;
-		this.player1_y = 0.5;
-		this.player1_size = 0.3;
-		this.player1_score = 0;
-		
-		this.player2_x = 0.994;
-		this.player2_y = 0.5;
-		this.player2_size = 0.3;
-		this.player2_score = 0;
-		
-		this.player_width = 0.015;
-		this.player_speed = 0.05;
-	}
-	
-	resetBall() {
-		this.ball_x = 0.5;
-		this.ball_y = 0.5;
-		this.ball_direction = this.getRandomDirection();
-		this.ball_speed_x = 0.018 * GameRatio;
-		this.ball_speed_y = 0.018;
-		this.ball_size = 0.05;
-	}
-	
-	getRandomDirection() {
-		const range = 0.70;
-		let first = (Math.random() * range - range / 2) * Math.PI;
-		let second = Math.random() * range - range / 2;
-		second = (second + (1 - (range / 2)) * Math.sign(second)) * Math.PI ;
-		return Math.random() > 0.5 ? first : second;
-	}
-	
-	accelerate() {
-		this.ball_speed_x *= 1.1;
-		this.ball_speed_y *= 1.1;
-	}
-}
+import { Rooms } from "./class";
 
 @WebSocketGateway({namespace:"game", cors: {origin: "*"}})
 export class GameGateway {
@@ -100,7 +35,6 @@ export class GameGateway {
 	private getBallDirectionBounce2(gameState: Rooms, y: number) {
 		let percent = (y - gameState.player2_y) / gameState.player2_size;
 		gameState.accelerate();
-		console.log(percent);
 		return Math.PI - Math.PI / 2 * percent;
 		
 	}
@@ -208,7 +142,6 @@ export class GameGateway {
 		let gameState = new Rooms();
 		let end = false;
 
-		console.log("start game");
 
 		await this.prisma.game.update({
 			where: { id: room },
@@ -219,7 +152,6 @@ export class GameGateway {
 				this.ConnectedSockets.findIndex((socket) => socket.roomName === "game-" + room && socket.state === "player2") === -1) {
 			await this.sleep(1000);
 		}
-		console.log("real game");
 		await this.prisma.game.update({
 			where: { id: room },
 			data: { score1: 0, score2: 0, state: "PLAYING"}
@@ -233,7 +165,7 @@ export class GameGateway {
 			end = this.checkEnd(gameState);
 			if (end === true)
 				break;
-			await this.sleep(20)
+			await this.sleep(5)
 		}
 		await this.prisma.game.update({
 			where: { id: room },
@@ -270,13 +202,12 @@ export class GameGateway {
 		jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => { if (err) return ; });
 
 		if (!client.handshake.query || !client.handshake.query.room)
-		return ;
-		const query = client.handshake.query.room.toString();
-		const room = parseInt(query)
+			return ;
+		const room = parseInt(client.handshake.query.room.toString());
 		
 		const user = await this.prisma.user.findUnique({where: {login: userCookie.login}});
 		if (!user)
-		return;
+			return;
 		
 		const game = await this.prisma.game.findUnique({where: {id: room}});
 		if (!game || game.state == "ENDED")
@@ -319,12 +250,12 @@ export class GameGateway {
 	}
 
 	async handleConnection(client: Socket) {
-		console.log(`Client connected: ${client.id}`);
 		return await this.checkAndSave(client)
 	}
 
 	handleDisconnect(client: Socket) {
 		const sockUser : SocketUser = this.ConnectedSockets.find(x => x.socketId === client.id);
+		
 		
 		if (sockUser != null)
 		{
@@ -332,7 +263,6 @@ export class GameGateway {
 			this.server.to(sockUser.socketId).emit("close");
 			this.ConnectedSockets.splice(this.ConnectedSockets.findIndex(x => x.socketId === client.id), 1);
 		}
-		console.log(`Client disconnected: ${client.id}`);
 		return ;
 	}
 
