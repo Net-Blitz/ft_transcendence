@@ -14,6 +14,7 @@ const Toggle = ({statusState, setStatusState} : ToggleProps) => {
 	function toggleButton (event: any) {
 		const part_one = document.querySelector<HTMLElement>('.toggle-wrapper .button-element');
 		const part_two = document.querySelector<HTMLElement>('.toggle-wrapper #yes');
+		const screen_size: number = window.innerWidth;
 
 		if (!statusState)
 		{
@@ -21,9 +22,19 @@ const Toggle = ({statusState, setStatusState} : ToggleProps) => {
 			setFirstElement('Yes');
 			setSecondElement('No');
 			if (part_one)
-				part_one.style.transform = 'translateX(100px)';
+			{
+				if (screen_size > 820)
+					part_one.style.transform = 'translateX(100px)';
+				else
+					part_one.style.transform = 'translateX(75px)';
+			}
 			if (part_two)
-				part_two.style.transform = 'translateX(-90px)';
+			{
+				if (screen_size > 820)
+					part_two.style.transform = 'translateX(-90px)';
+				else
+					part_two.style.transform = 'translateX(-63px)';
+			}
 		}
 		else
 		{
@@ -31,9 +42,9 @@ const Toggle = ({statusState, setStatusState} : ToggleProps) => {
 			setFirstElement('No');
 			setSecondElement('Yes');
 			if (part_one)
-				part_one.style.transform = 'translateX(0px)';
+					part_one.style.transform = 'translateX(0px)';
 			if (part_two)
-			part_two.style.transform = 'translateX(0px)';
+				part_two.style.transform = 'translateX(0px)';
 		}
 	} 
 

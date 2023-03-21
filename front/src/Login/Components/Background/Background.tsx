@@ -2,7 +2,7 @@ import React from 'react';
 import './Background.css';
 
 /*	RESSOURCES	*/
-import BackgroundImg from './Ressources/background.png';
+import logo_mobile from './Ressources/Logo.png';
 import img_lgiband from './Ressources/lgiband.png';
 import img_gkehren from './Ressources/gkehren.png';
 import img_jbach from './Ressources/jbach.png';
@@ -27,8 +27,11 @@ export const AvatarData = [
 const Background = () => {
 	return (
 		<div>
+			<div className='logo-mobile'>
+				<img src={logo_mobile}/>
+			</div>
 			<div className='main-background'>
-				<img src={BackgroundImg} className='img-background'/>
+				{/* <img src={BackgroundImg} className='img-background'/> */}
 				<div className='our-team'>
 					<p className='title-team' >Our team</p>
 					<div className='picture-team'>

@@ -2,16 +2,32 @@
 .main-background {
 	height: 100vh;
 	width: 100vw;
-	background-color: rgba(255, 255, 255, 0.94)
+	/* background-color: rgba(255, 255, 255, 0.94) */
+	background-image: url("./Ressources/background.png");
+	background-repeat: no-repeat;
+	background-size: 100%;
+	background-position: bottom;
+	min-height: 600px;
+	min-width: 700px;
 }
 
-.img-background {
+.logo-mobile img{
+	width:25%;
+}
+
+.logo-mobile{
+	display: none;
+	/* display: flex; */
+	/* justify-content: center; */
+}
+/* 
+.img-logo {
 	height: 440px;
 	position: absolute;
 	bottom: 0;
 	left: 0;
 	width:100%;
-}
+} */
 
 /*	TEAM	*/
 
@@ -55,13 +71,13 @@
 	font-family: 'Poppins', sans-serif;
 	font-size: 11px;
 	width: min-content;
-	color:#101010;
+	color:#0a3d62;
 }
 
 .title-team {
 	font-family: 'YesevaOne', sans-serif;
 	font-size: 36px;
-	color:#101010;
+	color:#0a3d62;
 	padding: 0;
 	margin: 0 0 10px 0;
 }
@@ -79,6 +95,21 @@
 	}
 	.profile-team {
 		width:30%;
+	}
+	.logo-mobile{
+		display: flex;
+		justify-content: center;
+	}
+	.logo-mobile img{
+		width: 30%;
+		margin-left: 10%;
+		margin-top: 10%;
+	}
+}
+
+@media screen and (min-width:562px) and  (max-width: 819px) {
+	.logo-mobile img{
+		margin-top: 5%;
 	}
 }
 
