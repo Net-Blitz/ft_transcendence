@@ -3,8 +3,8 @@ import { Server, Socket } from "socket.io";
 import { PrismaService } from "src/prisma/prisma.service";
 import { SocketUser } from "./dto";
 import * as jwt from 'jsonwebtoken'
-import { Game } from "@prisma/client";
-import { Rooms } from "./class";
+import { Game, User } from "@prisma/client";
+import { GameRoom } from "./class";
 
 @WebSocketGateway({namespace:"game", cors: {origin: "*"}})
 export class GameGateway {
@@ -16,164 +16,80 @@ export class GameGateway {
 	ConnectedSockets: SocketUser[] = [];
 	GamePlaying = [];
 
-	ballMarge = 0.05; //need to be < ball_size / 2
-	
 	async sleep(ms: number) {
 		return new Promise(resolve => setTimeout(resolve, ms));
 	}
-	
-	private getY(x: number, y: number, direction: number, x2: number) {
-		return y + (x2 - x) * Math.tan(direction);
+
+	private getPlayerSocket(room: number) {
+		const player1 = this.ConnectedSockets.find((socket) =>
+				socket.roomName === "game-" + room
+				&& socket.state === "player1");
+		const player2 = this.ConnectedSockets.find((socket) =>
+			socket.roomName === "game-" + room &&
+			socket.state === "player2");
+		return ({player1, player2})
 	}
 
-	private getBallDirectionBounce(gameState: Rooms, y: number) {
-		let percent = (y - gameState.player1_y) / gameState.player1_size;
-		gameState.accelerate();
-		return Math.PI / 2 * percent;
-	}
-	
-	private getBallDirectionBounce2(gameState: Rooms, y: number) {
-		let percent = (y - gameState.player2_y) / gameState.player2_size;
-		gameState.accelerate();
-		return Math.PI - Math.PI / 2 * percent;
+	private async moveBall(gameRoom: GameRoom, room: number) {
+
+		let increment_x = gameRoom.ball.speed_x * Math.cos(gameRoom.ball.direction);
+		let increment_y = gameRoom.ball.speed_y * Math.sin(gameRoom.ball.direction);
 		
-	}
-
-	private checkBounce(gameState: Rooms, increment_x: number) {
-		let y : number;
-		let ballY : number;
-		let playerY : number;
-		if (gameState.ball_direction > Math.PI / 2 || gameState.ball_direction < -Math.PI / 2) {
-			if (gameState.ball_x > gameState.player1_x + gameState.player_width && gameState.ball_x + increment_x <= gameState.player1_x + gameState.player_width) {
-				y = this.getY(gameState.ball_x, gameState.ball_y, gameState.ball_direction, gameState.player1_x + gameState.player_width);
-				ballY = gameState.ball_y - (gameState.ball_size * (gameState.ball_y - 0.5));
-				playerY = gameState.player1_y - (gameState.player1_size * (gameState.player1_y - 0.5));
-				if ( (ballY + this.ballMarge > playerY - gameState.player1_size / 2 && ballY + this.ballMarge < playerY + gameState.player1_size / 2) 
-					|| (ballY - this.ballMarge > playerY - gameState.player1_size / 2 && ballY - this.ballMarge < playerY + gameState.player1_size / 2) ) {
-					gameState.ball_direction = this.getBallDirectionBounce(gameState, y);
-					increment_x = Math.abs(increment_x) - Math.abs(gameState.ball_x - gameState.player1_x - gameState.player_width);
-				}
-			}
-		}
-		else if (gameState.ball_direction < Math.PI / 2 && gameState.ball_direction > -Math.PI / 2) {
-			if (gameState.ball_x < gameState.player2_x - gameState.player_width  && gameState.ball_x + increment_x >= gameState.player2_x - gameState.player_width) {
-				y = this.getY(gameState.ball_x, gameState.ball_y, gameState.ball_direction, gameState.player2_x - gameState.player_width);
-				ballY = gameState.ball_y - (gameState.ball_size * (gameState.ball_y - 0.5));
-				playerY = gameState.player2_y - (gameState.player2_size * (gameState.player2_y - 0.5));
-				if ( (ballY + this.ballMarge > playerY - gameState.player2_size / 2 && ballY + this.ballMarge < playerY + gameState.player2_size / 2) 
-					|| (ballY - this.ballMarge > playerY - gameState.player2_size / 2 && ballY - this.ballMarge < playerY + gameState.player2_size / 2)) {
-					gameState.ball_direction = this.getBallDirectionBounce2(gameState, y);
-					increment_x = (Math.abs(increment_x) - Math.abs(gameState.ball_x - gameState.player2_x + gameState.player_width));
-				}
-			}
-		}
-		gameState.ball_x += increment_x;
-	}
+		gameRoom.checkBallBounce(increment_x);
 		
-	private async moveBall(gameState: Rooms, room: number) {
-		let increment_x = gameState.ball_speed_x * Math.cos(gameState.ball_direction);
-		let increment_y = gameState.ball_speed_y * Math.sin(gameState.ball_direction);
-		this.checkBounce(gameState, increment_x);
-		gameState.ball_y += increment_y;
+		gameRoom.incrementBallY(increment_y);
 
-		if (gameState.ball_y < 0 || gameState.ball_y > 1) {
-			gameState.ball_direction = -gameState.ball_direction;
-			if (gameState.ball_y < 0)
-				gameState.ball_y = -gameState.ball_y;
-			else
-				gameState.ball_y = 2 - gameState.ball_y;
-		}
-		if ((gameState.ball_x < 0 && (gameState.ball_direction > Math.PI / 2 || gameState.ball_direction < -Math.PI / 2))
-			|| (gameState.ball_x > 1 && gameState.ball_direction < Math.PI / 2 && gameState.ball_direction > -Math.PI / 2)) {
-			if (gameState.ball_x < 0)
-				gameState.player2_score++;
-			else if (gameState.ball_x > 1)
-				gameState.player1_score++;
-			gameState.resetBall();
+		if (gameRoom.checkBallScore()) {
 			await this.prisma.game.update({
-				where: {
-					id: room
-				},
-				data: {
-					score1: gameState.player1_score,
-					score2: gameState.player2_score
-				}
+				where: { id: room },
+				data: { score1: gameRoom.player1.score, score2: gameRoom.player2.score }
 			})
 		}
 	}
-	
-	private checkEnd(gameState: Rooms) {
-		if ((gameState.player1_score >= 10 || gameState.player2_score >= 10) && Math.abs(gameState.player1_score - gameState.player2_score) >= 2)
-			return true
-		return false
+
+	private movePlayer(gameRoom: GameRoom, room: number) {
+		let players = this.getPlayerSocket(room);
+
+		gameRoom.updatePlayerPosition(players.player1);
+		gameRoom.updatePlayerPosition(players.player2);
 	}
 
-	private movePlayer(gameState: Rooms, room: number) {
-		const player1 = this.ConnectedSockets.find((socket) => socket.roomName === "game-" + room && socket.state === "player1");
-		const player2 = this.ConnectedSockets.find((socket) => socket.roomName === "game-" + room && socket.state === "player2");
-
-		if (player1) {
-			if (player1.up == 1) {
-				gameState.player1_y -= gameState.player_speed;
-				if (gameState.player1_y < 0)
-					gameState.player1_y = 0;
-			}
-			if (player1.down == 1) {
-				gameState.player1_y += gameState.player_speed;
-				if (gameState.player1_y > 1)
-					gameState.player1_y = 1;
-			}
-		}
-		if (player2) {
-			if (player2.up == 1) {
-				gameState.player2_y -= gameState.player_speed;
-				if (gameState.player2_y < 0)
-					gameState.player2_y = 0;
-			}
-			if (player2.down == 1) {
-				gameState.player2_y += gameState.player_speed;
-				if (gameState.player2_y > 1)
-					gameState.player2_y = 1;
-			}
-		}
-	}
-
-	async startGame(room: number, game: Game) {
-		let gameState = new Rooms();
-		let end = false;
-
-
-		await this.prisma.game.update({
-			where: { id: room },
-			data: { state: "PLAYING"}
-		})
-
+	private async waitingPlayerConnection(room: number) {
 		while (this.ConnectedSockets.findIndex((socket) => socket.roomName === "game-" + room && socket.state === "player1") === -1 ||
 				this.ConnectedSockets.findIndex((socket) => socket.roomName === "game-" + room && socket.state === "player2") === -1) {
-			await this.sleep(1000);
+				//console.log(this.ConnectedSockets);	
+				await this.sleep(1000); // can add a timeout here --> if timeout, delete the game or make cancel state
 		}
 		await this.prisma.game.update({
 			where: { id: room },
 			data: { score1: 0, score2: 0, state: "PLAYING"}
 		})
-		//faire une animation parce que c'est jolie
+		//faire une animation parce que c'est jolie // probablement du front enfaite
+	}
 
-		while (end === false) {
-			this.movePlayer(gameState, room);
-			await this.moveBall(gameState, room);
-			this.server.to("game-" + room).emit("gameState", gameState);
-			end = this.checkEnd(gameState);
-			if (end === true)
+	private async gameRun(gameRoom: GameRoom, room: number) {
+		while (true) {
+			this.movePlayer(gameRoom, room);
+			await this.moveBall(gameRoom, room);
+			this.server.to("game-" + room).emit("gameState", gameRoom.getGameRoomInfo());
+			if (gameRoom.checkEndGame())
 				break;
 			await this.sleep(5)
 		}
+	}
+
+	private async gameEnd(gameRoom: GameRoom, room: number) {
 		await this.prisma.game.update({
 			where: { id: room },
 			data: { state: "ENDED"}
 		})
 
+		const game = await this.prisma.game.findUnique({where: {id: room}});	
+		if (!game)
+			return (false);
+	
 		//set win/loss/stats
-		if (gameState.player1_score > gameState.player2_score)
+		if (gameRoom.player1.score > gameRoom.player2.score)
 		{
 			await this.prisma.user.update({
 				where: { id: game.user1Id },
@@ -191,32 +107,51 @@ export class GameGateway {
 				where: { id: game.user1Id },
 				data: { state: "ONLINE", losses: { increment: 1 } }})
 		}
+		
+		this.GamePlaying.splice(this.GamePlaying.indexOf(room), 1);
 		//disconnect all socket to the room associated and navigate to the end page
-		this.server.to("game-" + room).emit("close", {player1_score: gameState.player1_score, player2_score: gameState.player2_score});
+		this.server.to("game-" + room).emit("close", {player1_score: gameRoom.player1.score, player2_score: gameRoom.player2.score});
+		//jE PENSE QU'IL FAUDRAIT AUSSI DELETE ROOM
+		
+
 	}
 
-	private async checkAndSave(client: Socket) { //I don'know how to redirect the user if request doesnt match
-		const cookies = client.handshake.headers.cookie; //maybe trhow an error
+	async gameLoop(room: number) {
+		let gameRoom = new GameRoom(room);
+
+		await this.waitingPlayerConnection(room);
+
+		await this.gameRun(gameRoom, room);
+
+		await this.gameEnd(gameRoom, room);
+	}
+
+	private async checkUserConnection(client: Socket) {
+	
+		const cookies = client.handshake.headers.cookie;
 		const token = cookies.split("jwt=")[1].split(";")[0];
 		const userCookie = JSON.parse(atob(token.split(".")[1]));
-		jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => { if (err) return ; });
+	//	jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => { if (err) return (null); });
 
 		if (!client.handshake.query || !client.handshake.query.room)
-			return ;
-		const room = parseInt(client.handshake.query.room.toString());
+			return (null);
 		
 		const user = await this.prisma.user.findUnique({where: {login: userCookie.login}});
 		if (!user)
-			return;
+			return (null);
+		const room = parseInt(client.handshake.query.room.toString());	
 		
-		const game = await this.prisma.game.findUnique({where: {id: room}});
+		const game = await this.prisma.game.findUnique({where: {id: room}});	
 		if (!game || game.state == "ENDED")
-			return;
+			return (null);
+		return ({login: userCookie.login, user, game, room})
+	}
 
+	private setupUserSocket(client: Socket, user: User, game: Game, userLogin: string, room: number) {
 		let state : string;
 
 		if (game.user1Id == user.id)
-			state = "player1";
+		state = "player1";
 		else if (game.user2Id == user.id)
 			state = "player2";	
 		else
@@ -226,43 +161,56 @@ export class GameGateway {
 		if (sockUser != null)
 		{
 			client.leave(sockUser.roomName);
-			this.server.to(sockUser.socketId).emit("close");
-			this.server.socketsLeave(sockUser.socketId);
-			this.ConnectedSockets.splice(this.ConnectedSockets.findIndex(x => x.login === user.login), 1);
+			client.emit("close");
 		}
-		
+
 		this.ConnectedSockets.push({
 			prismaId: user.id,
 			socketId: client.id,
-			login: userCookie.login,
+			login: userLogin,
 			roomName: "game-" + room,
 			state: state,
 			up: 0,
 			down: 0
 		});
 		client.join("game-" + room);
-		if (this.GamePlaying.findIndex(x => x === room) === -1)
-		{
-			this.GamePlaying.push(room);
-			this.startGame(room, game);
-		}
-		return "OK";
 	}
 
-	async handleConnection(client: Socket) {
+
+	private async checkAndSave(client: Socket) {
+
+		let userCheck = await this.checkUserConnection(client);
+		
+		if (userCheck === null)
+		{
+			client.emit("BadConnection"); 
+			return (false);
+		}
+		
+		this.setupUserSocket(client, userCheck.user, userCheck.game, userCheck.login, userCheck.room);
+		
+		if (this.GamePlaying.findIndex(x => x === userCheck.room) === -1)
+		{
+			this.GamePlaying.push(userCheck.room);
+			this.gameLoop(userCheck.room);
+		}
+		return (true);
+	}
+ 
+	async handleConnection(client: Socket) { 
+		console.log("New connection !")
 		return await this.checkAndSave(client)
 	}
 
 	handleDisconnect(client: Socket) {
 		const sockUser : SocketUser = this.ConnectedSockets.find(x => x.socketId === client.id);
-		
-		
 		if (sockUser != null)
 		{
 			client.leave(sockUser.roomName);
 			this.server.to(sockUser.socketId).emit("close");
 			this.ConnectedSockets.splice(this.ConnectedSockets.findIndex(x => x.socketId === client.id), 1);
 		}
+		console.log(this.ConnectedSockets)
 		return ;
 	}
 
