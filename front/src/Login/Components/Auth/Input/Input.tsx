@@ -1,8 +1,8 @@
 import React from 'react';
 import './Input.css';
 /*	RESSOURCES	*/
-import Padlock from './Ressources/padlock_white.png'
-import IdCard from './Ressources/id_card_white.png'
+import Padlock from './Ressources/padlock_white.png';
+import IdCard from './Ressources/id_card_white.png';
 
 interface InputProps {
 	input_title: string;
@@ -10,18 +10,20 @@ interface InputProps {
 	icon: string;
 }
 
-const Input = ({input_title, placeholder, icon} : InputProps) => {
+const Input = ({ input_title, placeholder, icon }: InputProps) => {
 	return (
-		<div className='input-wrapper'>
-			<div className='logo-input-wrapper'><img 
-					src={icon === 'id_card' ? IdCard : Padlock} 
-					alt='cadenas' />
+		<div className="input-wrapper">
+			<div className="logo-input-wrapper">
+				<img
+					src={icon === 'id_card' ? IdCard : Padlock}
+					alt="cadenas"
+				/>
 			</div>
 			<div>
 				<p>{input_title}</p>
-				<input type='text' placeholder={placeholder}/>
+				<input type="text" placeholder={placeholder} />
 			</div>
 		</div>
 	);
-}
+};
 export default Input;

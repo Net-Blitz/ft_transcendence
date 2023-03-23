@@ -18,6 +18,7 @@ export const AuthStart = () => {
 			<Button
 				content='Login with 42'
 				bottom='false'
+				href='https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-f157f9462f604eede6bbea3f75533e279c51636777b283bfe57dfcb391784532&redirect_uri=http%3A%2F%2Flocalhost%3A3333%2Fauth%2Fcallback&response_type=code'
 			/>
 		</div>
 	);
@@ -38,6 +39,7 @@ export const Auth2fa = () => {
 			<Button
 				content='Login with 42'
 				bottom='false'
+				href=''
 			/>
 		</div>
 	);
@@ -59,6 +61,7 @@ export const AuthNameAvatar = () => {
 			<Button
 				content='Continue'
 				bottom='true'
+				href=''
 			/>
 		</div>
 	);
@@ -97,6 +100,7 @@ export const Auth2faConfig = () => {
 			<Button
 				content='Login with 42'
 				bottom={statusState === false ? 'true' : 'false'}
+				href=''
 			/>
 		</div>
 	);

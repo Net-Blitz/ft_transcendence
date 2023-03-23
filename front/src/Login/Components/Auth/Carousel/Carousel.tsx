@@ -14,43 +14,40 @@ const Carousel = () => {
 	}, avatar);
 
 	const prev = () => {
-		if (currentIndex !== 0)
-			setCurrentIndex(currentIndex - 1);
+		if (currentIndex !== 0) setCurrentIndex(currentIndex - 1);
 	};
 
 	const next = () => {
-		if (currentIndex + 1 < length)
-			setCurrentIndex(currentIndex + 1);
-	}
+		if (currentIndex + 1 < length) setCurrentIndex(currentIndex + 1);
+	};
 
 	const renderAvatar = (index: number, setting: string) => {
-		if (index < 0 || index >= length)
-		{
-			return (
-				<div
-					className={`avatar ${setting} empty`}
-				></div>
-			);
-		}
-		else
-		{
+		if (index < 0 || index >= length) {
+			return <div className={`avatar ${setting} empty`}></div>;
+		} else {
 			return (
 				<div
 					className={`avatar ${setting}`}
 					style={{
 						backgroundImage: `url(${avatar[index].avatar})`,
 						backgroundPosition: 'center',
-						backgroundSize: 'cover'
+						backgroundSize: 'cover',
 					}}
-					onClick={setting === 'left' ? prev : setting === 'right' ? next : undefined}
+					onClick={
+						setting === 'left'
+							? prev
+							: setting === 'right'
+							? next
+							: undefined
+					}
 				></div>
 			);
 		}
-	}
+	};
 
 	return (
-		<div className='carousel-wrapper'>
-			<div className='carousel-element'>
+		<div className="carousel-wrapper">
+			<div className="carousel-element">
 				{renderAvatar(currentIndex - 1, 'left')}
 				{renderAvatar(currentIndex, '')}
 				{renderAvatar(currentIndex + 1, 'right')}

@@ -4,13 +4,14 @@ import './Button.css';
 interface ButtonProps {
 	content: string;
 	bottom: string;
+	href: string;
 }
 
-const Button = ({content, bottom} : ButtonProps) => {
+const Button = ({content, bottom, href} : ButtonProps) => {
 	return (
 		<div 
 			className={bottom === 'true' ? 'button-wrapper bottom' : 'button-wrapper'}>
-			<button>{content}</button>
+			<a href={href}><button>{content}</button></a>
 		</div>
 	);
 }
