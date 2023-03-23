@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
     provider = "prisma-client-js"
 }
@@ -10,67 +7,162 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-enum UserStatus {
-    OFFLINE
-    ONLINE
-    SEARCHING
-    PLAYING
-}
-
 model User {
-    id       Int    @id @default(autoincrement())
-    login    String @unique
-    username String @unique
-
-    avatar    String?
-    twoFactor Boolean    @default(false)
-    secret    String?
-    state     UserStatus @default(ONLINE)
-    wins      Int        @default(0)
-    losses    Int        @default(0)
-    elo       Int        @default(300)
-
-    //chat	relation
-    channels      Channel[] @relation("ChatUsers")
-    channelsAdmin Channel[] @relation("Admin")
-    channelsOwn   Channel[] @relation("Owner")
+    id            Int               @id @default(autoincrement())
+    username      String            @unique
+    avatar        String?
+    twoFactor     Boolean           @default(false)
+    status        UserStatus        @default(ONLINE)
+    wins          Int               @default(0)
+    losses        Int               @default(0)
+    elo           Int               @default(300)
+    login         String            @unique
+    secret        String?
+    blockByMe     Blocked[]         @relation("blockByMe")
+    blockOnMe     Blocked[]         @relation("blockOnMe")
+    friend        FriendsRelation[] @relation("friend")
+    friendwith    FriendsRelation[] @relation("friendwith")
+    GameAsPlayer1 Game[]            @relation("player1")
+    GameAsPlayer2 Game[]            @relation("player2")
+    Admin         Admin[]
+    Ban           Ban[]
+    ChatUsers     ChatUsers[]
+    InviteChannel InviteChannel[]
+    Mute          Mute[]
+    channelsOwn   Channel[]         @relation("Owner")
     messages      Message[]
-
-    //friends relation
-    friend     FriendsRelation[] @relation("friend")
-    friendwith FriendsRelation[] @relation("friendwith")
-
-    //game relation
-    GameAsPlayer1 Game[] @relation("player1")
-    GameAsPlayer2 Game[] @relation("player2")
-    queue         Queue? @relation("Queue")
-
-    mutedList   Channel[] @relation("Mute")
-    BannedList  Channel[] @relation("Ban")
-    invitedList Channel[] @relation("InviteChannel")
-    blockOnMe   Blocked[] @relation("blockOnMe")
-    blockByMe   Blocked[] @relation("blockByMe")
-
-    //NEED invitation(game)
+    queue         Queue?            @relation("Queue")
 }
 
-////self many to many database
+/// /self many to many database
 model FriendsRelation {
-    friend       User @relation("friend", fields: [friendId], references: [id])
     friendId     Int
-    friendwith   User @relation("friendwith", fields: [friendwithId], references: [id])
     friendwithId Int
+    friend       User   @relation("friend", fields: [friendId], references: [id])
+    friendwith   User   @relation("friendwith", fields: [friendwithId], references: [id])
+    status       String @default("PENDING")
 
     @@id([friendId, friendwithId])
 }
 
 model Blocked {
-    blockByMe   User @relation("blockByMe", fields: [blockByMeId], references: [id])
     blockByMeId Int
-    blockOnMe   User @relation("blockOnMe", fields: [blockOnMeId], references: [id])
     blockOnMeId Int
+    blockByMe   User @relation("blockByMe", fields: [blockByMeId], references: [id])
+    blockOnMe   User @relation("blockOnMe", fields: [blockOnMeId], references: [id])
 
     @@id([blockByMeId, blockOnMeId])
+}
+
+model Channel {
+    id            Int             @id @default(autoincrement())
+    name          String
+    hash          String?
+    state         ChannelState
+    ownerId       Int
+    Admin         Admin[]
+    Ban           Ban[]
+    ChatUsers     ChatUsers[]
+    InviteChannel InviteChannel[]
+    Mute          Mute[]
+    owner         User            @relation("Owner", fields: [ownerId], references: [id])
+    messages      Message[]
+
+    @@map("channels")
+}
+
+model Message {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    message   String
+    channelId Int
+    userId    Int
+    channel   Channel  @relation(fields: [channelId], references: [id])
+    user      User     @relation(fields: [userId], references: [id])
+
+    @@map("messages")
+}
+
+model Game {
+    id         Int       @id @default(autoincrement())
+    difficulty Int       @default(0)
+    state      GameState @default(CREATING)
+    score1     Int       @default(0)
+    score2     Int       @default(0)
+    user1Id    Int
+    user2Id    Int
+    user1      User      @relation("player1", fields: [user1Id], references: [id])
+    user2      User      @relation("player2", fields: [user2Id], references: [id])
+}
+
+model Queue {
+    id     Int  @id @default(autoincrement())
+    userId Int  @unique
+    user   User @relation("Queue", fields: [userId], references: [id])
+
+    @@map("queues")
+}
+
+model Admin {
+    A        Int
+    B        Int
+    channels Channel @relation(fields: [A], references: [id], onDelete: Cascade)
+    User     User    @relation(fields: [B], references: [id], onDelete: Cascade)
+
+    @@unique([A, B], map: "_Admin_AB_unique")
+    @@index([B], map: "_Admin_B_index")
+    @@map("_Admin")
+}
+
+model Ban {
+    A        Int
+    B        Int
+    channels Channel @relation(fields: [A], references: [id], onDelete: Cascade)
+    User     User    @relation(fields: [B], references: [id], onDelete: Cascade)
+
+    @@unique([A, B], map: "_Ban_AB_unique")
+    @@index([B], map: "_Ban_B_index")
+    @@map("_Ban")
+}
+
+model ChatUsers {
+    A        Int
+    B        Int
+    channels Channel @relation(fields: [A], references: [id], onDelete: Cascade)
+    User     User    @relation(fields: [B], references: [id], onDelete: Cascade)
+
+    @@unique([A, B], map: "_ChatUsers_AB_unique")
+    @@index([B], map: "_ChatUsers_B_index")
+    @@map("_ChatUsers")
+}
+
+model InviteChannel {
+    A        Int
+    B        Int
+    channels Channel @relation(fields: [A], references: [id], onDelete: Cascade)
+    User     User    @relation(fields: [B], references: [id], onDelete: Cascade)
+
+    @@unique([A, B], map: "_InviteChannel_AB_unique")
+    @@index([B], map: "_InviteChannel_B_index")
+    @@map("_InviteChannel")
+}
+
+model Mute {
+    A        Int
+    B        Int
+    channels Channel @relation(fields: [A], references: [id], onDelete: Cascade)
+    User     User    @relation(fields: [B], references: [id], onDelete: Cascade)
+
+    @@unique([A, B], map: "_Mute_AB_unique")
+    @@index([B], map: "_Mute_B_index")
+    @@map("_Mute")
+}
+
+enum UserStatus {
+    OFFLINE
+    ONLINE
+    SEARCHING
+    PLAYING
 }
 
 enum ChannelState {
@@ -80,67 +172,8 @@ enum ChannelState {
     PRIVMSG
 }
 
-model Channel {
-    id    Int          @id @default(autoincrement())
-    name  String
-    hash  String?
-    state ChannelState
-
-    ownerId  Int
-    owner    User      @relation("Owner", fields: [ownerId], references: [id])
-    admins   User[]    @relation("Admin")
-    users    User[]    @relation("ChatUsers")
-    messages Message[]
-
-    mutedList   User[] @relation("Mute")
-    bannedList  User[] @relation("Ban")
-    invitedList User[] @relation("InviteChannel") //maybe we want to know who invite to the channel
-
-    // public: no hash everyone can access, protected: hash everyone can access, private: no hash need to be invited, privmsg: no hash no invite
-
-    @@map("channels")
-}
-
-model Message {
-    id        Int      @id @default(autoincrement())
-    createdAt DateTime @default(now())
-
-    message String
-
-    channelId Int
-    userId    Int
-    user      User    @relation(fields: [userId], references: [id])
-    channel   Channel @relation(fields: [channelId], references: [id])
-
-    @@map("messages")
-}
-
 enum GameState {
     CREATING
     PLAYING
     ENDED
 }
-
-model Game {
-    id Int @id @default(autoincrement())
-
-    difficulty Int       @default(0)
-    state      GameState @default(CREATING)
-    score1     Int       @default(0)
-    score2     Int       @default(0)
-    user1Id Int
-    user2Id Int
-    user1   User @relation("player1", fields: [user1Id], references: [id])
-    user2   User @relation("player2", fields: [user2Id], references: [id])
-}
-
-model Queue {
-    id Int @id @default(autoincrement())
-
-    userId Int  @unique
-    user   User @relation("Queue", fields: [userId], references: [id])
-
-    @@map("queues")
-}
-
-//MAYBE add a lobby to handle properly game invite

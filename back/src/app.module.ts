@@ -4,8 +4,7 @@ import { ConfigModule } from "@nestjs/config";
 import { PrismaModule } from "./prisma/prisma.module";
 import { UserModule } from "./user/user.module";
 import { JwtModule } from "@nestjs/jwt";
-import { GameModule } from './game/game.module';
-import { QueueModule } from './queue/queue.module';
+import { FriendModule } from './friend/friend.module';
 
 @Module({
 	imports: [
@@ -17,8 +16,7 @@ import { QueueModule } from './queue/queue.module';
 			secret: process.env.JWT_SECRET,
 			signOptions: { expiresIn: "120min" },
 		}),
-		GameModule,
-		QueueModule,
+		FriendModule,
 	],
 })
-export class AppModule {};
+export class AppModule {}

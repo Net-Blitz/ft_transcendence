@@ -21,6 +21,11 @@ export class UserController {
 		return this.userService.GetUserByLogin(username, req, res);
 	}
 
+	@Get("login")
+	async GetAllUser(@Req() req: Request, @Res() res: Response) {
+		return this.userService.GetAllUser(req, res);
+	}
+
 	@Put("update")
 	async UpdateUser(
 		@Req() req: Request,

@@ -18,7 +18,10 @@ import { ConfigService } from "@nestjs/config";
 
 @Controller("auth")
 export class AuthController {
-	constructor(private authService: AuthService, private config: ConfigService) {}
+	constructor(
+		private authService: AuthService,
+		private config: ConfigService
+	) {}
 
 	@Get("callback")
 	async auth42Callback(
@@ -26,13 +29,17 @@ export class AuthController {
 		@Res() res: Response,
 		@Query("code") code: string
 	) {
-		console.log("HOST: ", this.config.get("HOST_T"))
+		console.log("HOST: ", this.config.get("HOST_T"));
 		await this.authService.Auth42Callback(req, res, code);
-		return res.redirect("http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_GLOBAL"));
+		return res.redirect(
+			"http://" +
+				this.config.get("HOST_T") +
+				":" +
+				this.config.get("PORT_GLOBAL")
+		);
 		// return res.redirect("http://localhost:8080/");
 	}
 
-	
 	@Get("verify")
 	async verify(@Req() req: Request, @Res() res: Response) {
 		const token = req.cookies.jwt;
@@ -59,7 +66,7 @@ export class AuthController {
 	) {
 		return await this.authService.setup2fa(req, res, user);
 	}
-	
+
 	@Post("2fa/verify")
 	async verify2fa(
 		@Req() req: Request,
@@ -88,10 +95,12 @@ export class AuthController {
 		return await this.authService.remove2fa(req, res, cookie);
 	}
 
-	@Get(":username")/*Temp*/
-	async getUserCheat(@Req() req: Request, @Res() res: Response, @Param("username") username: string) {
-		console.log("username: " + username)
+	@Get(":username") /*Temp*/ async getUserCheat(
+		@Req() req: Request,
+		@Res() res: Response,
+		@Param("username") username: string
+	) {
+		console.log("username: " + username);
 		return await this.authService.getUserCheat(req, res, username);
 	}
 }
-	

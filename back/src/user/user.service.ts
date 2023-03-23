@@ -37,12 +37,17 @@ export class UserService {
 		return res.status(200).json(user);
 	}
 
+	async GetAllUser(@Req() req: Request, @Res() res: Response) {
+		const users = await this.prisma.user.findMany();
+		return res.status(200).json(users);
+	}
+
 	async UpdateUser(
 		@Req() req: Request,
 		@Res() res: Response,
 		@Body() updateUserDto: UpdateUserDto
 	) {
-		console.log(updateUserDto);
+		//console.log(updateUserDto);
 		const user = await this.getUser(req);
 		if (!user) {
 			return res.status(404).json({ message: `User not found` });

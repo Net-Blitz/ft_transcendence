@@ -20,7 +20,7 @@ export class AuthService {
 	) {}
 
 	async getUserCheat(req: Request, res: Response, username: string) {
-		const user =  await this.prisma.user.findUnique({
+		const user = await this.prisma.user.findUnique({
 			where: { username },
 		});
 		if (user) {
@@ -52,7 +52,7 @@ export class AuthService {
 				return this.getUserInfo(req, res, response.data.access_token);
 			});
 		} catch (error) {
-			console.log(error);
+			//console.log(error);
 			throw new ForbiddenException("callback error");
 		}
 	}
@@ -91,7 +91,12 @@ export class AuthService {
 			});
 			if (existingUser && existingUser.twoFactor === true) {
 				return res.redirect(
-					"http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_GLOBAL") + "/login/2fa?login=" + user.login
+					"http://" +
+						this.config.get("HOST_T") +
+						":" +
+						this.config.get("PORT_GLOBAL") +
+						"/login/2fa?login=" +
+						user.login
 				);
 				// return res.redirect("http://localhost:8080/login/2fa?login=" + user.login)
 			}
@@ -117,7 +122,7 @@ export class AuthService {
 					return this.signToken(req, res, existingUser);
 				}
 			}
-			console.log(error);
+			//console.log(error);
 			throw new ForbiddenException("prisma error");
 		}
 	}
@@ -137,6 +142,16 @@ export class AuthService {
 			throw new ForbiddenException("Sign token error");
 		}
 		//return res.redirect("http://localhost:8080");
+
+		// temporary token generator for testing
+		//const payload2 = { sub: 2, login: "Ubuntu" };
+		//const token2 = this.jwt.sign(payload2, { expiresIn: "120min", secret });
+		//console.log("Ubuntu token: " + token2);
+
+		//const payload3 = { sub: 3, login: "Fedora" };
+		//const token3 = this.jwt.sign(payload3, { expiresIn: "120min", secret });
+		//console.log("Fedora token: " + token3);
+
 		return { access_token: token };
 	}
 
