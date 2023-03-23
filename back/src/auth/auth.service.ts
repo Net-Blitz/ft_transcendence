@@ -62,7 +62,6 @@ export class AuthService {
 		@Res() res: Response,
 		token: string
 	) {
-		//console.log("token: " + token);
 		try {
 			await axios({
 				method: "get",
@@ -82,7 +81,6 @@ export class AuthService {
 	}
 
 	async createUser(@Req() req: Request, @Res() res: Response, user: UserDto) {
-		//console.log("User: " + user.login);
 		try {
 			const existingUser = await this.prisma.user.findUnique({
 				where: {
@@ -90,22 +88,26 @@ export class AuthService {
 				},
 			});
 			if (existingUser && existingUser.twoFactor === true) {
+				// User deja log avec 2fa true
 				return res.redirect(
 					"http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_GLOBAL") + "/login/2fa?login=" + user.login
 				);
-				// return res.redirect("http://localhost:8080/login/2fa?login=" + user.login)
 			}
 			if (existingUser) {
-				return this.signToken(req, res, existingUser);
+				console.log("second connection");
+				this.signToken(req, res, existingUser);
+				if (existingUser.avatar)
+					return res.redirect("http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_GLOBAL"));
+				return res.redirect("http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_GLOBAL") + '/login/name&avatar');
 			}
 			const createdUser = await this.prisma.user.create({
 				data: {
 					login: user.login,
-					avatar: user.avatar,
 					username: user.login,
 				},
 			});
-			return this.signToken(req, res, createdUser);
+			this.signToken(req, res, createdUser);
+			return res.redirect("http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_GLOBAL") + '/login/name&avatar');
 		} catch (error) {
 			if (error instanceof PrismaClientKnownRequestError) {
 				if (error.code === "P2002") {

@@ -26,17 +26,13 @@ export class AuthController {
 		@Res() res: Response,
 		@Query("code") code: string
 	) {
-		console.log("HOST: ", this.config.get("HOST_T"))
 		await this.authService.Auth42Callback(req, res, code);
-		return res.redirect("http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_GLOBAL"));
-		// return res.redirect("http://localhost:8080/");
+		return ;
 	}
 
-	
 	@Get("verify")
 	async verify(@Req() req: Request, @Res() res: Response) {
 		const token = req.cookies.jwt;
-		//console.log("token2: " + token);
 		if (!token) {
 			res.status(401).send("Unauthorized: No token provided");
 			return { valid: false };
