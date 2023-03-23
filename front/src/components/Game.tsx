@@ -28,8 +28,9 @@ function Game() {
 		socket.close();
 		navigate("/");		
 	});
-	
+
 	socket.on("gameState", (gameState: any) => {
+		console.log("gameState", gameState.player1_score, gameState.player2_score)
 		let ball = document.getElementById("ball");
 		let player1 = document.getElementById("player1");
 		let player2 = document.getElementById("player2");

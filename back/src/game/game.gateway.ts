@@ -158,22 +158,35 @@ export class GameGateway {
 			state = "spectator";
 
 		const sockUser : SocketUser = this.ConnectedSockets.find(x => x.login === user.login);
+
 		if (sockUser != null)
 		{
-			client.leave(sockUser.roomName);
-			client.emit("close");
+			console.log("room: " + room, "sockUser.RommNmae: ", sockUser.roomName, "sockUser.state: ");
+			if (sockUser.roomName !== "game-" + room)
+			{
+				console.log("different room");
+				this.server.to(sockUser.socketId).emit("close");
+				sockUser.roomName = "game-" + room;
+				sockUser.state = state;
+				sockUser.up = 0;
+				sockUser.down = 0;
+				sockUser.socketId = client.id;
+				client.join("game-" + room);
+			}
 		}
-
-		this.ConnectedSockets.push({
-			prismaId: user.id,
-			socketId: client.id,
-			login: userLogin,
-			roomName: "game-" + room,
-			state: state,
-			up: 0,
-			down: 0
-		});
-		client.join("game-" + room);
+		else
+		{
+			this.ConnectedSockets.push({
+				prismaId: user.id,
+				socketId: client.id,
+				login: userLogin,
+				roomName: "game-" + room,
+				state: state,
+				up: 0,
+				down: 0
+			});
+			client.join("game-" + room);
+		}
 	}
 
 
@@ -189,6 +202,22 @@ export class GameGateway {
 		
 		this.setupUserSocket(client, userCheck.user, userCheck.game, userCheck.login, userCheck.room);
 		
+		if (userCheck.game.state === "CREATING")// || userCheck.game.state === "PLAYING")
+			client.emit("gameState", {
+				ball_x: 0.5,
+				ball_y: 0.5,
+				ball_size: 0.05,
+				
+				player1_x: 0.006,
+				player1_y: 0.5,
+				player1_size: 0.3,
+				player1_score: 0,
+	
+				player2_x: 0.994,
+				player2_y: 0.5,
+				player2_size: 0.3,
+				player2_score: 0,
+			});
 		if (this.GamePlaying.findIndex(x => x === userCheck.room) === -1)
 		{
 			this.GamePlaying.push(userCheck.room);
@@ -198,7 +227,6 @@ export class GameGateway {
 	}
  
 	async handleConnection(client: Socket) { 
-		console.log("New connection !")
 		return await this.checkAndSave(client)
 	}
 
@@ -210,7 +238,6 @@ export class GameGateway {
 			this.server.to(sockUser.socketId).emit("close");
 			this.ConnectedSockets.splice(this.ConnectedSockets.findIndex(x => x.socketId === client.id), 1);
 		}
-		console.log(this.ConnectedSockets)
 		return ;
 	}
 
