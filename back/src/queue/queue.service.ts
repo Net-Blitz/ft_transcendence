@@ -4,95 +4,54 @@ import { AddQueueDto, QueueObject } from './dto';
 
 @Injectable()
 export class QueueService {
-	constructor(private queue: QueueObject[], private prisma: PrismaService) {}
+	queue1v1: QueueObject[]
+	queue2v2: QueueObject[]
+
+	constructor(private prisma: PrismaService, ) {
+		this.queue1v1 = [];
+		this.queue2v2 = [];
+	}
 
 	async getQueue() {
-		return this.queue;
+		return this.queue1v1;
 	}
 
 	getUserInQueue(userLogin: string) {
-		return this.queue.find((queuer) => queuer.login === userLogin);
+		return this.queue1v1.find((queuer) => queuer.login === userLogin);
 	}
 
 	async addToQueue(userLogin: string, dto: AddQueueDto) {
 		const user = await this.prisma.user.findUnique({
-			where: {
-				login: userLogin,
-			}
-		});
+			where: {login: userLogin,}});
 		if (!user || user.state !== "ONLINE")
 			return ;
 
 		if (!this.getUserInQueue(userLogin))
-			this.queue.push({id:user.id, login: userLogin,
+			this.queue1v1.push({id:user.id, login: userLogin,
+				socketId: undefined,
 				mode: dto.mode,elo: user.elo,
 				bonus1: (dto.bonus1 == undefined) ? false : true,
 				bonus2: (dto.bonus2 == undefined) ? false : true,
+				timeData: Date.now()
 				});
 		return await this.prisma.user.update({
-			where: {
-				login: userLogin,
-			},
-			data: {
-				state: "SEARCHING",
-			}
+			where: {login: userLogin,},
+			data: {state: "SEARCHING",}
 		});
 	}
 
 	async removeFromQueue(userLogin: string) {
 		const user = await this.prisma.user.findUnique({
-			where: {
-				login: userLogin,
-			}
-		});
-		console.log(this.queue)
-		if (!user || user.state !== "SEARCHING")
+			where: {login: userLogin,}});
+		console.log("remove: ", this.queue1v1)
+		if (!user || user.state === "PLAYING")
 			return ;
 		
 		if (this.getUserInQueue(userLogin))
-			this.queue.splice(this.queue.indexOf(this.getUserInQueue(userLogin)), 1);
+			this.queue1v1.splice(this.queue1v1.indexOf(this.getUserInQueue(userLogin)), 1);
 		return await this.prisma.user.update({
-			where: {
-				login: userLogin,
-			},
-			data: {
-				state: "ONLINE",
-			}
+			where: {login: userLogin,},
+			data: {state: "ONLINE",}
 		});
-	}
-	
-	async match(userLogin: string) {
-		const user = await this.prisma.user.findUnique({
-			where: {
-				login: userLogin,
-			}
-		});
-		console.log(user)
-		if (!user || user.state !== "SEARCHING")
-			return ;
-
-		if (!this.getUserInQueue(userLogin))
-			return  ;
-		//Algo to find a good opponent
-		const opponent = this.queue.find((queuer) => queuer.login !== userLogin);
-		console.log("oponent: ", opponent)
-		if (!opponent)
-			return ;
-
-		this.queue.splice(this.queue.indexOf(this.getUserInQueue(userLogin)), 1);
-		this.queue.splice(this.queue.indexOf(this.getUserInQueue(userLogin)), 1);
-		console.log(this.queue)
-		await this.prisma.user.updateMany({
-			where: {
-				login: {
-					in: [userLogin, opponent.login],
-				}
-			},
-			data: {
-				state: "PLAYING",
-			}
-		});
-		console.log(user)
-		return {player1: user.id, player2: opponent.id}
 	}
 }

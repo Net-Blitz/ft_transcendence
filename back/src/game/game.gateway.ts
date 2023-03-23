@@ -161,10 +161,8 @@ export class GameGateway {
 
 		if (sockUser != null)
 		{
-			console.log("room: " + room, "sockUser.RommNmae: ", sockUser.roomName, "sockUser.state: ");
 			if (sockUser.roomName !== "game-" + room)
 			{
-				console.log("different room");
 				this.server.to(sockUser.socketId).emit("close");
 				sockUser.roomName = "game-" + room;
 				sockUser.state = state;

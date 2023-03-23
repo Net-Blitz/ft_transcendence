@@ -25,8 +25,10 @@ export class QueueObject {
 
 	id: number;
 	login: string;
+	socketId: string;
 	mode: string;
 	bonus1: boolean;
 	bonus2: boolean;
 	elo: number;
+	timeData: number
 }

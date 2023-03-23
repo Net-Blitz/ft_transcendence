@@ -4,7 +4,7 @@ import { GetUser } from "src/auth/decorator";
 import { AddQueueDto } from "./dto";
 import { GameService } from "src/game/game.service";
 
-@Controller("queue")
+@Controller("queues")
 export class QueueController {
 	constructor(private queueService: QueueService, private game: GameService) {}
 

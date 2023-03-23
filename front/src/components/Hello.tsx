@@ -19,7 +19,7 @@ function Hello() {
 	};
 
 	const handleGame = () => {
-		axios.post("http://localhost:3333/queue/add", {mode: "1v1"}, { withCredentials: true })
+		axios.post("http://localhost:3333/queues/add", {mode: "1v1"}, { withCredentials: true })
 		.then((res) => {
 			console.log(res);
 			navigate("/lobby");
