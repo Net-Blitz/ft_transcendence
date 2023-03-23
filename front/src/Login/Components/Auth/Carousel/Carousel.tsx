@@ -11,7 +11,7 @@ const Carousel = () => {
 
 	useEffect(() => {
 		setLenght(avatar.length);
-	}, avatar);
+	}, [avatar]);
 
 	const prev = () => {
 		if (currentIndex !== 0) setCurrentIndex(currentIndex - 1);
@@ -39,8 +39,7 @@ const Carousel = () => {
 							: setting === 'right'
 							? next
 							: undefined
-					}
-				></div>
+					}></div>
 			);
 		}
 	};

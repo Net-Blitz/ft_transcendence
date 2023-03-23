@@ -20,30 +20,6 @@ async function isAuthenticated() {
 	}
 }
 
-async function isConfigurated() {
-	try {
-		const response = await axios.get('http://localhost:3333/users/me', {
-			withCredentials: true,
-		});
-		if (response.data.avatar !== null) return true;
-		return false;
-	} catch (error) {
-		return false;
-	}
-}
-
-async function is2FAconf() {
-	try {
-		const response = await axios.get('http://localhost:3333/users/me', {
-			withCredentials: true,
-		});
-		if (response.data.twoFactor === true) return true;
-		return false;
-	} catch (error) {
-		return false;
-	}
-}
-
 function PrivateRoute({ children }: PrivateRouteProps) {
 	const [isAuth, setIsAuth] = useState<boolean>();
 	const [isLoading, setIsLoading] = useState(true);

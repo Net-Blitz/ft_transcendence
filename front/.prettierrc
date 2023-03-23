@@ -9,6 +9,7 @@
     "trailingComma": "es5",
     "bracketSpacing": true,
     "bracketSameLine": false,
+    "jsxBracketSameLine": true,
     "arrowParens": "always",
     "endOfLine": "lf",
     "embeddedLanguageFormatting": "off",

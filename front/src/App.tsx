@@ -17,7 +17,7 @@ function App(this: any) {
 						<Login />
 					</PrivateRoute>
 				}
-			/>{' '}
+			/>
 			{/*	config */}
 			<Route path="/login" element={<Login />} /> {/*	rien */}
 			<Route
@@ -27,7 +27,7 @@ function App(this: any) {
 						<Login />
 					</PrivateRoute>
 				}
-			/>{' '}
+			/>
 			{/*	config + 2fa */}
 			<Route
 				path="/login/name&avatar"
@@ -36,7 +36,7 @@ function App(this: any) {
 						<Login />
 					</PrivateRoute>
 				}
-			/>{' '}
+			/>
 			{/*no config*/}
 			<Route
 				path="/login/2faconfig"
@@ -45,7 +45,7 @@ function App(this: any) {
 						<Login />
 					</PrivateRoute>
 				}
-			/>{' '}
+			/>
 			{/*no config*/}
 		</Routes>
 	);
