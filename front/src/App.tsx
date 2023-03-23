@@ -1,27 +1,29 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Routes, Route, BrowserRouter } from 'react-router-dom';
+import Hello from './components/Hello';
+import PrivateRoute from './components/PrivateRoute';
+import Login from './components/Login';
+import Dashboard from './components/Dashboard';
+import SearchUser from './components/SearchUser';
+import DoubleAuth from './components/DoubleAuth';
+import Lobby from './components/Lobby';
+import Game from './components/Game';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          HELLO
-          Learn React salut les gars
-        </a>
-      </header>
-    </div>
-  );
+function App(this: any) {
+	return (
+		<BrowserRouter>
+			<Routes>
+				<Route path="/login" element={<Login />} />
+				<Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+				<Route path="/" element={<PrivateRoute><Hello /></PrivateRoute>} />
+				<Route path="/search" element={<PrivateRoute><SearchUser /></PrivateRoute>} />
+				<Route path="/2fa" element={<PrivateRoute><DoubleAuth /></PrivateRoute>} />
+				<Route path="/lobby" element={<PrivateRoute><Lobby /></PrivateRoute>} />
+				<Route path="/game" element={<PrivateRoute><Game /></PrivateRoute>} />
+				{/* <Route path="/game/:id" exact component={Game} /> */}
+			</Routes>
+		</BrowserRouter>
+	);
 }
 
 export default App;
