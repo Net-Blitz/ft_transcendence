@@ -22,16 +22,4 @@ export class QueueController {
 	async removeFromQueue(@GetUser("login") userLogin: string) {
 		return this.queueService.removeFromQueue(userLogin);
 	}
-
-	@Get("match") /* Temp route */
-	async match(@GetUser("login") userLogin: string) {
-		const match = await this.queueService.match(userLogin);
-		if (match)
-		{
-			console.log("match: ", match)
-			return await this.game.createGame(match);
-		}
-		return null;
-	}
-
 }
