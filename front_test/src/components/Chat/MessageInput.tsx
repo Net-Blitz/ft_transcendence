@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { MessageDto } from "./Chat";
 
 function MessageInput({
 	sendMessage,
+	userInfo,
 }: {
-	sendMessage: (value: string) => void;
+	sendMessage: (value: MessageDto) => void;
+	userInfo: any;
 }) {
 	const [value, setValue] = useState("");
 
@@ -15,7 +18,13 @@ function MessageInput({
 				value={value}
 				type="text"
 			/>
-			<button onClick={() => sendMessage(value)}>Send</button>
+			<button
+				onClick={() =>
+					sendMessage({ username: userInfo.username, content: value })
+				}
+			>
+				Send
+			</button>
 		</>
 	);
 }

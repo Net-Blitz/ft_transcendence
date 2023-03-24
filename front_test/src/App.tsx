@@ -12,6 +12,7 @@ import Game from "./components/Game";
 import Friend from "./components/Friend";
 import Profile from "./components/Profile";
 import Chat from "./components/Chat/Chat";
+import Channel from "./components/Chat/Channel";
 
 function App(this: any) {
 	return (
@@ -85,6 +86,14 @@ function App(this: any) {
 				/>
 				<Route
 					path="/chat"
+					element={
+						<PrivateRoute>
+							<Channel />
+						</PrivateRoute>
+					}
+				/>
+				<Route
+					path="/chat/:name"
 					element={
 						<PrivateRoute>
 							<Chat />

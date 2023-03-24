@@ -6,6 +6,7 @@ import { UserModule } from "./user/user.module";
 import { JwtModule } from "@nestjs/jwt";
 import { FriendModule } from "./friend/friend.module";
 import { ChatGateway } from "./chat/chat.gateway";
+import { ChatModule } from "./chat/chat.module";
 
 @Module({
 	imports: [
@@ -18,6 +19,7 @@ import { ChatGateway } from "./chat/chat.gateway";
 			signOptions: { expiresIn: "120min" },
 		}),
 		FriendModule,
+		ChatModule,
 	],
 	providers: [ChatGateway],
 })
