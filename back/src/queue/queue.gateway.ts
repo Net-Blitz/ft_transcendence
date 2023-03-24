@@ -9,8 +9,13 @@ export class QueueGateway {
 
 	@WebSocketServer()
 	server: Server;
-	
-	constructor(private prisma: PrismaService, private queueService: QueueService) {
+
+	queue1v1: QueueObject[]
+	queue2v2: QueueObject[]
+
+	constructor(private prisma: PrismaService) {
+		this.queue1v1 = [];
+		this.queue2v2 = [];
 		this.runQueue();
 	}
 	
@@ -21,11 +26,11 @@ export class QueueGateway {
 	async runQueue() {
 		while (1)
 		{
-			console.log ("Queue 1v1: ", this.queueService.queue1v1);
-			if (this.queueService.queue1v1.length >= 2)
+			console.log ("Queue 1v1: ", this.queue1v1);
+			if (this.queue1v1.length >= 2)
 			{
-				const player1 = this.queueService.queue1v1.shift();
-				const player2 = this.queueService.queue1v1.shift();
+				const player1 = this.queue1v1.shift();
+				const player2 = this.queue1v1.shift();
 				await this.prisma.user.updateMany({
 					where: {login: {in: [player1.login, player2.login],}}, 
 					data: {state: "PLAYING",}});
@@ -53,23 +58,50 @@ export class QueueGateway {
 	}
 
 
-	handleConnection(client: Socket) { 
-		const cookies = client.handshake.headers.cookie;
-		const token = cookies.split("jwt=")[1].split(";")[0];
-		const userCookie = JSON.parse(atob(token.split(".")[1]));
- 
-		const user = this.queueService.getUserInQueue(userCookie.login);
+	async addUserToQueue(userParam: any, client: Socket) {
+		const prismaUser = await this.prisma.user.findFirst({where: {login: userParam.login}});
+		if (!prismaUser)
+			return client.emit("close");
+		const user = this.queue1v1.find((queuer) => queuer.login === userParam.login);
 		if (user)
 		{
-			if (user.socketId !== client.id && user.socketId !== undefined)
-				this.server.to(user.socketId).emit("close");
+			this.server.to(user.socketId).emit("close");
 			user.socketId = client.id;
+			user.mode = userParam.mode;
+			user.bonus1 = (userParam.bonus1 == undefined) ? false : true;
+			user.bonus2 = (userParam.bonus2 == undefined) ? false : true;
+			user.timeData = Date.now();
 		}
-		console.log("Socket connected: ", client.id);
+		else
+		{
+			this.queue1v1.push({
+			id: prismaUser.id,
+			login: userParam.login,
+			socketId: client.id,
+			mode: userParam.mode, elo: prismaUser.elo,
+			bonus1: (userParam.bonus1 == undefined) ? false : true,
+			bonus2: (userParam.bonus2 == undefined) ? false : true,
+			timeData: Date.now()
+			});
+		}
+	}
+
+	handleConnection(client: Socket) { 
+		const userParam = client.handshake.auth;
+ 
+		if (userParam.login == undefined || userParam.mode == undefined)
+			return client.emit("redirect", "/");
+
+		this.addUserToQueue(userParam, client);
+
+		return ;
 	} 
 
 	handleDisconnect(client: Socket) {
-		console.log("Socket disconnected: ", client.id);
+		const user = this.queue1v1.find((queuer) => queuer.socketId === client.id);
+		if (!user)
+			return ;
+		this.queue1v1 = this.queue1v1.filter((queuer) => queuer.socketId !== client.id);
 		return ;
 	}
 }

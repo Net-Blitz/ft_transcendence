@@ -1,15 +1,21 @@
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { io, Socket } from "socket.io-client";
+import { redirect } from "react-router-dom";
 
 function Lobby() {
 	//const [queue, setqueue] = useState<QueueObject[]>();
 	//const [game, setgame] = useState<GameObject[]>();
 	const navigate = useNavigate();
+	const location = useLocation();
+	const queueParam = location.state;
 	
 	const connectionObject = { //-> cause probablement le probleme de double connection
 		transports: ['websocket'],
 		withCredentials: true,
+		auth : {
+			...queueParam
+		}
 	  };
 
 	const socket: Socket = io(`http://localhost:3333/queue`, connectionObject);
@@ -26,6 +32,11 @@ function Lobby() {
 		socket.close();
 	});
 
+	socket.on("redirect", (data:string) => {
+		socket.close();
+		navigate(data);
+	});
+
 	socket.on("queue1v1", (data:string) => {
 		console.log("data: ", data);
 	})
@@ -37,16 +48,10 @@ function Lobby() {
 	})
 
 
-	const handleLeave = async () => {
-		await axios.delete("http://localhost:3333/queues/remove", {
-			withCredentials: true})
-			.then((res) => {
-				console.log(res);
-			})
-			.catch((err) => {
-				console.log(err);
-			});
-			navigate("/");
+	const handleLeave = () => {
+		socket.emit("leaveQueue");
+		socket.close();
+		navigate("/");
 	};
 
 	//const handleMatch = async () => {
@@ -75,7 +80,6 @@ function Lobby() {
 	return (
 		<div>
 			<h1>Lobby</h1>
-			<h2>User information:</h2>
 			{/*<ul>
 				{queue?.every ? (
 					<div>

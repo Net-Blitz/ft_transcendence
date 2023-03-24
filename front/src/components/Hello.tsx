@@ -19,10 +19,11 @@ function Hello() {
 	};
 
 	const handleGame = () => {
-		axios.post("http://localhost:3333/queues/add", {mode: "1v1"}, { withCredentials: true })
+		axios.get("http://localhost:3333/queues/joinable", { withCredentials: true })
 		.then((res) => {
-			console.log(res);
-			navigate("/lobby");
+			console.log("res: ", res.data.canJoin);
+			if (res.data.canJoin)
+				navigate("/lobby", { state: { mode: "1v1", login: res.data.login } } );
 		})
 		.catch((err) => {
 			console.log(err);
