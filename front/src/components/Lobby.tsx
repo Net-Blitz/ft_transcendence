@@ -22,7 +22,7 @@ function Lobby() {
 				
 	const joinGame = async (gameId: number) => {
 			socket.close();
-			navigate("/game", { state: { gameId: gameId } } );
+			navigate("/game", { state: { gameId: gameId, login: queueParam.login } } );
 	}
 
 	socket.on('disconnect', () => {

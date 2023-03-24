@@ -128,7 +128,7 @@ model Game {
     state      GameState @default(CREATING)
     score1     Int       @default(0)
     score2     Int       @default(0)
-    playerConnected Int  @default(0)     
+    winner    Int       @default(0)     
     user1Id Int
     user2Id Int
     user1   User @relation("player1", fields: [user1Id], references: [id])

@@ -18,10 +18,21 @@ export class QueueService {
 	async checkPermission(userLogin: string) {
 		const user = await this.prisma.user.findUnique({
 			where: {login: userLogin,}});
-		if (!user || user.state !== "ONLINE")
+		if (!user || user.state === "OFFLINE" || user.state === "SEARCHING")
 			return ({canJoin: false, reason: "User not found or not online"});
+		if (user.state === "PLAYING")
+		{
+			const game = await this.prisma.game.findFirst({
+				where: {OR: [{state: "CREATING", user1Id: user.id}, {state: "PLAYING", user1Id: user.id},
+					{state: "CREATING", user2Id: user.id}, {state: "PLAYING", user2Id: user.id}]}
+			});
+			if (game)
+				return ({canJoin: false, reason: "playing", gameId: game.id, login: userLogin});
+
+		}
 		return ({canJoin: true, login: userLogin});
 	}
+
 
 	//async addToQueue(userLogin: string, dto: AddQueueDto) {
 	//	const user = await this.prisma.user.findUnique({

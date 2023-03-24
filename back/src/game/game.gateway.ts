@@ -57,7 +57,6 @@ export class GameGateway {
 	private async waitingPlayerConnection(room: number) {
 		while (this.ConnectedSockets.findIndex((socket) => socket.roomName === "game-" + room && socket.state === "player1") === -1 ||
 				this.ConnectedSockets.findIndex((socket) => socket.roomName === "game-" + room && socket.state === "player2") === -1) {
-				//console.log(this.ConnectedSockets);	
 				await this.sleep(1000); // can add a timeout here --> if timeout, delete the game or make cancel state
 		}
 		await this.prisma.game.update({
@@ -67,53 +66,104 @@ export class GameGateway {
 		//faire une animation parce que c'est jolie // probablement du front enfaite
 	}
 
+	private checkConnected(room: number) {
+		let players = this.getPlayerSocket(room);
+		if (players.player1 === undefined && players.player2 === undefined)
+			return ({state: true, mode: "disconnected"});
+		else if (players.player1 && players.player1.surrender)
+			return ({state: true, mode: "surrender", player: 1});
+		else if (players.player2 && players.player2.surrender)
+			return ({state: true, mode: "surrender", player: 2});
+		return ({state: false, mode: "none"});
+	}
+
+
 	private async gameRun(gameRoom: GameRoom, room: number) {
+		let end;
+
 		while (true) {
 			this.movePlayer(gameRoom, room);
 			await this.moveBall(gameRoom, room);
 			this.server.to("game-" + room).emit("gameState", gameRoom.getGameRoomInfo());
-			if (gameRoom.checkEndGame())
-				break;
+			end = gameRoom.checkEndGame();
+			if (end.state)
+				return (end.mode);
+			end = this.checkConnected(room);
+			if (end.state)
+				return (end);
 			await this.sleep(5)
 		}
 	}
 
-	private async gameEnd(gameRoom: GameRoom, room: number) {
+	private async gameEnd(gameRoom: GameRoom, room: number, endMode: any) {
 		await this.prisma.game.update({
 			where: { id: room },
 			data: { state: "ENDED"}
 		})
 
-		const game = await this.prisma.game.findUnique({where: {id: room}});	
-		if (!game)
-			return (false);
-	
-		//set win/loss/stats
-		if (gameRoom.player1.score > gameRoom.player2.score)
-		{
-			await this.prisma.user.update({
-				where: { id: game.user1Id },
-				data: { state: "ONLINE", wins: { increment: 1 } }})
-			await this.prisma.user.update({
-				where: { id: game.user2Id },
-				data: { state: "ONLINE", losses: { increment: 1 } }})
+		if (endMode.mode === "normal") {
+			const game = await this.prisma.game.findUnique({where: {id: room}});	
+			if (!game)
+				return (false);
+			if (gameRoom.player1.score > gameRoom.player2.score)
+			{
+				await this.prisma.game.update({
+					where: { id: room },
+					data: { winner: game.user1Id }})
+				await this.prisma.user.update({
+					where: { id: game.user1Id },
+					data: { state: "ONLINE", wins: { increment: 1 } }})
+				await this.prisma.user.update({
+					where: { id: game.user2Id },
+					data: { state: "ONLINE", losses: { increment: 1 } }})
+			}
+			else
+			{
+				await this.prisma.game.update({
+					where: { id: room },
+					data: { winner: game.user2Id }})
+				await this.prisma.user.update({
+					where: { id: game.user2Id },
+					data: { state: "ONLINE",wins: { increment: 1 } }})
+				await this.prisma.user.update({
+					where: { id: game.user1Id },
+					data: { state: "ONLINE", losses: { increment: 1 } }})
+			}
 		}
-		else
-		{
-			await this.prisma.user.update({
-				where: { id: game.user2Id },
-				data: { state: "ONLINE",wins: { increment: 1 } }})
-			await this.prisma.user.update({
-				where: { id: game.user1Id },
-				data: { state: "ONLINE", losses: { increment: 1 } }})
+		else if (endMode.mode === "surrender") {
+			const game = await this.prisma.game.findUnique({where: {id: room}});	
+			if (!game)
+				return (false);
+			if (endMode.player === 2)
+			{
+				await this.prisma.game.update({
+					where: { id: room },
+					data: { winner: game.user1Id }})
+				await this.prisma.user.update({
+					where: { id: game.user1Id },
+					data: { state: "ONLINE", wins: { increment: 1 } }})
+				await this.prisma.user.update({
+					where: { id: game.user2Id },
+					data: { state: "ONLINE", losses: { increment: 1 } }})
+			}
+			else
+			{
+				await this.prisma.game.update({
+					where: { id: room },
+					data: { winner: game.user2Id }})
+				await this.prisma.user.update({
+					where: { id: game.user2Id },
+					data: { state: "ONLINE",wins: { increment: 1 } }})
+				await this.prisma.user.update({
+					where: { id: game.user1Id },
+					data: { state: "ONLINE", losses: { increment: 1 } }})
+			}
 		}
 		
 		this.GamePlaying.splice(this.GamePlaying.indexOf(room), 1);
 		//disconnect all socket to the room associated and navigate to the end page
-		this.server.to("game-" + room).emit("close", {player1_score: gameRoom.player1.score, player2_score: gameRoom.player2.score});
+		this.server.to("game-" + room).emit("endGame", {player1_score: gameRoom.player1.score, player2_score: gameRoom.player2.score});
 		//jE PENSE QU'IL FAUDRAIT AUSSI DELETE ROOM
-		
-
 	}
 
 	async gameLoop(room: number) {
@@ -121,9 +171,9 @@ export class GameGateway {
 
 		await this.waitingPlayerConnection(room);
 
-		await this.gameRun(gameRoom, room);
+		let end: any = await this.gameRun(gameRoom, room);
 
-		await this.gameEnd(gameRoom, room);
+		await this.gameEnd(gameRoom, room, end);
 	}
 
 	private async checkUserConnection(client: Socket) {
@@ -139,7 +189,9 @@ export class GameGateway {
 		const user = await this.prisma.user.findUnique({where: {login: userCookie.login}});
 		if (!user)
 			return (null);
-		const room = parseInt(client.handshake.query.room.toString());	
+		const room = parseInt(client.handshake.query.room.toString());
+		if (!room)
+			return (null);
 		
 		const game = await this.prisma.game.findUnique({where: {id: room}});	
 		if (!game || game.state == "ENDED")
@@ -181,7 +233,8 @@ export class GameGateway {
 				roomName: "game-" + room,
 				state: state,
 				up: 0,
-				down: 0
+				down: 0,
+				surrender: false
 			});
 			client.join("game-" + room);
 		}
@@ -273,5 +326,16 @@ export class GameGateway {
 					sockUser.up = 1;
 			}
 		}
+	}
+
+	@SubscribeMessage("surrender")
+	HandleSurrender(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+		console.log("surrender: ", data)
+		const players = this.getPlayerSocket(data.room);
+		
+		if (players.player1 != null && players.player1.login === data.login)
+			players.player1.surrender = true;
+		if (players.player2 != null && players.player2.login === data.login)
+			players.player2.surrender = true;
 	}
 }

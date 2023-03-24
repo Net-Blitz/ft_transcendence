@@ -4,10 +4,12 @@ import {io, Socket} from 'socket.io-client';
 import "./Game.css";
 
 
+
 function Game() {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const room = location.state.gameId;
+	const login = location.state.login;
 
 	const connectionObject = { //-> cause probablement le probleme de double connection
 		transports: ['websocket'],
@@ -23,6 +25,12 @@ function Game() {
 	socket.on("close", () => {
 		socket.close();
 	});
+
+	socket.on("endGame", () => {
+		console.log("Redirecting to /")
+		socket.close();
+		navigate("/");
+	}); 
 
 	socket.on("BadConnection", () => {
 		socket.close();
@@ -78,8 +86,8 @@ function Game() {
 			socket.emit('keyRelease', 'DOWN');
 	});
 
-	const leaveGame = () => {
-		//socket.emit('leaveLobby');
+	const surrend = () => {
+		socket.emit('surrender', {login: login, room: room});
 	}
 
 	
@@ -94,7 +102,7 @@ function Game() {
 				<span id="score2">0</span>
 			</div>
 			<div>
-				<button id="surrend" onClick={leaveGame}> Surrend </button> 
+				<button id="surrend" onClick={surrend}> Surrend </button> 
 			</div>
 
 		</div>

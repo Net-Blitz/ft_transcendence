@@ -130,14 +130,14 @@ export class GameRoom {
 		let percent = (y - this.player1.y) / this.player1.size;
 
 		this.accelerate();
-		return ((Math.PI / 2) * percent)
+		return ((Math.PI / 3) * percent);
 	}
 	
 	private getBallDirectionBounceLeft(y: number) {
 		let percent = (y - this.player2.y) / this.player2.size;
-
+		
 		this.accelerate();
-		return (Math.PI - (Math.PI / 2) * percent);
+		return (Math.PI - (Math.PI / 3) * percent)
 	}
 
 
@@ -202,7 +202,7 @@ export class GameRoom {
 
 	checkEndGame() {
 		if ((this.player1.score >= 10 || this.player2.score >= 10) && Math.abs(this.player1.score - this.player2.score) >= 2)
-			return false /* TEMP */ //return true;
-		return false
+			return {state: true, mode: "normal"} /* TEMP */ //return true;
+		return {state: false, mode: "none"}
 	} 
 }

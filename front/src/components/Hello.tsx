@@ -24,6 +24,10 @@ function Hello() {
 			console.log("res: ", res.data.canJoin);
 			if (res.data.canJoin)
 				navigate("/lobby", { state: { mode: "1v1", login: res.data.login } } );
+			if (res.data.reason === "playing")
+			{
+				navigate("/game", { state: { gameId: res.data.gameId, login: res.data.login } } );
+			}
 		})
 		.catch((err) => {
 			console.log(err);
