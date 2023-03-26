@@ -1,12 +1,6 @@
-import { Navigate } from 'react-router-dom';
-import React, { ReactNode, useEffect, useState } from 'react';
+import { Navigate, Outlet } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-
-interface PrivateRouteProps {
-	children: ReactNode;
-	check2fa?: boolean;
-	checkconf?: boolean;
-}
 
 async function isAuthenticated() {
 	try {
@@ -20,7 +14,7 @@ async function isAuthenticated() {
 	}
 }
 
-function PrivateRoute({ children }: PrivateRouteProps) {
+function PrivateRoutes() {
 	const [isAuth, setIsAuth] = useState<boolean>();
 	const [isLoading, setIsLoading] = useState(true);
 
@@ -37,10 +31,7 @@ function PrivateRoute({ children }: PrivateRouteProps) {
 		return <div>Loading...</div>;
 	}
 
-	if (isAuth === undefined || isAuth === false) {
-		return <Navigate to="/login" replace />;
-	}
-	return children as JSX.Element;
+	return !isAuth ? <Outlet /> : <Navigate to="/login" replace />;
 }
 
-export default PrivateRoute;
+export default PrivateRoutes;

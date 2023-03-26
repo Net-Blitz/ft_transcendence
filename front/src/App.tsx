@@ -4,49 +4,18 @@ import './App.css';
 
 /*	COMPONENTS	*/
 import Login from './Login/Login';
-import PrivateRoute from './PrivateRoute';
+import PrivateRoutes from './PrivateRoutes';
 
 function App(this: any) {
 	return (
 		<Routes>
-			{/*	LOGIN	*/}
-			<Route
-				path="/"
-				element={
-					<PrivateRoute checkconf={true}>
-						<Login />
-					</PrivateRoute>
-				}
-			/>
-			{/*	config */}
-			<Route path="/login" element={<Login />} /> {/*	rien */}
-			<Route
-				path="/login/2fa"
-				element={
-					<PrivateRoute check2fa={true} checkconf={true}>
-						<Login />
-					</PrivateRoute>
-				}
-			/>
-			{/*	config + 2fa */}
-			<Route
-				path="/login/name&avatar"
-				element={
-					<PrivateRoute checkconf={false}>
-						<Login />
-					</PrivateRoute>
-				}
-			/>
-			{/*no config*/}
-			<Route
-				path="/login/2faconfig"
-				element={
-					<PrivateRoute checkconf={false}>
-						<Login />
-					</PrivateRoute>
-				}
-			/>
-			{/*no config*/}
+			<Route element={<PrivateRoutes />}>
+				<Route path="/" element={<Login />} />
+				<Route path="/login/2fa" element={<Login />} />
+				<Route path="/login/name&avatar" element={<Login />} />
+				<Route path="/login/2faconfig" element={<Login />} />
+			</Route>
+			<Route path="/login" element={<Login />} />
 		</Routes>
 	);
 }
