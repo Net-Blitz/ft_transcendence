@@ -1,39 +1,8 @@
+import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 /*	SELECTORS	*/
 import { useSelector } from 'react-redux';
-import { selectUser, selectUserAuth } from './redux/selectors';
-
-async function isAuthenticated() {
-	try {
-		const response = await axios.get('http://localhost:3333/auth/verify', {
-			withCredentials: true,
-		});
-		if (response.data === 'OK') return true;
-		return false;
-	} catch (error) {
-		return false;
-	}
-}
-
-function PrivateRoutes() {
-	const [isAuth, setIsAuth] = useState<boolean>();
-	const [isLoading, setIsLoading] = useState(true);
-
-	useEffect(() => {
-		async function checkAuth() {
-			const auth = await isAuthenticated();
-			setIsAuth(auth);
-			setIsLoading(false);
-		}
-		checkAuth();
-	}, []);
-	if (isLoading) {
-		return <div>Loading...</div>;
-	}
-	return isAuth ? <Outlet /> : <Navigate to="/login" replace />;
-}
+import { selectUser, selectUserAuth, selectUserData } from './redux/selectors';
 
 export function AuthRoutes() {
 	const isAuth = useSelector(selectUserAuth);
@@ -42,4 +11,13 @@ export function AuthRoutes() {
 	if (status !== 'resolved' && status !== 'notAuth')
 		return (<div>isLoading</div>);
 	return isAuth ? <Outlet /> : <Navigate to="/login" replace />;
+}
+
+export function ConfigRoutes() {
+	const avatar_url = useSelector(selectUserData).avatar;
+	let ok: boolean = false;
+
+	if (avatar_url === null)
+		ok = true;
+	return ok ? <Outlet /> : <Navigate to="/" replace />;
 }

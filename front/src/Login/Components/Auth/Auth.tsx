@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Navigate} from 'react-router-dom';
 import './Auth.css';
 /*	COMPONENTS	*/
 import Input from './Input/Input';
@@ -7,6 +8,9 @@ import Button from './Button/Button';
 import Carousel from './Carousel/Carousel';
 import Toggle from './Toggle/Toggle';
 import QRCode from './QRCode/QRCode';
+/*	SELECTORS	*/
+import { useSelector } from 'react-redux';
+import { selectUserData } from '../../../utils/redux/selectors';
 
 export const AuthStart = () => {
 	return (
@@ -22,6 +26,13 @@ export const AuthStart = () => {
 };
 
 export const Auth2fa = () => {
+	const twoFactor = useSelector(selectUserData).twoFactor;
+	const avatar_url = useSelector(selectUserData).avatar;
+
+	if (avatar_url === null)
+		return <Navigate to="/login/name&avatar" replace />;
+	if (twoFactor === false)
+		return <Navigate to="/" replace />;
 	return (
 		<div className="auth2fa-wrapper">
 			<Title title="Welcome" subtitle="" />
