@@ -37,6 +37,12 @@ li {
 	font-weight: bold;
 }
 
+.friend-info span:last-of-type {
+	margin-left: auto;
+	font-weight: bold;
+	color: #555;
+}
+
 .add-friend-btn {
 	margin-left: auto;
 	border: none;

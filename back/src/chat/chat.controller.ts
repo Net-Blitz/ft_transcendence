@@ -13,7 +13,7 @@ export class ChatController {
 		@Res() res: Response,
 		@GetUser() user: any
 	) {
-		return this.chatService.CreateChannel(channel, res, user);
+		return await this.chatService.CreateChannel(channel, res, user);
 	}
 
 	@Post("join/:channel")
@@ -22,7 +22,7 @@ export class ChatController {
 		@Res() res: Response,
 		@GetUser() user: any
 	) {
-		return this.chatService.JoinChannel(channel, res, user);
+		return await this.chatService.JoinChannel(channel, res, user);
 	}
 
 	@Delete("leave/:channel")
@@ -31,16 +31,16 @@ export class ChatController {
 		@Res() res: Response,
 		@GetUser() user: any
 	) {
-		return this.chatService.LeaveChannel(channel, res, user);
+		return await this.chatService.LeaveChannel(channel, res, user);
 	}
 
 	@Get("channels")
 	async getChannels(@Res() res: Response) {
-		return this.chatService.getChannels(res);
+		return await this.chatService.getChannels(res);
 	}
 
 	@Get("channel/:channel")
 	async getChannel(@Param("channel") channel: string, @Res() res: Response) {
-		return this.chatService.getChannel(channel, res);
+		return await this.chatService.getChannel(channel, res);
 	}
 }

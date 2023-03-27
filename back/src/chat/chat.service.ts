@@ -117,8 +117,26 @@ export class ChatService {
 				},
 			},
 		});
+
+		const admin = await this.prisma.admin.findMany({
+			where: {
+				A: channelExists.id,
+			},
+		});
+
+		const NewUsers: any = usersInfo;
+
+		NewUsers.forEach((user: any) => {
+			user["role"] = "user";
+			if (user.id === channelExists.ownerId) {
+				user["role"] = "owner";
+			} else if (admin.find((admin) => admin.B === user.id)) {
+				user["role"] = "admin";
+			}
+		});
+
 		return res
 			.status(200)
-			.json({ channel: channelExists, users: usersInfo });
+			.json({ channel: channelExists, users: NewUsers });
 	}
 }

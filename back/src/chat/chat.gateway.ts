@@ -22,7 +22,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	> = new Map();
 
 	handleConnection(client: Socket) {
-		console.log("Client connected: ", client.id);
+		//console.log("Client connected: ", client.id);
 	}
 
 	async handleDisconnect(client: Socket) {
@@ -37,6 +37,39 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				channel: channel,
 			});
 
+			try {
+				const channelExists = await this.prisma.channel.findUnique({
+					where: {
+						name: channel,
+					},
+				});
+
+				const userExists = await this.prisma.user.findUnique({
+					where: {
+						username: username,
+					},
+				});
+
+				await this.prisma.chatUsers.deleteMany({
+					where: {
+						A: channelExists.id,
+						B: userExists.id,
+					},
+				});
+			} catch (e) {}
+		}
+	}
+
+	@SubscribeMessage("join")
+	async handleJoinChannel(
+		client: Socket,
+		data: { channel: string; username: string }
+	) {
+		const { channel, username } = data;
+		this.connectedClients.set(client.id, { channel, username });
+		client.join(channel);
+
+		try {
 			const channelExists = await this.prisma.channel.findUnique({
 				where: {
 					name: channel,
@@ -49,23 +82,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				},
 			});
 
-			await this.prisma.chatUsers.deleteMany({
-				where: {
+			await this.prisma.chatUsers.create({
+				data: {
 					A: channelExists.id,
 					B: userExists.id,
 				},
 			});
-		}
-	}
-
-	@SubscribeMessage("join")
-	handleJoinChannel(
-		client: Socket,
-		data: { channel: string; username: string }
-	) {
-		const { channel, username } = data;
-		this.connectedClients.set(client.id, { channel, username });
-		client.join(channel);
+		} catch (e) {}
 	}
 
 	@SubscribeMessage("chat")
