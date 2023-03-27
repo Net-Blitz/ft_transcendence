@@ -4,7 +4,7 @@ import './App.css';
 
 /*	COMPONENTS	*/
 import Login from './Login/Login';
-import PrivateRoutes from './PrivateRoutes';
+import PrivateRoutes from './utils/PrivateRoutes';
 
 function App(this: any) {
 	return (

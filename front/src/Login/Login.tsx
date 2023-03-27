@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSelector } from 'react-redux'
+import { useSelector } from 'react-redux';
 import './Login.css';
 /*	COMPONENTS	*/
 import Background from './Components/Background/Background';
@@ -9,6 +9,7 @@ import {
 	AuthNameAvatar,
 	Auth2faConfig,
 } from './Components/Auth/Auth';
+import { selectUser } from '../utils/redux/selectors';
 
 interface LoginPages {
 	[key: string]: JSX.Element;
@@ -21,8 +22,6 @@ const Login = () => {
 		'/login/name&avatar': <AuthNameAvatar />,
 		'/login/2faconfig': <Auth2faConfig />,
 	};
-	// const user = useSelector((state: any) => state.user);
-	// console.log(user);
 	return (
 		<div>
 			{loginPages[window.location.pathname]}

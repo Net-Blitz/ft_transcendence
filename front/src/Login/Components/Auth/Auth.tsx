@@ -8,7 +8,7 @@ import Carousel from './Carousel/Carousel';
 import Toggle from './Toggle/Toggle';
 import QRCode from './QRCode/QRCode';
 /*	FUNCTIONS	*/
-import { fetchOrUpdateUser } from '../../../redux/user';
+import { fetchOrUpdateUser } from '../../../utils/redux/user';
 import { useStore } from 'react-redux';
 
 export const AuthStart = () => {

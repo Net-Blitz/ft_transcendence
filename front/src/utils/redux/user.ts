@@ -1,4 +1,4 @@
-import { selectUser } from '../redux/selectors';
+import { selectUser } from './selectors';
 import axios from 'axios';
 import { createAction, createReducer } from '@reduxjs/toolkit';
 
