@@ -1,6 +1,9 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+/*	SELECTORS	*/
+import { useSelector } from 'react-redux';
+import { selectUser, selectUserAuth } from './redux/selectors';
 
 async function isAuthenticated() {
 	try {
@@ -32,4 +35,11 @@ function PrivateRoutes() {
 	return isAuth ? <Outlet /> : <Navigate to="/login" replace />;
 }
 
-export default PrivateRoutes;
+export function AuthRoutes() {
+	const isAuth = useSelector(selectUserAuth);
+	const status = useSelector(selectUser).status;
+	
+	if (status !== 'resolved' && status !== 'notAuth')
+		return (<div>isLoading</div>);
+	return isAuth ? <Outlet /> : <Navigate to="/login" replace />;
+}

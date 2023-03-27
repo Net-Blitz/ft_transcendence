@@ -5,14 +5,14 @@ import './App.css';
 /*	COMPONENTS	*/
 import MainPage from './MainPage/MainPage';
 import Login from './Login/Login';
-import PrivateRoutes from './utils/PrivateRoutes';
+import { AuthRoutes } from './utils/PrivateRoutes';
 import { useGetUser } from './utils/hooks';
 
 function App(this: any) {
 	useGetUser();
 	return (
 		<Routes>
-			<Route element={<PrivateRoutes />}>
+			<Route element={<AuthRoutes />}>
 				<Route path="/" element={<MainPage />} />
 				<Route path="/login/2fa" element={<Login />} />
 				<Route path="/login/name&avatar" element={<Login />} />

@@ -12,6 +12,7 @@ const initialState = {
 
 // Actions Creators
 const userAuth = createAction<any>('user/auth');
+const userStatus = createAction<any>('user/status');
 const userFetching = createAction('user/fetching');
 const userResolved = createAction<any>('user/resolved');
 const userRejected = createAction<any>('user/rejected');
@@ -24,7 +25,8 @@ export async function fetchOrUpdateUser(store: any) {
 		const data = response.data;
 		if (data === 'OK')
 			store.dispatch(userAuth(true));
-	} catch (error) {
+	} catch (error) { 
+		store.dispatch(userStatus('notAuth'));
 		store.dispatch(userAuth(false));
 		return ;
 	}
@@ -44,10 +46,15 @@ export async function fetchOrUpdateUser(store: any) {
 	}
 }
 
+// Reducer
 export default createReducer(initialState, (builder) =>
 	builder
 		.addCase(userAuth, (draft, action) => {
 			draft.auth = action.payload;
+			return ;
+		})
+		.addCase(userStatus, (draft, action) => {
+			draft.status = action.payload;
 			return ;
 		})
 		.addCase(userFetching, (draft, action) => {
