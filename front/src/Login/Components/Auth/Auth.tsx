@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import './Auth.css';
 /*	COMPONENTS	*/
 import Input from './Input/Input';
@@ -7,9 +7,6 @@ import Button from './Button/Button';
 import Carousel from './Carousel/Carousel';
 import Toggle from './Toggle/Toggle';
 import QRCode from './QRCode/QRCode';
-/*	FUNCTIONS	*/
-import { fetchOrUpdateUser } from '../../../utils/redux/user';
-import { useStore } from 'react-redux';
 
 export const AuthStart = () => {
 	return (
@@ -39,12 +36,6 @@ export const Auth2fa = () => {
 };
 
 export const AuthNameAvatar = () => {
-	const store = useStore();
-
-	useEffect(() => {
-		fetchOrUpdateUser(store);
-	}, [store]);
-
 	return (
 		<div className="authnameavatar-wrapper">
 			<Title

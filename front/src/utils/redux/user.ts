@@ -4,17 +4,30 @@ import { createAction, createReducer } from '@reduxjs/toolkit';
 
 // First State
 const initialState = {
+	auth: false,
 	status: 'void',
 	data: null,
 	error: null,
 };
 
 // Actions Creators
+const userAuth = createAction<any>('user/auth');
 const userFetching = createAction('user/fetching');
-const userResolved = createAction<any | undefined>('user/resolved');
-const userRejected = createAction<any | undefined>('user/rejected');
+const userResolved = createAction<any>('user/resolved');
+const userRejected = createAction<any>('user/rejected');
 
 export async function fetchOrUpdateUser(store: any) {
+	try {
+		const response = await axios.get('http://localhost:3333/auth/verify', {
+			withCredentials: true,
+		});
+		const data = response.data;
+		if (data === 'OK')
+			store.dispatch(userAuth(true));
+	} catch (error) {
+		store.dispatch(userAuth(false));
+		return ;
+	}
 	const status = selectUser(store.getState()).status;
 	if (status === 'pending' || status === 'updating') {
 		return;
@@ -33,6 +46,10 @@ export async function fetchOrUpdateUser(store: any) {
 
 export default createReducer(initialState, (builder) =>
 	builder
+		.addCase(userAuth, (draft, action) => {
+			draft.auth = action.payload;
+			return ;
+		})
 		.addCase(userFetching, (draft, action) => {
 			if (draft.status === 'void') {
 				draft.status = 'pending';

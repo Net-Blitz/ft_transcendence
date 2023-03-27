@@ -1,5 +1,4 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
 import './Login.css';
 /*	COMPONENTS	*/
 import Background from './Components/Background/Background';
@@ -9,7 +8,6 @@ import {
 	AuthNameAvatar,
 	Auth2faConfig,
 } from './Components/Auth/Auth';
-import { selectUser } from '../utils/redux/selectors';
 
 interface LoginPages {
 	[key: string]: JSX.Element;

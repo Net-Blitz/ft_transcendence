@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useStore } from 'react-redux';
+import { fetchOrUpdateUser } from './redux/user';
 
+// Hook to query data from back
 export function useAxios(url: string) {
 	const [data, setData] = useState({});
 	const [isLoading, setLoading] = useState(true);
@@ -26,4 +29,15 @@ export function useAxios(url: string) {
 	}, [url]);
 
 	return { isLoading, data, error };
+}
+
+// Hook to update User on Redux
+export function useGetUser() {
+	const store = useStore();
+
+	useEffect(() => {
+		fetchOrUpdateUser(store);
+	}, [store]);
+
+	return;
 }
