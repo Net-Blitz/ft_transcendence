@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './Auth.css';
 /*	COMPONENTS	*/
 import Input from './Input/Input';
@@ -7,6 +7,9 @@ import Button from './Button/Button';
 import Carousel from './Carousel/Carousel';
 import Toggle from './Toggle/Toggle';
 import QRCode from './QRCode/QRCode';
+/*	FUNCTIONS	*/
+import { fetchOrUpdateUser } from '../../../redux/user';
+import { useStore } from 'react-redux';
 
 export const AuthStart = () => {
 	return (
@@ -36,6 +39,12 @@ export const Auth2fa = () => {
 };
 
 export const AuthNameAvatar = () => {
+	const store = useStore();
+
+	useEffect(() => {
+		fetchOrUpdateUser(store);
+	}, [store]);
+
 	return (
 		<div className="authnameavatar-wrapper">
 			<Title
@@ -62,8 +71,7 @@ export const Auth2faConfig = () => {
 				statusState === false
 					? 'auth2faconfig-no-wrapper'
 					: 'auth2faconfig-yes-wrapper'
-			}
-		>
+			}>
 			<Title title="Welcome" subtitle="Do you want to configure 2FA ?" />
 			<Toggle statusState={statusState} setStatusState={setStatusState} />
 			{statusState && (
@@ -73,8 +81,7 @@ export const Auth2faConfig = () => {
 						display: 'flex',
 						flexDirection: 'column',
 						alignItems: 'center',
-					}}
-				>
+					}}>
 					<QRCode />
 					<Input
 						input_title="Generate code"

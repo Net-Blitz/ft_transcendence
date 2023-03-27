@@ -21,8 +21,8 @@ const Login = () => {
 		'/login/name&avatar': <AuthNameAvatar />,
 		'/login/2faconfig': <Auth2faConfig />,
 	};
-	const user = useSelector((state: any) => state.user);
-	console.log(user);
+	// const user = useSelector((state: any) => state.user);
+	// console.log(user);
 	return (
 		<div>
 			{loginPages[window.location.pathname]}
