@@ -22,6 +22,7 @@ function App(this: any) {
 				<Route path="/2fa" element={<PrivateRoute><DoubleAuth /></PrivateRoute>} />
 				<Route path="/lobby" element={<PrivateRoute><Lobby /></PrivateRoute>} />
 				<Route path="/game" element={<PrivateRoute><Game /></PrivateRoute>} />
+				{/* <Route path="/game/:id" exact component={Game} /> */}
 			</Routes>
 		</BrowserRouter>
 	);

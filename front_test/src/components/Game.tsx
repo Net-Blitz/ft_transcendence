@@ -8,25 +8,14 @@ function Game() {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const room = location.state.gameId;
-	// console.log("location: ", location.state.gameId
+	const login = location.state.login;
 
 	const connectionObject = { //-> cause probablement le probleme de double connection
 		transports: ['websocket'],
-		transportOptions: {
-		  polling: {
-			withCredentials: true
-		  }
-		},
+		withCredentials: true,
 	  };
 
 	const socket: Socket = io(`http://localhost:3333/game?room=${room}`, connectionObject);
-
-	socket.on('connect', () => {
-		console.log("connected");
-		socket.on('disconnecting', () => {
-			console.log("disconnecting");
-		});
-	});
 
 	socket.on('disconnect', () => {
 		console.log("disconnected");
@@ -35,8 +24,20 @@ function Game() {
 	socket.on("close", () => {
 		socket.close();
 	});
-	
+
+	socket.on("endGame", () => {
+		console.log("Redirecting to /")
+		socket.close();
+		navigate("/");
+	}); 
+
+	socket.on("BadConnection", () => {
+		socket.close();
+		navigate("/");		
+	});
+
 	socket.on("gameState", (gameState: any) => {
+		console.log("gameState", gameState.player1_score, gameState.player2_score)
 		let ball = document.getElementById("ball");
 		let player1 = document.getElementById("player1");
 		let player2 = document.getElementById("player2");
@@ -84,8 +85,8 @@ function Game() {
 			socket.emit('keyRelease', 'DOWN');
 	});
 
-	const leaveGame = () => {
-		//socket.emit('leaveLobby');
+	const surrend = () => {
+		socket.emit('surrender', {login: login, room: room});
 	}
 
 	
@@ -100,7 +101,7 @@ function Game() {
 				<span id="score2">0</span>
 			</div>
 			<div>
-				<button id="surrend" onClick={leaveGame}> Surrend </button>
+				<button id="surrend" onClick={surrend}> Surrend </button> 
 			</div>
 
 		</div>
