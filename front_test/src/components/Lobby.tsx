@@ -10,7 +10,7 @@ function Lobby() {
 	const location = useLocation();
 	const queueParam = location.state;
 	
-	const connectionObject = { //-> cause probablement le probleme de double connection
+	const connectionObject = { //-> cause probablement le probleme de double connection ou alors c'est aue la page se re-render
 		transports: ['websocket'],
 		withCredentials: true,
 		auth : {
