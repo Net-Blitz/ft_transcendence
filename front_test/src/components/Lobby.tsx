@@ -1,105 +1,86 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-
-interface QueueObject {
-
-	id: number;
-	login: string;
-	mode: string;
-	bonus1: boolean;
-	bonus2: boolean;
-	elo: number;
-}
-
-interface GameObject {
-
-	id: number;
-	difficulty: number;
-	state: string;
-	score1: number;
-	score2: number;
-	playerConnected: number;
-	user1Id: number;
-	user2Id: number;
-}
+import { useLocation, useNavigate } from "react-router-dom";
+import { io, Socket } from "socket.io-client";
+import { redirect } from "react-router-dom";
 
 function Lobby() {
-	const [queue, setqueue] = useState<QueueObject[]>();
-	const [game, setgame] = useState<GameObject[]>();
+	//const [queue, setqueue] = useState<QueueObject[]>();
+	//const [game, setgame] = useState<GameObject[]>();
 	const navigate = useNavigate();
-
-	useEffect(() => {
-		const fetchData = async () => {
-			const response = await axios.get("http://localhost:3333/queue/all", {
-				withCredentials: true,
-			});
-			setqueue(response.data);
-		};
-		fetchData();
-	}, []);
-
-	useEffect(() => {
-		const fetchData = async () => {
-			const response = await axios.get("http://localhost:3333/games/", {
-				withCredentials: true,
-			});
-			setgame(response.data);
-		};
-		fetchData();
-	}, []);
-	//console.log(userInfo);
+	const location = useLocation();
+	const queueParam = location.state;
 	
-	const handleLeave = async () => {
-		await axios.post("http://localhost:3333/queue/remove", {}, {
-			withCredentials: true})
-			.then((res) => {
-				console.log(res);
-			})
-			.catch((err) => {
-				console.log(err);
-			});
-			navigate("/");
-	};
+	const connectionObject = { //-> cause probablement le probleme de double connection ou alors c'est aue la page se re-render
+		transports: ['websocket'],
+		withCredentials: true,
+		auth : {
+			...queueParam
+		}
+	  };
 
-	const handleMatch = async () => {
-		await axios.get("http://localhost:3333/queue/match", {withCredentials: true})
-			.then((res) => {
-				console.log("res: ", res);
-				navigate("/lobby");
-			})
-			.catch((err) => {
-				console.log(err);
-			});
-	};
-
-	const handleConnect = async () => {
-		await axios.get("http://localhost:3333/games/connect", {withCredentials: true})
-			.then((res) => {
-				if (res.data)					
-					navigate("/game", { state: { gameId: res.data.id } } );
-			})
-			.catch((err) => {
-				console.log(err);
-			});
-	};
-
+	const socket: Socket = io(`http://localhost:3333/queue`, connectionObject);
+				
 	const joinGame = async (gameId: number) => {
-		await axios.get("http://localhost:3333/games/" + gameId, {withCredentials: true})
-			.then((res) => {
-				if (res.data.state !== "ENDED")
-					navigate("/game", { state: { gameId: gameId } } );
-			})
-			.catch((err) => {
-				console.log(err);
-			});
+			socket.close();
+			navigate("/game", { state: { gameId: gameId, login: queueParam.login } } );
 	}
+
+	socket.on('disconnect', () => {
+	});
+
+	socket.on("close", () => {
+		socket.close();
+	});
+
+	socket.on("redirect", (data:string) => {
+		socket.close();
+		navigate(data);
+	});
+
+	socket.on("queue1v1", (data:string) => {
+		console.log("data: ", data);
+	})
+
+	socket.on("gameFound", (data:any) => {
+		console.log(data);
+		socket.close();
+		joinGame(data.gameId);
+	})
+
+
+	const handleLeave = () => {
+		socket.emit("leaveQueue");
+		socket.close();
+		navigate("/");
+	};
+
+	//const handleMatch = async () => {
+	//	await axios.get("http://localhost:3333/queue/match", {withCredentials: true})
+	//		.then((res) => {
+	//			console.log("res: ", res);
+	//			navigate("/lobby");
+	//		})
+	//		.catch((err) => {
+	//			console.log(err);
+	//		});
+	//};
+
+	//const handleConnect = async () => {
+	//	await axios.get("http://localhost:3333/games/connect", {withCredentials: true})
+	//		.then((res) => {
+	//			if (res.data)					
+	//				navigate("/game", { state: { gameId: res.data.id } } );
+	//		})
+	//		.catch((err) => {
+	//			console.log(err);
+	//		});
+	//};
+
 
 	return (
 		<div>
 			<h1>Lobby</h1>
-			<h2>User information:</h2>
-			<ul>
+			{/*<ul>
 				{queue?.every ? (
 					<div>
 						{queue.map((user) => (
@@ -122,11 +103,11 @@ function Lobby() {
 				) : (
 					<p>Loading...</p>
 					)}
-			</ul>
+			</ul>*/}
 			<div>
 				<button onClick={handleLeave}>LeaveLobby</button>
-				<button onClick={handleMatch}>Match</button>
-				<button onClick={handleConnect}>ConnectToMyGame</button>
+				{/*<button onClick={handleMatch}>Match</button>
+				<button onClick={handleConnect}>ConnectToMyGame</button>*/}
 			</div>
 		</div>
 	);
