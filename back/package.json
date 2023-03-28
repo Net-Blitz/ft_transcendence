@@ -8,8 +8,8 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start",
-    "start:dev": "nest start --watch",
+    "start": "nest start && npx prisma migrate dev --name init --preview-feature",
+    "start:dev": "nest start --watch  && npx prisma migrate dev --name init --preview-feature",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
