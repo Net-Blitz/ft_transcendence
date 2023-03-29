@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import QRCode from "qrcode.react";
 import axios from "axios";
+import "./DoubleAuth.css"
 
 function DoubleAuth() {
 	const [qrCodeUrl, setQrCodeUrl] = useState("");
 	const [verificationCode, setVerificationCode] = useState("");
+	const [message, setMessage] = useState("");
 
 	async function generateQRCode() {
 		try {
@@ -13,27 +15,41 @@ function DoubleAuth() {
 			});
 			setQrCodeUrl(data.otpAuthUrl);
 		} catch (error) {
-			console.log(error);
+			setMessage("2FA already enabled");
+			//console.log(error);
 		}
 	}
 
 	async function verify2fa() {
 		try {
 			const { data } = await axios.post(
-				"http://localhost:3333/auth/2fa/verify",
+				"http://localhost:3333/auth/2fa/verify_test",
 				{ verificationCode },
 				{ withCredentials: true }
 			);
-			console.log(data);
+			setMessage("Code verified");
 		} catch (error) {
-			console.log(error);
+			setMessage("Invalid code");
+		}
+	}
+
+	async function disable2FA() {
+		try {
+			const { data } = await axios.delete(
+				"http://localhost:3333/auth/2fa/disable",
+				{ withCredentials: true }
+			);
+			setMessage("2FA disabled");
+		} catch (error) {
+			setMessage("Error while disabling 2FA");
 		}
 	}
 
 	return (
-		<div>
+		<div className="container">
 			<button onClick={generateQRCode}>Générer le QR Code</button>
-			{qrCodeUrl && <QRCode value={qrCodeUrl} />}
+			<div className="qr-code">{qrCodeUrl && <QRCode value={qrCodeUrl} />}</div>
+			<button onClick={disable2FA}>Supprimer la 2FA</button>
 			<input
 				type="text"
 				value={verificationCode}
@@ -41,6 +57,7 @@ function DoubleAuth() {
 				placeholder="Entrez le code de vérification ici"
 			/>
 			<button onClick={verify2fa}>Vérifier le code de vérification</button>
+			{message && <p>{message}</p>}
 		</div>
 	);
 }

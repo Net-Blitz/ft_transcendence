@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Post, Req } from "@nestjs/common";
 import { QueueService } from "./queue.service";
-import { GetUser } from "src/auth/decorator";
+import { GetCookie, GetUser } from "src/auth/decorator";
 import { AddQueueDto } from "./dto";
 import { GameService } from "src/game/game.service";
 
@@ -12,4 +12,5 @@ export class QueueController {
 	async canIJoinQueue(@GetUser("login") userLogin: string) {
 		return this.queueService.checkPermission(userLogin);
 	}
+
 }

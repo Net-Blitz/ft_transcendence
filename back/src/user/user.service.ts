@@ -3,7 +3,6 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { Request, Response } from "express";
 import { UpdateUserDto } from "./dto";
 import { AuthService } from "src/auth/auth.service";
-import { GetUser } from "src/auth/decorator";
 
 @Injectable()
 export class UserService {
@@ -12,16 +11,19 @@ export class UserService {
 		@Inject(AuthService) private authService: AuthService
 	) {}
 
-	async getUser(userLogin: string) {
+	async getUser(@Req() req: Request) {
+		const jwt = req.cookies.jwt;
+		const login = JSON.parse(atob(jwt.split(".")[1])).login;
 		return await this.prisma.user.findUnique({
 			where: {
-				login: userLogin,
+				login: login,
 			},
 		});
 	}
 
 	async GetUserByLogin(
 		@Param("username") username: string,
+		@Req() req: Request,
 		@Res() res: Response
 	) {
 		const user = await this.prisma.user.findUnique({
@@ -36,12 +38,12 @@ export class UserService {
 	}
 
 	async UpdateUser(
-		@GetUser("id") userLogin: string,
+		@Req() req: Request,
 		@Res() res: Response,
 		@Body() updateUserDto: UpdateUserDto
 	) {
 		console.log(updateUserDto);
-		const user = await this.getUser(userLogin);
+		const user = await this.getUser(req);
 		if (!user) {
 			return res.status(404).json({ message: `User not found` });
 		}
@@ -58,18 +60,8 @@ export class UserService {
 		return res.status(200).json(updatedUser);
 	}
 
-	Logout(@Res() res: Response) {
+	Logout(@Req() req: Request, @Res() res: Response) {
 		res.clearCookie("jwt", { httpOnly: true });
 		return res.status(200).json({ message: "Logged out" });
-	}
-
-	async createRandomUser(@Body() body: any) {
-		const user = await this.prisma.user.create({
-			data: {
-				login: body.login,
-				username: body.username,
-			},
-		});
-		return  user;
 	}
 }

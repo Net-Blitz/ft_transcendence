@@ -15,15 +15,14 @@ services:
             - back
         restart: always
 
-
     front:
-        container_name: front
+        container_name: ${FRONT}
         build:
+            context: ./${FRONT}
             dockerfile: Dockerfile
-            context: ./front
         env_file: ./.env
         volumes:
-            - frontVolume:/app/
+            - ${FRONT}Volume:/app/
         networks:
             - transcenet
 
@@ -60,6 +59,13 @@ volumes:
         driver_opts:
             type: 'none'
             device: '$PWD/front'
+            o: bind
+    
+    front_testVolume:
+        driver: local
+        driver_opts:
+            type: 'none'
+            device: '$PWD/front_test'
             o: bind
 
     backVolume:

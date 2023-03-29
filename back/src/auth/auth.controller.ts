@@ -12,10 +12,13 @@ import {
 import { AuthService } from "./auth.service";
 import { Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
+import { GetCookie, GetUser } from "./decorator";
+import { CookieDto } from "./decorator/cookie.dto";
+import { ConfigService } from "@nestjs/config";
 
 @Controller("auth")
 export class AuthController {
-	constructor(private authService: AuthService) {}
+	constructor(private authService: AuthService, private config: ConfigService) {}
 
 	@Get("callback")
 	async auth42Callback(
@@ -23,9 +26,10 @@ export class AuthController {
 		@Res() res: Response,
 		@Query("code") code: string
 	) {
-		//console.log("code: " + code);
+		console.log("HOST: ", this.config.get("HOST_T"))
 		await this.authService.Auth42Callback(req, res, code);
-		res.redirect("http://localhost:8080");
+		return res.redirect("http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_GLOBAL"));
+		// return res.redirect("http://localhost:8080/");
 	}
 
 	
@@ -46,15 +50,14 @@ export class AuthController {
 			return { valid: false };
 		}
 	}
-	
+
 	@Post("2fa/setup")
-	async setup2fa(@Req() req: Request, @Res() res: Response) {
-		return await this.authService.setup2fa(req, res);
-	}
-	
-	@Delete("2fa/remove")
-	async remove2fa(@Req() req: Request, @Res() res: Response) {
-		return await this.authService.remove2fa(req, res);
+	async setup2fa(
+		@Req() req: Request,
+		@Res() res: Response,
+		@GetUser() user: any
+	) {
+		return await this.authService.setup2fa(req, res, user);
 	}
 	
 	@Post("2fa/verify")
@@ -62,9 +65,28 @@ export class AuthController {
 		@Req() req: Request,
 		@Res() res: Response,
 		@Body("verificationCode") code: string
-		) {
-			return await this.authService.verify2fa(req, res, code);
-		}
+	) {
+		return await this.authService.verify2fa(req, res, code);
+	}
+
+	@Post("2fa/verify_test")
+	async verify2fa_test(
+		@Req() req: Request,
+		@Res() res: Response,
+		@GetUser() user: any,
+		@Body("verificationCode") code: string
+	) {
+		return await this.authService.verify2fa_test(req, res, user, code);
+	}
+
+	@Delete("2fa/disable")
+	async remove2fa(
+		@Req() req: Request,
+		@Res() res: Response,
+		@GetCookie() cookie: CookieDto
+	) {
+		return await this.authService.remove2fa(req, res, cookie);
+	}
 
 	@Get(":username")/*Temp*/
 	async getUserCheat(@Req() req: Request, @Res() res: Response, @Param("username") username: string) {

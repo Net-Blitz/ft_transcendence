@@ -8,6 +8,8 @@ import axios from "axios";
 import { UserDto } from "./dto";
 import { authenticator } from "otplib";
 import * as QRCode from "qrcode";
+import { GetCookie, GetUser } from "./decorator";
+import { CookieDto } from "./decorator/cookie.dto";
 
 @Injectable()
 export class AuthService {
@@ -38,9 +40,8 @@ export class AuthService {
 			client_id: this.config.get("CLIENT_ID"),
 			client_secret: this.config.get("CLIENT_SECRET"),
 			redirect_uri: this.config.get("REDIRECT_URI"),
-			code ,
+			code,
 		};
-		console.log(payload)
 		try {
 			await axios({
 				method: "post",
@@ -51,7 +52,7 @@ export class AuthService {
 				return this.getUserInfo(req, res, response.data.access_token);
 			});
 		} catch (error) {
-			console.log(error)
+			console.log(error);
 			throw new ForbiddenException("callback error");
 		}
 	}
@@ -88,6 +89,12 @@ export class AuthService {
 					login: user.login,
 				},
 			});
+			if (existingUser && existingUser.twoFactor === true) {
+				return res.redirect(
+					"http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_GLOBAL") + "/login/2fa?login=" + user.login
+				);
+				// return res.redirect("http://localhost:8080/login/2fa?login=" + user.login)
+			}
 			if (existingUser) {
 				return this.signToken(req, res, existingUser);
 			}
@@ -110,15 +117,12 @@ export class AuthService {
 					return this.signToken(req, res, existingUser);
 				}
 			}
+			console.log(error);
 			throw new ForbiddenException("prisma error");
 		}
 	}
 
-	async signToken(
-		@Req() req: Request,
-		@Res() res: Response,
-		user: UserDto
-	): Promise<{ access_token: string }> {
+	async signToken(@Req() req: Request, @Res() res: Response, user: UserDto) {
 		const payload = { sub: user.id, login: user.login };
 		const secret = this.config.get("JWT_SECRET");
 		const token = this.jwt.sign(payload, { expiresIn: "120min", secret });
@@ -129,32 +133,37 @@ export class AuthService {
 				secure: false,
 				sameSite: "lax",
 			});
-			//console.log("cookie: " + req.cookies.jwt);
 		} catch (error) {
-			console.log(error);
+			throw new ForbiddenException("Sign token error");
 		}
-		//console.log(token)
+		//return res.redirect("http://localhost:8080");
 		return { access_token: token };
 	}
 
-	async setup2fa(@Req() req: Request, @Res() res: Response) {
+	async setup2fa(
+		@Req() req: Request,
+		@Res() res: Response,
+		@GetUser() user: any
+	) {
+		if (!user || user.twoFactor) {
+			return res.status(400).json({
+				message: "2FA already setup",
+			});
+		}
 		try {
 			const secret = authenticator.generateSecret();
-			console.log("🚀 ~ secret:", secret);
-
-			const jwt = req.cookies.jwt;
-			const login = JSON.parse(atob(jwt.split(".")[1])).login;
+			//console.log("🚀 ~ secret:", secret);
 
 			const otpAuthUrl = authenticator.keyuri(
-				login,
-				"Pong League",
+				user.login,
+				"NetBlitz",
 				secret
 			);
 			const qrCode = await QRCode.toDataURL(otpAuthUrl);
 
 			await this.prisma.user.update({
 				where: {
-					login: login,
+					login: user.login,
 				},
 				data: {
 					twoFactor: true,
@@ -163,61 +172,76 @@ export class AuthService {
 			});
 			return res.status(200).json({ otpAuthUrl, qrCode });
 		} catch (error) {
-			console.log(error);
-			return res.status(500).json({ message: "error" });
+			throw new ForbiddenException("2FA setup error");
 		}
 	}
 
 	async verify2fa(@Req() req: Request, @Res() res: Response, code: string) {
-		const jwt = req.cookies.jwt;
-		const login = JSON.parse(atob(jwt.split(".")[1])).login;
-		const user = await this.prisma.user.findUnique({
-			where: {
-				login: login,
-			},
-		});
+		const login = req.query.login;
 
-		if (!user || !user.twoFactor || !user.secret) {
+		if (!login) {
 			return res.status(400).json({
-				message:
-					"La double authentification n'est pas activée pour cet utilisateur",
+				message: "NO LOGIN",
 			});
 		}
 
-		console.log("🚀 ~ user.secret:", user.secret);
-		console.log("🚀 ~ token:", code);
+		const user = await this.prisma.user.findUnique({
+			where: {
+				login: login as string,
+			},
+		});
 
 		const verified = authenticator.verify({
 			secret: user.secret,
 			token: code,
 		});
 
-		console.log("🚀 ~ verified:", verified);
-
 		if (verified) {
-			return res.status(200).json({
-				message:
-					"La double authentification a été vérifiée avec succès",
-			});
+			const token = await this.signToken(req, res, user);
+			return res.status(200).json(token);
 		} else {
-			return res
-				.status(400)
-				.json({ message: "Le code de vérification est incorrect" });
+			return res.status(400).json({ message: "UNVALID" });
 		}
 	}
 
-	async remove2fa(@Req() req: Request, @Res() res: Response) {
-		const jwt = req.cookies.jwt;
-		const login = JSON.parse(atob(jwt.split(".")[1])).login;
+	async verify2fa_test(
+		@Req() req: Request,
+		@Res() res: Response,
+		@GetUser() user: any,
+		code: string
+	) {
+		if (!user || !user.twoFactor || !user.secret) {
+			return res.status(400).json({
+				message: "NO 2FA",
+			});
+		}
+
+		const verified = authenticator.verify({
+			secret: user.secret,
+			token: code,
+		});
+
+		if (verified) {
+			return res.status(200).json({ message: "OK" });
+		} else {
+			return res.status(400).json({ message: "UNVALID" });
+		}
+	}
+
+	async remove2fa(
+		@Req() req: Request,
+		@Res() res: Response,
+		@GetCookie() cookie: CookieDto
+	) {
 		await this.prisma.user.update({
 			where: {
-				login: login,
+				login: cookie.login,
 			},
 			data: {
 				twoFactor: false,
 				secret: null,
 			},
 		});
-		return res.status(200).json({ message: "2fa removed" });
+		return res.status(200).json({ message: "OK" });
 	}
 }

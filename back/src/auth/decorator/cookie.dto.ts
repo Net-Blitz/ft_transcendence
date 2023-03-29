@@ -1,14 +1,14 @@
-import { IsInt, IsNumber, IsAlphanumeric, IsNotEmpty } from "class-validator";
+import { IsNumber, IsString, IsNotEmpty } from "class-validator";
 import { Type } from "class-transformer";
-import { isInt32Array } from "util/types";
 
 export class CookieDto {
-  
 	@IsNotEmpty()
-  	login: string;
-	 
+	@IsString()
+	login: string;
+
 	@IsNotEmpty()
-  	username: string;
+	@IsString()
+	username: string;
 
 	@IsNotEmpty()
 	@IsNumber()

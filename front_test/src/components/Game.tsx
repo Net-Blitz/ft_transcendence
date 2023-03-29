@@ -4,7 +4,6 @@ import {io, Socket} from 'socket.io-client';
 import "./Game.css";
 
 
-
 function Game() {
 	const navigate = useNavigate();
 	const location = useLocation();

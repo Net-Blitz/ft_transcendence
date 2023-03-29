@@ -25,7 +25,7 @@ model User {
     avatar    String?
     twoFactor Boolean    @default(false)
     secret    String?
-    state    UserStatus @default(ONLINE)
+    state     UserStatus @default(ONLINE)
     wins      Int        @default(0)
     losses    Int        @default(0)
     elo       Int        @default(300)
@@ -116,7 +116,7 @@ model Message {
 }
 
 enum GameState {
-    CREATING 
+    CREATING
     PLAYING
     ENDED
 }
