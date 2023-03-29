@@ -145,7 +145,7 @@ export class AuthService {
 
 		// temporary token generator for testing
 		//const payload2 = { sub: 2, login: "Ubuntu" };
-		//const token2 = this.jwt.sign(payload2, { expiresIn: "120min", secret });
+		//const token2 = this.jwt.sign(payload2, { expiresIn: "480min", secret });
 		//console.log("Ubuntu token: " + token2);
 
 		//const payload3 = { sub: 3, login: "Fedora" };

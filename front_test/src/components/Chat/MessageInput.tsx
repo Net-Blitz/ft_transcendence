@@ -10,6 +10,11 @@ function MessageInput({
 }) {
 	const [value, setValue] = useState("");
 
+	const handleSendMessage = () => {
+		sendMessage({ username: userInfo.username, content: value });
+		setValue("");
+	};
+
 	return (
 		<>
 			<input
@@ -18,13 +23,7 @@ function MessageInput({
 				value={value}
 				type="text"
 			/>
-			<button
-				onClick={() =>
-					sendMessage({ username: userInfo.username, content: value })
-				}
-			>
-				Send
-			</button>
+			<button onClick={() => handleSendMessage()}>Send</button>
 		</>
 	);
 }

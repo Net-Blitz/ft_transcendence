@@ -1,7 +1,8 @@
-import { Injectable, Param, Res } from "@nestjs/common";
+import { Body, Injectable, Param, Res } from "@nestjs/common";
 import { Response } from "express";
 import { GetUser } from "src/auth/decorator";
 import { PrismaService } from "src/prisma/prisma.service";
+import * as bcrypt from "bcrypt";
 
 @Injectable()
 export class ChatService {
@@ -35,6 +36,39 @@ export class ChatService {
 		return res.status(200).json({ message: "Channel created" });
 	}
 
+	async CreateProtectedChannel(
+		@Param("channel") channel: string,
+		password: string,
+		@Res() res: Response,
+		@GetUser() user: any
+	) {
+		const channelExists = await this.prisma.channel.findUnique({
+			where: {
+				name: channel,
+			},
+		});
+		if (channelExists) {
+			return res.status(400).json({ message: "Channel already exists" });
+		}
+
+		const hashedPassword = await bcrypt.hash(password, 10);
+
+		try {
+			await this.prisma.channel.create({
+				data: {
+					name: channel,
+					state: "PROTECTED",
+					ownerId: user.id,
+					hash: hashedPassword,
+				},
+			});
+		} catch (e) {
+			console.log({ e });
+			return res.status(400).json({ message: "Channel already exists" });
+		}
+		return res.status(200).json({ message: "Channel created" });
+	}
+
 	async JoinChannel(
 		@Param("channel") channel: string,
 		@Res() res: Response,
@@ -47,6 +81,41 @@ export class ChatService {
 		});
 		if (!channelExists) {
 			return res.status(404).json({ message: "Channel not found" });
+		}
+		if (channelExists.state === "PROTECTED")
+			return res.status(400).json({ message: "Channel is protected" });
+		try {
+			await this.prisma.chatUsers.create({
+				data: {
+					A: channelExists.id,
+					B: user.id,
+				},
+			});
+		} catch (e) {
+			return res.status(400).json({ message: "Channel already joined" });
+		}
+		return res.status(200).json({ message: "Channel joined" });
+	}
+
+	async JoinProtectedChannel(
+		@Param("channel") channel: string,
+		@Body("password") password: string,
+		@Res() res: Response,
+		@GetUser() user: any
+	) {
+		const channelExists = await this.prisma.channel.findUnique({
+			where: {
+				name: channel,
+			},
+		});
+		if (!channelExists) {
+			return res.status(404).json({ message: "Channel not found" });
+		}
+		if (channelExists.state === "PUBLIC")
+			return res.status(400).json({ message: "Channel is public" });
+		const match = await bcrypt.compare(password, channelExists.hash);
+		if (!match) {
+			return res.status(400).json({ message: "Wrong password" });
 		}
 		try {
 			await this.prisma.chatUsers.create({

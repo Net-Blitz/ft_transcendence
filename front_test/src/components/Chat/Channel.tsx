@@ -11,6 +11,9 @@ export interface ChannelDto {
 function Channel() {
 	const [channels, setChannels] = useState([] as ChannelDto[]);
 	const [value, setValue] = useState("");
+	const [password, setPassword] = useState("");
+	const [isPrivate, setIsPrivate] = useState(false);
+
 	const navigate = useNavigate();
 
 	const fetchChannels = async () => {
@@ -34,9 +37,11 @@ function Channel() {
 
 	const CreateChannel = async (name: string) => {
 		try {
+			const state = isPrivate ? "PROTECTED" : "PUBLIC";
+			//console.log("state: " + state);
 			await axios.post(
 				"http://localhost:3333/chat/create/" + name,
-				{},
+				{ state, password },
 				{ withCredentials: true }
 			);
 			fetchChannels();
@@ -45,13 +50,22 @@ function Channel() {
 		}
 	};
 
-	const JoinChannel = async (name: string) => {
+	const JoinChannel = async (name: string, password: string) => {
+		//console.log("Joining channel: " + name + " with password: " + password);
 		try {
-			await axios.post(
-				"http://localhost:3333/chat/join/" + name,
-				{},
-				{ withCredentials: true }
-			);
+			if (password) {
+				await axios.post(
+					"http://localhost:3333/chat/join/" + name,
+					{ state: "PROTECTED", password },
+					{ withCredentials: true }
+				);
+			} else {
+				await axios.post(
+					"http://localhost:3333/chat/join/" + name,
+					{ state: "PUBLIC" },
+					{ withCredentials: true }
+				);
+			}
 			navigate("/chat/" + name);
 		} catch (error) {
 			console.error(error);
@@ -66,24 +80,54 @@ function Channel() {
 				value={value}
 				type="text"
 			/>
+			<label>
+				Private:
+				<input
+					type="checkbox"
+					checked={isPrivate}
+					onChange={() => setIsPrivate(!isPrivate)}
+				/>
+			</label>
+			{isPrivate && (
+				<input
+					onChange={(e) => setPassword(e.target.value)}
+					placeholder="Enter channel password"
+					value={password}
+					type="password"
+				/>
+			)}
 			<button onClick={() => CreateChannel(value)}>Create</button>
 			<h1>List of Channels</h1>
 			<ul>
-				{channels.map((channel) => (
-					<li key={channel.id}>
-						<div className="channel-info">
-							<span className="friend-username">
-								{channel.name}
-							</span>
-						</div>
-						<button
-							className="add-friend"
-							onClick={() => JoinChannel(channel.name)}
-						>
-							Join Channel
-						</button>
-					</li>
-				))}
+				{channels
+					.sort((a, b) => (a.state === "PROTECTED" ? -1 : 1))
+					.map((channel) => (
+						<li key={channel.id}>
+							<div className="channel-info">
+								<span className="friend-username">
+									{channel.name}
+								</span>
+								{channel.state === "PROTECTED" && (
+									<input
+										onChange={(e) =>
+											setPassword(e.target.value)
+										}
+										placeholder="Enter password"
+										value={password}
+										type="password"
+									/>
+								)}
+							</div>
+							<button
+								className="add-friend"
+								onClick={() =>
+									JoinChannel(channel.name, password)
+								}
+							>
+								Join Channel
+							</button>
+						</li>
+					))}
 			</ul>
 		</div>
 	);
