@@ -9,7 +9,7 @@ export function AuthRoutes() {
 	const status = useSelector(selectUser).status;
 	
 	if (status !== 'resolved' && status !== 'notAuth')
-		return (<div>isLoading</div>);
+		return (<div></div>);
 	return isAuth ? <Outlet /> : <Navigate to="/login" replace />;
 }
 

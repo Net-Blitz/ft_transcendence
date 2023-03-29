@@ -14,7 +14,7 @@ const Button = ({ content, bottom, href }: ButtonProps) => {
 				bottom === 'true' ? 'button-wrapper bottom' : 'button-wrapper'
 			}
 		>
-			<a href={href}>
+			<a href={href.length !== 0 ? href : undefined}>
 				<button>{content}</button>
 			</a>
 		</div>
