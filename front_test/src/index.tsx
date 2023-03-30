@@ -9,6 +9,7 @@ const root = ReactDOM.createRoot(
 );
 root.render(
 	<React.StrictMode>
+		<meta name="viewport" content="width=device-width, initial-scale=1.00, maximum-scale=2.00, minimum-scale=1.00"></meta>
 		<App />
 	</React.StrictMode>
 );

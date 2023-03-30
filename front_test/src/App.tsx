@@ -9,10 +9,12 @@ import DoubleAuth from './components/DoubleAuth';
 import Login2fa from './components/Login2fa';
 import Lobby from './components/Lobby';
 import Game from './components/Game';
+import GamePopUp from './components/GamePopUp';
 
 function App(this: any) {
 	return (
 		<BrowserRouter>
+			<GamePopUp />
 			<Routes>
 				<Route path="/login" element={<Login />} />
 				<Route path="/login/2fa" element={<Login2fa />} />
