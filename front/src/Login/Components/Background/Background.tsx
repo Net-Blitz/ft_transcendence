@@ -8,50 +8,33 @@ import img_gkehren from './Ressources/gkehren.png';
 import img_jbach from './Ressources/jbach.png';
 import img_genouf from './Ressources/genouf.png';
 
-/*	TEMPORARY	*/
-export const AvatarData = [
-	{
-		avatar: img_genouf,
-	},
-	{
-		avatar: img_lgiband,
-	},
-	{
-		avatar: img_gkehren,
-	},
-	{
-		avatar: img_jbach,
-	},
-];
-
 const Background = () => {
 	return (
 		<div>
 			<div className="logo-mobile">
-				<img src={logo_mobile} />
+				<img src={logo_mobile} alt='background' />
 			</div>
 			<div className="main-background">
-				{/* <img src={BackgroundImg} className='img-background'/> */}
 				<div className="our-team">
 					<p className="title-team">Our team</p>
 					<div className="picture-team">
 						<div className="twoteam">
 							<div className="profile-team">
-								<img src={img_lgiband} />
+								<img src={img_lgiband} alt='avatar' />
 								<p>Leo Giband</p>
 							</div>
 							<div className="profile-team">
-								<img src={img_gkehren} />
+								<img src={img_gkehren} alt='avatar' />
 								<p>Guillaume Kehren</p>
 							</div>
 						</div>
 						<div className="twoteam">
 							<div className="profile-team">
-								<img src={img_jbach} />
+								<img src={img_jbach} alt='avatar' />
 								<p>Josephine Bach</p>
 							</div>
 							<div className="profile-team">
-								<img src={img_genouf} />
+								<img src={img_genouf} alt='avatar' />
 								<p>Gabriel Enouf</p>
 							</div>
 						</div>

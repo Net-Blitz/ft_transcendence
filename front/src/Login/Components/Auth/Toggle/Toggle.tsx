@@ -60,7 +60,7 @@ const Toggle = ({ statusState, setStatusState }: ToggleProps) => {
 		return () => {
 			window.removeEventListener('resize', handleResize);
 		};
-	}, []);
+	}, [setStatusState]);
 
 	return (
 		<div className="toggle-wrapper">

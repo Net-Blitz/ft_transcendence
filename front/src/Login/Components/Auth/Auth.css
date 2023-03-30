@@ -44,6 +44,7 @@
 /*	Name & Avatar	*/
 .authnameavatar-wrapper {
 	height: 560px;
+	min-width: 500px;
 }
 
 .authnameavatar-wrapper .title-wrapper {

@@ -69,7 +69,7 @@ export const Auth2faConfig = () => {
 	const [statusState, setStatusState] = useState(false);
 	const { state } = useLocation();
 
-	if (!state || state.prec != 'config')
+	if (!state || state.prec !== 'config')
 		return <Navigate to="/login" replace />
 	return (
 		<div

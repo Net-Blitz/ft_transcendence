@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { AvatarData } from '../../Background/Background';
+import React, { useEffect, useState} from 'react';
 import './Carousel.css';
+/*	Functions	*/
+import { useGenerateAvatars } from './genAvatars';
 
 const Carousel = () => {
 	/*	HOOK settings	*/
 	const [currentIndex, setCurrentIndex] = useState(0);
-	const [avatar, setAvatar] = useState(AvatarData);
+	const [avatar, setAvatar] = useState(useGenerateAvatars(12));
 	const [length, setLenght] = useState(avatar.length);
 
+	// console.log(avatar);
 	useEffect(() => {
 		setLenght(avatar.length);
 	}, [avatar]);
@@ -24,22 +26,22 @@ const Carousel = () => {
 		if (index < 0 || index >= length) {
 			return <div className={`avatar ${setting} empty`}></div>;
 		} else {
-			return (
-				<div
-					className={`avatar ${setting}`}
-					style={{
-						backgroundImage: `url(${avatar[index].avatar})`,
-						backgroundPosition: 'center',
-						backgroundSize: 'cover',
-					}}
-					onClick={
-						setting === 'left'
-							? prev
-							: setting === 'right'
-							? next
-							: undefined
-					}></div>
-			);
+				return (
+					<div
+						className={`avatar ${setting}`}
+						style={{
+							backgroundImage: `url('${avatar[index].url}')`,
+							backgroundPosition: 'center',
+							backgroundSize: 'cover',
+						}}
+						onClick={
+							setting === 'left'
+								? prev
+								: setting === 'right'
+								? next
+								: undefined
+						}></div>
+				);
 		}
 	};
 
@@ -50,7 +52,7 @@ const Carousel = () => {
 			const reader = new FileReader();
 			reader.addEventListener("load", function() {
 				let newAvatar = [...avatar];
-				newAvatar.splice(currentIndex, 0, {avatar: reader.result});
+				newAvatar.splice(currentIndex, 0, {url: reader.result, source: 'imported'});
 				setAvatar(newAvatar);
 			});
 			reader.readAsDataURL(file);
