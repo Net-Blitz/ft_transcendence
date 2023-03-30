@@ -48,6 +48,11 @@ export const Auth2fa = () => {
 };
 
 export const AuthNameAvatar = () => {
+	const isConfig = useSelector(selectUserData).config;
+
+	console.log(isConfig);
+	if (isConfig === true)
+		return <Navigate to="/" replace />;
 	return (
 		<div className="authnameavatar-wrapper">
 			<Title
@@ -70,7 +75,7 @@ export const Auth2faConfig = () => {
 	const { state } = useLocation();
 
 	if (!state || state.prec !== 'config')
-		return <Navigate to="/login" replace />
+		return <Navigate to="/" replace />
 	return (
 		<div
 			className={
