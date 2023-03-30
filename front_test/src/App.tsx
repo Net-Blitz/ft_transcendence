@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Routes, Route, BrowserRouter } from 'react-router-dom';
 import Hello from './components/Hello';
 import PrivateRoute from './components/PrivateRoute';
@@ -10,11 +10,32 @@ import Login2fa from './components/Login2fa';
 import Lobby from './components/Lobby';
 import Game from './components/Game';
 import GamePopUp from './components/GamePopUp';
+import { io, Socket } from 'socket.io-client';
 
 function App(this: any) {
+
+	const [socketQueue, setSocketQueue] = useState({} as Socket);
+	const [load, updateLoad] = useState(0);
+
+	useEffect(() => {
+		const socket: Socket = io("http://localhost:3333/queue", {transports: ['websocket'], withCredentials: true,})
+		socket.on("connect", () => {
+			console.log("Connected to socket.io server");
+		});
+		socket.on("disconnect", () => {
+			console.log("Disconnected from socket.io server");
+		});
+		socket.on("close", () => {
+			console.log("Closed socket.io server");
+			socket.close();
+		});
+		setSocketQueue(socket);
+		
+	}, []);
+
 	return (
-		<BrowserRouter>
-			<GamePopUp />
+			<div>
+			<GamePopUp socketQueue={socketQueue} load={load} updateLoad={updateLoad} />
 			<Routes>
 				<Route path="/login" element={<Login />} />
 				<Route path="/login/2fa" element={<Login2fa />} />
@@ -26,7 +47,7 @@ function App(this: any) {
 				<Route path="/game" element={<PrivateRoute><Game /></PrivateRoute>} />
 				{/* <Route path="/game/:id" exact component={Game} /> */}
 			</Routes>
-		</BrowserRouter>
+			</div>
 	);
 }
 

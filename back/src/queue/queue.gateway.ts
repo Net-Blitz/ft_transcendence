@@ -50,7 +50,10 @@ export class QueueGateway {
 			else
 			{
 				if (this.server)
+				{
 					this.server.emit("queue1v1", "Waiting for opponent");
+					this.server.emit("check", "check");
+				}
 			}
 
 			await this.sleep(5000);
@@ -87,21 +90,23 @@ export class QueueGateway {
 	}
 
 	handleConnection(client: Socket) { 
-		const userParam = client.handshake.auth;
+		// const userParam = client.handshake.auth;
  
-		if (userParam.login == undefined || userParam.mode == undefined)
-			return client.emit("redirect", "/");
+		// if (userParam.login == undefined || userParam.mode == undefined)
+		// 	return client.emit("redirect", "/");
 
-		this.addUserToQueue(userParam, client);
+		// this.addUserToQueue(userParam, client);
+		console.log("Connected to server");
 
 		return ;
 	} 
 
 	handleDisconnect(client: Socket) {
-		const user = this.queue1v1.find((queuer) => queuer.socketId === client.id);
-		if (!user)
-			return ;
-		this.queue1v1 = this.queue1v1.filter((queuer) => queuer.socketId !== client.id);
+		// const user = this.queue1v1.find((queuer) => queuer.socketId === client.id);
+		// if (!user)
+		// 	return ;
+		// this.queue1v1 = this.queue1v1.filter((queuer) => queuer.socketId !== client.id);
+		console.log("Disconnected from server");
 		return ;
 	}
 }
