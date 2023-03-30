@@ -24,6 +24,7 @@ model User {
 
     avatar    String?
     twoFactor Boolean    @default(false)
+    config    Boolean    @default(false)
     secret    String?
     state     UserStatus @default(ONLINE)
     wins      Int        @default(0)
