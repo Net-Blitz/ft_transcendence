@@ -12,30 +12,41 @@ import Game from './components/Game';
 import GamePopUp from './components/GamePopUp';
 import { io, Socket } from 'socket.io-client';
 
-function App(this: any) {
-
-	const [socketQueue, setSocketQueue] = useState({} as Socket);
-	const [load, updateLoad] = useState(0);
-
+function initOneSocket(path: string, debug: boolean = false, connectFunction?: () => void, disconnectFunction?: () => void) {
+	const [socket, setSocket] = useState({} as Socket);
 	useEffect(() => {
-		const socket: Socket = io("http://localhost:3333/queue", {transports: ['websocket'], withCredentials: true,})
+		const socket: Socket = io("http://localhost:3333/" + path, {transports: ['websocket'], withCredentials: true,})
 		socket.on("connect", () => {
-			console.log("Connected to socket.io server");
+			if (debug)
+				console.log("Connected to socket.io server " + path);
+			if (connectFunction)
+				connectFunction();
 		});
 		socket.on("disconnect", () => {
-			console.log("Disconnected from socket.io server");
+			if (debug)
+				console.log("Disconnected from socket.io server " + path);
+			if (disconnectFunction)
+				disconnectFunction();
 		});
-		socket.on("close", () => {
-			console.log("Closed socket.io server");
-			socket.close();
-		});
-		setSocketQueue(socket);
+		setSocket(socket);
 		
 	}, []);
+	return (socket);
+}
+
+function initSockets() {
+	const socketQueue = initOneSocket("queue"); // set dans redux ce qu'il faut pour affiner l'animation ou pour toggle la popUp par exemple
+	// const socketGame = initOneSocket("game");
+	return ({queue: socketQueue});
+}
+
+function App(this: any) {
+
+	const socket = initSockets();
 
 	return (
 			<div>
-			<GamePopUp socketQueue={socketQueue} load={load} updateLoad={updateLoad} />
+			<GamePopUp socketQueue={socket.queue} />
 			<Routes>
 				<Route path="/login" element={<Login />} />
 				<Route path="/login/2fa" element={<Login2fa />} />

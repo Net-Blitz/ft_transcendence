@@ -42,7 +42,6 @@ function Lobby() {
 	})
 
 	socket.on("gameFound", (data:any) => {
-		console.log(data);
 		socket.close();
 		joinGame(data.gameId);
 	})

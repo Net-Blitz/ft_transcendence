@@ -1,24 +1,28 @@
-import userEvent from "@testing-library/user-event";
 import { useEffect, useState } from "react";
-import { Socket } from "socket.io-client";
 import "./GamePopUp.css";
 
 
 	
-const GamePopUp = ({socketQueue, load, updateLoad}:any) => {
-	// socketQueue.on("gameFound", (data: any) => {
-	// });
+const GamePopUp = ({socketQueue}:any) => {
+
 	const [accept, update_accept] = useState(0)
+	const [load, updateLoad] = useState(0)
 	
+	/* Socket Manager */
 	useEffect(() => {
-		function handleCheck(data: any) {
+	//socket.on("gameOK", (data: any) => { remove popUp, load game page })
+	//socket.on("gameKO", (data: any) => { remove popUp, update game state(maybe can be user state) })
+		/* Function handler */
+		function handleCheck(data: any) { 			
 			console.log("check: ", data);
 		}
+
+		/* Load or unload listener */ 
 		if (socketQueue && socketQueue.connected !== undefined && load == 1) {
 			socketQueue.on("check", handleCheck);	
 		}
 		else if (socketQueue && socketQueue.connected !== undefined && load == 0) {
-			console.log("Queue: ");
+			console.log("uncheck");
 			socketQueue.off("check");
 		}
 	
@@ -39,9 +43,7 @@ const GamePopUp = ({socketQueue, load, updateLoad}:any) => {
 			});
 	}, []);
 
-	//socket.on("gameOK", (data: any) => { remove popUp, load game page })
-	//socket.on("gameKO", (data: any) => { remove popUp, update game state(maybe can be user state) })
-
+	/* Aniamtion manager */
 	useEffect(() => {
 		if (accept == 0)
 			return;
@@ -54,6 +56,7 @@ const GamePopUp = ({socketQueue, load, updateLoad}:any) => {
 		//socket.emit("acceptGame")
 	}, [accept]);
 		
+	/* Button handler */
 	const handleAccept = (e:any) => {
 		if (accept == 0)
 			update_accept(1);
@@ -62,8 +65,8 @@ const GamePopUp = ({socketQueue, load, updateLoad}:any) => {
 	const handleDecline = () => {
 		console.log("Decline");
 		updateLoad(0);
-		//socket.emit("declineGame")
 		document.querySelector<HTMLElement>(".game-pop-up-main")!.style.display = "none";
+		//socket.emit("declineGame")
 	}
 
 	return (
