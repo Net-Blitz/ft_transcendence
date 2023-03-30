@@ -28,7 +28,6 @@ export class AuthService {
 		}
 		return user;
 	}
-	//eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImxvZ2luIjoiamVhbiIsImlhdCI6MTY3ODQ2NDQ5MiwiZXhwIjoxNjc4NDcxNjkyfQ.gK4NF2HcjxMvgf9KOj_H3TU2R8vyzEwCVxqRYij_nP4
 
 	async Auth42Callback(
 		@Req() req: Request,
@@ -52,7 +51,7 @@ export class AuthService {
 				return this.getUserInfo(req, res, response.data.access_token);
 			});
 		} catch (error) {
-			//console.log(error);
+			console.log(error);
 			throw new ForbiddenException("callback error");
 		}
 	}

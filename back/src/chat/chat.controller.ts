@@ -23,10 +23,13 @@ export class ChatController {
 		@Res() res: Response,
 		@GetUser() user: any
 	) {
-		console.log({ state });
-		console.log("ALED: ", state);
-		if (state === "PUBLIC")
-			return await this.chatService.CreateChannel(channel, res, user);
+		if (state === "PUBLIC" || state === "PRIVATE")
+			return await this.chatService.CreateChannel(
+				channel,
+				state,
+				res,
+				user
+			);
 		else if (state === "PROTECTED")
 			return await this.chatService.CreateProtectedChannel(
 				channel,
@@ -40,23 +43,60 @@ export class ChatController {
 	@Post("join/:channel")
 	async JoinChannel(
 		@Param("channel") channel: string,
+		@Body("state") state: string,
 		@Body("password") password: string,
 		@Res() res: Response,
 		@GetUser() user: any
 	) {
 		console.log({ password });
-		if (password) {
-			console.log("private channel");
+		console.log({ state });
+		if (password && state === "PROTECTED") {
 			return await this.chatService.JoinProtectedChannel(
 				channel,
 				password,
 				res,
 				user
 			);
+		} else if (state === "PRIVATE") {
+			return await this.chatService.JoinPrivateChannel(
+				channel,
+				res,
+				user
+			);
+		} else if (state === "PUBLIC") {
+			return await this.chatService.JoinChannel(channel, res, user);
 		} else {
-			console.log("public channel");
+			return res.status(400).json({ message: "Invalid channel state" });
 		}
-		return await this.chatService.JoinChannel(channel, res, user);
+	}
+
+	@Post("invite/:channel")
+	async InviteUser(
+		@Param("channel") channel: string,
+		@Body("login") login: string,
+		@Res() res: Response,
+		@GetUser() user: any
+	) {
+		return await this.chatService.InviteToChannel(
+			channel,
+			login,
+			res,
+			user
+		);
+	}
+
+	@Delete("decline/:channel")
+	async DeclineInvite(
+		@Param("channel") channel: string,
+		@Res() res: Response,
+		@GetUser() user: any
+	) {
+		return await this.chatService.DeclineInvite(channel, res, user);
+	}
+
+	@Get("invites")
+	async GetInvites(@Res() res: Response, @GetUser() user: any) {
+		return await this.chatService.GetInvites(res, user);
 	}
 
 	@Delete("leave/:channel")

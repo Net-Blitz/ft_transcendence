@@ -5,6 +5,7 @@ import Messages from "./Messages";
 import axios from "axios";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ChannelDto } from "./Channel";
+import Invite from "./Invite";
 
 export interface MessageDto {
 	username: string;
@@ -132,6 +133,10 @@ function Chat() {
 				))}
 			</ul>
 			<button onClick={handleDisconnect}>Back</button>
+			{channel?.state === "PRIVATE" &&
+				userInfo.id === channel.ownerId && (
+					<Invite channelName={channel.name}></Invite>
+				)}
 			<MessageInput sendMessage={sendMessage} userInfo={userInfo} />
 			<Messages messages={messages} />
 		</div>
