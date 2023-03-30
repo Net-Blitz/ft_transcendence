@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Navigate} from 'react-router-dom';
+import { Navigate, useLocation} from 'react-router-dom';
 import './Auth.css';
 /*	COMPONENTS	*/
 import Input from './Input/Input';
@@ -18,8 +18,9 @@ export const AuthStart = () => {
 			<Title title="Welcome" subtitle="" />
 			<Button
 				content="Login with 42"
-				bottom="false"
+				bottom={false}
 				href="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-f157f9462f604eede6bbea3f75533e279c51636777b283bfe57dfcb391784532&redirect_uri=http%3A%2F%2Flocalhost%3A3333%2Fauth%2Fcallback&response_type=code"
+				absolut={true}
 			/>
 		</div>
 	);
@@ -41,7 +42,7 @@ export const Auth2fa = () => {
 				placeholder="enter the generated code"
 				icon="padlock"
 			/>
-			<Button content="Login with 42" bottom="false" href="" />
+			<Button content="Login with 42" bottom={false} href="" absolut={true} />
 		</div>
 	);
 };
@@ -59,14 +60,17 @@ export const AuthNameAvatar = () => {
 				icon="id_card"
 			/>
 			<Carousel />
-			<Button content="Continue" bottom="true" href="" />
+			<Button content="Continue" bottom={true} href="/login/2faconfig" absolut={false} state="config" />
 		</div>
 	);
 };
 
 export const Auth2faConfig = () => {
 	const [statusState, setStatusState] = useState(false);
+	const { state } = useLocation();
 
+	if (!state || state.prec != 'config')
+		return <Navigate to="/login" replace />
 	return (
 		<div
 			className={
@@ -94,8 +98,9 @@ export const Auth2faConfig = () => {
 			)}
 			<Button
 				content="Login with 42"
-				bottom={statusState === false ? 'true' : 'false'}
+				bottom={statusState === false ? true : false}
 				href=""
+				absolut={true}
 			/>
 		</div>
 	);

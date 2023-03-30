@@ -16,10 +16,10 @@ function App(this: any) {
 			<Route element={<AuthRoutes />}>
 				<Route path="/" element={<MainPage />} />
 				<Route path="/login/2fa" element={<Login />} />
-				<Route element={<ConfigRoutes />}>
-					<Route path="/login/name&avatar" element={<Login />} />
-					<Route path="/login/2faconfig" element={<Login />} />
-				</Route>
+				{/* <Route element={<ConfigRoutes />}> */}
+				<Route path="/login/name&avatar" element={<Login />} />
+				<Route path="/login/2faconfig" element={<Login />} />
+				{/* </Route> */}
 			</Route>
 			<Route path="/login" element={<Login />} />
 		</Routes>

@@ -1,22 +1,29 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import './Button.css';
 
 interface ButtonProps {
 	content: string;
-	bottom: string;
+	bottom: boolean;
 	href: string;
+	absolut: boolean;
+	state?: string;
 }
 
-const Button = ({ content, bottom, href }: ButtonProps) => {
+const Button = ({ content, bottom, href, absolut, state }: ButtonProps) => {
 	return (
 		<div
 			className={
-				bottom === 'true' ? 'button-wrapper bottom' : 'button-wrapper'
+				bottom === true ? 'button-wrapper bottom' : 'button-wrapper'
 			}
 		>
-			<a href={href.length !== 0 ? href : undefined}>
+			<Link
+				to={href} 
+				relative={absolut === true ? 'path' : undefined}
+				state={state ? {prec: state} : undefined}
+			>
 				<button>{content}</button>
-			</a>
+			</Link>
 		</div>
 	);
 };
