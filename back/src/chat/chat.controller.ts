@@ -99,6 +99,36 @@ export class ChatController {
 		return await this.chatService.GetInvites(res, user);
 	}
 
+	@Post("admin/promote/:channel")
+	async AddAdminUser(
+		@Param("channel") channel: string,
+		@Body("login") login: string,
+		@Res() res: Response,
+		@GetUser() user: any
+	) {
+		return await this.chatService.AddAdminUser(channel, login, res, user);
+	}
+
+	@Delete("admin/demote/:channel")
+	async RemoveAdminUser(
+		@Param("channel") channel: string,
+		@Body("login") login: string,
+		@Res() res: Response,
+		@GetUser() user: any
+	) {
+		return await this.chatService.RemoveAdminUser(
+			channel,
+			login,
+			res,
+			user
+		);
+	}
+
+	@Get("admin/:channel")
+	async GetAdmins(@Param("channel") channel: string, @Res() res: Response) {
+		return await this.chatService.GetAdmins(channel, res);
+	}
+
 	@Delete("leave/:channel")
 	async LeaveChannel(
 		@Param("channel") channel: string,

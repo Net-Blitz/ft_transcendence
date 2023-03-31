@@ -88,6 +88,15 @@ export class ChatService {
 		}
 		if (channelExists.state !== "PUBLIC")
 			return res.status(400).json({ message: "Invalid state" });
+		const bans = await this.prisma.ban.findMany({
+			where: {
+				A: channelExists.id,
+				B: user.id,
+			},
+		});
+		if (bans.length > 0) {
+			return res.status(400).json({ message: "You are banned" });
+		}
 		try {
 			await this.prisma.chatUsers.create({
 				data: {
@@ -117,6 +126,15 @@ export class ChatService {
 		}
 		if (channelExists.state !== "PROTECTED")
 			return res.status(400).json({ message: "Invalid state" });
+		const bans = await this.prisma.ban.findMany({
+			where: {
+				A: channelExists.id,
+				B: user.id,
+			},
+		});
+		if (bans.length > 0) {
+			return res.status(400).json({ message: "You are banned" });
+		}
 		const match = await bcrypt.compare(password, channelExists.hash);
 		if (!match) {
 			return res.status(400).json({ message: "Wrong password" });
@@ -152,6 +170,15 @@ export class ChatService {
 		}
 		if (!user) {
 			return res.status(404).json({ message: "User not found" });
+		}
+		const bans = await this.prisma.ban.findMany({
+			where: {
+				A: channelExists.id,
+				B: user.id,
+			},
+		});
+		if (bans.length > 0) {
+			return res.status(400).json({ message: "You are banned" });
 		}
 
 		if (channelExists.ownerId === user.id) {
@@ -299,6 +326,117 @@ export class ChatService {
 			return res.status(404).json({ message: "Invites not found" });
 		}
 		return res.status(200).json(invites);
+	}
+
+	async AddAdminUser(
+		@Param("channel") channel: string,
+		@Body("login") login: string,
+		@Res() res: Response,
+		@GetUser() user: any
+	) {
+		const channelExists = await this.prisma.channel.findUnique({
+			where: {
+				name: channel,
+			},
+		});
+		if (!channelExists) {
+			return res.status(404).json({ message: "Channel not found" });
+		}
+		if (!login)
+			return res.status(400).json({ message: "Login is required" });
+
+		const PromotedUser = await this.prisma.user.findUnique({
+			where: {
+				login: login,
+			},
+		});
+		if (!PromotedUser) {
+			return res.status(404).json({ message: "User not found" });
+		}
+		if (user.id !== channelExists.ownerId) {
+			return res.status(400).json({ message: "You are not owner" });
+		}
+		try {
+			await this.prisma.admin.create({
+				data: {
+					A: channelExists.id,
+					B: PromotedUser.id,
+				},
+			});
+		} catch (e) {
+			return res.status(400).json({ message: "User already admin" });
+		}
+		return res
+			.status(200)
+			.json({ message: "User has been successfully promoted" });
+	}
+
+	async RemoveAdminUser(
+		@Param("channel") channel: string,
+		@Body("login") login: string,
+		@Res() res: Response,
+		@GetUser() user: any
+	) {
+		const channelExists = await this.prisma.channel.findUnique({
+			where: {
+				name: channel,
+			},
+		});
+		if (!channelExists) {
+			return res.status(404).json({ message: "Channel not found" });
+		}
+		if (!login)
+			return res.status(400).json({ message: "Login is required" });
+
+		const DemotedUser = await this.prisma.user.findUnique({
+			where: {
+				login: login,
+			},
+		});
+		if (!DemotedUser) {
+			return res.status(404).json({ message: "User not found" });
+		}
+		if (user.id !== channelExists.ownerId) {
+			return res.status(400).json({ message: "You are not owner" });
+		}
+		try {
+			await this.prisma.admin.delete({
+				where: {
+					A_B: {
+						A: channelExists.id,
+						B: DemotedUser.id,
+					},
+				},
+			});
+		} catch (e) {
+			return res.status(400).json({ message: "User is not admin" });
+		}
+		return res
+			.status(200)
+			.json({ message: "User has been successfully demoted" });
+	}
+
+	async GetAdmins(@Param("channel") channel: string, @Res() res: Response) {
+		const channelExists = await this.prisma.channel.findUnique({
+			where: {
+				name: channel,
+			},
+		});
+		if (!channelExists) {
+			return res.status(404).json({ message: "Channel not found" });
+		}
+		const admins = await this.prisma.admin.findMany({
+			where: {
+				A: channelExists.id,
+			},
+			include: {
+				User: true,
+			},
+		});
+		if (!admins) {
+			return res.status(404).json({ message: "Admins not found" });
+		}
+		return res.status(200).json(admins);
 	}
 
 	async LeaveChannel(

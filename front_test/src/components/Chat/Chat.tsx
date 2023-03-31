@@ -18,6 +18,7 @@ function Chat() {
 	const [userInfo, setUserInfo] = useState<any>();
 	const [channel, setChannel] = useState<ChannelDto>();
 	const [userChannel, setUserChannel] = useState<any>();
+	const [isAdmin, setIsAdmin] = useState(false);
 	const { name } = useParams<{ name: string }>();
 	const navigate = useNavigate();
 
@@ -38,10 +39,6 @@ function Chat() {
 		};
 		fetchData();
 		fetchChannel();
-
-		// useless if we update the channel when we receive a message from the server (see handleMessage below)
-		//const interval = setInterval(fetchChannel, 5000);
-		//return () => clearInterval(interval);
 	}, [channel?.name, name, socket, userInfo?.username]);
 
 	useEffect(() => {
@@ -93,12 +90,32 @@ function Chat() {
 			}
 		};
 
+		const me = userChannel?.find((user: any) => user.id === userInfo?.id);
+		if (me?.role === "admin") {
+			setIsAdmin(true);
+		} else {
+			setIsAdmin(false);
+		}
+
 		socket.on("chat", handleMessage);
+		socket.on("kick", (data: any) => {
+			if (data.username === userInfo?.username) {
+				handleDisconnect();
+			}
+		});
 
 		return () => {
 			socket.off("chat", handleMessage);
 		};
-	}, [messages, name, navigate, socket, userInfo?.username]);
+	}, [
+		messages,
+		name,
+		navigate,
+		socket,
+		userChannel,
+		userInfo?.id,
+		userInfo?.username,
+	]);
 
 	const sendMessage = (message: MessageDto) => {
 		socket?.emit("chat", { ...message, channel: name });
@@ -107,6 +124,37 @@ function Chat() {
 	const filtereduserChannel = userChannel?.filter(
 		(user: any) => user.id !== userInfo?.id
 	);
+
+	const handlePromote = async (login: string) => {
+		try {
+			await axios.post(
+				"http://localhost:3333/chat/admin/promote/" + name,
+				{
+					login: login,
+				},
+				{ withCredentials: true }
+			);
+			alert(login + " is now administator of the channel");
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const handleKick = async (login: string) => {
+		socket?.emit("ToKick", {
+			username: userInfo.username,
+			channel: name,
+			login: login,
+		});
+	};
+
+	const handleBan = async (login: string) => {
+		socket?.emit("ToBan", {
+			username: userInfo.username,
+			channel: name,
+			login: login,
+		});
+	};
 
 	return (
 		<div>
@@ -128,7 +176,34 @@ function Chat() {
 							</Link>
 						</div>
 						<span className="friend-info">Role: {user.role}</span>
-						<button className="add-friend">Block</button>
+						{userInfo?.id === channel?.ownerId && (
+							<>
+								<button
+									onClick={() => handlePromote(user.login)}
+								>
+									Promote
+								</button>
+								<button onClick={() => handleBan(user.login)}>
+									Ban
+								</button>
+								<button onClick={() => handleKick(user.login)}>
+									Kick
+								</button>
+								<button>Mute</button>
+							</>
+						)}
+						{user.role === "user" && isAdmin === true && (
+							<>
+								<button onClick={() => handleBan(user.login)}>
+									Ban
+								</button>
+								<button onClick={() => handleKick(user.login)}>
+									Kick
+								</button>
+								<button>Mute</button>
+							</>
+						)}
+						<button>Block</button>
 					</li>
 				))}
 			</ul>

@@ -143,13 +143,13 @@ export class AuthService {
 		//return res.redirect("http://localhost:8080");
 
 		// temporary token generator for testing
-		//const payload2 = { sub: 2, login: "Ubuntu" };
-		//const token2 = this.jwt.sign(payload2, { expiresIn: "480min", secret });
-		//console.log("Ubuntu token: " + token2);
+		const payload2 = { sub: 2, login: "Ubuntu" };
+		const token2 = this.jwt.sign(payload2, { expiresIn: "480min", secret });
+		console.log("Ubuntu token: " + token2);
 
-		//const payload3 = { sub: 3, login: "Fedora" };
-		//const token3 = this.jwt.sign(payload3, { expiresIn: "120min", secret });
-		//console.log("Fedora token: " + token3);
+		const payload3 = { sub: 3, login: "Fedora" };
+		const token3 = this.jwt.sign(payload3, { expiresIn: "120min", secret });
+		console.log("Fedora token: " + token3);
 
 		return { access_token: token };
 	}

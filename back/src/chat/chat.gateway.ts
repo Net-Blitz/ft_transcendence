@@ -101,4 +101,123 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		console.log(channel, ": ", username, ": ", message.content);
 		this.server.to(channel).emit("chat", message);
 	}
+
+	@SubscribeMessage("ToKick")
+	async handleKick(
+		client: Socket,
+		data: { username: string; channel: string; login: string }
+	) {
+		const connectedClient = this.connectedClients.get(client.id);
+		if (!connectedClient) {
+			return;
+		}
+		const { channel, username } = connectedClient;
+		try {
+			const channelExists = await this.prisma.channel.findUnique({
+				where: {
+					name: channel,
+				},
+			});
+
+			const admins = await this.prisma.admin.findMany({
+				where: {
+					A: channelExists.id,
+				},
+				include: {
+					User: true,
+				},
+			});
+
+			let isAdmin = admins.some(
+				(admin) => admin.User.username === username
+			);
+
+			const userExists = await this.prisma.user.findUnique({
+				where: {
+					username: username,
+				},
+			});
+
+			if (userExists.id === channelExists.ownerId) {
+				isAdmin = true;
+			}
+
+			if (isAdmin) {
+				console.log(
+					username + " kicked " + data.login + " from " + channel
+				);
+				this.server
+					.to(channel)
+					.emit("kick", { username: data.login, channel: channel });
+			}
+		} catch (e) {
+			console.log(e);
+		}
+	}
+
+	@SubscribeMessage("ToBan")
+	async handleBan(
+		client: Socket,
+		data: { username: string; channel: string; login: string }
+	) {
+		const connectedClient = this.connectedClients.get(client.id);
+		if (!connectedClient) {
+			return;
+		}
+		const { channel, username } = connectedClient;
+		try {
+			const channelExists = await this.prisma.channel.findUnique({
+				where: {
+					name: channel,
+				},
+			});
+
+			const admins = await this.prisma.admin.findMany({
+				where: {
+					A: channelExists.id,
+				},
+				include: {
+					User: true,
+				},
+			});
+
+			let isAdmin = admins.some(
+				(admin) => admin.User.username === username
+			);
+
+			const userExists = await this.prisma.user.findUnique({
+				where: {
+					username: data.login,
+				},
+			});
+
+			const user = await this.prisma.user.findUnique({
+				where: {
+					username: username,
+				},
+			});
+
+			if (user.id === channelExists.ownerId) {
+				isAdmin = true;
+			}
+
+			await this.prisma.ban.create({
+				data: {
+					A: channelExists.id,
+					B: userExists.id,
+				},
+			});
+			console.log("isAdmin: ", isAdmin);
+			if (isAdmin) {
+				console.log(
+					username + " banned " + data.login + " from " + channel
+				);
+				this.server
+					.to(channel)
+					.emit("kick", { username: data.login, channel: channel });
+			}
+		} catch (e) {
+			console.log(e);
+		}
+	}
 }
