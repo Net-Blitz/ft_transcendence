@@ -156,6 +156,30 @@ function Chat() {
 		});
 	};
 
+	const handleUnban = async (login: string) => {
+		socket?.emit("ToUnban", {
+			username: userInfo.username,
+			channel: name,
+			login: login,
+		});
+	};
+
+	const handleMute = async (login: string) => {
+		socket?.emit("ToMute", {
+			username: userInfo.username,
+			channel: name,
+			login: login,
+		});
+	};
+
+	const handleUnmute = async (login: string) => {
+		socket?.emit("ToUnmute", {
+			username: userInfo.username,
+			channel: name,
+			login: login,
+		});
+	};
+
 	return (
 		<div>
 			<h1>Chat: {name}</h1>
@@ -189,7 +213,14 @@ function Chat() {
 								<button onClick={() => handleKick(user.login)}>
 									Kick
 								</button>
-								<button>Mute</button>
+								<button onClick={() => handleMute(user.login)}>
+									Mute
+								</button>
+								<button
+									onClick={() => handleUnmute(user.login)}
+								>
+									UnMute
+								</button>
 							</>
 						)}
 						{user.role === "user" && isAdmin === true && (
@@ -200,7 +231,9 @@ function Chat() {
 								<button onClick={() => handleKick(user.login)}>
 									Kick
 								</button>
-								<button>Mute</button>
+								<button onClick={() => handleMute(user.login)}>
+									Mute
+								</button>
 							</>
 						)}
 						<button>Block</button>

@@ -92,14 +92,42 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage("chat")
-	handleMessage(client: Socket, message: MessageDto) {
+	async handleMessage(client: Socket, message: MessageDto) {
 		const connectedClient = this.connectedClients.get(client.id);
 		if (!connectedClient) {
 			return;
 		}
 		const { channel, username } = connectedClient;
-		console.log(channel, ": ", username, ": ", message.content);
-		this.server.to(channel).emit("chat", message);
+
+		try {
+			const channelExists = await this.prisma.channel.findUnique({
+				where: {
+					name: channel,
+				},
+			});
+
+			const userExists = await this.prisma.user.findUnique({
+				where: {
+					username: username,
+				},
+			});
+
+			const mutedUser = this.prisma.mute.findMany({
+				where: {
+					A: channelExists.id,
+					B: userExists.id,
+				},
+			});
+
+			if ((await mutedUser).length > 0) {
+				console.log(userExists.username + " is muted");
+				return;
+			}
+			console.log(channel, ": ", username, ": ", message.content);
+			this.server.to(channel).emit("chat", message);
+		} catch (e) {
+			console.log(e);
+		}
 	}
 
 	@SubscribeMessage("ToKick")
@@ -215,6 +243,196 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				this.server
 					.to(channel)
 					.emit("kick", { username: data.login, channel: channel });
+			}
+		} catch (e) {
+			console.log(e);
+		}
+	}
+
+	@SubscribeMessage("ToUnban")
+	async handleUnban(
+		client: Socket,
+		data: { username: string; channel: string; login: string }
+	) {
+		const connectedClient = this.connectedClients.get(client.id);
+		if (!connectedClient) {
+			return;
+		}
+		const { channel, username } = connectedClient;
+		try {
+			const channelExists = await this.prisma.channel.findUnique({
+				where: {
+					name: channel,
+				},
+			});
+
+			const admins = await this.prisma.admin.findMany({
+				where: {
+					A: channelExists.id,
+				},
+				include: {
+					User: true,
+				},
+			});
+
+			let isAdmin = admins.some(
+				(admin) => admin.User.username === username
+			);
+
+			const userExists = await this.prisma.user.findUnique({
+				where: {
+					username: data.login,
+				},
+			});
+
+			const user = await this.prisma.user.findUnique({
+				where: {
+					username: username,
+				},
+			});
+
+			if (user.id === channelExists.ownerId) {
+				isAdmin = true;
+			}
+
+			if (isAdmin) {
+				console.log(
+					username + " unbanned " + data.login + " from " + channel
+				);
+				await this.prisma.ban.deleteMany({
+					where: {
+						A: channelExists.id,
+						B: userExists.id,
+					},
+				});
+			}
+		} catch (e) {
+			console.log(e);
+		}
+	}
+
+	@SubscribeMessage("ToMute")
+	async handleMute(
+		client: Socket,
+		data: { username: string; channel: string; login: string }
+	) {
+		const connectedClient = this.connectedClients.get(client.id);
+		if (!connectedClient) {
+			return;
+		}
+		const { channel, username } = connectedClient;
+		try {
+			const channelExists = await this.prisma.channel.findUnique({
+				where: {
+					name: channel,
+				},
+			});
+
+			const admins = await this.prisma.admin.findMany({
+				where: {
+					A: channelExists.id,
+				},
+				include: {
+					User: true,
+				},
+			});
+
+			let isAdmin = admins.some(
+				(admin) => admin.User.username === username
+			);
+
+			const userExists = await this.prisma.user.findUnique({
+				where: {
+					username: data.login,
+				},
+			});
+
+			const user = await this.prisma.user.findUnique({
+				where: {
+					username: username,
+				},
+			});
+
+			if (user.id === channelExists.ownerId) {
+				isAdmin = true;
+			}
+
+			await this.prisma.mute.create({
+				data: {
+					A: channelExists.id,
+					B: userExists.id,
+				},
+			});
+			console.log("isAdmin: ", isAdmin);
+			if (isAdmin) {
+				console.log(
+					username + " muted " + data.login + " from " + channel
+				);
+				this.server
+					.to(channel)
+					.emit("mute", { username: data.login, channel: channel });
+			}
+		} catch (e) {
+			console.log(e);
+		}
+	}
+
+	@SubscribeMessage("ToUnmute")
+	async handleUnmute(
+		client: Socket,
+		data: { username: string; channel: string; login: string }
+	) {
+		const connectedClient = this.connectedClients.get(client.id);
+		if (!connectedClient) {
+			return;
+		}
+		const { channel, username } = connectedClient;
+		try {
+			const channelExists = await this.prisma.channel.findUnique({
+				where: {
+					name: channel,
+				},
+			});
+
+			const admins = await this.prisma.admin.findMany({
+				where: {
+					A: channelExists.id,
+				},
+				include: {
+					User: true,
+				},
+			});
+
+			let isAdmin = admins.some(
+				(admin) => admin.User.username === username
+			);
+
+			const userExists = await this.prisma.user.findUnique({
+				where: {
+					username: data.login,
+				},
+			});
+
+			const user = await this.prisma.user.findUnique({
+				where: {
+					username: username,
+				},
+			});
+
+			if (user.id === channelExists.ownerId) {
+				isAdmin = true;
+			}
+
+			if (isAdmin) {
+				console.log(
+					username + " unmuted " + data.login + " from " + channel
+				);
+				await this.prisma.mute.deleteMany({
+					where: {
+						A: channelExists.id,
+						B: userExists.id,
+					},
+				});
 			}
 		} catch (e) {
 			console.log(e);
