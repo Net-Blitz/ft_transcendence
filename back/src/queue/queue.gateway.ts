@@ -28,8 +28,6 @@ export class QueueGateway {
 	}
 
 	checkQueue() {
-
-		console.log ("Queue 1v1: ", this.queue1v1);
 		if (this.queue1v1.length >= 2)
 		{
 			const player1 = this.queue1v1.shift();
@@ -176,9 +174,11 @@ export class QueueGateway {
 
 	handleDisconnect(client: Socket) {
 
-		console.log(client.id);
+		const user = this.queue1v1.find((queuer) => queuer.socketId === client.id);
+		if (!user)
+			return ;
+		this.queue1v1 = this.queue1v1.filter((queuer) => queuer.socketId !== client.id);
 
-		console.log("Queue Server Disconnection");
 		return ;
 	}
 

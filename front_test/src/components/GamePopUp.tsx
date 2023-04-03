@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 
 const replayAnimations = () => {
 	document.getAnimations().forEach((anim: Animation) => {
-		console.log(anim)
 		if (anim.playState === "idle")
 		{
 			anim.cancel();

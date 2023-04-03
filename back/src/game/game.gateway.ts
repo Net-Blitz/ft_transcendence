@@ -57,6 +57,7 @@ export class GameGateway {
 	private async waitingPlayerConnection(room: number) {
 		while (this.ConnectedSockets.findIndex((socket) => socket.roomName === "game-" + room && socket.state === "player1") === -1 ||
 				this.ConnectedSockets.findIndex((socket) => socket.roomName === "game-" + room && socket.state === "player2") === -1) {
+				console.log("waiting for player connection");
 				await this.sleep(1000); // can add a timeout here --> if timeout, delete the game or make cancel state
 		}
 		await this.prisma.game.update({
@@ -176,26 +177,25 @@ export class GameGateway {
 		await this.gameEnd(gameRoom, room, end);
 	}
 
-	private async checkUserConnection(client: Socket) {
+	private async checkUserConnection(client: Socket, data: any) {
 	
 		const cookies = client.handshake.headers.cookie;
 		const token = cookies.split("jwt=")[1].split(";")[0];
 		const userCookie = JSON.parse(atob(token.split(".")[1]));
 	//	jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => { if (err) return (null); });
 
-		if (!client.handshake.query || !client.handshake.query.room)
-			return (null);
-		
+		console.log("checkUserConnection")
 		const user = await this.prisma.user.findUnique({where: {login: userCookie.login}});
 		if (!user)
 			return (null);
-		const room = parseInt(client.handshake.query.room.toString());
-		if (!room)
+		if (!data || !data.room)
 			return (null);
+		const room = data.room;
 		
 		const game = await this.prisma.game.findUnique({where: {id: room}});	
 		if (!game || game.state == "ENDED")
 			return (null);
+		console.log("checkUserConnection2")
 		return ({login: userCookie.login, user, game, room})
 	}
 
@@ -215,12 +215,12 @@ export class GameGateway {
 		{
 			if (sockUser.roomName !== "game-" + room)
 			{
-				this.server.to(sockUser.socketId).emit("close");
 				sockUser.roomName = "game-" + room;
 				sockUser.state = state;
 				sockUser.up = 0;
 				sockUser.down = 0;
 				sockUser.socketId = client.id;
+
 				client.join("game-" + room);
 			}
 		}
@@ -240,14 +240,13 @@ export class GameGateway {
 		}
 	}
 
+	private async checkAndSave(client: Socket, data: any) {
 
-	private async checkAndSave(client: Socket) {
-
-		let userCheck = await this.checkUserConnection(client);
+		let userCheck = await this.checkUserConnection(client, data);
 		
 		if (userCheck === null)
 		{
-			client.emit("BadConnection"); 
+			client.emit("error"); 
 			return (false);
 		}
 		
@@ -277,8 +276,10 @@ export class GameGateway {
 		return (true);
 	}
  
-	async handleConnection(client: Socket) { 
-		return await this.checkAndSave(client)
+	async handleConnection(client: Socket) {
+		console.log("Game Server Connection", client.id);
+
+		return ;
 	}
 
 	handleDisconnect(client: Socket) {
@@ -286,10 +287,25 @@ export class GameGateway {
 		if (sockUser != null)
 		{
 			client.leave(sockUser.roomName);
-			this.server.to(sockUser.socketId).emit("close");
 			this.ConnectedSockets.splice(this.ConnectedSockets.findIndex(x => x.socketId === client.id), 1);
 		}
 		return ;
+	}
+
+	@SubscribeMessage("gameConnection")
+	async handleGameConnection(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+		return await this.checkAndSave(client, data);
+	}
+
+	@SubscribeMessage("gameDisconnection")
+	async handleGameDisconnection(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+		const sockUser : SocketUser = this.ConnectedSockets.find(x => x.socketId === client.id);
+		if (sockUser != null)
+		{
+			client.leave(sockUser.roomName);
+			//this.server.to(client.id).socketsLeave(sockUser.roomName);
+			this.ConnectedSockets.splice(this.ConnectedSockets.findIndex(x => x.socketId === client.id), 1);
+		}
 	}
 
 	@SubscribeMessage("keyPress")
