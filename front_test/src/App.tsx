@@ -92,14 +92,14 @@ function App(this: any) {
 						</PrivateRoute>
 					}
 				/>
-				<Route
+				{/*<Route
 					path="/chat/:name"
 					element={
 						<PrivateRoute>
 							<Chat />
 						</PrivateRoute>
 					}
-				/>
+				/>*/}
 			</Routes>
 		</BrowserRouter>
 	);

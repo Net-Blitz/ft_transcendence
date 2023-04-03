@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { io, Socket } from "socket.io-client";
+import { Socket } from "socket.io-client";
 import MessageInput from "./MessageInput";
 import Messages from "./Messages";
 import axios from "axios";
@@ -12,8 +12,7 @@ export interface MessageDto {
 	content: string;
 }
 
-function Chat() {
-	const [socket, setSocket] = useState<Socket>();
+function Chat(socket: any) {
 	const [messages, setMessages] = useState<MessageDto[]>([]);
 	const [userInfo, setUserInfo] = useState<any>();
 	const [channel, setChannel] = useState<ChannelDto>();
@@ -39,26 +38,19 @@ function Chat() {
 		};
 		fetchData();
 		fetchChannel();
-	}, [channel?.name, name, socket, userInfo?.username]);
+	}, [channel?.name, name, userInfo?.username]);
 
 	useEffect(() => {
-		const newSocket = io("http://localhost:3334");
-		setSocket(newSocket);
-
-		newSocket?.emit("join", {
+		socket?.emit("join", {
 			channel: name,
 			username: userInfo?.username,
 		});
-		newSocket?.emit("chat", {
+		socket?.emit("chat", {
 			username: "Server",
 			content: userInfo?.username + " has join the channel",
 			channel: name,
 		});
-
-		return () => {
-			newSocket.disconnect();
-		};
-	}, [name, userInfo?.username]);
+	}, [name, socket, userInfo?.username]);
 
 	const handleDisconnect = async () => {
 		try {
@@ -246,7 +238,7 @@ function Chat() {
 					<Invite channelName={channel.name}></Invite>
 				)}
 			<MessageInput sendMessage={sendMessage} userInfo={userInfo} />
-			<Messages messages={messages} />
+			<Messages messages={messages} userInfo={userInfo} />
 		</div>
 	);
 }

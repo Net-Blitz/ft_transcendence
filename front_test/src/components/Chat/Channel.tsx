@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
+import { io, Socket } from "socket.io-client";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import Chat from "./Chat";
+import JoinnedChannels from "./Joinnedchannel";
 
 export interface ChannelDto {
 	id: number;
@@ -10,11 +14,13 @@ export interface ChannelDto {
 }
 
 function Channel() {
-	const [channels, setChannels] = useState([] as ChannelDto[]);
+	const [channels, setChannels] = useState<ChannelDto[]>([]);
 	const [name, setName] = useState("");
 	const [password, setPassword] = useState("");
 	const [privacy, setPrivacy] = useState("PUBLIC");
 	const [invites, setInvites] = useState<any[]>([]);
+	const [socket, setSocket] = useState<Socket>();
+	//const [JoinnedChannels, setJoinnedChannels] = useState<string[]>([]);
 
 	const navigate = useNavigate();
 
@@ -33,7 +39,7 @@ function Channel() {
 
 	const fetchInvites = async () => {
 		try {
-			const response = await axios.get<any[]>(
+			const response = await axios.get(
 				"http://localhost:3333/chat/invites",
 				{ withCredentials: true }
 			);
@@ -48,6 +54,15 @@ function Channel() {
 
 		const interval = setInterval(fetchChannels, 5000);
 		return () => clearInterval(interval);
+	}, []);
+
+	useEffect(() => {
+		const newSocket = io("http://localhost:3334");
+		setSocket(newSocket);
+
+		return () => {
+			newSocket.disconnect();
+		};
 	}, []);
 
 	const JoinChannel = async (
@@ -78,7 +93,11 @@ function Channel() {
 			} else {
 				return;
 			}
-			navigate("/chat/" + name);
+			//setJoinnedChannels((prev) => [...prev, name]);
+			//JoinnedChannels.map((channel) => {
+			//	console.log("Joinned channel: " + channel);
+			//});
+			//navigate("/chat/" + name);
 		} catch (error) {
 			console.error(error);
 		}
@@ -115,6 +134,9 @@ function Channel() {
 	const handlePrivacyChange = (event: any) => {
 		setPrivacy(event.target.value);
 	};
+
+	// ChannelsList is a list of name of channels
+	const ChannelsList = channels.map((channel) => channel.name);
 
 	return (
 		<div>
@@ -204,6 +226,7 @@ function Channel() {
 					</li>
 				))}
 			</ul>
+			<JoinnedChannels ChannelsList={ChannelsList} />
 		</div>
 	);
 }

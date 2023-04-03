@@ -23,7 +23,12 @@ function MessageInput({
 				value={value}
 				type="text"
 			/>
-			<button onClick={() => handleSendMessage()}>Send</button>
+			<button
+				className="write-link send"
+				onClick={() => handleSendMessage()}
+			>
+				Send
+			</button>
 		</>
 	);
 }
