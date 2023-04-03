@@ -33,7 +33,7 @@ function Game() {
 
 	socket.on("BadConnection", () => {
 		socket.close();
-		navigate("/");		
+		//navigate("/");		
 	});
 
 	socket.on("gameState", (gameState: any) => {

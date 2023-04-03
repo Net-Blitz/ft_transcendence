@@ -40,10 +40,10 @@
 	border-radius: 15px;
 	background: #115484;
 	animation: linear;
-	animation-name: gameBackground;
+	animation-name: gameFoundBackground;
 	animation-duration: 20s;
 }
-	@keyframes gameBackground {
+	@keyframes gameFoundBackground {
 		0% {
 			width: 32px;
 		}
@@ -124,10 +124,10 @@
 	border-radius: 50%;
 	position: absolute;
 	animation: linear;
-	animation-name: gameFound;
+	animation-name: gameFoundBall;
 	animation-duration: 20s;
   }
-  @keyframes gameFound {
+  @keyframes gameFoundBall {
 	  0% {
 		  left: 2%;
 		  top: 62%;

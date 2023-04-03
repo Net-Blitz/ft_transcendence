@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 function Hello() {
 	const navigate = useNavigate();
+
 	const handleClick = () => {
 		navigate("/dashboard");
 	};
@@ -20,7 +21,6 @@ function Hello() {
 	const handleGame = () => {
 		axios.get("http://localhost:3333/queues/joinable", { withCredentials: true })
 		.then((res) => {
-			console.log("res: ", res.data.canJoin);
 			if (res.data.canJoin)
 				navigate("/lobby", { state: { mode: "1v1", login: res.data.login } } );
 			if (res.data.reason === "playing")
