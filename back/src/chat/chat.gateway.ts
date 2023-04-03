@@ -88,6 +88,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					B: userExists.id,
 				},
 			});
+			this.server.to(channel).emit("chat", {
+				username: "Server",
+				content: `${username} has joinned the channel`,
+				channel: channel,
+			});
 		} catch (e) {}
 	}
 

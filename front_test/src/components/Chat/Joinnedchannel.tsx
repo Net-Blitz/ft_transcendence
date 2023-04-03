@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import "./Chat.css";
-import { userInfo } from "os";
 import MessageInput from "./MessageInput";
 import { MessageDto } from "./Chat";
 import { ChannelDto } from "./Channel";
 import axios from "axios";
 import { Socket, io } from "socket.io-client";
 import Messages from "./Messages";
+import UsersList from "./UsersList";
 
 function JoinnedChannels({ ChannelsList }: any) {
 	const [selectedChannel, setSelectedChannel] = useState<string>("");
@@ -14,7 +14,7 @@ function JoinnedChannels({ ChannelsList }: any) {
 	const [userInfo, setUserInfo] = useState<any>();
 	const [channel, setChannel] = useState<ChannelDto>();
 	const [messages, setMessages] = useState<MessageDto[]>([]);
-	const [userChannel, setUserChannel] = useState<any>();
+	const [showUsers, setShowUsers] = useState(false);
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -29,7 +29,6 @@ function JoinnedChannels({ ChannelsList }: any) {
 				{ withCredentials: true }
 			);
 			setChannel(response.data.channel);
-			setUserChannel(response.data.users);
 		};
 		fetchData();
 		fetchChannel();
@@ -45,34 +44,26 @@ function JoinnedChannels({ ChannelsList }: any) {
 	}, []);
 
 	const handleChannelClick = (channel: string) => {
-		setSelectedChannel(channel);
-		socket?.emit("join", {
-			channel: channel,
-			username: userInfo?.username,
-		});
-		socket?.emit("chat", {
-			username: "Server",
-			content: userInfo?.username + " has join the channel",
-			channel: channel,
-		});
-	};
-
-	useEffect(() => {
 		const fetchChannel = async () => {
 			const response = await axios.get(
 				"http://localhost:3333/chat/channel/" + selectedChannel,
 				{ withCredentials: true }
 			);
 			setChannel(response.data.channel);
-			setUserChannel(response.data.users);
 		};
 
+		setSelectedChannel(channel);
+		socket?.emit("join", {
+			channel: channel,
+			username: userInfo?.username,
+		});
+		fetchChannel();
+	};
+
+	useEffect(() => {
 		const handleMessage = (message: MessageDto) => {
 			console.log(message);
 			setMessages([...messages, message]);
-			if (message.username === "Server") {
-				fetchChannel();
-			}
 		};
 
 		socket?.on("chat", handleMessage);
@@ -85,12 +76,17 @@ function JoinnedChannels({ ChannelsList }: any) {
 		socket?.emit("chat", { ...message, channel: selectedChannel });
 	};
 
+	const handleToggleUsers = () => {
+		setShowUsers(!showUsers);
+	};
+
 	return (
 		<div className="wrapper">
 			<div className="container">
 				<div className="left">
 					<div className="top">
-						<p>Joinned Channels</p>
+						<p>Channels</p>
+						<button onClick={handleToggleUsers}>Show Users</button>
 					</div>
 					<ul className="people">
 						{ChannelsList.map((channel: string) => (
@@ -106,15 +102,29 @@ function JoinnedChannels({ ChannelsList }: any) {
 						))}
 					</ul>
 				</div>
+				{showUsers && (
+					<div className="middle">
+						<UsersList channel={selectedChannel} />
+					</div>
+				)}
 				<div className="right">
 					<div className="top">
 						<span>
-							To: <span className="name">{selectedChannel}</span>
+							To:{" "}
+							<span className="name">
+								{selectedChannel === ""
+									? "No Channel selected"
+									: selectedChannel}
+							</span>
 						</span>
 					</div>
+					{selectedChannel === "" && (
+						<div className="chat center">
+							<p>No Channel selected</p>
+						</div>
+					)}
 					<Messages messages={messages} userInfo={userInfo} />
 					<div className="write">
-						<input type="text" />
 						<MessageInput
 							sendMessage={sendMessage}
 							userInfo={userInfo}

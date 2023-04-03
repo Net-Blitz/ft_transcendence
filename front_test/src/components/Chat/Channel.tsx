@@ -135,7 +135,6 @@ function Channel() {
 		setPrivacy(event.target.value);
 	};
 
-	// ChannelsList is a list of name of channels
 	const ChannelsList = channels.map((channel) => channel.name);
 
 	return (

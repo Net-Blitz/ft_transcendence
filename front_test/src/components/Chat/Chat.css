@@ -25,6 +25,14 @@
 	border-right: 1px solid #e6e6e6;
 }
 
+.middle {
+	display: flex;
+	flex-direction: column;
+	width: 20%;
+	height: 100%;
+	border-right: 1px solid #e6e6e6;
+}
+
 .top {
 	padding: 15px;
 	border-bottom: 1px solid #e6e6e6;
@@ -103,6 +111,13 @@
 	justify-content: space-between;
 	align-items: center;
 	border-top: 1px solid #e6e6e6;
+}
+
+.center {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-size: large;
 }
 
 input[type="text"] {
