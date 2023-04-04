@@ -24,7 +24,8 @@ function JoinnedChannels({ ChannelsList }: any) {
 			setUserInfo(response.data);
 		};
 		const fetchChannel = async () => {
-			const response = await axios.get<any>(
+			if (!selectedChannel) return;
+			const response = await axios.get(
 				"http://localhost:3333/chat/channel/" + selectedChannel,
 				{ withCredentials: true }
 			);
@@ -104,7 +105,7 @@ function JoinnedChannels({ ChannelsList }: any) {
 				</div>
 				{showUsers && (
 					<div className="middle">
-						<UsersList channel={selectedChannel} />
+						<UsersList channel={selectedChannel} socket={socket} />
 					</div>
 				)}
 				<div className="right">
