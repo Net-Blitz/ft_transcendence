@@ -27,7 +27,7 @@ code {
 }
 @font-face {
 	font-family: 'Poppins';
-  font-weight: 300;
+  	font-weight: 300;
 	src: local('Poppins-Light'), url('fonts/Poppins/Poppins-Light.ttf') format(truetype);
 }
   
