@@ -184,7 +184,6 @@ export class GameGateway {
 		const userCookie = JSON.parse(atob(token.split(".")[1]));
 	//	jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => { if (err) return (null); });
 
-		console.log("checkUserConnection")
 		const user = await this.prisma.user.findUnique({where: {login: userCookie.login}});
 		if (!user)
 			return (null);
@@ -195,7 +194,6 @@ export class GameGateway {
 		const game = await this.prisma.game.findUnique({where: {id: room}});	
 		if (!game || game.state == "ENDED")
 			return (null);
-		console.log("checkUserConnection2")
 		return ({login: userCookie.login, user, game, room})
 	}
 

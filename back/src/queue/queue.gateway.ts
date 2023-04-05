@@ -144,12 +144,16 @@ export class QueueGateway {
 		const user = this.queue1v1.find((queuer) => queuer.login === userParam.login);
 		if (user)
 		{
-			user.socketId = client.id;
-			user.mode = userParam.mode;
-			user.bonus1 = (userParam.bonus1 === undefined) ? false : true;
-			user.bonus2 = (userParam.bonus2 === undefined) ? false : true;
-			user.timeData = Date.now();
-			user.state = QueueState.Searching;
+			if (user.socketId !== client.id)
+			{
+				console.log("newDqte")
+				user.socketId = client.id;
+				user.mode = userParam.mode;
+				user.bonus1 = (userParam.bonus1 === undefined) ? false : true;
+				user.bonus2 = (userParam.bonus2 === undefined) ? false : true;
+				user.timeData = Date.now();
+				user.state = QueueState.Searching;
+			}
 		}
 		else
 		{
@@ -184,7 +188,6 @@ export class QueueGateway {
 
 	@SubscribeMessage("ConnectToQueue")
 	connectToQueue(@ConnectedSocket() client: Socket, @MessageBody() userParam: any) {
-		console.log(userParam)
 		if (userParam && userParam.login === undefined || userParam.mode === undefined)
 			return ;
 		
@@ -216,7 +219,7 @@ export class QueueGateway {
 		if (gameMatch.player2.socketId === client.id && gameMatch.player2.state === QueueState.Searching)
 			gameMatch.player2.state = QueueState.Accepted;
 	}
-
+ 
 	@SubscribeMessage("DeclineGame")
 	declineGame(@ConnectedSocket() client: Socket) {
 		const gameMatch = this.gameMatched.find((match) => (match.player1.socketId === client.id || match.player2.socketId === client.id));
@@ -229,5 +232,13 @@ export class QueueGateway {
 
 		if (gameMatch.player2.socketId === client.id && gameMatch.player2.state === QueueState.Searching)
 			gameMatch.player2.state = QueueState.Declined;
+	}
+
+	@SubscribeMessage("Timer")
+	timer(@ConnectedSocket() client: Socket) {
+		const user = this.queue1v1.find((queuer) => queuer.socketId === client.id);
+		if (!user)
+			return ;
+		client.emit("TimerResponse", {message: (Date.now() - user.timeData) / 1000});
 	}
 }

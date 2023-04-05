@@ -12,6 +12,7 @@ function Game({socketGame}:any) {
 
 	useEffect(() => {
 		socketGame.emit("gameConnection", {room: room});
+		localStorage.removeItem("lobby-chat-storage");
 	}, [room, socketGame]);
 
 	useEffect(() => {
