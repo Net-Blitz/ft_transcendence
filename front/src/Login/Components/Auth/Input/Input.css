@@ -1,7 +1,7 @@
 .input-wrapper {
+	height: 70px;
 	width: 74%;
 	display: flex;
-	justify-content: space-between;
 	align-content: center;
 	background-color: #0A3D62;
 	border: 1px solid #0A3D62;
@@ -9,10 +9,12 @@
 	padding: 2px;
 }
 .logo-input-wrapper {
-	width:30%;
+	display: flex;
+	align-items: center;
 }
 .logo-input-wrapper img{
-	width:85%;
+	height: 40px;
+	width: 40px;
 }
 
 .input-wrapper div:first-child, .input-wrapper div:last-child {
@@ -27,7 +29,6 @@
 }
 
 .input-wrapper div:last-child {
-	margin-left: 25px;
 	width: 100%;
 	display: flex;
 	flex-direction: column;
