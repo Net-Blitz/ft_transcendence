@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { ChannelDto } from "./Channel";
+import Notification from "../Notification/Notification";
 
 function UsersList({ channel, socket }: { channel: string; socket: any }) {
 	const [userInfo, setUserInfo] = useState<any>();
@@ -10,6 +11,7 @@ function UsersList({ channel, socket }: { channel: string; socket: any }) {
 	const [openUsername, setOpenUsername] = useState<string>("");
 	const [isAdmin, setIsAdmin] = useState(false);
 	const dropdownRef = useRef<HTMLDivElement>(null);
+	const [notification, setNotification] = useState({ message: "", type: "" });
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -76,9 +78,16 @@ function UsersList({ channel, socket }: { channel: string; socket: any }) {
 				},
 				{ withCredentials: true }
 			);
-			//alert(login + " is now administator of the channel");
+			setNotification({
+				message: login + " has been promoted",
+				type: "success",
+			});
 		} catch (error) {
 			console.error(error);
+			setNotification({
+				message: "An error occured",
+				type: "error",
+			});
 		}
 	};
 
@@ -88,7 +97,10 @@ function UsersList({ channel, socket }: { channel: string; socket: any }) {
 			channel: channel,
 			login: login,
 		});
-		//alert(login + " has been kicked from the channel");
+		setNotification({
+			message: login + " has been kicked",
+			type: "success",
+		});
 	};
 
 	const handleBan = async (login: string) => {
@@ -97,7 +109,10 @@ function UsersList({ channel, socket }: { channel: string; socket: any }) {
 			channel: channel,
 			login: login,
 		});
-		//alert(login + " has been banned from the channel");
+		setNotification({
+			message: login + " has been banned",
+			type: "success",
+		});
 	};
 
 	const handleUnban = async (login: string) => {
@@ -106,26 +121,22 @@ function UsersList({ channel, socket }: { channel: string; socket: any }) {
 			channel: channel,
 			login: login,
 		});
-		//alert(login + " has been unbanned from the channel");
+		setNotification({
+			message: login + " has been unbanned",
+			type: "success",
+		});
 	};
 
 	const handleMute = async (login: string) => {
-		console.log("socket: ", socket);
-		console.log(
-			"login: ",
-			login + " channel: " + channel + " username: " + userInfo.username
-		);
-		try {
-			socket?.emit("ToMute", {
-				username: userInfo.username,
-				channel: channel,
-				login: login,
-			});
-		} catch (error) {
-			console.error(error);
-		}
-
-		//alert(login + " has been muted from the channel");
+		socket?.emit("ToMute", {
+			username: userInfo.username,
+			channel: channel,
+			login: login,
+		});
+		setNotification({
+			message: login + " has been muted",
+			type: "success",
+		});
 	};
 
 	const handleUnmute = async (login: string) => {
@@ -134,11 +145,18 @@ function UsersList({ channel, socket }: { channel: string; socket: any }) {
 			channel: channel,
 			login: login,
 		});
-		//alert(login + " has been unmuted from the channel");
+		setNotification({
+			message: login + " has been unmuted",
+			type: "success",
+		});
 	};
 
 	return (
 		<>
+			<Notification
+				message={notification.message}
+				type={notification.type}
+			/>
 			<div className="top">
 				<p>Users list</p>
 			</div>
