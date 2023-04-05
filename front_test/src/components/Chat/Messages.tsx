@@ -8,14 +8,6 @@ function Messages({
 	userInfo: any;
 }) {
 	return (
-		//<div className="chat">
-		//	<div className="bubble you">
-		//		Hello, how are you? Lorem ipsum dolor sit amet,
-		//	</div>
-		//	<div className="bubble me">
-		//		Hello, how are you? Lorem ipsum dolor sit amet,
-		//	</div>
-		//</div>
 		<div className="chat">
 			{messages.map((message, index) => (
 				<div

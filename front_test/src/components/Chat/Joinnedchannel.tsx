@@ -56,6 +56,7 @@ function JoinnedChannels({ ChannelsList }: any) {
 		console.log(channel);
 		if (channel?.state === "PUBLIC") {
 			setSelectedChannel(channel.name);
+			setMessages([]);
 			socket?.emit("join", {
 				channel: channel.name,
 				username: userInfo?.username,
@@ -65,6 +66,7 @@ function JoinnedChannels({ ChannelsList }: any) {
 				SaveChannel.find((channelName) => channelName === channel.name)
 			) {
 				setSelectedChannel(channel.name);
+				setMessages([]);
 				socket?.emit("join", {
 					channel: channel.name,
 					username: userInfo?.username,
@@ -78,6 +80,7 @@ function JoinnedChannels({ ChannelsList }: any) {
 				SaveChannel.find((channelName) => channelName === channel.name)
 			) {
 				setSelectedChannel(channel.name);
+				setMessages([]);
 				socket?.emit("join", {
 					channel: channel.name,
 					username: userInfo?.username,
@@ -90,6 +93,7 @@ function JoinnedChannels({ ChannelsList }: any) {
 						{ withCredentials: true }
 					);
 					setSelectedChannel(channel.name);
+					setMessages([]);
 					socket?.emit("join", {
 						channel: channel.name,
 						username: userInfo?.username,
@@ -118,6 +122,7 @@ function JoinnedChannels({ ChannelsList }: any) {
 				{ withCredentials: true }
 			);
 			setSelectedChannel(PopupPasswordChannel);
+			setMessages([]);
 			socket?.emit("join", {
 				channel: PopupPasswordChannel,
 				username: userInfo?.username,
