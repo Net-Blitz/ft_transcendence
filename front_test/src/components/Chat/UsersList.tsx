@@ -3,7 +3,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { ChannelDto } from "./Channel";
 
-function UsersList({ channel }: any, { socket }: any) {
+function UsersList({ channel, socket }: { channel: string; socket: any }) {
 	const [userInfo, setUserInfo] = useState<any>();
 	const [channelInfo, setChannelInfo] = useState<ChannelDto>();
 	const [users, setUsers] = useState<any>([]);
@@ -76,7 +76,7 @@ function UsersList({ channel }: any, { socket }: any) {
 				},
 				{ withCredentials: true }
 			);
-			alert(login + " is now administator of the channel");
+			//alert(login + " is now administator of the channel");
 		} catch (error) {
 			console.error(error);
 		}
@@ -88,7 +88,7 @@ function UsersList({ channel }: any, { socket }: any) {
 			channel: channel,
 			login: login,
 		});
-		alert(login + " has been kicked from the channel");
+		//alert(login + " has been kicked from the channel");
 	};
 
 	const handleBan = async (login: string) => {
@@ -97,7 +97,7 @@ function UsersList({ channel }: any, { socket }: any) {
 			channel: channel,
 			login: login,
 		});
-		alert(login + " has been banned from the channel");
+		//alert(login + " has been banned from the channel");
 	};
 
 	const handleUnban = async (login: string) => {
@@ -106,16 +106,26 @@ function UsersList({ channel }: any, { socket }: any) {
 			channel: channel,
 			login: login,
 		});
-		alert(login + " has been unbanned from the channel");
+		//alert(login + " has been unbanned from the channel");
 	};
 
 	const handleMute = async (login: string) => {
-		socket?.emit("ToMute", {
-			username: userInfo.username,
-			channel: channel,
-			login: login,
-		});
-		alert(login + " has been muted from the channel");
+		console.log("socket: ", socket);
+		console.log(
+			"login: ",
+			login + " channel: " + channel + " username: " + userInfo.username
+		);
+		try {
+			socket?.emit("ToMute", {
+				username: userInfo.username,
+				channel: channel,
+				login: login,
+			});
+		} catch (error) {
+			console.error(error);
+		}
+
+		//alert(login + " has been muted from the channel");
 	};
 
 	const handleUnmute = async (login: string) => {
@@ -124,7 +134,7 @@ function UsersList({ channel }: any, { socket }: any) {
 			channel: channel,
 			login: login,
 		});
-		alert(login + " has been unmuted from the channel");
+		//alert(login + " has been unmuted from the channel");
 	};
 
 	return (
