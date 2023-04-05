@@ -1,9 +1,11 @@
 import React from 'react';
 import './MainPage.css';
+// Components
+import Navbar from './Components/Navbar';
 
 const MainPage = () => {
 	return (
-		<div className='mainpage-wrapper'></div>
+		<Navbar/>
 	);
 }
 
