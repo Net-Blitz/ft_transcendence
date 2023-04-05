@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { createAvatar } from '@dicebear/core';
 import { adventurer } from '@dicebear/collection';
 import { v4 as uuidv4 } from 'uuid';
@@ -24,14 +23,11 @@ const createAvatarObject = (seed: string) :AvatarProps => {
 }
 
 export const useGenerateAvatars = (number: number) => {
-	let AvatarData: AvatarProps[] = useMemo(() => {
-		let avatars: AvatarProps[] = [];
-		for(let i = 0; i < number; i++)
-		{
-			let seed = generateSeed();
-			avatars.push(createAvatarObject(seed));
-		}
-		return (avatars);
-	}, [number]);
+	let AvatarData: AvatarProps[] = [];
+	for(let i = 0; i < number; i++)
+	{
+		let seed = generateSeed();
+		AvatarData.push(createAvatarObject(seed));
+	}
 	return (AvatarData);
 }

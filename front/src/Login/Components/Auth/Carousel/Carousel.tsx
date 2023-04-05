@@ -2,6 +2,8 @@ import React, { useEffect, useState} from 'react';
 import './Carousel.css';
 /*	Functions	*/
 import { useGenerateAvatars } from './genAvatars';
+/*	Ressources	*/
+import refresh from './Ressources/refresh.png';
 
 const Carousel = () => {
 	/*	HOOK settings	*/
@@ -9,7 +11,6 @@ const Carousel = () => {
 	const [avatar, setAvatar] = useState(useGenerateAvatars(12));
 	const [length, setLenght] = useState(avatar.length);
 
-	// console.log(avatar);
 	useEffect(() => {
 		setLenght(avatar.length);
 	}, [avatar]);
@@ -59,6 +60,16 @@ const Carousel = () => {
 		}
 	}
 
+	const handleRefresh = () => {
+		let newAvatar = useGenerateAvatars(12);
+		for (let i = 0; i < avatar.length; i++)
+		{
+			if (avatar[i].source === 'imported')
+				newAvatar.splice(i, 0, avatar[i]);
+		}
+		setAvatar(newAvatar);
+	}
+
 	return (
 		<div className="carousel-wrapper">
 			<div className="carousel-element">
@@ -66,15 +77,18 @@ const Carousel = () => {
 				{renderAvatar(currentIndex, '')}
 				{renderAvatar(currentIndex + 1, 'right')}
 			</div>
-			<label htmlFor="inputTag">
-				Download your avatar
-				<input
-					id="inputTag" 
-					type="file" 
-					accept=".png, .jpg, .jpeg"
-					onChange={handleChange}
-				/>
-			</label>
+			<div className='carousel-refresh'>
+				<label htmlFor="inputTag">
+					Download your avatar
+					<input
+						id="inputTag" 
+						type="file" 
+						accept=".png, .jpg, .jpeg"
+						onChange={handleChange}
+					/>
+				</label>
+				<img src={refresh} alt="refresh logo" onClick={handleRefresh} />
+			</div>
 		</div>
 	);
 };

@@ -33,7 +33,7 @@
 
 .carousel-wrapper label {
 	text-align: center;
-	width: 55%;
+	width: 85%;
 	background-color: #0a3d62;
 	border: 0.1rem solid #0a3d62;
 	border-radius: 10px;
@@ -51,6 +51,17 @@
 
 #inputTag {
 	display: none;
+}
+
+.carousel-refresh {
+	height: 30px;
+	width: 55%;
+	display: flex;
+	justify-content: space-between;
+}
+
+.carousel-refresh img {
+	cursor: pointer;
 }
 
 /*	RESPONSIVE	*/
