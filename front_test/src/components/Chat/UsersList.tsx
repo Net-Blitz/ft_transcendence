@@ -3,6 +3,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { ChannelDto } from "./Channel";
 import Notification from "../Notification/Notification";
+import Invite from "./Invite";
 
 function UsersList({ channel, socket }: { channel: string; socket: any }) {
 	const [userInfo, setUserInfo] = useState<any>();
@@ -239,6 +240,10 @@ function UsersList({ channel, socket }: { channel: string; socket: any }) {
 					</li>
 				))}
 			</ul>
+			{channelInfo?.state === "PRIVATE" &&
+				userInfo.id === channelInfo.ownerId && (
+					<Invite channelName={channelInfo.name} />
+				)}
 		</>
 	);
 }

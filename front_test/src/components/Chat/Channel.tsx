@@ -135,8 +135,6 @@ function Channel() {
 		setPrivacy(event.target.value);
 	};
 
-	const ChannelsList = channels.map((channel) => channel.name);
-
 	return (
 		<div>
 			<h1>Create a Channel</h1>
@@ -225,7 +223,7 @@ function Channel() {
 					</li>
 				))}
 			</ul>
-			<JoinnedChannels ChannelsList={ChannelsList} />
+			<JoinnedChannels ChannelsList={channels} />
 		</div>
 	);
 }
