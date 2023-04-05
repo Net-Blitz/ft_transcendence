@@ -24,6 +24,9 @@ function JoinnedChannels({ ChannelsList }: any) {
 	const PopupPasswordRef = useRef<HTMLDivElement>(null);
 	const [SaveChannel, setSaveChannel] = useState<string[]>([]); // <--- Save all joinned protected || private channel
 
+	// <=== Invite ===>
+	const [Invites, setInvites] = useState<any[]>([]); // <--- Save all invites
+
 	useEffect(() => {
 		const fetchData = async () => {
 			const response = await axios.get("http://localhost:3333/users/me", {
@@ -39,8 +42,23 @@ function JoinnedChannels({ ChannelsList }: any) {
 			);
 			setChannel(response.data.channel);
 		};
+		const fetchInvites = async () => {
+			try {
+				const response = await axios.get(
+					"http://localhost:3333/chat/invites",
+					{ withCredentials: true }
+				);
+				setInvites(response.data);
+			} catch (error) {
+				console.error(error);
+			}
+		};
+		fetchInvites();
 		fetchData();
 		fetchChannel();
+
+		const interval = setInterval(fetchInvites, 5000);
+		return () => clearInterval(interval);
 	}, [channel?.name, selectedChannel, userInfo?.username]);
 
 	useEffect(() => {
@@ -76,7 +94,14 @@ function JoinnedChannels({ ChannelsList }: any) {
 				setPopupPasswordChannel(channel.name);
 			}
 		} else if (channel?.state === "PRIVATE") {
-			if (
+			if (channel.ownerId === userInfo.id) {
+				setSelectedChannel(channel.name);
+				setMessages([]);
+				socket?.emit("join", {
+					channel: channel.name,
+					username: userInfo?.username,
+				});
+			} else if (
 				SaveChannel.find((channelName) => channelName === channel.name)
 			) {
 				setSelectedChannel(channel.name);
@@ -86,30 +111,10 @@ function JoinnedChannels({ ChannelsList }: any) {
 					username: userInfo?.username,
 				});
 			} else {
-				try {
-					await axios.post(
-						"http://localhost:3333/chat/join/" + channel.name,
-						{ state: "PRIVATE" },
-						{ withCredentials: true }
-					);
-					setSelectedChannel(channel.name);
-					setMessages([]);
-					socket?.emit("join", {
-						channel: channel.name,
-						username: userInfo?.username,
-					});
-					setSaveChannel([...SaveChannel, channel.name]);
-					setNotification({
-						message: "You joinned " + channel.name,
-						type: "success",
-					});
-				} catch (error) {
-					setNotification({
-						message:
-							"This channel is private, you have to be invited",
-						type: "error",
-					});
-				}
+				setNotification({
+					message: "This channel is private, you have to be invited",
+					type: "error",
+				});
 			}
 		}
 	};
@@ -139,6 +144,43 @@ function JoinnedChannels({ ChannelsList }: any) {
 				type: "error",
 			});
 		}
+	};
+
+	const JoinPrivateChannel = async (channelName: string) => {
+		try {
+			await axios.post(
+				"http://localhost:3333/chat/join/" + channelName,
+				{ state: "PRIVATE" },
+				{ withCredentials: true }
+			);
+			setSelectedChannel(channelName);
+			setMessages([]);
+			socket?.emit("join", {
+				channel: channelName,
+				username: userInfo?.username,
+			});
+			setSaveChannel([...SaveChannel, channelName]);
+			setNotification({
+				message: "You joinned " + channelName,
+				type: "success",
+			});
+		} catch (error) {
+			setNotification({
+				message: "You have already joinned this channel",
+				type: "error",
+			});
+		}
+	};
+
+	const DeclineInvite = async (channelName: string) => {
+		try {
+			axios.delete("http://localhost:3333/chat/decline/" + channelName, {
+				withCredentials: true,
+			});
+		} catch (error) {
+			console.error(error);
+		}
+		setInvites(Invites.filter((channel) => channel.name !== channelName));
 	};
 
 	useEffect(() => {
@@ -255,15 +297,35 @@ function JoinnedChannels({ ChannelsList }: any) {
 									</span>
 								</li>
 							))}
+							{Invites.map((invite) => (
+								<li className="person" key={invite.id}>
+									<span className="name">
+										{invite.channels.name}
+									</span>
+									<span
+										className="accept-invite"
+										onClick={() =>
+											JoinPrivateChannel(
+												invite.channels.name
+											)
+										}
+									>
+										&#10003;
+									</span>
+									<span
+										className="decline-invite"
+										onClick={() =>
+											DeclineInvite(invite.channels.name)
+										}
+									>
+										&times;
+									</span>
+								</li>
+							))}
 						</ul>
 					</div>
 					{showUsers && (
-						<div className="middle">
-							<UsersList
-								channel={selectedChannel}
-								socket={socket}
-							/>
-						</div>
+						<UsersList channel={selectedChannel} socket={socket} />
 					)}
 					<div className="right">
 						<div className="top">

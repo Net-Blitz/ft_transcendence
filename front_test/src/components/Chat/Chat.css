@@ -258,3 +258,15 @@ input[type="text"]:focus {
 .popup.p:last-child {
 	margin: 0;
 }
+
+.accept-invite {
+	font-size: large;
+	color: green;
+	font-weight: bold;
+}
+
+.decline-invite {
+	font-size: x-large;
+	color: red;
+	font-weight: bold;
+}

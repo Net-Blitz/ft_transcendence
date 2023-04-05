@@ -158,92 +158,97 @@ function UsersList({ channel, socket }: { channel: string; socket: any }) {
 				message={notification.message}
 				type={notification.type}
 			/>
-			<div className="top">
-				<p>Users list</p>
-			</div>
-			<ul className="users">
-				{filtereduserChannel.map((user: any) => (
-					<li className="person" key={user.id}>
-						<Link to={"/profile/" + user.username}>
-							<div className="users-list">
-								<img
-									className="friend-img"
-									src={user.avatar}
-									alt="avatar"
-								/>
-								<span className="name">{user.username}</span>
-								<span className="role">{user.role}</span>
-							</div>
-						</Link>
-						{(userInfo?.id === channelInfo?.ownerId ||
-							(user.role === "admin" && isAdmin === true)) && (
-							<div
-								className="dropdown-menu-container"
-								ref={dropdownRef}
-							>
-								<div
-									className="dropdown-menu-header"
-									onClick={() =>
-										handleToggleDropdown(user.username)
-									}
-								>
-									<span>Options</span>
-									<i
-										className={`arrow ${
-											openUsername === user.username
-												? "up"
-												: "down"
-										}`}
+			<div className="middle">
+				<div className="top">
+					<p>Users list</p>
+				</div>
+				<ul className="users">
+					{filtereduserChannel.map((user: any) => (
+						<li className="person" key={user.id}>
+							<Link to={"/profile/" + user.username}>
+								<div className="users-list">
+									<img
+										className="friend-img"
+										src={user.avatar}
+										alt="avatar"
 									/>
+									<span className="name">
+										{user.username}
+									</span>
+									<span className="role">{user.role}</span>
 								</div>
-								{openUsername === user.username && (
-									<ul className="dropdown-menu-options">
-										<li
-											onClick={() =>
-												handlePromote(user.username)
-											}
-										>
-											Make Admin
-										</li>
-										<li
-											onClick={() =>
-												handleBan(user.username)
-											}
-										>
-											Ban
-										</li>
-										<li
-											onClick={() =>
-												handleKick(user.username)
-											}
-										>
-											Kick
-										</li>
-										<li
-											onClick={() =>
-												handleMute(user.username)
-											}
-										>
-											Mute
-										</li>
-										<li
-											onClick={() =>
-												handleUnmute(user.username)
-											}
-										>
-											Unmute
-										</li>
-									</ul>
-								)}
-							</div>
-						)}
-					</li>
-				))}
-			</ul>
-			{channelInfo?.state === "PRIVATE" &&
-				userInfo.id === channelInfo.ownerId && (
-					<Invite channelName={channelInfo.name} />
-				)}
+							</Link>
+							{(userInfo?.id === channelInfo?.ownerId ||
+								(user.role === "admin" &&
+									isAdmin === true)) && (
+								<div
+									className="dropdown-menu-container"
+									ref={dropdownRef}
+								>
+									<div
+										className="dropdown-menu-header"
+										onClick={() =>
+											handleToggleDropdown(user.username)
+										}
+									>
+										<span>Options</span>
+										<i
+											className={`arrow ${
+												openUsername === user.username
+													? "up"
+													: "down"
+											}`}
+										/>
+									</div>
+									{openUsername === user.username && (
+										<ul className="dropdown-menu-options">
+											<li
+												onClick={() =>
+													handlePromote(user.username)
+												}
+											>
+												Make Admin
+											</li>
+											<li
+												onClick={() =>
+													handleBan(user.username)
+												}
+											>
+												Ban
+											</li>
+											<li
+												onClick={() =>
+													handleKick(user.username)
+												}
+											>
+												Kick
+											</li>
+											<li
+												onClick={() =>
+													handleMute(user.username)
+												}
+											>
+												Mute
+											</li>
+											<li
+												onClick={() =>
+													handleUnmute(user.username)
+												}
+											>
+												Unmute
+											</li>
+										</ul>
+									)}
+								</div>
+							)}
+						</li>
+					))}
+				</ul>
+				{channelInfo?.state === "PRIVATE" &&
+					userInfo.id === channelInfo.ownerId && (
+						<Invite channelName={channelInfo.name} />
+					)}
+			</div>
 		</>
 	);
 }
