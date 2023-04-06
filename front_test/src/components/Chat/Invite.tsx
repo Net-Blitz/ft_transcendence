@@ -11,7 +11,6 @@ function InviteUser({ channelName }: { channelName: string }) {
 				{ login: username },
 				{ withCredentials: true }
 			);
-			console.log(`User ${username} invited to channel ${channelName}`);
 		} catch (error) {
 			console.error(error);
 		}

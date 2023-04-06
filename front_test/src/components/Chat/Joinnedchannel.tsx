@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import "./Chat.css";
 import MessageInput from "./MessageInput";
-import { MessageDto } from "./Chat";
+import { MessageDto } from "./Messages";
 import { ChannelDto } from "./Channel";
 import axios from "axios";
 import { Socket, io } from "socket.io-client";
@@ -71,7 +71,6 @@ function JoinnedChannels({ ChannelsList }: any) {
 	}, []);
 
 	const handleChannelClick = async (channel: ChannelDto) => {
-		console.log(channel);
 		if (channel?.state === "PUBLIC") {
 			setSelectedChannel(channel.name);
 			setMessages([]);
@@ -195,8 +194,6 @@ function JoinnedChannels({ ChannelsList }: any) {
 	}, [messages, selectedChannel, socket]);
 
 	const sendMessage = (message: MessageDto) => {
-		console.log(message);
-		console.log(selectedChannel);
 		if (!message.content) return;
 		socket?.emit("chat", { ...message, channel: selectedChannel });
 	};
@@ -241,7 +238,7 @@ function JoinnedChannels({ ChannelsList }: any) {
 								Show Users
 							</button>
 						</div>
-						<ul className="people">
+						<ul className="channel">
 							{ChannelsList.map((channel: ChannelDto) => (
 								<li
 									key={channel.id}

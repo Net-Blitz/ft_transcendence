@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MessageDto } from "./Chat";
+import { MessageDto } from "./Messages";
 
 function MessageInput({
 	sendMessage,

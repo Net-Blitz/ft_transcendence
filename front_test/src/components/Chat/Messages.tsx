@@ -1,4 +1,7 @@
-import { MessageDto } from "./Chat";
+export interface MessageDto {
+	username: string;
+	content: string;
+}
 
 function Messages({
 	messages,
