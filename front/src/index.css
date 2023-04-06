@@ -33,4 +33,10 @@ code {
   font-weight: 300;
   font-style: normal;
 }
+@font-face {
+	font-family: 'Poppins';
+  src: url('fonts/Poppins/Poppins-SemiBold.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
   

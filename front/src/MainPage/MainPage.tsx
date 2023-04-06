@@ -24,7 +24,7 @@ const MainPage = () => {
 			<div className='filter'>
 				<FilterButton
 					label="Sort By"
-					options={['Sorted by name', 'Sorted by date', 'Sorted by map', 'Sorted by difficulty']}
+					options={['name', 'date', 'map', 'difficulty']}
 					onFilter={handleFilter}
 					isOpen={openFilter === "Sort By"} 
 					//If another button is clicked, openFilter will have a different value and isOpen will be false

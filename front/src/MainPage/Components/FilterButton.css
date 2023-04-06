@@ -18,6 +18,7 @@
 	height: 8px;
 	border: solid 0.5px #0A3D62;
 	margin-right: 5px;
+	border-radius: 2px;
 }
 
 .filter-dropdown{
@@ -60,6 +61,13 @@
 	color: #0A3D62;
 }
 
-.filter-dropdown-selected{
+.txt_sub_filter_selected{
 	color: #F9DA49;
+	font-family: 'Poppins';
+	font-weight: 500;
+}
+
+.rect_sub_filter_selected{
+	background-color: #F9DA49;
+	border: none;
 }
