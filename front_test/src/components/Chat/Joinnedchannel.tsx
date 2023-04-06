@@ -10,6 +10,7 @@ import UsersList from "./UsersList";
 import Notification from "../Notification/Notification";
 import PopupProtected from "./PopupProtected";
 import HandleInvite from "./HandleInvite";
+import CreateChannel from "./CreateChannel";
 
 function JoinnedChannels({ ChannelsList }: any) {
 	const [selectedChannel, setSelectedChannel] = useState<string>("");
@@ -19,10 +20,9 @@ function JoinnedChannels({ ChannelsList }: any) {
 	const [messages, setMessages] = useState<MessageDto[]>([]);
 	const [showUsers, setShowUsers] = useState(false);
 	const [notification, setNotification] = useState({ message: "", type: "" });
-
-	// <=== Popup Password ===>
 	const [PopupPassword, setPopupPassword] = useState<string>(""); // <-- name of protected channel
 	const [SaveChannel, setSaveChannel] = useState<string[]>([]); // <--- Save all joinned protected || private channel
+	const [PopupCreateChannel, setPopupCreateChannel] = useState(false);
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -124,20 +124,28 @@ function JoinnedChannels({ ChannelsList }: any) {
 		setPopupPassword(channel);
 	};
 
+	const handleToggleCreateChannel = () => {
+		setPopupCreateChannel(!PopupCreateChannel);
+	};
+
 	return (
 		<>
 			<Notification
 				message={notification.message}
 				type={notification.type}
 			/>
+			{PopupCreateChannel && (
+				<CreateChannel ClosePopup={handleToggleCreateChannel} />
+			)}
 			<div className="wrapper">
 				<div className="container">
 					<div className="left">
 						<div className="top">
 							<p>Channels</p>
-							<button onClick={handleToggleUsers}>
-								Show Users
+							<button onClick={handleToggleCreateChannel}>
+								Create
 							</button>
+							<button onClick={handleToggleUsers}>Users</button>
 						</div>
 						<ul className="channel">
 							{ChannelsList.map((channel: ChannelDto) => (
