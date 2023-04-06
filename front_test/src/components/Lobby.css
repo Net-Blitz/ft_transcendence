@@ -153,11 +153,66 @@
 	bottom: 37px;
 	left: 14px;
 	width: 26vw;
-	height: 30vh;
+	height: 35vh;
 	background-color: #0A3D62;
 	box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25), 0px 4px 4px rgba(0, 0, 0, 0.25);
 	border-radius: 15px;
 	display: flex;
+}
+
+.game-waiting-chat > ul {
+	position: absolute;
+	/* top: 7px;
+	left: 7px; */
+
+	width: calc(100% - 24px);
+	height: 28vh;
+	overflow-y: auto;
+	overflow-wrap: break-word;
+	overflow-anchor: none;
+	scrollbar-width: 20px;
+	margin: 7px;
+	padding: 5px;
+	z-index: 0;
+
+}
+
+.game-waiting-chat > ul > li {
+	color : #DFDDC4;
+	list-style: none;
+	font-family: 'Poppins';
+	font-style: normal;
+	font-size: 20px;
+	/* font-weight: 700; */
+	/* line-height: 45px; */
+
+	padding: 4px;
+}
+
+/* width */
+.game-waiting-chat > ul::-webkit-scrollbar {
+	width: 10px;
+	direction: rtl;
+	border-radius: 5px;
+
+}
+
+/* Track */
+.game-waiting-chat> ul::-webkit-scrollbar-track {
+	background: #0A3D62;
+	border-radius: 5px;
+}
+
+/* Handle */
+.game-waiting-chat> ul::-webkit-scrollbar-thumb {
+	background: #FFFDE4;
+	border-radius: 5px;
+}
+
+/* Handle on hover */
+.game-waiting-chat> ul::-webkit-scrollbar-thumb:hover {
+	background: #DFDDC4;
+	border-radius: 5px;
 }
 
 .game-waiting-chat > input {
@@ -178,6 +233,7 @@
 	justify-content: center;
 	align-items: center;
 	padding-left: 5px;
+	z-index: 1;
 }
 
 .game-waiting-chat > button {
@@ -196,6 +252,8 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	font-size: min(max(5px, 3vw), 15px);
+	z-index: 1;
 }
 
 .game-waiting-chat > button:active {

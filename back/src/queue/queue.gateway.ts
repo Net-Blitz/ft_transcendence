@@ -128,6 +128,7 @@ export class QueueGateway {
 	async runQueue() {
 		while (1)
 		{
+			// console.log("This is the queue: ", this.queue1v1);
 			this.checkQueue();
 			
 			await this.checkMatch();
@@ -146,7 +147,7 @@ export class QueueGateway {
 		{
 			if (user.socketId !== client.id)
 			{
-				console.log("newDqte")
+				console.log("adduser");
 				user.socketId = client.id;
 				user.mode = userParam.mode;
 				user.bonus1 = (userParam.bonus1 === undefined) ? false : true;
@@ -157,11 +158,13 @@ export class QueueGateway {
 		}
 		else
 		{
-			this.queue1v1.push({
+		this.queue1v1.push({
 			id: prismaUser.id,
 			login: userParam.login,
 			socketId: client.id,
-			mode: userParam.mode, elo: prismaUser.elo,
+			mode: userParam.mode,
+			avatar: prismaUser.avatar,
+			elo: prismaUser.elo,
 			bonus1: (userParam.bonus1 === undefined) ? false : true,
 			bonus2: (userParam.bonus2 === undefined) ? false : true,
 			timeData: Date.now(),
@@ -187,23 +190,36 @@ export class QueueGateway {
 	}
 
 	@SubscribeMessage("ConnectToQueue")
-	connectToQueue(@ConnectedSocket() client: Socket, @MessageBody() userParam: any) {
+	async connectToQueue(@ConnectedSocket() client: Socket, @MessageBody() userParam: any) {
 		if (userParam && userParam.login === undefined || userParam.mode === undefined)
 			return ;
 		
-		this.addUserToQueue(userParam, client);
+		await this.addUserToQueue(userParam, client);
 		
-		console.log("ConnectToQueue: ", client.id)
+		await this.prisma.user.update({
+			where: {login: userParam.login},
+			data: {state: "SEARCHING"}
+		});
+
+		const user = this.queue1v1.find((queuer) => queuer.socketId === client.id);
+		if (!user)
+			return ;
+		
+		
+		client.emit("ConnectToQueueResponse", {player1: {elo: user.elo, login: user.login, avatar: user.avatar}});
 	}
 
 	@SubscribeMessage("DisconnectFromQueue")
-	disconnectFromQueue(@ConnectedSocket() client: Socket) {
+	async disconnectFromQueue(@ConnectedSocket() client: Socket) {
 		const user = this.queue1v1.find((queuer) => queuer.socketId === client.id);
 		if (!user)
 			return ;
 		this.queue1v1 = this.queue1v1.filter((queuer) => queuer.socketId !== client.id);
 
-
+		await this.prisma.user.update({
+			where: {login: user.login},
+			data: {state: "ONLINE"}
+		});
 		console.log("DisconnectFromQueue: ", client.id)
 	}
 
@@ -221,24 +237,52 @@ export class QueueGateway {
 	}
  
 	@SubscribeMessage("DeclineGame")
-	declineGame(@ConnectedSocket() client: Socket) {
+	async declineGame(@ConnectedSocket() client: Socket) {
 		const gameMatch = this.gameMatched.find((match) => (match.player1.socketId === client.id || match.player2.socketId === client.id));
 
 		if (!gameMatch)
 			return ;
-
+		
+			
 		if (gameMatch.player1.socketId === client.id && gameMatch.player1.state === QueueState.Searching)
+		{
 			gameMatch.player1.state = QueueState.Declined;
+			await this.prisma.user.update({
+				where: {login: gameMatch.player1.login},
+				data: {state: "ONLINE"}
+			});
+		}
 
 		if (gameMatch.player2.socketId === client.id && gameMatch.player2.state === QueueState.Searching)
+		{
 			gameMatch.player2.state = QueueState.Declined;
+			await this.prisma.user.update({
+				where: {login: gameMatch.player2.login},
+				data: {state: "ONLINE"}
+			});
+		}	
 	}
 
 	@SubscribeMessage("Timer")
 	timer(@ConnectedSocket() client: Socket) {
+		console.log("Timer: ", client.id)
 		const user = this.queue1v1.find((queuer) => queuer.socketId === client.id);
 		if (!user)
 			return ;
 		client.emit("TimerResponse", {message: (Date.now() - user.timeData) / 1000});
+	}
+
+	@SubscribeMessage("ChatWithGroup")
+	chatWithGroup(@ConnectedSocket() client: Socket, @MessageBody() message: any) {
+		console.log("ChatWithGroup: ", client.id)
+		const user = this.queue1v1.find((queuer) => queuer.socketId === client.id);
+		if (!user)
+			return ;
+		console.log("ChatWithGroup: ", message.message)
+		for (const queuer of this.queue1v1) //envoi a tout le groupes plutot que tout la queue
+		{
+			console.log("Queuer: ", queuer.socketId)
+			queuer.socketId && this.server.to(queuer.socketId).emit("GetNewMessage", {message: message.message, login: user.login});
+		}
 	}
 }

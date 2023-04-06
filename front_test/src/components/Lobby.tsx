@@ -18,7 +18,7 @@ const PlayerInLobby = ({player}:any) => {
 			<div className="game-waiting-player-avatar-underdiv">
 				<img className="game-waiting-player-avatar" src={player.avatar} alt="Avatar" />
 			</div>
-			<div className="game-waiting-player-name">{player.name}</div>
+			<div className="game-waiting-player-name">{player.login}</div>
 			<div className="game-waiting-player-rank">{player.elo} LP</div>
 		</div>
 		:
@@ -28,24 +28,49 @@ const PlayerInLobby = ({player}:any) => {
 	)
 }
 
-const LobbyChat = ({player, socketQueue}:any) => {
-	const [input, setInput] = useState("");
+const LobbyTimer = ({socketQueue}:any) => {
+	const [timer, updateTimer] = useState(0);
+	const [count, updateCount] = useState(0);
 
-	const handleChange = (e:any) => {
-		setInput(e.target.value);
+	const setTimer = (timer:number) => {
+		if (timer === 0) {
+			return "00:00";
+		}
+		const minutes = Math.floor(timer / 60);
+		const seconds = timer - minutes * 60;
+		return `${minutes < 10 ? "0" + minutes : minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
 	}
 
+	const getTimer = (data:any) => {
+		updateTimer(parseInt(data.message));
+	}
+
+	useEffect(() => {
+		socketQueue.on("TimerResponse", getTimer);
+		socketQueue.emit("Timer");
+	}, [socketQueue]);
+
+	useEffect(() => {
+		const interval = setInterval(() => updateTimer(current => (current + 1)), 1000);
+		return () => {
+			clearInterval(interval);
+		};
+	}, [timer]);
+
+
+	return (<div className="game-waiting-timer">{setTimer(timer)}</div>)
+
+}
+
+const LobbyChat = ({socketQueue}:any) => {
+	const [input, setInput] = useState("");
+
+	
 	const sendFunction = (message:string) => {
-		
-		const chatUl = document.getElementById("lobby-chat");
-		const li = document.createElement("li");
-		console.log("sendFunction: ", message);
-		
-		if (chatUl !== null) {
-			li.appendChild(document.createTextNode(`${player.name}: ${message}`));
-			chatUl.appendChild(li);
-			localStorage.setItem("chat", chatUl.innerHTML);
-		}
+		if (message === "")
+			return;
+		socketQueue.emit("ChatWithGroup", {message: message});
+
 		
 		
 		setInput("");
@@ -54,21 +79,54 @@ const LobbyChat = ({player, socketQueue}:any) => {
 			inputDiv.value = "";
 		}
 	}
+	
+	const handleChange = (e:any) => {
+		setInput(e.target.value);
+	}
+
+	const handleEnter = (e:any) => {
+		if (e.key === "Enter") {
+			sendFunction(input);
+		}
+	}
+
+	const handleMessage = (data:any) => {
+		const chatUl = document.getElementById("lobby-chat");
+		const li = document.createElement("li");
+		console.log("data: ", data);
+		if (chatUl) {
+			li.innerHTML = `<b>${data.login}:</b> ${data.message}`
+			chatUl.appendChild(li);
+			localStorage.setItem("lobby-chat-storage", chatUl.innerHTML);
+			chatUl.scrollTop = chatUl.scrollHeight;
+		}
+	};
 
 	useEffect(() => {
-		const chatUl = document.getElementById("lobby-chat");
+		socketQueue.off("GetNewMessage")
+		socketQueue.on("GetNewMessage", handleMessage);
+		
+	}, [socketQueue]);
+
+	useEffect(() => {
+		const chatUl = document.querySelector("#lobby-chat");
 		const preMsg = localStorage.getItem("lobby-chat-storage");
-	
+		
+		console.log("ChatUl: ", chatUl);
 		if (chatUl !== null && preMsg !== null) {
 			chatUl.innerHTML = preMsg;
 		}
+		if (chatUl)
+			chatUl.scrollTop = chatUl.scrollHeight;
+
 	}, [])
 
 	return (
 		<div className="game-waiting-chat">
-			<input type="text" onChange={handleChange} placeholder="Type a message..."/>
+			<input id="lobby-input" type="text" onKeyDown={handleEnter} onChange={handleChange} placeholder="Type a message..."/>
 			<button onClick={() => sendFunction(input)}>Send</button>
-			<ul className="game-waiting-chat-messages" id="lobby-chat">
+			<ul id="lobby-chat">
+				
 			</ul>
 		</div>
 	)
@@ -78,81 +136,47 @@ function Lobby({socketQueue}:any) {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const queueParam = location.state;
-	const [time, setTime] = useState(0);
-	const [count, updateCount] = useState(0);
-	const setTimer = (timer:number) => {
-		if (timer === 0) {
-			return "00:00";
-		}
-		const minutes = Math.floor(timer / 60);
-		const seconds = timer - minutes * 60;
-		return `${minutes < 10 ? "0" + minutes : minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
-	}
-	
-	// function callFrontTimer() {
-	// 	updateTimer(timer + 1);
-	// 	console.log("here")
-	// }
+	const [player1, setPlayer1] = useState(undefined);
+	const [player2, setPlayer2] = useState(undefined);
+	const [player3, setPlayer3] = useState(undefined);
 
-	// const interval = setInterval(callFrontTimer, 1000);
-
-	const getTimer = (data:any) => {
-		setTime(parseInt(data.message));
-		console.log("call back");
+	const setPlayer = (data:any) => {
+		console.log("data: ", data);
+		if (data && data.player1)
+			setPlayer1(data.player1);
 	}
 
 	useEffect(() => {
 		
 		socketQueue.emit("ConnectToQueue", {login: queueParam.login, mode: queueParam.mode}); // -> appuie sur le bouton plutot
-		socketQueue.on("TimerResponse", getTimer);
-		socketQueue.emit("Timer"); 
+
+		socketQueue.on("ConnectToQueueResponse", setPlayer);
 	}, [queueParam, socketQueue]);
 
 
-	useEffect(() => {
-			const interval = setInterval(() => setTime(time + 1), 1000);
-			return () => {
-				clearInterval(interval);
-			};
-	}, [time]);
-
-	useEffect(() => {
-		const interval = setInterval(() => socketQueue.emit, 5000);
-		return () => {
-			clearInterval(interval);
-		};
-	}, [count]);
-
 	const handleLeave = () => {
-		//socket.emit("leaveQueue");
-		//socket.close();
 		console.log("socketQueue: ", socketQueue); 
 		localStorage.removeItem("lobby-chat-storage");
 		socketQueue.emit("DisconnectFromQueue");
-		socketQueue.off("TimerResponse", getTimer);
+		socketQueue.off("ConnectToQueueResponse", setPlayer);
+		socketQueue.off("GetNewMessage");
 		navigate("/");
 	};
-
-	const player = {
-		avatar: "https://pbs.twimg.com/profile_images/1221057614764703744/QljZ27-o_400x400.jpg",
-		name: "Lgiband",
-		elo: 300
-	}
-
 
 	return (
 		<div className="game-waiting-parent-div">
 			<div className="game-waiting-nav-bar">
 			</div>
 			<LobbyBox>
-				<div className="game-waiting-timer">{setTimer(time)}</div>
+				<LobbyTimer socketQueue={socketQueue} />
 
 				<div className="game-waiting-players">
-					<PlayerInLobby player={player}/>
-					<PlayerInLobby player={player}/>
+					<PlayerInLobby player={player1}/>
+					<PlayerInLobby player={player2}/>
+					<PlayerInLobby player={player3}/>
 				</div>
 
-				<LobbyChat socketQueue={socketQueue} player={player} />
+				<LobbyChat socketQueue={socketQueue} />
 				
 				<button className="game-waiting-button-cancel" onClick={handleLeave} >Cancel Queue</button>
 
