@@ -117,6 +117,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				},
 			});
 
+			const userInChannel = await this.prisma.chatUsers.findMany({
+				where: {
+					A: channelExists.id,
+					B: userExists.id,
+				},
+			});
+
+			if (userInChannel.length === 0) {
+				console.log(userExists.username + " is not in channel");
+				return;
+			}
+
 			const mutedUser = this.prisma.mute.findMany({
 				where: {
 					A: channelExists.id,
@@ -175,10 +187,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				isAdmin = true;
 			}
 
+			const kickedUser = await this.prisma.user.findUnique({
+				where: {
+					username: data.login,
+				},
+			});
+
 			if (isAdmin) {
 				console.log(
 					username + " kicked " + data.login + " from " + channel
 				);
+				await this.prisma.chatUsers.deleteMany({
+					where: {
+						A: channelExists.id,
+						B: kickedUser.id,
+					},
+				});
 				this.server
 					.to(channel)
 					.emit("kick", { username: data.login, channel: channel });
@@ -247,7 +271,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				);
 				this.server
 					.to(channel)
-					.emit("kick", { username: data.login, channel: channel });
+					.emit("ban", { username: data.login, channel: channel });
 			}
 		} catch (e) {
 			console.log(e);

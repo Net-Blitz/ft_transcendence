@@ -109,7 +109,7 @@ export class ChatController {
 		return await this.chatService.AddAdminUser(channel, login, res, user);
 	}
 
-	@Delete("admin/demote/:channel")
+	@Post("admin/demote/:channel")
 	async RemoveAdminUser(
 		@Param("channel") channel: string,
 		@Body("login") login: string,
@@ -146,5 +146,15 @@ export class ChatController {
 	@Get("channel/:channel")
 	async getChannel(@Param("channel") channel: string, @Res() res: Response) {
 		return await this.chatService.getChannel(channel, res);
+	}
+
+	@Get("ban/:username")
+	async getBan(@Param("username") username: string, @Res() res: Response) {
+		return await this.chatService.getBan(username, res);
+	}
+
+	@Get("bans/:channel")
+	async getBans(@Param("channel") channel: string, @Res() res: Response) {
+		return await this.chatService.getBans(channel, res);
 	}
 }

@@ -13,6 +13,7 @@ function UsersList({ channel, socket }: { channel: string; socket: any }) {
 	const [isAdmin, setIsAdmin] = useState(false);
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	const [notification, setNotification] = useState({ message: "", type: "" });
+	const [BanUsers, setBanUsers] = useState<any>([]);
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -28,6 +29,14 @@ function UsersList({ channel, socket }: { channel: string; socket: any }) {
 			);
 			setChannelInfo(response.data.channel);
 			setUsers(response.data.users);
+			fetchBan();
+		};
+		const fetchBan = async () => {
+			const reponse = await axios.get(
+				"http://localhost:3333/chat/bans/" + channel,
+				{ withCredentials: true }
+			);
+			setBanUsers(reponse.data);
 		};
 		fetchData();
 		fetchChannel();
@@ -66,10 +75,6 @@ function UsersList({ channel, socket }: { channel: string; socket: any }) {
 		}
 	};
 
-	const filtereduserChannel = users?.filter(
-		(user: any) => user.id !== userInfo?.id
-	);
-
 	const handlePromote = async (login: string) => {
 		try {
 			await axios.post(
@@ -81,6 +86,28 @@ function UsersList({ channel, socket }: { channel: string; socket: any }) {
 			);
 			setNotification({
 				message: login + " has been promoted",
+				type: "success",
+			});
+		} catch (error) {
+			console.error(error);
+			setNotification({
+				message: "An error occured",
+				type: "error",
+			});
+		}
+	};
+
+	const handleDemote = async (login: string) => {
+		try {
+			await axios.post(
+				"http://localhost:3333/chat/admin/demote/" + channel,
+				{
+					login: login,
+				},
+				{ withCredentials: true }
+			);
+			setNotification({
+				message: login + " has been demoted",
 				type: "success",
 			});
 		} catch (error) {
@@ -163,7 +190,7 @@ function UsersList({ channel, socket }: { channel: string; socket: any }) {
 					<p>Users list</p>
 				</div>
 				<ul className="users">
-					{filtereduserChannel.map((user: any) => (
+					{users.map((user: any) => (
 						<li className="person" key={user.id}>
 							<Link to={"/profile/" + user.username}>
 								<div className="users-list">
@@ -178,9 +205,9 @@ function UsersList({ channel, socket }: { channel: string; socket: any }) {
 									<span className="role">{user.role}</span>
 								</div>
 							</Link>
-							{(userInfo?.id === channelInfo?.ownerId ||
-								(user.role === "admin" &&
-									isAdmin === true)) && (
+							{((isAdmin && user.role === "user") ||
+								(userInfo?.id === channelInfo?.ownerId &&
+									user.role !== "owner")) && (
 								<div
 									className="dropdown-menu-container"
 									ref={dropdownRef}
@@ -202,13 +229,27 @@ function UsersList({ channel, socket }: { channel: string; socket: any }) {
 									</div>
 									{openUsername === user.username && (
 										<ul className="dropdown-menu-options">
-											<li
-												onClick={() =>
-													handlePromote(user.username)
-												}
-											>
-												Make Admin
-											</li>
+											{user.role === "user" ? (
+												<li
+													onClick={() =>
+														handlePromote(
+															user.username
+														)
+													}
+												>
+													Make Admin
+												</li>
+											) : (
+												<li
+													onClick={() =>
+														handleDemote(
+															user.username
+														)
+													}
+												>
+													Remove Admin
+												</li>
+											)}
 											<li
 												onClick={() =>
 													handleBan(user.username)
@@ -240,6 +281,32 @@ function UsersList({ channel, socket }: { channel: string; socket: any }) {
 										</ul>
 									)}
 								</div>
+							)}
+						</li>
+					))}
+					{BanUsers.map((user: any) => (
+						<li className="person" key={user.id}>
+							<Link to={"/profile/" + user.username}>
+								<div className="users-list">
+									<img
+										className="friend-img"
+										src={user.avatar}
+										alt="avatar"
+									/>
+									<span className="name">
+										{user.username}
+									</span>
+									<span className="role">Banned</span>
+								</div>
+							</Link>
+							{((isAdmin && user.role === "user") ||
+								(userInfo?.id === channelInfo?.ownerId &&
+									user.role !== "owner")) && (
+								<button
+									onClick={() => handleUnban(user.username)}
+								>
+									Unban
+								</button>
 							)}
 						</li>
 					))}

@@ -12,10 +12,9 @@ import PopupProtected from "./PopupProtected";
 import HandleInvite from "./HandleInvite";
 import CreateChannel from "./CreateChannel";
 
-function JoinnedChannels({ ChannelsList }: any) {
+function JoinnedChannels({ ChannelsList, userInfo, ban }: any) {
 	const [selectedChannel, setSelectedChannel] = useState<string>("");
 	const [socket, setSocket] = useState<Socket>();
-	const [userInfo, setUserInfo] = useState<any>();
 	const [channel, setChannel] = useState<ChannelDto>();
 	const [messages, setMessages] = useState<MessageDto[]>([]);
 	const [showUsers, setShowUsers] = useState(false);
@@ -25,12 +24,6 @@ function JoinnedChannels({ ChannelsList }: any) {
 	const [PopupCreateChannel, setPopupCreateChannel] = useState(false);
 
 	useEffect(() => {
-		const fetchData = async () => {
-			const response = await axios.get("http://localhost:3333/users/me", {
-				withCredentials: true,
-			});
-			setUserInfo(response.data);
-		};
 		const fetchChannel = async () => {
 			if (!selectedChannel) return;
 			const response = await axios.get(
@@ -39,9 +32,8 @@ function JoinnedChannels({ ChannelsList }: any) {
 			);
 			setChannel(response.data.channel);
 		};
-		fetchData();
 		fetchChannel();
-	}, [channel?.name, selectedChannel, userInfo?.username]);
+	}, [channel?.name, selectedChannel, userInfo?.username, ban]);
 
 	useEffect(() => {
 		const newSocket = io("http://localhost:3334");
@@ -53,7 +45,12 @@ function JoinnedChannels({ ChannelsList }: any) {
 	}, []);
 
 	const handleChannelClick = async (channel: ChannelDto) => {
-		if (channel?.state === "PUBLIC") {
+		if (ban?.find((ban: any) => ban.name === channel.name)) {
+			setNotification({
+				message: "You are banned from this channel",
+				type: "error",
+			});
+		} else if (channel?.state === "PUBLIC") {
 			setSelectedChannel(channel.name);
 			setMessages([]);
 			socket?.emit("join", {
@@ -106,10 +103,32 @@ function JoinnedChannels({ ChannelsList }: any) {
 		};
 
 		socket?.on("chat", handleMessage);
+		socket?.on("kick", (data: any) => {
+			if (data?.username === userInfo?.username) {
+				setSelectedChannel("");
+				setMessages([]);
+				setNotification({
+					message: `You have been kicked from ${data?.channel}`,
+					type: "error",
+				});
+			}
+		});
+		socket?.on("ban", (data: any) => {
+			if (data?.username === userInfo?.username) {
+				setSelectedChannel("");
+				setMessages([]);
+				setNotification({
+					message: `You have been banned from ${data?.channel}`,
+					type: "error",
+				});
+			}
+		});
 		return () => {
 			socket?.off("chat", handleMessage);
+			socket?.off("kick");
+			socket?.off("ban");
 		};
-	}, [messages, selectedChannel, socket]);
+	}, [messages, selectedChannel, socket, userInfo?.username]);
 
 	const sendMessage = (message: MessageDto) => {
 		if (!message.content) return;

@@ -517,4 +517,61 @@ export class ChatService {
 			.status(200)
 			.json({ channel: channelExists, users: NewUsers });
 	}
+
+	async getBan(@Param("username") username: string, @Res() res: Response) {
+		const userExists = await this.prisma.user.findUnique({
+			where: {
+				login: username,
+			},
+		});
+		if (!userExists) {
+			return res.status(404).json({ message: "User not found" });
+		}
+		const ban = await this.prisma.ban.findMany({
+			where: {
+				B: userExists.id,
+			},
+		});
+		if (!ban) {
+			return res.status(404).json({ message: "Ban not found" });
+		}
+		const channels = await this.prisma.channel.findMany({
+			where: {
+				id: {
+					in: ban.map((ban) => ban.A),
+				},
+			},
+			select: {
+				name: true,
+			},
+		});
+		return res.status(200).json(channels);
+	}
+
+	async getBans(@Param("channel") channel: string, @Res() res: Response) {
+		const channelExists = await this.prisma.channel.findUnique({
+			where: {
+				name: channel,
+			},
+		});
+		if (!channelExists) {
+			return res.status(404).json({ message: "Channel not found" });
+		}
+		const ban = await this.prisma.ban.findMany({
+			where: {
+				A: channelExists.id,
+			},
+		});
+		if (!ban) {
+			return res.status(404).json({ message: "Ban not found" });
+		}
+		const users = await this.prisma.user.findMany({
+			where: {
+				id: {
+					in: ban.map((ban) => ban.B),
+				},
+			},
+		});
+		return res.status(200).json(users);
+	}
 }
