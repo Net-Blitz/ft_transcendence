@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import "./Chat.css";
 import MessageInput from "./MessageInput";
 import { MessageDto } from "./Messages";
@@ -8,6 +8,8 @@ import { Socket, io } from "socket.io-client";
 import Messages from "./Messages";
 import UsersList from "./UsersList";
 import Notification from "../Notification/Notification";
+import PopupProtected from "./PopupProtected";
+import HandleInvite from "./HandleInvite";
 
 function JoinnedChannels({ ChannelsList }: any) {
 	const [selectedChannel, setSelectedChannel] = useState<string>("");
@@ -19,13 +21,8 @@ function JoinnedChannels({ ChannelsList }: any) {
 	const [notification, setNotification] = useState({ message: "", type: "" });
 
 	// <=== Popup Password ===>
-	const [PopupPassword, setPopupPassword] = useState(""); // <--- Password for protected channel
-	const [PopupPasswordChannel, setPopupPasswordChannel] = useState(""); // <--- Name of protected channel
-	const PopupPasswordRef = useRef<HTMLDivElement>(null);
+	const [PopupPassword, setPopupPassword] = useState<string>(""); // <-- name of protected channel
 	const [SaveChannel, setSaveChannel] = useState<string[]>([]); // <--- Save all joinned protected || private channel
-
-	// <=== Invite ===>
-	const [Invites, setInvites] = useState<any[]>([]); // <--- Save all invites
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -42,23 +39,8 @@ function JoinnedChannels({ ChannelsList }: any) {
 			);
 			setChannel(response.data.channel);
 		};
-		const fetchInvites = async () => {
-			try {
-				const response = await axios.get(
-					"http://localhost:3333/chat/invites",
-					{ withCredentials: true }
-				);
-				setInvites(response.data);
-			} catch (error) {
-				console.error(error);
-			}
-		};
-		fetchInvites();
 		fetchData();
 		fetchChannel();
-
-		const interval = setInterval(fetchInvites, 5000);
-		return () => clearInterval(interval);
 	}, [channel?.name, selectedChannel, userInfo?.username]);
 
 	useEffect(() => {
@@ -88,9 +70,9 @@ function JoinnedChannels({ ChannelsList }: any) {
 					channel: channel.name,
 					username: userInfo?.username,
 				});
-				setPopupPasswordChannel("");
+				handleTogglePopupPassword("");
 			} else {
-				setPopupPasswordChannel(channel.name);
+				handleTogglePopupPassword(channel.name);
 			}
 		} else if (channel?.state === "PRIVATE") {
 			if (channel.ownerId === userInfo.id) {
@@ -118,70 +100,6 @@ function JoinnedChannels({ ChannelsList }: any) {
 		}
 	};
 
-	const JoinProtectedChannel = async () => {
-		try {
-			await axios.post(
-				"http://localhost:3333/chat/join/" + PopupPasswordChannel,
-				{ state: "PROTECTED", password: PopupPassword },
-				{ withCredentials: true }
-			);
-			setSelectedChannel(PopupPasswordChannel);
-			setMessages([]);
-			socket?.emit("join", {
-				channel: PopupPasswordChannel,
-				username: userInfo?.username,
-			});
-			setPopupPasswordChannel("");
-			setSaveChannel([...SaveChannel, PopupPasswordChannel]);
-			setNotification({
-				message: "You joinned " + PopupPasswordChannel,
-				type: "success",
-			});
-		} catch (error) {
-			setNotification({
-				message: "Wrong password",
-				type: "error",
-			});
-		}
-	};
-
-	const JoinPrivateChannel = async (channelName: string) => {
-		try {
-			await axios.post(
-				"http://localhost:3333/chat/join/" + channelName,
-				{ state: "PRIVATE" },
-				{ withCredentials: true }
-			);
-			setSelectedChannel(channelName);
-			setMessages([]);
-			socket?.emit("join", {
-				channel: channelName,
-				username: userInfo?.username,
-			});
-			setSaveChannel([...SaveChannel, channelName]);
-			setNotification({
-				message: "You joinned " + channelName,
-				type: "success",
-			});
-		} catch (error) {
-			setNotification({
-				message: "You have already joinned this channel",
-				type: "error",
-			});
-		}
-	};
-
-	const DeclineInvite = async (channelName: string) => {
-		try {
-			axios.delete("http://localhost:3333/chat/decline/" + channelName, {
-				withCredentials: true,
-			});
-		} catch (error) {
-			console.error(error);
-		}
-		setInvites(Invites.filter((channel) => channel.name !== channelName));
-	};
-
 	useEffect(() => {
 		const handleMessage = (message: MessageDto) => {
 			setMessages([...messages, message]);
@@ -202,25 +120,8 @@ function JoinnedChannels({ ChannelsList }: any) {
 		setShowUsers(!showUsers);
 	};
 
-	// <=== Popup Password ===>
-	useEffect(() => {
-		const handleClickOutside = (event: MouseEvent) => {
-			if (
-				PopupPasswordRef.current &&
-				!PopupPasswordRef.current.contains(event.target as Node)
-			) {
-				setPopupPasswordChannel("");
-			}
-		};
-
-		document.addEventListener("mousedown", handleClickOutside);
-		return () => {
-			document.removeEventListener("mousedown", handleClickOutside);
-		};
-	}, [PopupPasswordRef]);
-
-	const ClosePopupPassword = () => {
-		setPopupPasswordChannel("");
+	const handleTogglePopupPassword = (channel: string) => {
+		setPopupPassword(channel);
 	};
 
 	return (
@@ -249,44 +150,19 @@ function JoinnedChannels({ ChannelsList }: any) {
 									}`}
 									onClick={() => handleChannelClick(channel)}
 								>
-									{PopupPasswordChannel !== "" && (
-										<div
-											ref={PopupPasswordRef}
-											className="overlay"
-										>
-											<div className="popup">
-												<label
-													className="close"
-													onClick={ClosePopupPassword}
-												>
-													&times;
-												</label>
-												<h2>Private Channel</h2>
-												<div className="content">
-													<p>
-														Enter the password of
-														the channel
-													</p>
-													<input
-														onChange={(e) =>
-															setPopupPassword(
-																e.target.value
-															)
-														}
-														placeholder="Enter password"
-														value={PopupPassword}
-														type="password"
-													/>
-													<button
-														onClick={() =>
-															JoinProtectedChannel()
-														}
-													>
-														Join
-													</button>
-												</div>
-											</div>
-										</div>
+									{PopupPassword !== "" && (
+										<PopupProtected
+											channel={PopupPassword}
+											socket={socket}
+											userInfo={userInfo}
+											setSelectedChannel={
+												setSelectedChannel
+											}
+											setMessages={setMessages}
+											SaveChannel={SaveChannel}
+											setSaveChannel={setSaveChannel}
+											setNotification={setNotification}
+										/>
 									)}
 									<span className="name">{channel.name}</span>
 									<span className="role">
@@ -294,31 +170,15 @@ function JoinnedChannels({ ChannelsList }: any) {
 									</span>
 								</li>
 							))}
-							{Invites.map((invite) => (
-								<li className="person" key={invite.id}>
-									<span className="name">
-										{invite.channels.name}
-									</span>
-									<span
-										className="accept-invite"
-										onClick={() =>
-											JoinPrivateChannel(
-												invite.channels.name
-											)
-										}
-									>
-										&#10003;
-									</span>
-									<span
-										className="decline-invite"
-										onClick={() =>
-											DeclineInvite(invite.channels.name)
-										}
-									>
-										&times;
-									</span>
-								</li>
-							))}
+							<HandleInvite
+								socket={socket}
+								userInfo={userInfo}
+								setSelectedChannel={setSelectedChannel}
+								setMessages={setMessages}
+								SaveChannel={SaveChannel}
+								setSaveChannel={setSaveChannel}
+								setNotification={setNotification}
+							/>
 						</ul>
 					</div>
 					{showUsers && (
