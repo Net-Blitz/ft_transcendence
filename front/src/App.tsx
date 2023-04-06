@@ -7,9 +7,9 @@ import MainPage from './MainPage/MainPage';
 import Contact from './Contact/Contact';
 import Login from './Login/Login';
 import Chat from './Chat/Chat';
+import AppLayout from './AppLayout';
 import Game from './Game/Game';
 import Notification from './Notification/Notification';
-import Navbar from './Components/Navbar/Navbar';
 import { AuthRoutes} from './utils/PrivateRoutes';
 import { useSelector } from 'react-redux';
 /*	HOOKS	*/
@@ -28,14 +28,14 @@ function App(this: any) {
 		<div>
 			<Routes>
 				<Route element={<AuthRoutes />}>
-					<Route path="/"element={<> <Navbar /> <MainPage /></>} />
+					<Route path="/"element={<AppLayout> <MainPage /></AppLayout>} />
 					<Route path="/login/2fa" element={<Login />} />
 					<Route path="/login/name&avatar" element={<Login />} /> {/** @TODO Changer le path */}
 					<Route path="/login/2faconfig" element={<Login />} />
-					<Route path="/contact" element={<> <Navbar /> <Contact /></>} />
-					<Route path="/chat" element={<> <Navbar /> <Chat /></>} />
-					<Route path="/game" element={<> <Navbar /> <Game /></>} />
-					<Route path="/notification" element={<> <Navbar /> <Notification /></>} />
+					<Route path="/contact" element={<AppLayout> <Contact /></AppLayout>} />
+					<Route path="/chat" element={<AppLayout> <Chat /></AppLayout>} />
+					<Route path="/game" element={<AppLayout> <Game /></AppLayout>} />
+					<Route path="/notification" element={<AppLayout> <Notification /></AppLayout>} />
 				</Route>
 				<Route path="/login" element={<Login />} />
 			</Routes>

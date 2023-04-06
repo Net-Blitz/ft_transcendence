@@ -23,11 +23,14 @@ code {
 /* Poppins */
 @font-face {
 	font-family: 'Poppins';
-	src: local('Poppins-Regular'), url('fonts/Poppins/Poppins-Regular.ttf') format(truetype);
+  src: url('fonts/Poppins/Poppins-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
 }
 @font-face {
 	font-family: 'Poppins';
-  	font-weight: 300;
-	src: local('Poppins-Light'), url('fonts/Poppins/Poppins-Light.ttf') format(truetype);
+  src: url('fonts/Poppins/Poppins-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
 }
   
