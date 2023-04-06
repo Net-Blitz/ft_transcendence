@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Navigate, useLocation} from 'react-router-dom';
+import React, { useCallback, useState } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
 import './Auth.css';
 /*	COMPONENTS	*/
 import Input from './Input/Input';
@@ -11,6 +11,8 @@ import QRCode from './QRCode/QRCode';
 /*	SELECTORS	*/
 import { useSelector } from 'react-redux';
 import { selectUserData } from '../../../utils/redux/selectors';
+/*	FUNCTIONS	*/
+import { useAxios } from '../../../utils/hooks';
 
 export const AuthStart = () => {
 	return (
@@ -32,8 +34,7 @@ export const Auth2fa = () => {
 
 	if (avatar_url === null)
 		return <Navigate to="/login/name&avatar" replace />;
-	if (twoFactor === false)
-		return <Navigate to="/" replace />;
+	if (twoFactor === false) return <Navigate to="/" replace />;
 	return (
 		<div className="auth2fa-wrapper">
 			<Title title="Welcome" subtitle="" />
@@ -42,17 +43,36 @@ export const Auth2fa = () => {
 				placeholder="enter the generated code"
 				icon="padlock"
 			/>
-			<Button content="Login with 42" bottom={false} href="" absolut={true} />
+			<Button
+				content="Login with 42"
+				bottom={false}
+				href=""
+				absolut={true}
+			/>
 		</div>
 	);
 };
 
 export const AuthNameAvatar = () => {
 	const isConfig = useSelector(selectUserData).config;
+	const [inputError, setInputError] = useState('');
+	const { data, error } = useAxios('http://localhost:3333/users/me');
+	const allPseudo = data;
 
-	console.log(isConfig);
-	if (isConfig === true)
-		return <Navigate to="/" replace />;
+	if (isConfig === true) return <Navigate to="/" replace />;
+
+	const handleClick = useCallback(() => {
+		const pseudo = document.querySelector<HTMLInputElement>(
+			'.input-wrapper input'
+		)?.value;
+		const avatar = document
+			.querySelector<HTMLElement>('.carousel-element div:nth-child(2)')
+			?.style.backgroundImage.slice(5, -2);
+		console.log(pseudo);
+		console.log(avatar);
+		console.log(allPseudo);
+	}, [allPseudo]);
+
 	return (
 		<div className="authnameavatar-wrapper">
 			<Title
@@ -63,9 +83,17 @@ export const AuthNameAvatar = () => {
 				input_title="Pseudo"
 				placeholder="enter your pseudo"
 				icon="id_card"
+				error={inputError}
 			/>
 			<Carousel />
-			<Button content="Continue" bottom={true} href="/login/2faconfig" absolut={false} state="config" />
+			<Button
+				onClick={handleClick}
+				content="Continue"
+				bottom={true}
+				href="/login/name&avatar"
+				absolut={false}
+				state="config"
+			/>
 		</div>
 	);
 };
@@ -74,8 +102,7 @@ export const Auth2faConfig = () => {
 	const [statusState, setStatusState] = useState(false);
 	const { state } = useLocation();
 
-	if (!state || state.prec !== 'config')
-		return <Navigate to="/" replace />
+	if (!state || state.prec !== 'config') return <Navigate to="/" replace />;
 	return (
 		<div
 			className={

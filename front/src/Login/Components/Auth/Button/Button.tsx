@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import './Button.css';
 
 interface ButtonProps {
+	onClick?: () => void;
 	content: string;
 	bottom: boolean;
 	href: string;
@@ -10,7 +11,7 @@ interface ButtonProps {
 	state?: string;
 }
 
-const Button = ({ content, bottom, href, absolut, state }: ButtonProps) => {
+const Button = ({ onClick, content, bottom, href, absolut, state }: ButtonProps) => {
 	return (
 		<div
 			className={
@@ -18,6 +19,7 @@ const Button = ({ content, bottom, href, absolut, state }: ButtonProps) => {
 			}
 		>
 			<Link
+				onClick={onClick}
 				to={href} 
 				relative={absolut === true ? 'path' : undefined}
 				state={state ? {prec: state} : undefined}

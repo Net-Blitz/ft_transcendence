@@ -36,7 +36,7 @@ export class UserService {
 		}
 		return res.status(200).json(user);
 	}
-
+	
 	async UpdateUser(
 		@Req() req: Request,
 		@Res() res: Response,

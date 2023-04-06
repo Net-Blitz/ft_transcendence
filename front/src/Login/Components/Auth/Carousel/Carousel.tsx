@@ -69,7 +69,7 @@ const Carousel = () => {
 		}
 		setAvatar(newAvatar);
 	}
-
+	
 	return (
 		<div className="carousel-wrapper">
 			<div className="carousel-element">

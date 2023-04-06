@@ -34,4 +34,10 @@ export class UserController {
 	Logout(@Req() req: Request, @Res() res: Response) {
 		return this.userService.Logout(req, res);
 	}
+
+	@Get("/all/pseudo")
+	async GetAllPseudo(@Res() res: Response) {
+		return (res);
+	}
+
 }
