@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './MainPage.css';
 // Components
-// import refresh from './Ressources/refresh.svg';
+import refresh from './Components/Ressources/refresh.svg';
 import FilterButton from './Components/FilterButton';
 
 const MainPage = () => {
@@ -9,6 +9,7 @@ const MainPage = () => {
 		console.log('Selected filter:', option);
 		//here we will handle the filter
 	};
+	const [resetFilter, setResetFilter] = useState(false);
 	const [openFilter, setOpenFilter] = useState<string | null>(null); //can be a string or null
 	//open or close the filter
 	const toggleDropdown = (filterName : string) => {
@@ -17,11 +18,19 @@ const MainPage = () => {
 		} else {
 		  setOpenFilter(filterName);
 		}
-	  };
+	};
+	const clearAllFilter = () => {
+		setOpenFilter(null);
+		// handleFilter(""); // Clear the filter -> only usefull when the handleFilter will do something
+		setResetFilter(!resetFilter); // Toggle resetFilter state -> what triggers the UseEffect
+	};
 	return (
 		<div className='rect_no_msg'>
 			<p>Games in progress</p>
 			<div className='filter'>
+				<button onClick={clearAllFilter}>
+					<img src={refresh} alt="refresh"/>
+				</button>
 				<FilterButton
 					label="Sort By"
 					options={['name', 'date', 'map', 'difficulty']}
@@ -30,6 +39,7 @@ const MainPage = () => {
 					//If another button is clicked, openFilter will have a different value and isOpen will be false
 					toggleDropdown={() => toggleDropdown("Sort By")} 
 					//update the state openFilter
+					resetFilter={resetFilter}
 				/>
 				<FilterButton
 					label="Game Mode"
@@ -37,6 +47,7 @@ const MainPage = () => {
 					onFilter={handleFilter}
 					isOpen={openFilter === "Game Mode"}
 					toggleDropdown={() => toggleDropdown("Game Mode")}
+					resetFilter={resetFilter}
 				/>
 				<FilterButton
 					label="Friends"
@@ -44,6 +55,7 @@ const MainPage = () => {
 					onFilter={handleFilter}
 					isOpen={openFilter === "Friends"}
 					toggleDropdown={() => toggleDropdown("Friends")}
+					resetFilter={resetFilter}
 				/>
 				<FilterButton
 					label="Map"
@@ -51,6 +63,7 @@ const MainPage = () => {
 					onFilter={handleFilter}
 					isOpen={openFilter === "Map"}
 					toggleDropdown={() => toggleDropdown("Map")}
+					resetFilter={resetFilter}
 				/>
 				<FilterButton
 					label="Difficulty"
@@ -58,6 +71,7 @@ const MainPage = () => {
 					onFilter={handleFilter}
 					isOpen={openFilter === "Difficulty"}
 					toggleDropdown={() => toggleDropdown("Difficulty")}
+					resetFilter={resetFilter}
 				/>
 			</div>
 		</div>

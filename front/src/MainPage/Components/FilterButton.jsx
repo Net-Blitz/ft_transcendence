@@ -4,7 +4,7 @@ import arrow_down from './Ressources/arrow_down_beige.svg';
 import close from './Ressources/close_blue.svg';
 
 
-const FilterButton = ({ label, options, onFilter, isOpen, toggleDropdown }) => {
+const FilterButton = ({ label, options, onFilter, isOpen, toggleDropdown, resetFilter}) => {
 	const [selectedFilter, setSelectedFilter] = useState(label); //if one filter was selected
 	const [isFilterSelected, setIsFilterSelected] = useState(false);
 
@@ -14,6 +14,11 @@ const FilterButton = ({ label, options, onFilter, isOpen, toggleDropdown }) => {
 		setIsFilterSelected(true);
 		setIsOpen(false);
 	};
+
+	useEffect(() => {
+		setSelectedFilter(label);
+		setIsFilterSelected(false);
+	  }, [resetFilter, label]);
 
 	const handleButtonClose = () => {
 		if (isFilterSelected) {
