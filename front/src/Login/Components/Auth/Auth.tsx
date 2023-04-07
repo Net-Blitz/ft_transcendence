@@ -12,7 +12,6 @@ import QRCode from './QRCode/QRCode';
 import { useSelector } from 'react-redux';
 import { selectUserData } from '../../../utils/redux/selectors';
 /*	FUNCTIONS	*/
-import { useAxios } from '../../../utils/hooks';
 import { inputProtectionPseudo } from './Input/inputProtection';
 import axios from 'axios';
 
@@ -60,6 +59,7 @@ export const AuthNameAvatar = () => {
 	const [inputError, setInputError] = useState('');
 	const [usernames, setUsernames] = useState<string[]>([]);
 	const [pseudo, setPseudo] = useState('');
+	const [hasInput, setHasInput] = useState(false);
 
 	if (isConfig === true) return <Navigate to="/" replace />;
 
@@ -90,9 +90,17 @@ export const AuthNameAvatar = () => {
 			.querySelector<HTMLElement>('.carousel-element div:nth-child(2)')
 			?.style.backgroundImage.slice(5, -2);
 		if (inputPseudo)
+		{
 			setPseudo(inputPseudo);
-		setInputError(inputProtectionPseudo(pseudo, usernames));
-	}, [usernames]);
+			setHasInput(true);
+		}
+	}, []);
+
+	useEffect(() => {
+		if (hasInput) {
+		  setInputError(inputProtectionPseudo(pseudo, usernames));
+		}
+	  }, [pseudo, usernames, hasInput]);
 
 	return (
 		<div className="authnameavatar-wrapper">

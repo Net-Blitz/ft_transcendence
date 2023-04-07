@@ -1,4 +1,3 @@
-import axios from "axios";
 
 export const inputProtectionPseudo = (input: string, usernames: any[]): string => {
 	const regexLetters = /^[a-zA-Z0-9_]+$/;
