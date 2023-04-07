@@ -1,4 +1,4 @@
-import React, { useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import './Carousel.css';
 /*	Functions	*/
 import { useGenerateAvatars } from './genAvatars';
@@ -27,49 +27,66 @@ const Carousel = () => {
 		if (index < 0 || index >= length) {
 			return <div className={`avatar ${setting} empty`}></div>;
 		} else {
-				return (
-					<div
-						className={`avatar ${setting}`}
-						style={{
-							backgroundImage: `url('${avatar[index].url}')`,
-							backgroundPosition: 'center',
-							backgroundSize: 'cover',
-						}}
-						onClick={
-							setting === 'left'
-								? prev
-								: setting === 'right'
-								? next
-								: undefined
-						}></div>
-				);
+			return (
+				<div
+					className={`avatar ${setting}`}
+					style={{
+						backgroundImage: `url('${avatar[index].url}')`,
+						backgroundPosition: 'center',
+						backgroundSize: 'cover',
+					}}
+					onClick={
+						setting === 'left'
+							? prev
+							: setting === 'right'
+							? next
+							: undefined
+					}></div>
+			);
 		}
 	};
 
 	const handleChange = (event: any) => {
 		const file = event.target.files[0];
-		if (file)
-		{
-			const reader = new FileReader();
-			reader.addEventListener("load", function() {
-				let newAvatar = [...avatar];
-				newAvatar.splice(currentIndex, 0, {url: reader.result, source: 'imported'});
-				setAvatar(newAvatar);
-			});
-			reader.readAsDataURL(file);
+		console.log(file);
+		if (file) {
+			const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+			const allowedSize = 2 * 1024 * 1024;
+			if (allowedTypes.includes(file.type) && file.size <= allowedSize) {
+				const img = new Image();
+				img.src = URL.createObjectURL(file);
+				img.onload = () => {
+					if (img.width > 400 || img.height > 400)
+						alert('Image too big (max 400x400)');
+					else
+					{
+						const reader = new FileReader();
+						reader.addEventListener('load', function () {
+							let newAvatar = [...avatar];
+							newAvatar.splice(currentIndex, 0, {
+								url: reader.result,
+								source: 'imported',
+							});
+							setAvatar(newAvatar);
+						});
+						reader.readAsDataURL(file);
+					};
+				}
+			}
+			else
+				alert('File not supported (png, jpg, jpeg) or too big (> 2Mo)');
 		}
-	}
+	};
 
 	const handleRefresh = () => {
 		let newAvatar = useGenerateAvatars(12);
-		for (let i = 0; i < avatar.length; i++)
-		{
+		for (let i = 0; i < avatar.length; i++) {
 			if (avatar[i].source === 'imported')
 				newAvatar.splice(i, 0, avatar[i]);
 		}
 		setAvatar(newAvatar);
-	}
-	
+	};
+
 	return (
 		<div className="carousel-wrapper">
 			<div className="carousel-element">
@@ -77,12 +94,12 @@ const Carousel = () => {
 				{renderAvatar(currentIndex, '')}
 				{renderAvatar(currentIndex + 1, 'right')}
 			</div>
-			<div className='carousel-refresh'>
+			<div className="carousel-refresh">
 				<label htmlFor="inputTag">
 					Download your avatar
 					<input
-						id="inputTag" 
-						type="file" 
+						id="inputTag"
+						type="file"
 						accept=".png, .jpg, .jpeg"
 						onChange={handleChange}
 					/>
