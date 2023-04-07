@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import './Auth.css';
 /*	COMPONENTS	*/
@@ -13,6 +13,8 @@ import { useSelector } from 'react-redux';
 import { selectUserData } from '../../../utils/redux/selectors';
 /*	FUNCTIONS	*/
 import { useAxios } from '../../../utils/hooks';
+import { inputProtectionPseudo } from './Input/inputProtection';
+import axios from 'axios';
 
 export const AuthStart = () => {
 	return (
@@ -56,22 +58,41 @@ export const Auth2fa = () => {
 export const AuthNameAvatar = () => {
 	const isConfig = useSelector(selectUserData).config;
 	const [inputError, setInputError] = useState('');
-	const { data, error } = useAxios('http://localhost:3333/users/me');
-	const allPseudo = data;
+	const [usernames, setUsernames] = useState<string[]>([]);
+	const [pseudo, setPseudo] = useState('');
 
 	if (isConfig === true) return <Navigate to="/" replace />;
 
+	useEffect(() => {
+		async function fetchData() {
+			try {
+				const response = await axios.get(
+					'http://localhost:3333/users/all/pseudo',
+					{
+						withCredentials: true,
+					}
+				);
+				const usernames = response.data;
+				setUsernames(usernames);
+			} catch (error) {
+				console.error(error);
+			}
+		}
+		fetchData();
+	}, []);
+
 	const handleClick = useCallback(() => {
-		const pseudo = document.querySelector<HTMLInputElement>(
-			'.input-wrapper input'
-		)?.value;
+		const inputPseudo: string | undefined =
+			document.querySelector<HTMLInputElement>(
+				'.input-wrapper input'
+			)?.value;
 		const avatar = document
 			.querySelector<HTMLElement>('.carousel-element div:nth-child(2)')
 			?.style.backgroundImage.slice(5, -2);
-		console.log(pseudo);
-		console.log(avatar);
-		console.log(allPseudo);
-	}, [allPseudo]);
+		if (inputPseudo)
+			setPseudo(inputPseudo);
+		setInputError(inputProtectionPseudo(pseudo, usernames));
+	}, [usernames]);
 
 	return (
 		<div className="authnameavatar-wrapper">

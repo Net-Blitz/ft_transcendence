@@ -1,12 +1,18 @@
+import axios from "axios";
 
-export const inputProtectionPseudo = (input: string) : string => {
+export const inputProtectionPseudo = (input: string, usernames: any[]): string => {
 	const regexLetters = /^[a-zA-Z0-9_]+$/;
+	if (input === '')
+		return ('Bad input');
 	if (!regexLetters.test(input))
 		return ('Bad characters');
 	const regexLenght = /^.{3,14}$/;
 	if (!regexLenght.test(input))
 		return ('Bad length');
-		
+	for (let i = 0; i < usernames.length; i++) {
+		if (usernames[i].username === input)
+			return ('Username already taken');
+	}
 	return ('');
 }
 

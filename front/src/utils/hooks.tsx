@@ -17,7 +17,6 @@ export function useAxios(url: string) {
 				const response = await axios.get(url, {
 					withCredentials: true,
 				});
-				console.log(response);
 				setData(response.data);
 			} catch (err) {
 				console.log(err);

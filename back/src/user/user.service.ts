@@ -64,4 +64,13 @@ export class UserService {
 		res.clearCookie("jwt", { httpOnly: true });
 		return res.status(200).json({ message: "Logged out" });
 	}
+
+	async GetAllPseudo() {
+		const res = await this.prisma.user.findMany({
+			select: {
+				username: true,
+			},
+		});
+		return (res);
+	}
 }

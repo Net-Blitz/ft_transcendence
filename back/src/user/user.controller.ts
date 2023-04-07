@@ -36,8 +36,8 @@ export class UserController {
 	}
 
 	@Get("/all/pseudo")
-	async GetAllPseudo(@Res() res: Response) {
-		return (res);
+	async GetAllPseudo() {
+		return (this.userService.GetAllPseudo());
 	}
 
 }
