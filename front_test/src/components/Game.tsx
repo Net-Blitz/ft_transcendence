@@ -95,18 +95,23 @@ function Game({socketGame}:any) {
 
 	 
 	return (
-		<div>
-			<h1>Gaming</h1>
-			<div id="Game">
-				<span id="ball"></span>
+		<div className="game-playing-parent">
+			<div className="game-playing-top">
+				<div className="game-playing-quick-chat">
+					
+				</div>
+				<div className="game-playing-viewer">
+					Viewer : 5
+				</div>
+			</div>
+			<div className="game-playing-board">
+				{/* <span id="ball"></span>
 				<span id="player1"></span>
 				<span id="player2"></span>
 				<span id="score1">0</span>
-				<span id="score2">0</span>
+				<span id="score2">0</span> */}
 			</div>
-			<div>
-				<button id="surrend" onClick={surrend}> Surrend </button> 
-			</div>
+			<button className="game-playing-button-surrend" onClick={surrend}> Surrend </button> 
 
 		</div>
 			
