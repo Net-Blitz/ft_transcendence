@@ -30,6 +30,11 @@ function Hello() {
 			console.log(err);
 		});
 	};
+
+	const handleGaming = () => {
+		navigate("/game", {state: {gameId: 1, login: "jean"}})
+	};
+
 	return (
 		<div>
 			<h1>Hello</h1>
@@ -39,6 +44,7 @@ function Hello() {
 			<button onClick={() => navigate("/search")}>SearchUser</button>
 			<button onClick={() => navigate("/2fa")}>2FA</button>
 			<button onClick={handleGame}>JoinGame</button>
+			<button onClick={handleGaming}>Gaming</button>
 		</div>
 	);
 };
