@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { generateAvatars } from './Carousel/genAvatars';
+import axios from 'axios';
 import './Auth.css';
 /*	COMPONENTS	*/
 import Input from './Input/Input';
@@ -14,7 +15,6 @@ import { useSelector } from 'react-redux';
 import { selectUserData } from '../../../utils/redux/selectors';
 /*	FUNCTIONS	*/
 import { inputProtectionPseudo } from './Input/inputProtection';
-import axios from 'axios';
 
 export const AuthStart = () => {
 	return (
@@ -61,7 +61,8 @@ export const AuthNameAvatar = () => {
 	const [usernames, setUsernames] = useState<string[]>([]);
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [avatar, setAvatar] = useState(generateAvatars(12));
-	
+	const navigate = useNavigate();
+
 	useEffect(() => {
 		async function fetchData() {
 			try {
@@ -70,41 +71,46 @@ export const AuthNameAvatar = () => {
 					{
 						withCredentials: true,
 					}
-					);
-					const usernames = response.data;
-					setUsernames(usernames);
-				} catch (error) {
-					console.error(error);
-				}
+				);
+				const usernames = response.data;
+				setUsernames(usernames);
+			} catch (error) {
+				console.error(error);
 			}
-			fetchData();
-		}, []);
-		
-		const handleClick = useCallback(async () => {
-			const inputPseudo: string | undefined =
+		}
+		fetchData();
+	}, []);
+
+	const handleClick = useCallback(async () => {
+		const inputPseudo: string | undefined =
 			document.querySelector<HTMLInputElement>(
 				'.input-wrapper input'
-				)?.value;
-				if (inputPseudo) {
-					const error: string = inputProtectionPseudo(inputPseudo, usernames);
-					if (error === '') {
-						const formData = new FormData();
-						formData.append('username', inputPseudo);
-						formData.append('file', avatar[currentIndex].file);
-						const response = await axios.post('http://localhost:3333/users/config', formData, {
-							withCredentials: true,
-						});
-						if (response.status === 200)
-						window.location.replace('/');
-						window.location.replace('/login/config');
-					} else setInputError(error);
-				} else setInputError('Please enter a pseudo');
-			}, [usernames, currentIndex, avatar]);
-			
-			if (isConfig === true) return <Navigate to="/" replace />;
+			)?.value;
+		if (inputPseudo) {
+			const error: string = inputProtectionPseudo(inputPseudo, usernames);
+			if (error === '') {
+				const formData = new FormData();
+				formData.append('username', inputPseudo);
+				formData.append('file', avatar[currentIndex].file);
+				const response = await axios.post(
+					'http://localhost:3333/users/config',
+					formData,
+					{
+						withCredentials: true,
+					}
+				);
+				if (response.status === 200)
+					navigate('/login/2faconfig', { state: { prec: true } });
+				else
+					navigate('/login/config');
+			} else setInputError(error);
+		} else setInputError('Please enter a pseudo');
+	}, [usernames, currentIndex, avatar]);
 
-			return (
-				<div className="authnameavatar-wrapper">
+	if (isConfig === true) return <Navigate to="/" replace />;
+
+	return (
+		<div className="authnameavatar-wrapper">
 			<Title
 				title="Welcome"
 				subtitle="please enter your pseudo and choose your avatar"
@@ -137,7 +143,7 @@ export const Auth2faConfig = () => {
 	const [statusState, setStatusState] = useState(false);
 	const { state } = useLocation();
 
-	if (!state || state.prec !== 'config') return <Navigate to="/" replace />;
+	if (!state || !state.prec) return <Navigate to="/" replace />;
 	return (
 		<div
 			className={

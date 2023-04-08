@@ -95,7 +95,7 @@ export class AuthService {
 			if (existingUser) {
 				console.log("second connection");
 				this.signToken(req, res, existingUser);
-				if (existingUser.avatar)
+				if (existingUser.config)
 					return res.redirect("http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_GLOBAL"));
 				return res.redirect("http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_GLOBAL") + '/login/config');
 			}
