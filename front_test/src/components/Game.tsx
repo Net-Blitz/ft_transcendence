@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import eyePNG from "../eye.png"
 import "./Game.css";
 
 
@@ -101,15 +102,18 @@ function Game({socketGame}:any) {
 					
 				</div>
 				<div className="game-playing-viewer">
-					Viewer : 5
+					<img src={eyePNG} alt="Spec" className="game-playing-eye" />
+					  : 5
 				</div>
 			</div>
 			<div className="game-playing-board">
-				{/* <span id="ball"></span>
-				<span id="player1"></span>
-				<span id="player2"></span>
-				<span id="score1">0</span>
-				<span id="score2">0</span> */}
+				<span className="game-playing-ball"></span>
+				<span className="game-playing-player" id="game-playing-player1"></span>
+				<span className="game-playing-player" id="game-playing-player2"></span>
+				<div className="game-playing-score-div">
+					<span className="game-playing-score" id="game-playing-score1">0</span>
+					<span className="game-playing-score" id="game-playing-score2">0</span>
+				</div>
 			</div>
 			<button className="game-playing-button-surrend" onClick={surrend}> Surrend </button> 
 

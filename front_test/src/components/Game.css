@@ -33,24 +33,31 @@
 	box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25), 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
 
+.game-playing-eye {
+	height: min(max(5px, 8vw), 35px);
+	width: min(max(5px, 8vw), 35px);
+	color: #FFFDE4;
+	margin: 5%;
+}
+
 .game-playing-viewer {
 	width: 15vw;
 	max-width: 120px;
 	height: min(8vw, 4vh);
 	max-height: 45px;
 	min-height: 18px;
-	
+
 	background: #0A3D62;
 	border-radius: 10px;
 	box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25), 0px 4px 4px rgba(0, 0, 0, 0.25);
-	
+
 	color: #FFFDE4;
 	font-family: 'Poppins';
 	font-style: normal;
 	font-weight: 700;
 	font-size: min(max(5px, 4vw), 20px);
 	line-height: 45px;
-	
+
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -64,6 +71,7 @@
 	box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25), 0px 4px 4px rgba(0, 0, 0, 0.25);
 	background: #EFEDD4;
 	border: 2px solid #0A3D62;
+	position: relative;
 }
 
 .game-playing-button-surrend:hover {
@@ -86,56 +94,73 @@
     cursor: pointer;
     text-align: center;
     border-radius: 10px;
-    transition-duration: 0.4s;    
+    transition-duration: 0.4s;
     background-color: #0A3D62;
     font-family: 'Poppins', sans-serif;
     font-weight: 300;
     font-size: min(max(5px, 5vw), 30px);
-	
+
 	width: min(50%, 323px);
 	height: 72px;
 }
 
-#ball {
-	background-color: #252525;
-	position: absolute;
-	height: 30px;
-	width: 30px;
+.game-playing-ball {
+	background-color: #0A3D62;
+	height: 6%;
+	width: 3%;
 	border-radius: 50%;
-	left: 47.5%;
-	top: 45%;
+	position: absolute;
+	top: calc(50% - 3%);
+	left: calc(50% - 1.5%);
+	z-index: 1;
 }
 
-#player1 {
-	left: 6px;
-	background-color: #5055AA;
-	height: 90px;
-	width: 10px;
-	border-radius: 15px;
+.game-playing-player {
+	background-color: #0A3D62;
+	height:20%;
+	width: 1.5%;
+	border-radius: 3px;
 	display: inline-block;
 	position: absolute;
-	top: 115px;
+	top: 40%;
+	z-index: 2;
 }
 
-#player2 {
-	right: 6px;
-	background-color: #5055AA;
-	height: 90px;
-	width: 10px;
-	border-radius: 15px;
-	display: inline-block;
-	position: absolute;
-	top: 115px;
+#game-playing-player1 {
+	left: 4px;
+
+}
+#game-playing-player2 {
+	right: 4px;
 }
 
-#score1 {
+.game-playing-score-div {
 	position: absolute;
-	left: 10px;
-	top: 10px;
+	display: flex;
+	flex-direction: row;
+	width: 90%;
+	height: 100%;
+	left: 5%;
+	align-items: center;
+	justify-content: space-between;
+
+	z-index: 0;
+
 }
 
-#score2 {
-	position: absolute;
+.game-playing-score {
+	color: rgba(255, 255, 255, 0.70);
+	font-family: fantasy;
+	font-style: normal;
+	font-weight: 700;
+	font-size: min(max(5px, 30vw), 180px);
+
+}
+
+#game-playing-score1 {
+	left: 100px;
+}
+
+#game-playing-score1 {
 	right: 10px;
-	top: 10px;
 }
