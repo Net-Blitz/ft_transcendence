@@ -9,12 +9,15 @@ import Title from './Title/Title';
 import Button from './Button/Button';
 import Carousel from './Carousel/Carousel';
 import Toggle from './Toggle/Toggle';
-import QRCode from './QRCode/QRCode';
+import QRCode from './QRCode/QrCode';
 /*	SELECTORS	*/
 import { useSelector } from 'react-redux';
 import { selectUserData } from '../../../utils/redux/selectors';
 /*	FUNCTIONS	*/
-import { inputProtectionPseudo } from './Input/inputProtection';
+import {
+	inputProtectionPseudo,
+	inputProtectionQR,
+} from './Input/inputProtection';
 
 export const AuthStart = () => {
 	return (
@@ -92,17 +95,18 @@ export const AuthNameAvatar = () => {
 				const formData = new FormData();
 				formData.append('username', inputPseudo);
 				formData.append('file', avatar[currentIndex].file);
-				const response = await axios.post(
-					'http://localhost:3333/users/config',
-					formData,
-					{
-						withCredentials: true,
-					}
-				);
-				if (response.status === 200)
+				try {
+					const response = await axios.post(
+						'http://localhost:3333/users/config',
+						formData,
+						{
+							withCredentials: true,
+						}
+					);
 					navigate('/login/2faconfig', { state: { prec: true } });
-				else
+				} catch (error) {
 					navigate('/login/config');
+				}
 			} else setInputError(error);
 		} else setInputError('Please enter a pseudo');
 	}, [usernames, currentIndex, avatar]);
@@ -142,8 +146,35 @@ export const AuthNameAvatar = () => {
 export const Auth2faConfig = () => {
 	const [statusState, setStatusState] = useState(false);
 	const { state } = useLocation();
+	const navigate = useNavigate();
+	const [inputError, setInputError] = useState('');
 
 	if (!state || !state.prec) return <Navigate to="/" replace />;
+
+	const handleClick2fa = useCallback(async () => {
+		const inputKey: string | undefined =
+			document.querySelector<HTMLInputElement>(
+				'.input-wrapper input'
+			)?.value;
+		if (inputKey) {
+			const error: string = inputProtectionQR(inputKey);
+			if (error === '') {
+				try {
+					const response = await axios.post(
+						'http://localhost:3333/auth/2fa/verify',
+						{ inputKey },
+						{
+							withCredentials: true,
+						}
+					);
+					navigate('/');
+				} catch (error) {
+					setInputError('Invalid key');
+				}
+			} else setInputError(error);
+		} else setInputError('Please enter a key');
+	}, [inputError]);
+
 	return (
 		<div
 			className={
@@ -166,13 +197,15 @@ export const Auth2faConfig = () => {
 						input_title="Generate code"
 						placeholder="enter the generated code"
 						icon="padlock"
+						error={inputError}
 					/>
 				</div>
 			)}
 			<Button
+				onClick={statusState ? handleClick2fa : undefined}
 				content="Login with 42"
-				bottom={statusState === false ? true : false}
-				href=""
+				bottom={statusState ? false : true}
+				href={!statusState ? '/' : ''}
 				absolut={true}
 			/>
 		</div>

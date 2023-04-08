@@ -1,4 +1,15 @@
-import { Body, Controller, Get, Param, Post, Put, Req, Res, UseInterceptors, UploadedFile } from "@nestjs/common";
+import {
+	Body,
+	Controller,
+	Get,
+	Param,
+	Post,
+	Put,
+	Req,
+	Res,
+	UseInterceptors,
+	UploadedFile,
+} from "@nestjs/common";
 import { UserService } from "./user.service";
 import { Request, Response } from "express";
 import { UpdateUserDto } from "./dto";
@@ -13,13 +24,20 @@ export class UserController {
 		return this.userService.getUser(req);
 	}
 
-	@Get("login/:username")
+	@Get("login/:login")
 	async GetUserByLogin(
-		@Param("username") username: string,
-		@Req() req: Request,
+		@Param("login") username: string,
 		@Res() res: Response
 	) {
-		return this.userService.GetUserByLogin(username, req, res);
+		return this.userService.GetUserByLogin(username, res);
+	}
+
+	@Get("username/:username")
+	async GetUserByUsername(
+		@Param("username") username: string,
+		@Res() res: Response
+	) {
+		return this.userService.GetUserByUsername(username, res);
 	}
 
 	@Put("update")
@@ -38,12 +56,17 @@ export class UserController {
 
 	@Get("/all/pseudo")
 	async GetAllPseudo() {
-		return (this.userService.GetAllPseudo());
+		return this.userService.GetAllPseudo();
 	}
 
 	@Post("config")
-	@UseInterceptors(FileInterceptor('file'))
-	async ConfigUser(@Req() req: Request, @Res() res: Response, @UploadedFile() file, @Body('username') text: string) {
+	@UseInterceptors(FileInterceptor("file"))
+	async ConfigUser(
+		@Req() req: Request,
+		@Res() res: Response,
+		@UploadedFile() file,
+		@Body("username") text: string
+	) {
 		this.userService.ConfigUser(req, res, file, text);
 	}
 }

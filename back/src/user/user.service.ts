@@ -14,7 +14,7 @@ export class UserService {
 		private prisma: PrismaService,
 		@Inject(AuthService) private authService: AuthService,
 		private fileservice: FileService,
-		private config: ConfigService,
+		private config: ConfigService
 	) {}
 
 	async getUser(@Req() req: Request) {
@@ -28,8 +28,22 @@ export class UserService {
 	}
 
 	async GetUserByLogin(
+		@Param("login") login: string,
+		@Res() res: Response
+	) {
+		const user = await this.prisma.user.findUnique({
+			where: {
+				login,
+			},
+		});
+		if (!user) {
+			return res.status(404).json({ message: "User not found" });
+		}
+		return res.status(200).json(user);
+	}
+
+	async GetUserByUsername(
 		@Param("username") username: string,
-		@Req() req: Request,
 		@Res() res: Response
 	) {
 		const user = await this.prisma.user.findUnique({
@@ -80,7 +94,12 @@ export class UserService {
 		return res;
 	}
 
-	async ConfigUser(@Req() req: Request, @Res() res: Response, file: any, text: string) {
+	async ConfigUser(
+		@Req() req: Request,
+		@Res() res: Response,
+		file: any,
+		text: string
+	) {
 		if ((await this.fileservice.checkFile(file)) === false)
 			return res.status(400).json({ message: "Bad file" });
 		const filepath: string = path.join(
@@ -104,5 +123,5 @@ export class UserService {
 			data: user,
 		});
 		return res.status(200).json(updatedUser);
-	}	
+	}
 }
