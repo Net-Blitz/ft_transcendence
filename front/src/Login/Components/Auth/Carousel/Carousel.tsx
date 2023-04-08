@@ -1,14 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import './Carousel.css';
 /*	Functions	*/
-import { useGenerateAvatars } from './genAvatars';
+import { generateAvatars } from './genAvatars';
 /*	Ressources	*/
 import refresh from './Ressources/refresh.png';
 
-const Carousel = () => {
+interface CarouselProps {
+	currentIndex: number;
+	setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
+	avatar: any;
+	setAvatar: React.Dispatch<React.SetStateAction<any>>;
+}
+
+const Carousel = ({currentIndex, setCurrentIndex, avatar, setAvatar}: CarouselProps) => {
 	/*	HOOK settings	*/
-	const [currentIndex, setCurrentIndex] = useState(0);
-	const [avatar, setAvatar] = useState(useGenerateAvatars(12));
 	const [length, setLenght] = useState(avatar.length);
 
 	useEffect(() => {
@@ -73,20 +78,18 @@ const Carousel = () => {
 				const img = new Image();
 				img.src = URL.createObjectURL(file);
 				img.onload = () => {
+					console.log(img);
 					if (img.width > 400 || img.height > 400)
 						alert('Image too big (max 400x400)');
 					else {
-						const reader = new FileReader();
-						reader.addEventListener('load', function () {
-							let newAvatar = [...avatar];
-							newAvatar.splice(currentIndex, 0, {
-								url: reader.result,
-								source: 'imported',
-								type: file.type,
-							});
-							setAvatar(newAvatar);
+						let newAvatar = [...avatar];
+						newAvatar.splice(currentIndex, 0, {
+							file: file,
+							url: img.src,
+							source: 'imported',
+							type: file.type,
 						});
-						reader.readAsDataURL(file);
+						setAvatar(newAvatar);
 					}
 				};
 			} else
@@ -95,7 +98,7 @@ const Carousel = () => {
 	};
 
 	const handleRefresh = () => {
-		let newAvatar = useGenerateAvatars(12);
+		let newAvatar = generateAvatars(12);
 		for (let i = 0; i < avatar.length; i++) {
 			if (avatar[i].source === 'imported')
 				newAvatar.splice(i, 0, avatar[i]);

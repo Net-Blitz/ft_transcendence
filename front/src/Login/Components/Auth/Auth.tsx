@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+import { generateAvatars } from './Carousel/genAvatars';
 import './Auth.css';
 /*	COMPONENTS	*/
 import Input from './Input/Input';
@@ -58,6 +59,8 @@ export const AuthNameAvatar = () => {
 	const isConfig = useSelector(selectUserData).config;
 	const [inputError, setInputError] = useState('');
 	const [usernames, setUsernames] = useState<string[]>([]);
+	const [currentIndex, setCurrentIndex] = useState(0);
+	const [avatar, setAvatar] = useState(generateAvatars(12));
 
 	if (isConfig === true) return <Navigate to="/" replace />;
 
@@ -84,13 +87,10 @@ export const AuthNameAvatar = () => {
 			document.querySelector<HTMLInputElement>(
 				'.input-wrapper input'
 			)?.value;
-		const avatar = document
-			.querySelector<HTMLElement>('.carousel-element div:nth-child(2)')
-			?.style.backgroundImage.slice(5, -2);
 		if (inputPseudo) {
 			const error: string = inputProtectionPseudo(inputPseudo, usernames);
 			if (error === '') {
-				if (avatar === '') return;
+				const toSend = avatar[currentIndex];
 				axios.post(
 					'http://localhost:3333/users/config',
 					{
@@ -117,7 +117,12 @@ export const AuthNameAvatar = () => {
 				icon="id_card"
 				error={inputError}
 			/>
-			<Carousel />
+			<Carousel
+				avatar={avatar}
+				currentIndex={currentIndex}
+				setCurrentIndex={setCurrentIndex}
+				setAvatar={setAvatar}
+			/>
 			<Button
 				onClick={handleClick}
 				content="Continue"
