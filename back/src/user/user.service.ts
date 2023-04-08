@@ -3,12 +3,14 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { Request, Response } from "express";
 import { UpdateUserDto } from "./dto";
 import { AuthService } from "src/auth/auth.service";
+import { FileService } from "src/file/file.service";
 
 @Injectable()
 export class UserService {
 	constructor(
 		private prisma: PrismaService,
-		@Inject(AuthService) private authService: AuthService
+		@Inject(AuthService) private authService: AuthService,
+		private fileservice: FileService,
 	) {}
 
 	async getUser(@Req() req: Request) {
@@ -74,7 +76,7 @@ export class UserService {
 		return (res);
 	}
 
-	async ConfigUser(@Req() req: Request) {
-		console.log(req.body);
+	async ConfigUser(file: any, text: string) {
+		return await this.fileservice.checkFile(file);
 	}
 }

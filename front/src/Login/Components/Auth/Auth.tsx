@@ -90,20 +90,15 @@ export const AuthNameAvatar = () => {
 		if (inputPseudo) {
 			const error: string = inputProtectionPseudo(inputPseudo, usernames);
 			if (error === '') {
-				const toSend = avatar[currentIndex];
-				axios.post(
-					'http://localhost:3333/users/config',
-					{
-						pseudo: inputPseudo,
-						avatar: avatar,
-					},
-					{
-						withCredentials: true,
-					}
-				);
+				const formData = new FormData();
+				formData.append('username', inputPseudo);
+				formData.append('file', avatar[currentIndex].file);
+				axios.post('http://localhost:3333/users/config', formData, {
+					withCredentials: true,
+				});
 			} else setInputError(error);
 		} else setInputError('Please enter a pseudo');
-	}, []);
+	}, [usernames]);
 
 	return (
 		<div className="authnameavatar-wrapper">

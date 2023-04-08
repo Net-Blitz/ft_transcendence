@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Param, Post, Put, Req, Res } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Put, Req, Res, UseInterceptors, UploadedFile } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { Request, Response } from "express";
 import { UpdateUserDto } from "./dto";
+import { FileInterceptor } from "@nestjs/platform-express";
 
 @Controller("users")
 export class UserController {
@@ -41,7 +42,8 @@ export class UserController {
 	}
 
 	@Post("config")
-	async ConfigUser(@Req() req: Request) {
-		this.userService.ConfigUser(req);
+	@UseInterceptors(FileInterceptor('file'))
+	async ConfigUser(@UploadedFile() file, @Body('username') text: string) {
+		console.log(await this.userService.ConfigUser(file, text));
 	}
 }
