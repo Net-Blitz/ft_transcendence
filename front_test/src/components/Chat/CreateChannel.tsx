@@ -1,13 +1,19 @@
 import axios from "axios";
-import { useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 
-function CreateChannel({ ClosePopup }: { ClosePopup: () => void }) {
+function CreateChannel({
+	ClosePopup,
+	setNotification,
+}: {
+	ClosePopup: () => void;
+	setNotification: (notification: { message: string; type: string }) => void;
+}) {
 	const [name, setName] = useState("");
 	const [password, setPassword] = useState("");
 	const [privacy, setPrivacy] = useState("PUBLIC");
 	const PopupRef = useRef<HTMLDivElement>(null);
 
-	const handleSubmit = async (event: any) => {
+	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		try {
 			let state = "PUBLIC";
@@ -31,17 +37,21 @@ function CreateChannel({ ClosePopup }: { ClosePopup: () => void }) {
 			setPassword("");
 			setPrivacy("PUBLIC");
 			ClosePopup();
+			setNotification({
+				message: "Channel " + name + " created",
+				type: "success",
+			});
 		} catch (error) {
-			console.error(error);
+			setNotification({
+				message: "Channel " + name + " already exist",
+				type: "error",
+			});
 		}
 	};
 
-	const handlePrivacyChange = (event: any) => {
-		setPrivacy(event.target.value);
-	};
 	return (
 		<div ref={PopupRef} className="overlay">
-			<div className="popup">
+			<div className="popup center">
 				<label className="close" onClick={ClosePopup}>
 					&times;
 				</label>
@@ -61,7 +71,7 @@ function CreateChannel({ ClosePopup }: { ClosePopup: () => void }) {
 							Privacy:
 							<select
 								value={privacy}
-								onChange={handlePrivacyChange}
+								onChange={(e) => setPrivacy(e.target.value)}
 							>
 								<option value="PUBLIC">Public</option>
 								<option value="PROTECTED">Protected</option>

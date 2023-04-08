@@ -13,16 +13,15 @@ export interface ChannelDto {
 function Channel() {
 	const [channels, setChannels] = useState<ChannelDto[]>([]);
 	const [userInfo, setUserInfo] = useState<any>();
-	const [ban, setBan] = useState<any[]>();
-
-	const fetchData = async () => {
-		const response = await axios.get("http://localhost:3333/users/me", {
-			withCredentials: true,
-		});
-		setUserInfo(response.data);
-	};
 
 	useEffect(() => {
+		const fetchData = async () => {
+			const response = await axios.get("http://localhost:3333/users/me", {
+				withCredentials: true,
+			});
+			setUserInfo(response.data);
+		};
+
 		const fetchChannels = async () => {
 			try {
 				const response = await axios.get<ChannelDto[]>(
@@ -35,35 +34,15 @@ function Channel() {
 			}
 		};
 
-		const fetchBan = async () => {
-			if (!userInfo?.username) return;
-			const response = await axios.get(
-				"http://localhost:3333/chat/ban/" + userInfo?.username,
-				{
-					withCredentials: true,
-				}
-			);
-			setBan(response.data);
-		};
-		const fetchAll = async () => {
-			await fetchData();
-			await fetchChannels();
-			await fetchBan();
-		};
-
-		fetchAll();
-
-		const interval = setInterval(fetchAll, 5000);
+		fetchData();
+		fetchChannels();
+		const interval = setInterval(fetchChannels, 5000);
 		return () => clearInterval(interval);
-	}, [setChannels, userInfo?.username]);
+	}, [userInfo?.username]);
 
 	return (
 		<div>
-			<JoinnedChannels
-				ChannelsList={channels}
-				userInfo={userInfo}
-				ban={ban}
-			/>
+			<JoinnedChannels ChannelsList={channels} userInfo={userInfo} />
 		</div>
 	);
 }

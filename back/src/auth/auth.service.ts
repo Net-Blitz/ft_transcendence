@@ -218,30 +218,6 @@ export class AuthService {
 		}
 	}
 
-	async verify2fa_test(
-		@Req() req: Request,
-		@Res() res: Response,
-		@GetUser() user: any,
-		code: string
-	) {
-		if (!user || !user.twoFactor || !user.secret) {
-			return res.status(400).json({
-				message: "NO 2FA",
-			});
-		}
-
-		const verified = authenticator.verify({
-			secret: user.secret,
-			token: code,
-		});
-
-		if (verified) {
-			return res.status(200).json({ message: "OK" });
-		} else {
-			return res.status(400).json({ message: "UNVALID" });
-		}
-	}
-
 	async remove2fa(
 		@Req() req: Request,
 		@Res() res: Response,

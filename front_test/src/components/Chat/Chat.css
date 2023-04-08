@@ -219,6 +219,8 @@ input[type="text"]:focus {
 }
 
 .popup {
+	display: flex;
+	flex-direction: column;
 	margin: 75px auto;
 	padding: 20px;
 	background: #fff;

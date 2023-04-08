@@ -12,7 +12,7 @@ import PopupProtected from "./PopupProtected";
 import HandleInvite from "./HandleInvite";
 import CreateChannel from "./CreateChannel";
 
-function JoinnedChannels({ ChannelsList, userInfo, ban }: any) {
+function JoinnedChannels({ ChannelsList, userInfo }: any) {
 	const [selectedChannel, setSelectedChannel] = useState<string>("");
 	const [socket, setSocket] = useState<Socket>();
 	const [channel, setChannel] = useState<ChannelDto>();
@@ -22,6 +22,7 @@ function JoinnedChannels({ ChannelsList, userInfo, ban }: any) {
 	const [PopupPassword, setPopupPassword] = useState<string>(""); // <-- name of protected channel
 	const [SaveChannel, setSaveChannel] = useState<string[]>([]); // <--- Save all joinned protected || private channel
 	const [PopupCreateChannel, setPopupCreateChannel] = useState(false);
+	const [ban, setBan] = useState<any[]>([]); // <--- Save all ban channel
 
 	useEffect(() => {
 		const fetchChannel = async () => {
@@ -32,6 +33,17 @@ function JoinnedChannels({ ChannelsList, userInfo, ban }: any) {
 			);
 			setChannel(response.data.channel);
 		};
+		const fetchBan = async () => {
+			if (!userInfo?.username) return;
+			const response = await axios.get(
+				"http://localhost:3333/chat/ban/" + userInfo?.username,
+				{
+					withCredentials: true,
+				}
+			);
+			setBan(response.data);
+		};
+		fetchBan();
 		fetchChannel();
 	}, [channel?.name, selectedChannel, userInfo?.username, ban]);
 
@@ -45,6 +57,13 @@ function JoinnedChannels({ ChannelsList, userInfo, ban }: any) {
 	}, []);
 
 	const handleChannelClick = async (channel: ChannelDto) => {
+		const response = await axios.get(
+			"http://localhost:3333/chat/ban/" + userInfo?.username,
+			{
+				withCredentials: true,
+			}
+		);
+		setBan(response.data);
 		if (ban?.find((ban: any) => ban.name === channel.name)) {
 			setNotification({
 				message: "You are banned from this channel",
@@ -154,7 +173,10 @@ function JoinnedChannels({ ChannelsList, userInfo, ban }: any) {
 				type={notification.type}
 			/>
 			{PopupCreateChannel && (
-				<CreateChannel ClosePopup={handleToggleCreateChannel} />
+				<CreateChannel
+					ClosePopup={handleToggleCreateChannel}
+					setNotification={setNotification}
+				/>
 			)}
 			<div className="wrapper">
 				<div className="container">

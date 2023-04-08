@@ -29,7 +29,6 @@ function PopupProtected({
 	const [ChannelName, setChannelName] = useState(channel); // <--- Name of protected channel
 	const PopupRef = useRef<HTMLDivElement>(null); // <--- Ref for protected channel
 
-	// <=== Close popup password ===> //
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
 			if (
@@ -50,7 +49,6 @@ function PopupProtected({
 		setChannelName("");
 	};
 
-	// <=== Join protected channel ===> //
 	const JoinProtectedChannel = async () => {
 		try {
 			await axios.post(
