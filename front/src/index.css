@@ -17,7 +17,9 @@ code {
 /* YesevaOne */
 @font-face {
 	font-family: 'YesevaOne';
-	src: local('YesevaOne-Regular'), url('fonts/YesevaOne-Regular.ttf') format(truetype);
+  src: url('fonts/YesevaOne-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
 }
 
 /* Poppins */
@@ -33,6 +35,13 @@ code {
   font-weight: 300;
   font-style: normal;
 }
+@font-face {
+	font-family: 'Poppins';
+  src: url('fonts/Poppins/Poppins-Medium.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+  
 @font-face {
 	font-family: 'Poppins';
   src: url('fonts/Poppins/Poppins-SemiBold.ttf') format('truetype');

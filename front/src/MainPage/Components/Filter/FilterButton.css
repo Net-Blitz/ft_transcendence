@@ -1,4 +1,4 @@
-.filter-button button{
+.filterButton button{
 	background: none;
 	border: none;
 	padding: 0;
@@ -13,7 +13,11 @@
 	font-weight: 300;
 }
 
-.rect_sub_filter{
+.refresh-button{
+	background: none;
+}
+
+.rectSubFilter{
 	width: 8px;
 	height: 8px;
 	border: solid 0.5px #0A3D62;
@@ -21,7 +25,8 @@
 	border-radius: 2px;
 }
 
-.filter-dropdown{
+.filterDropdown{
+	z-index: 2;
 	position: absolute;
 	top: 100%;
 	left: 0;
@@ -36,14 +41,14 @@
 }
 
 
-.filter-dropdown button{
+.filterDropdown button{
 	display:flex;
 	flex-direction:row;
 	white-space: nowrap;
 	align-items: center;
 }
 
-.filter-button{
+.filterButton{
 	position: relative;
 	background-color: #0A3D62;
 	padding: 5px 10px;
@@ -52,22 +57,22 @@
 	margin-left:10px;
 }
 
-.filter-button img{
+.filterButton img{
 	padding-left:10px;
 }
 
-.filter-button-selected{
+.filterButtonSelected{
 	background-color: #F9DA49;
 	color: #0A3D62;
 }
 
-.txt_sub_filter_selected{
+.txtSubFilterSelected{
 	color: #F9DA49;
 	font-family: 'Poppins';
 	font-weight: 500;
 }
 
-.rect_sub_filter_selected{
+.rectSubFilterSelected{
 	background-color: #F9DA49;
 	border: none;
 }
