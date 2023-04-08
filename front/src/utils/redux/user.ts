@@ -39,6 +39,7 @@ export async function fetchOrUpdateUser(store: any) {
 		const response = await axios.get('http://localhost:3333/users/me', {
 			withCredentials: true,
 		});
+		response.data.avatar = `http://localhost:3333/${response.data.avatar}`;
 		const data = response.data;
 		store.dispatch(userResolved(data));
 	} catch (error) {

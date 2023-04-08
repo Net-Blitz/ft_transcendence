@@ -4,6 +4,9 @@ import { Request, Response } from "express";
 import { UpdateUserDto } from "./dto";
 import { AuthService } from "src/auth/auth.service";
 import { FileService } from "src/file/file.service";
+import * as fs from "fs";
+import * as path from "path";
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class UserService {
@@ -11,6 +14,7 @@ export class UserService {
 		private prisma: PrismaService,
 		@Inject(AuthService) private authService: AuthService,
 		private fileservice: FileService,
+		private config: ConfigService,
 	) {}
 
 	async getUser(@Req() req: Request) {
@@ -38,7 +42,7 @@ export class UserService {
 		}
 		return res.status(200).json(user);
 	}
-	
+
 	async UpdateUser(
 		@Req() req: Request,
 		@Res() res: Response,
@@ -73,10 +77,32 @@ export class UserService {
 				username: true,
 			},
 		});
-		return (res);
+		return res;
 	}
 
-	async ConfigUser(file: any, text: string) {
-		return await this.fileservice.checkFile(file);
-	}
+	async ConfigUser(@Req() req: Request, @Res() res: Response, file: any, text: string) {
+		if ((await this.fileservice.checkFile(file)) === false)
+			return res.status(400).json({ message: "Bad file" });
+		const filepath: string = path.join(
+			"public",
+			"uploads",
+			file.originalname as string
+		);
+		await fs.promises.writeFile(filepath, file.buffer);
+
+		const user = await this.getUser(req);
+		if (!user) {
+			return res.status(404).json({ message: `User not found` });
+		}
+		if (text) user.username = text;
+		if (file) user.avatar = filepath;
+		user.config = true;
+		const updatedUser = await this.prisma.user.update({
+			where: {
+				login: user.login,
+			},
+			data: user,
+		});
+		return res.status(200).json(updatedUser);
+	}	
 }

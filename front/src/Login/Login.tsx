@@ -17,7 +17,7 @@ const Login = () => {
 	const loginPages: LoginPages = {
 		'/login': <AuthStart />,
 		'/login/2fa': <Auth2fa />,
-		'/login/name&avatar': <AuthNameAvatar />,
+		'/login/config': <AuthNameAvatar />,
 		'/login/2faconfig': <Auth2faConfig />,
 	};
 	return (

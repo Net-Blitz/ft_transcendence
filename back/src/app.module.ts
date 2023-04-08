@@ -7,6 +7,8 @@ import { JwtModule } from "@nestjs/jwt";
 import { GameModule } from './game/game.module';
 import { QueueModule } from './queue/queue.module';
 import { FileModule } from "./file/file.module";
+import { ServeStaticModule } from "@nestjs/serve-static";
+import { join } from "path";
 
 @Module({
 	imports: [
@@ -21,6 +23,10 @@ import { FileModule } from "./file/file.module";
 		GameModule,
 		QueueModule,
 		FileModule,
+		ServeStaticModule.forRoot({
+			rootPath: join(__dirname, "..", "public"),
+			serveRoot: "/public",
+		}),
 	],
 })
 export class AppModule {};

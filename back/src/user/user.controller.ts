@@ -43,7 +43,7 @@ export class UserController {
 
 	@Post("config")
 	@UseInterceptors(FileInterceptor('file'))
-	async ConfigUser(@UploadedFile() file, @Body('username') text: string) {
-		console.log(await this.userService.ConfigUser(file, text));
+	async ConfigUser(@Req() req: Request, @Res() res: Response, @UploadedFile() file, @Body('username') text: string) {
+		this.userService.ConfigUser(req, res, file, text);
 	}
 }

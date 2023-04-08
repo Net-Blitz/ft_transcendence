@@ -23,7 +23,7 @@ function App(this: any) {
 			<Route element={<AuthRoutes />}>
 				<Route path="/" element={<MainPage />} />
 				<Route path="/login/2fa" element={<Login />} />
-				<Route path="/login/name&avatar" element={<Login />} /> {/** @TODO Changer le path */}
+				<Route path="/login/config" element={<Login />} /> {/** @TODO Changer le path */}
 				<Route path="/login/2faconfig" element={<Login />} />
 			</Route>
 			<Route path="/login" element={<Login />} />

@@ -61,9 +61,7 @@ export const AuthNameAvatar = () => {
 	const [usernames, setUsernames] = useState<string[]>([]);
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [avatar, setAvatar] = useState(generateAvatars(12));
-
-	if (isConfig === true) return <Navigate to="/" replace />;
-
+	
 	useEffect(() => {
 		async function fetchData() {
 			try {
@@ -72,36 +70,41 @@ export const AuthNameAvatar = () => {
 					{
 						withCredentials: true,
 					}
-				);
-				const usernames = response.data;
-				setUsernames(usernames);
-			} catch (error) {
-				console.error(error);
+					);
+					const usernames = response.data;
+					setUsernames(usernames);
+				} catch (error) {
+					console.error(error);
+				}
 			}
-		}
-		fetchData();
-	}, []);
-
-	const handleClick = useCallback(async () => {
-		const inputPseudo: string | undefined =
+			fetchData();
+		}, []);
+		
+		const handleClick = useCallback(async () => {
+			const inputPseudo: string | undefined =
 			document.querySelector<HTMLInputElement>(
 				'.input-wrapper input'
-			)?.value;
-		if (inputPseudo) {
-			const error: string = inputProtectionPseudo(inputPseudo, usernames);
-			if (error === '') {
-				const formData = new FormData();
-				formData.append('username', inputPseudo);
-				formData.append('file', avatar[currentIndex].file);
-				axios.post('http://localhost:3333/users/config', formData, {
-					withCredentials: true,
-				});
-			} else setInputError(error);
-		} else setInputError('Please enter a pseudo');
-	}, [usernames]);
+				)?.value;
+				if (inputPseudo) {
+					const error: string = inputProtectionPseudo(inputPseudo, usernames);
+					if (error === '') {
+						const formData = new FormData();
+						formData.append('username', inputPseudo);
+						formData.append('file', avatar[currentIndex].file);
+						const response = await axios.post('http://localhost:3333/users/config', formData, {
+							withCredentials: true,
+						});
+						if (response.status === 200)
+						window.location.replace('/');
+						window.location.replace('/login/config');
+					} else setInputError(error);
+				} else setInputError('Please enter a pseudo');
+			}, [usernames, currentIndex, avatar]);
+			
+			if (isConfig === true) return <Navigate to="/" replace />;
 
-	return (
-		<div className="authnameavatar-wrapper">
+			return (
+				<div className="authnameavatar-wrapper">
 			<Title
 				title="Welcome"
 				subtitle="please enter your pseudo and choose your avatar"

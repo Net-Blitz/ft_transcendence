@@ -97,7 +97,7 @@ export class AuthService {
 				this.signToken(req, res, existingUser);
 				if (existingUser.avatar)
 					return res.redirect("http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_GLOBAL"));
-				return res.redirect("http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_GLOBAL") + '/login/name&avatar');
+				return res.redirect("http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_GLOBAL") + '/login/config');
 			}
 			const createdUser = await this.prisma.user.create({
 				data: {
@@ -106,7 +106,7 @@ export class AuthService {
 				},
 			});
 			this.signToken(req, res, createdUser);
-			return res.redirect("http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_GLOBAL") + '/login/name&avatar');
+			return res.redirect("http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_GLOBAL") + '/login/config');
 		} catch (error) {
 			if (error instanceof PrismaClientKnownRequestError) {
 				if (error.code === "P2002") {
@@ -137,7 +137,6 @@ export class AuthService {
 		} catch (error) {
 			throw new ForbiddenException("Sign token error");
 		}
-		//return res.redirect("http://localhost:8080");
 		return { access_token: token };
 	}
 
@@ -153,8 +152,6 @@ export class AuthService {
 		}
 		try {
 			const secret = authenticator.generateSecret();
-			//console.log("🚀 ~ secret:", secret);
-
 			const otpAuthUrl = authenticator.keyuri(
 				user.login,
 				"NetBlitz",

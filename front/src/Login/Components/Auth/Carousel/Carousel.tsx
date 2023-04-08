@@ -51,23 +51,6 @@ const Carousel = ({currentIndex, setCurrentIndex, avatar, setAvatar}: CarouselPr
 		}
 	};
 
-	// const checkFile = async (file: any) => {
-	// 	const formData = new FormData();
-	// 	formData.append('file', file);
-
-	// 	try {
-	// 		const response = await axios.post(
-	// 			'http://localhost:3333/file/check',
-	// 			formData,
-	// 			{
-	// 				withCredentials: true,
-	// 			}
-	// 		);
-	// 	} catch (error) {
-	// 		console.log(error);
-	// 	}
-	// };
-
 	const handleChange = (event: any) => {
 		const file = event.target.files[0];
 		console.log(file.name, file.type, file.size);
