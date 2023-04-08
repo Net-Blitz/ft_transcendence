@@ -73,4 +73,8 @@ export class UserService {
 		});
 		return (res);
 	}
+
+	async ConfigUser(@Req() req: Request) {
+		console.log(req.body);
+	}
 }

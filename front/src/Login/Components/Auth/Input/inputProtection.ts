@@ -1,8 +1,6 @@
 
 export const inputProtectionPseudo = (input: string, usernames: any[]): string => {
 	const regexLetters = /^[a-zA-Z0-9_]+$/;
-	if (input === '')
-		return ('Bad input');
 	if (!regexLetters.test(input))
 		return ('Bad characters');
 	const regexLenght = /^.{3,14}$/;

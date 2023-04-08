@@ -58,8 +58,6 @@ export const AuthNameAvatar = () => {
 	const isConfig = useSelector(selectUserData).config;
 	const [inputError, setInputError] = useState('');
 	const [usernames, setUsernames] = useState<string[]>([]);
-	const [pseudo, setPseudo] = useState('');
-	const [hasInput, setHasInput] = useState(false);
 
 	if (isConfig === true) return <Navigate to="/" replace />;
 
@@ -81,7 +79,7 @@ export const AuthNameAvatar = () => {
 		fetchData();
 	}, []);
 
-	const handleClick = useCallback(() => {
+	const handleClick = useCallback(async () => {
 		const inputPseudo: string | undefined =
 			document.querySelector<HTMLInputElement>(
 				'.input-wrapper input'
@@ -89,18 +87,23 @@ export const AuthNameAvatar = () => {
 		const avatar = document
 			.querySelector<HTMLElement>('.carousel-element div:nth-child(2)')
 			?.style.backgroundImage.slice(5, -2);
-		if (inputPseudo)
-		{
-			setPseudo(inputPseudo);
-			setHasInput(true);
-		}
+		if (inputPseudo) {
+			const error: string = inputProtectionPseudo(inputPseudo, usernames);
+			if (error === '') {
+				if (avatar === '') return;
+				axios.post(
+					'http://localhost:3333/users/config',
+					{
+						pseudo: inputPseudo,
+						avatar: avatar,
+					},
+					{
+						withCredentials: true,
+					}
+				);
+			} else setInputError(error);
+		} else setInputError('Please enter a pseudo');
 	}, []);
-
-	useEffect(() => {
-		if (hasInput) {
-		  setInputError(inputProtectionPseudo(pseudo, usernames));
-		}
-	  }, [pseudo, usernames, hasInput]);
 
 	return (
 		<div className="authnameavatar-wrapper">
@@ -119,7 +122,7 @@ export const AuthNameAvatar = () => {
 				onClick={handleClick}
 				content="Continue"
 				bottom={true}
-				href="/login/name&avatar"
+				href=""
 				absolut={false}
 				state="config"
 			/>

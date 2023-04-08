@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 interface AvatarProps {
 	url: any;
 	source: string;
+	type: string;
 }
 
 const generateSeed = () => {
@@ -19,6 +20,7 @@ const createAvatarObject = (seed: string) :AvatarProps => {
 			randomizeIds: true,
 		}).toDataUriSync(),
 		source: 'default',
+		type: 'image/png',
 	};
 }
 

@@ -6,6 +6,7 @@ import { UserModule } from "./user/user.module";
 import { JwtModule } from "@nestjs/jwt";
 import { GameModule } from './game/game.module';
 import { QueueModule } from './queue/queue.module';
+import { FileModule } from "./file/file.module";
 
 @Module({
 	imports: [
@@ -19,6 +20,7 @@ import { QueueModule } from './queue/queue.module';
 		}),
 		GameModule,
 		QueueModule,
+		FileModule,
 	],
 })
 export class AppModule {};

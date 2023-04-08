@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Put, Req, Res } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Put, Req, Res } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { Request, Response } from "express";
 import { UpdateUserDto } from "./dto";
@@ -40,4 +40,8 @@ export class UserController {
 		return (this.userService.GetAllPseudo());
 	}
 
+	@Post("config")
+	async ConfigUser(@Req() req: Request) {
+		this.userService.ConfigUser(req);
+	}
 }

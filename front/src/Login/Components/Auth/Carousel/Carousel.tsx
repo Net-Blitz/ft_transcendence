@@ -46,9 +46,26 @@ const Carousel = () => {
 		}
 	};
 
+	// const checkFile = async (file: any) => {
+	// 	const formData = new FormData();
+	// 	formData.append('file', file);
+
+	// 	try {
+	// 		const response = await axios.post(
+	// 			'http://localhost:3333/file/check',
+	// 			formData,
+	// 			{
+	// 				withCredentials: true,
+	// 			}
+	// 		);
+	// 	} catch (error) {
+	// 		console.log(error);
+	// 	}
+	// };
+
 	const handleChange = (event: any) => {
 		const file = event.target.files[0];
-		console.log(file);
+		console.log(file.name, file.type, file.size);
 		if (file) {
 			const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
 			const allowedSize = 2 * 1024 * 1024;
@@ -58,22 +75,21 @@ const Carousel = () => {
 				img.onload = () => {
 					if (img.width > 400 || img.height > 400)
 						alert('Image too big (max 400x400)');
-					else
-					{
+					else {
 						const reader = new FileReader();
 						reader.addEventListener('load', function () {
 							let newAvatar = [...avatar];
 							newAvatar.splice(currentIndex, 0, {
 								url: reader.result,
 								source: 'imported',
+								type: file.type,
 							});
 							setAvatar(newAvatar);
 						});
 						reader.readAsDataURL(file);
-					};
-				}
-			}
-			else
+					}
+				};
+			} else
 				alert('File not supported (png, jpg, jpeg) or too big (> 2Mo)');
 		}
 	};
