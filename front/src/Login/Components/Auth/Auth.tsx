@@ -99,7 +99,7 @@ export const Auth2fa = () => {
 	);
 };
 
-export const AuthNameAvatar = () => {
+export const AuthConfig = () => {
 	const isConfig = useSelector(selectUserData).config;
 	const [inputError, setInputError] = useState('');
 	const [usernames, setUsernames] = useState<string[]>([]);

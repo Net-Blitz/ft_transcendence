@@ -4,13 +4,21 @@ import './App.css';
 
 /*	COMPONENTS	*/
 import MainPage from './MainPage/MainPage';
-import { Login, Login2fa } from './Login/Login';
+import { Login, Login2fa, Config, Config2fa } from './Login/Login';
 import { AuthRoutes } from './utils/PrivateRoutes';
 import { useSelector } from 'react-redux';
 /*	HOOKS	*/
 import { useGetUser } from './utils/hooks';
 /*	SELECTORS	*/
 import { selectUser } from './utils/redux/selectors';
+
+const NotFound = () => {
+	return (
+		<div>
+			<h1>404 NOT FOUND</h1>
+		</div>
+	);
+};
 
 function App(this: any) {
 	useGetUser();
@@ -21,11 +29,12 @@ function App(this: any) {
 		<Routes>
 			<Route element={<AuthRoutes />}>
 				<Route path="/" element={<MainPage />} />
-				<Route path="/login/config" element={<Login />} />{' '}
-				<Route path="/login/2faconfig" element={<Login />} />
+				<Route path="/login/config" element={<Config />} />{' '}
+				<Route path="/login/2faconfig" element={<Config2fa />} />
 			</Route>
 			<Route path="/login/2fa/:login" element={<Login2fa />} />
 			<Route path="/login" element={<Login />} />
+			<Route path="*" element={<NotFound />} />
 		</Routes>
 	);
 }
