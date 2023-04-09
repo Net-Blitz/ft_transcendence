@@ -11,13 +11,14 @@ import Carousel from './Carousel/Carousel';
 import Toggle from './Toggle/Toggle';
 import QRCode from './QRCode/QrCode';
 /*	SELECTORS	*/
-import { useSelector } from 'react-redux';
+import { useSelector, useStore } from 'react-redux';
 import { selectUserData } from '../../../utils/redux/selectors';
 /*	FUNCTIONS	*/
 import {
 	inputProtectionPseudo,
 	inputProtectionQR,
 } from './Input/inputProtection';
+import { fetchOrUpdateUser } from '../../../utils/redux/user';
 
 export const AuthStart = () => {
 	return (
@@ -65,6 +66,7 @@ export const AuthNameAvatar = () => {
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [avatar, setAvatar] = useState(generateAvatars(12));
 	const navigate = useNavigate();
+	const store = useStore();
 
 	useEffect(() => {
 		async function fetchData() {
@@ -96,20 +98,21 @@ export const AuthNameAvatar = () => {
 				formData.append('username', inputPseudo);
 				formData.append('file', avatar[currentIndex].file);
 				try {
-					const response = await axios.post(
+					await axios.post(
 						'http://localhost:3333/users/config',
 						formData,
 						{
 							withCredentials: true,
 						}
 					);
+					await fetchOrUpdateUser(store);
 					navigate('/login/2faconfig', { state: { prec: true } });
 				} catch (error) {
 					navigate('/login/config');
 				}
 			} else setInputError(error);
 		} else setInputError('Please enter a pseudo');
-	}, [usernames, currentIndex, avatar]);
+	}, [usernames, currentIndex, avatar, navigate, store]);
 
 	if (isConfig === true) return <Navigate to="/" replace />;
 
@@ -148,8 +151,7 @@ export const Auth2faConfig = () => {
 	const { state } = useLocation();
 	const navigate = useNavigate();
 	const [inputError, setInputError] = useState('');
-
-	if (!state || !state.prec) return <Navigate to="/" replace />;
+	const store = useStore();
 
 	const handleClick2fa = useCallback(async () => {
 		const inputKey: string | undefined =
@@ -160,20 +162,25 @@ export const Auth2faConfig = () => {
 			const error: string = inputProtectionQR(inputKey);
 			if (error === '') {
 				try {
-					const response = await axios.post(
+					await axios.post(
 						'http://localhost:3333/auth/2fa/verify',
 						{ inputKey },
 						{
 							withCredentials: true,
 						}
 					);
+					await fetchOrUpdateUser(store);
 					navigate('/');
 				} catch (error) {
 					setInputError('Invalid key');
 				}
 			} else setInputError(error);
 		} else setInputError('Please enter a key');
-	}, [inputError]);
+	}, [navigate, store]);
+
+	if (!state && inputError === '') {
+		return <Navigate to="/" replace />;
+	}
 
 	return (
 		<div

@@ -194,14 +194,16 @@ export class AuthService {
 
 		if (verified) {
 			const token = await this.signToken(null, res, user);
-			await this.prisma.user.update({
-				where: {
-					login: user.login,
-				},
-				data: {
-					twoFactor: true,
-				},
-			});
+			if (user.twoFactor === false) {
+				await this.prisma.user.update({
+					where: {
+						login: user.login,
+					},
+					data: {
+						twoFactor: true,
+					},
+				});
+			}
 			return res.status(200).json(token);
 		} else {
 			return res.status(400).json({ message: "UNVALID" });
