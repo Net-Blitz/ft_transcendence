@@ -15,7 +15,6 @@ import CreateChannel from "./CreateChannel";
 function JoinnedChannels({ ChannelsList, userInfo }: any) {
 	const [selectedChannel, setSelectedChannel] = useState<string>("");
 	const [socket, setSocket] = useState<Socket>();
-	const [channel, setChannel] = useState<ChannelDto>();
 	const [messages, setMessages] = useState<MessageDto[]>([]);
 	const [showUsers, setShowUsers] = useState(false);
 	const [notification, setNotification] = useState({ message: "", type: "" });
@@ -23,16 +22,9 @@ function JoinnedChannels({ ChannelsList, userInfo }: any) {
 	const [SaveChannel, setSaveChannel] = useState<string[]>([]); // <--- Save all joinned protected || private channel
 	const [PopupCreateChannel, setPopupCreateChannel] = useState(false);
 	const [ban, setBan] = useState<any[]>([]); // <--- Save all ban channel
+	const [blocked, setBlocked] = useState<any[]>([]); // <--- Save all blocked user
 
 	useEffect(() => {
-		const fetchChannel = async () => {
-			if (!selectedChannel) return;
-			const response = await axios.get(
-				"http://localhost:3333/chat/channel/" + selectedChannel,
-				{ withCredentials: true }
-			);
-			setChannel(response.data.channel);
-		};
 		const fetchBan = async () => {
 			if (!userInfo?.username) return;
 			const response = await axios.get(
@@ -43,9 +35,24 @@ function JoinnedChannels({ ChannelsList, userInfo }: any) {
 			);
 			setBan(response.data);
 		};
+
 		fetchBan();
-		fetchChannel();
-	}, [channel?.name, selectedChannel, userInfo?.username, ban]);
+	}, [selectedChannel, userInfo?.username]);
+
+	useEffect(() => {
+		const fetchBlocked = async () => {
+			try {
+				const response = await axios.get(
+					"http://localhost:3333/friend/blocked",
+					{
+						withCredentials: true,
+					}
+				);
+				setBlocked(response.data);
+			} catch (error) {}
+		};
+		fetchBlocked();
+	}, [messages]);
 
 	useEffect(() => {
 		const newSocket = io("http://localhost:3334");
@@ -118,7 +125,8 @@ function JoinnedChannels({ ChannelsList, userInfo }: any) {
 
 	useEffect(() => {
 		const handleMessage = (message: MessageDto) => {
-			setMessages([...messages, message]);
+			if (!blocked.find((user) => user.username === message.username))
+				setMessages([...messages, message]);
 		};
 
 		socket?.on("chat", handleMessage);
@@ -147,7 +155,7 @@ function JoinnedChannels({ ChannelsList, userInfo }: any) {
 			socket?.off("kick");
 			socket?.off("ban");
 		};
-	}, [messages, selectedChannel, socket, userInfo?.username]);
+	}, [blocked, messages, selectedChannel, socket, userInfo?.username]);
 
 	const sendMessage = (message: MessageDto) => {
 		if (!message.content) return;

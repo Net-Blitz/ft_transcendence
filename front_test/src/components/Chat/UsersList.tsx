@@ -1,17 +1,16 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { ChannelDto } from "./Channel";
 import Notification from "../Notification/Notification";
 import InviteUser from "./InviteUser";
+import DropdownMenu from "./DropdownMenu";
 
 function UsersList({ channel, socket }: { channel: string; socket: any }) {
 	const [userInfo, setUserInfo] = useState<any>();
 	const [channelInfo, setChannelInfo] = useState<ChannelDto>();
 	const [users, setUsers] = useState<any>([]);
-	const [openUsername, setOpenUsername] = useState<string>("");
 	const [isAdmin, setIsAdmin] = useState(false);
-	const dropdownRef = useRef<HTMLDivElement>(null);
 	const [notification, setNotification] = useState({ message: "", type: "" });
 	const [BanUsers, setBanUsers] = useState<any>([]);
 
@@ -52,97 +51,6 @@ function UsersList({ channel, socket }: { channel: string; socket: any }) {
 		return () => clearInterval(interval);
 	}, [channel, userInfo?.id, users]);
 
-	useEffect(() => {
-		const handleClickOutside = (event: MouseEvent) => {
-			if (
-				dropdownRef.current &&
-				!dropdownRef.current.contains(event.target as Node)
-			) {
-				setOpenUsername("");
-			}
-		};
-
-		document.addEventListener("mousedown", handleClickOutside);
-		return () =>
-			document.removeEventListener("mousedown", handleClickOutside);
-	}, [dropdownRef]);
-
-	const handleToggleDropdown = (username: string) => {
-		if (openUsername === username) {
-			setOpenUsername("");
-		} else {
-			setOpenUsername(username);
-		}
-	};
-
-	const handlePromote = async (login: string) => {
-		try {
-			await axios.post(
-				"http://localhost:3333/chat/admin/promote/" + channel,
-				{
-					login: login,
-				},
-				{ withCredentials: true }
-			);
-			setNotification({
-				message: login + " has been promoted",
-				type: "success",
-			});
-		} catch (error) {
-			console.error(error);
-			setNotification({
-				message: "An error occured",
-				type: "error",
-			});
-		}
-	};
-
-	const handleDemote = async (login: string) => {
-		try {
-			await axios.post(
-				"http://localhost:3333/chat/admin/demote/" + channel,
-				{
-					login: login,
-				},
-				{ withCredentials: true }
-			);
-			setNotification({
-				message: login + " has been demoted",
-				type: "success",
-			});
-		} catch (error) {
-			console.error(error);
-			setNotification({
-				message: "An error occured",
-				type: "error",
-			});
-		}
-	};
-
-	const handleKick = async (login: string) => {
-		socket?.emit("ToKick", {
-			username: userInfo.username,
-			channel: channel,
-			login: login,
-		});
-		setNotification({
-			message: login + " has been kicked",
-			type: "success",
-		});
-	};
-
-	const handleBan = async (login: string) => {
-		socket?.emit("ToBan", {
-			username: userInfo.username,
-			channel: channel,
-			login: login,
-		});
-		setNotification({
-			message: login + " has been banned",
-			type: "success",
-		});
-	};
-
 	const handleUnban = async (login: string) => {
 		socket?.emit("ToUnban", {
 			username: userInfo.username,
@@ -151,30 +59,6 @@ function UsersList({ channel, socket }: { channel: string; socket: any }) {
 		});
 		setNotification({
 			message: login + " has been unbanned",
-			type: "success",
-		});
-	};
-
-	const handleMute = async (login: string) => {
-		socket?.emit("ToMute", {
-			username: userInfo.username,
-			channel: channel,
-			login: login,
-		});
-		setNotification({
-			message: login + " has been muted",
-			type: "success",
-		});
-	};
-
-	const handleUnmute = async (login: string) => {
-		socket?.emit("ToUnmute", {
-			username: userInfo.username,
-			channel: channel,
-			login: login,
-		});
-		setNotification({
-			message: login + " has been unmuted",
 			type: "success",
 		});
 	};
@@ -205,83 +89,15 @@ function UsersList({ channel, socket }: { channel: string; socket: any }) {
 									<span className="role">{user.role}</span>
 								</div>
 							</Link>
-							{((isAdmin && user.role === "user") ||
-								(userInfo?.id === channelInfo?.ownerId &&
-									user.role !== "owner")) && (
-								<div
-									className="dropdown-menu-container"
-									ref={dropdownRef}
-								>
-									<div
-										className="dropdown-menu-header"
-										onClick={() =>
-											handleToggleDropdown(user.username)
-										}
-									>
-										<span>Options</span>
-										<i
-											className={`arrow ${
-												openUsername === user.username
-													? "up"
-													: "down"
-											}`}
-										/>
-									</div>
-									{openUsername === user.username && (
-										<ul className="dropdown-menu-options">
-											{user.role === "user" ? (
-												<li
-													onClick={() =>
-														handlePromote(
-															user.username
-														)
-													}
-												>
-													Make Admin
-												</li>
-											) : (
-												<li
-													onClick={() =>
-														handleDemote(
-															user.username
-														)
-													}
-												>
-													Remove Admin
-												</li>
-											)}
-											<li
-												onClick={() =>
-													handleBan(user.username)
-												}
-											>
-												Ban
-											</li>
-											<li
-												onClick={() =>
-													handleKick(user.username)
-												}
-											>
-												Kick
-											</li>
-											<li
-												onClick={() =>
-													handleMute(user.username)
-												}
-											>
-												Mute
-											</li>
-											<li
-												onClick={() =>
-													handleUnmute(user.username)
-												}
-											>
-												Unmute
-											</li>
-										</ul>
-									)}
-								</div>
-							)}
+							<DropdownMenu
+								channel={channel}
+								socket={socket}
+								user={user}
+								userInfo={userInfo}
+								isAdmin={isAdmin}
+								channelInfo={channelInfo}
+								setNotification={setNotification}
+							/>
 						</li>
 					))}
 					{BanUsers.map((user: any) => (
