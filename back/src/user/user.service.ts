@@ -7,6 +7,7 @@ import { FileService } from "src/file/file.service";
 import * as fs from "fs";
 import * as path from "path";
 import { ConfigService } from "@nestjs/config";
+import { v4 as uuidv4 } from "uuid";
 
 @Injectable()
 export class UserService {
@@ -27,10 +28,7 @@ export class UserService {
 		});
 	}
 
-	async GetUserByLogin(
-		@Param("login") login: string,
-		@Res() res: Response
-	) {
+	async GetUserByLogin(@Param("login") login: string, @Res() res: Response) {
 		const user = await this.prisma.user.findUnique({
 			where: {
 				login,
@@ -100,16 +98,18 @@ export class UserService {
 		file: any,
 		text: string
 	) {
+		const user = await this.getUser(req);
+
 		if ((await this.fileservice.checkFile(file)) === false)
 			return res.status(400).json({ message: "Bad file" });
+		const extension = path.extname(file.originalname);
 		const filepath: string = path.join(
 			"public",
 			"uploads",
-			file.originalname as string
+			user.id + "-" + uuidv4() + extension
 		);
 		await fs.promises.writeFile(filepath, file.buffer);
 
-		const user = await this.getUser(req);
 		if (!user) {
 			return res.status(404).json({ message: `User not found` });
 		}
