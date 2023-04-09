@@ -92,7 +92,7 @@ export class AuthService {
 						this.config.get("HOST_T") +
 						":" +
 						this.config.get("PORT_GLOBAL") +
-						"/login/2fa?login=" +
+						"/login/2fa/" +
 						user.login
 				);
 			}
@@ -204,6 +204,27 @@ export class AuthService {
 					},
 				});
 			}
+			return res.status(200).json(token);
+		} else {
+			return res.status(400).json({ message: "UNVALID" });
+		}
+	}
+
+	async verify2falogin(@Res() res: Response, login: string, key: string) {
+		const user = await this.prisma.user.findUnique({
+			where: {
+				login: login,
+			},
+		});
+		if (!user) {
+			return res.status(400).json({ message: "UNVALID" });
+		}
+		const verified = authenticator.verify({
+			secret: user.secret,
+			token: key,
+		});
+		if (verified) {
+			const token = await this.signToken(null, res, user);
 			return res.status(200).json(token);
 		} else {
 			return res.status(400).json({ message: "UNVALID" });

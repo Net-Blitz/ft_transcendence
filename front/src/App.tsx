@@ -4,8 +4,8 @@ import './App.css';
 
 /*	COMPONENTS	*/
 import MainPage from './MainPage/MainPage';
-import Login from './Login/Login';
-import { AuthRoutes} from './utils/PrivateRoutes';
+import { Login, Login2fa } from './Login/Login';
+import { AuthRoutes } from './utils/PrivateRoutes';
 import { useSelector } from 'react-redux';
 /*	HOOKS	*/
 import { useGetUser } from './utils/hooks';
@@ -16,16 +16,15 @@ function App(this: any) {
 	useGetUser();
 	const status = useSelector(selectUser).status;
 
-	if (status !== 'resolved' && status !== 'notAuth')
-		return (<div></div>);
+	if (status !== 'resolved' && status !== 'notAuth') return <div></div>;
 	return (
 		<Routes>
 			<Route element={<AuthRoutes />}>
 				<Route path="/" element={<MainPage />} />
-				<Route path="/login/2fa" element={<Login />} />
-				<Route path="/login/config" element={<Login />} /> {/** @TODO Changer le path */}
+				<Route path="/login/config" element={<Login />} />{' '}
 				<Route path="/login/2faconfig" element={<Login />} />
 			</Route>
+			<Route path="/login/2fa/:login" element={<Login2fa />} />
 			<Route path="/login" element={<Login />} />
 		</Routes>
 	);

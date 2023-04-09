@@ -1,7 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import {
+	Navigate,
+	useLocation,
+	useNavigate,
+	useParams,
+} from 'react-router-dom';
 import { generateAvatars } from './Carousel/genAvatars';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 import './Auth.css';
 /*	COMPONENTS	*/
 import Input from './Input/Input';
@@ -12,7 +18,7 @@ import Toggle from './Toggle/Toggle';
 import QRCode from './QRCode/QrCode';
 /*	SELECTORS	*/
 import { useSelector, useStore } from 'react-redux';
-import { selectUserData } from '../../../utils/redux/selectors';
+import { selectUserData, selectUserAuth } from '../../../utils/redux/selectors';
 /*	FUNCTIONS	*/
 import {
 	inputProtectionPseudo,
@@ -21,6 +27,10 @@ import {
 import { fetchOrUpdateUser } from '../../../utils/redux/user';
 
 export const AuthStart = () => {
+	const isAuth = useSelector(selectUserAuth);
+
+	if (isAuth) return <Navigate to="/" />;
+
 	return (
 		<div className="authstart-wrapper">
 			<Title title="Welcome" subtitle="" />
@@ -35,12 +45,40 @@ export const AuthStart = () => {
 };
 
 export const Auth2fa = () => {
-	const twoFactor = useSelector(selectUserData).twoFactor;
-	const avatar_url = useSelector(selectUserData).avatar;
+	const [inputError, setInputError] = useState('');
+	const { login } = useParams();
+	const navigate = useNavigate();
+	const store = useStore();
+	const isAuth = useSelector(selectUserAuth);
 
-	if (avatar_url === null)
-		return <Navigate to="/login/name&avatar" replace />;
-	if (twoFactor === false) return <Navigate to="/" replace />;
+	const handleClick2fa = useCallback(async () => {
+		const inputKey: string | undefined =
+			document.querySelector<HTMLInputElement>(
+				'.input-wrapper input'
+			)?.value;
+		if (inputKey) {
+			const error: string = inputProtectionQR(inputKey);
+			if (error === '') {
+				try {
+					const response = await axios.post(
+						'http://localhost:3333/auth/2fa/verifylogin',
+						{ inputKey, login },
+						{
+							withCredentials: true,
+						}
+					);
+					Cookies.set('jwt', response.data.token);
+					await fetchOrUpdateUser(store);
+					navigate('/');
+				} catch (error) {
+					setInputError('Invalid key');
+				}
+			} else setInputError(error);
+		} else setInputError('Please enter a key');
+	}, [navigate, login, store]);
+
+	if (isAuth) return <Navigate to="/" />;
+
 	return (
 		<div className="auth2fa-wrapper">
 			<Title title="Welcome" subtitle="" />
@@ -48,12 +86,14 @@ export const Auth2fa = () => {
 				input_title="Generated code"
 				placeholder="enter the generated code"
 				icon="padlock"
+				error={inputError}
 			/>
 			<Button
+				onClick={handleClick2fa}
 				content="Login with 42"
 				bottom={false}
-				href=""
 				absolut={true}
+				href=""
 			/>
 		</div>
 	);

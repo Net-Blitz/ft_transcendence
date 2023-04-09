@@ -23,12 +23,14 @@ export async function fetchOrUpdateUser(store: any) {
 			withCredentials: true,
 		});
 		const data = response.data;
-		if (data === 'OK')
+		if (data === 'OK') {
+			store.dispatch(userStatus('void'));
 			store.dispatch(userAuth(true));
-	} catch (error) { 
+		}
+	} catch (error) {
 		store.dispatch(userStatus('notAuth'));
 		store.dispatch(userAuth(false));
-		return ;
+		return;
 	}
 	const status = selectUser(store.getState()).status;
 	if (status === 'pending' || status === 'updating') {
@@ -52,11 +54,11 @@ export default createReducer(initialState, (builder) =>
 	builder
 		.addCase(userAuth, (draft, action) => {
 			draft.auth = action.payload;
-			return ;
+			return;
 		})
 		.addCase(userStatus, (draft, action) => {
 			draft.status = action.payload;
-			return ;
+			return;
 		})
 		.addCase(userFetching, (draft, action) => {
 			if (draft.status === 'void') {

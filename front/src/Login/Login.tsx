@@ -13,10 +13,9 @@ interface LoginPages {
 	[key: string]: JSX.Element;
 }
 
-const Login = () => {
+export const Login = () => {
 	const loginPages: LoginPages = {
 		'/login': <AuthStart />,
-		'/login/2fa': <Auth2fa />,
 		'/login/config': <AuthNameAvatar />,
 		'/login/2faconfig': <Auth2faConfig />,
 	};
@@ -30,4 +29,13 @@ const Login = () => {
 	);
 };
 
-export default Login;
+export const Login2fa = () => {
+	return (
+		<div>
+			<Auth2fa />
+			<div className="login-background">
+				<Background />
+			</div>
+		</div>
+	);
+};

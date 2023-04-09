@@ -64,6 +64,15 @@ export class AuthController {
 		return await this.authService.verify2fa(user, res, key);
 	}
 
+	@Post("2fa/verifylogin")
+	async verify2falogin(
+		@Res() res: Response,
+		@Body("login") login: string,
+		@Body("inputKey") key: string
+	) {
+		return await this.authService.verify2falogin(res, login, key);
+	}
+
 	@Delete("2fa/disable")
 	async remove2fa(@Res() res: Response, @GetCookie() cookie: CookieDto) {
 		return await this.authService.remove2fa(res, cookie);
