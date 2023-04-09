@@ -192,6 +192,7 @@ export const Auth2faConfig = () => {
 	const navigate = useNavigate();
 	const [inputError, setInputError] = useState('');
 	const store = useStore();
+	const twoFactor = useSelector(selectUserData).twoFactor;
 
 	const handleClick2fa = useCallback(async () => {
 		const inputKey: string | undefined =
@@ -218,7 +219,7 @@ export const Auth2faConfig = () => {
 		} else setInputError('Please enter a key');
 	}, [navigate, store]);
 
-	if (!state && inputError === '') {
+	if ((!state && inputError === '') || twoFactor === true) {
 		return <Navigate to="/" replace />;
 	}
 
