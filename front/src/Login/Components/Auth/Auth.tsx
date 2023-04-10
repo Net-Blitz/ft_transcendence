@@ -1,5 +1,13 @@
-import React, { useState } from 'react';
-import { Navigate, useLocation} from 'react-router-dom';
+import React, { useCallback, useEffect, useState } from 'react';
+import {
+	Navigate,
+	useLocation,
+	useNavigate,
+	useParams,
+} from 'react-router-dom';
+import { generateAvatars } from './Carousel/genAvatars';
+import axios from 'axios';
+import Cookies from 'js-cookie';
 import './Auth.css';
 /*	COMPONENTS	*/
 import Input from './Input/Input';
@@ -7,12 +15,22 @@ import Title from './Title/Title';
 import Button from './Button/Button';
 import Carousel from './Carousel/Carousel';
 import Toggle from './Toggle/Toggle';
-import QRCode from './QRCode/QRCode';
+import QRCode from './QRCode/QrCode';
 /*	SELECTORS	*/
-import { useSelector } from 'react-redux';
-import { selectUserData } from '../../../utils/redux/selectors';
+import { useSelector, useStore } from 'react-redux';
+import { selectUserData, selectUserAuth } from '../../../utils/redux/selectors';
+/*	FUNCTIONS	*/
+import {
+	inputProtectionPseudo,
+	inputProtectionQR,
+} from './Input/inputProtection';
+import { fetchOrUpdateUser } from '../../../utils/redux/user';
 
 export const AuthStart = () => {
+	const isAuth = useSelector(selectUserAuth);
+
+	if (isAuth) return <Navigate to="/" />;
+
 	return (
 		<div className="authstart-wrapper">
 			<Title title="Welcome" subtitle="" />
@@ -27,13 +45,40 @@ export const AuthStart = () => {
 };
 
 export const Auth2fa = () => {
-	const twoFactor = useSelector(selectUserData).twoFactor;
-	const avatar_url = useSelector(selectUserData).avatar;
+	const [inputError, setInputError] = useState('');
+	const { login } = useParams();
+	const navigate = useNavigate();
+	const store = useStore();
+	const isAuth = useSelector(selectUserAuth);
 
-	if (avatar_url === null)
-		return <Navigate to="/login/name&avatar" replace />;
-	if (twoFactor === false)
-		return <Navigate to="/" replace />;
+	const handleClick2fa = useCallback(async () => {
+		const inputKey: string | undefined =
+			document.querySelector<HTMLInputElement>(
+				'.input-wrapper input'
+			)?.value;
+		if (inputKey) {
+			const error: string = inputProtectionQR(inputKey);
+			if (error === '') {
+				try {
+					const response = await axios.post(
+						'http://localhost:3333/auth/2fa/verifylogin',
+						{ inputKey, login },
+						{
+							withCredentials: true,
+						}
+					);
+					Cookies.set('jwt', response.data.token);
+					await fetchOrUpdateUser(store);
+					navigate('/');
+				} catch (error) {
+					setInputError('Invalid key');
+				}
+			} else setInputError(error);
+		} else setInputError('Please enter a key');
+	}, [navigate, login, store]);
+
+	if (isAuth) return <Navigate to="/" />;
+
 	return (
 		<div className="auth2fa-wrapper">
 			<Title title="Welcome" subtitle="" />
@@ -41,18 +86,76 @@ export const Auth2fa = () => {
 				input_title="Generated code"
 				placeholder="enter the generated code"
 				icon="padlock"
+				error={inputError}
 			/>
-			<Button content="Login with 42" bottom={false} href="" absolut={true} />
+			<Button
+				onClick={handleClick2fa}
+				content="Login with 42"
+				bottom={false}
+				absolut={true}
+				href=""
+			/>
 		</div>
 	);
 };
 
-export const AuthNameAvatar = () => {
+export const AuthConfig = () => {
 	const isConfig = useSelector(selectUserData).config;
+	const [inputError, setInputError] = useState('');
+	const [usernames, setUsernames] = useState<string[]>([]);
+	const [currentIndex, setCurrentIndex] = useState(0);
+	const [avatar, setAvatar] = useState(generateAvatars(12));
+	const navigate = useNavigate();
+	const store = useStore();
 
-	console.log(isConfig);
-	if (isConfig === true)
-		return <Navigate to="/" replace />;
+	useEffect(() => {
+		async function fetchData() {
+			try {
+				const response = await axios.get(
+					'http://localhost:3333/users/all/pseudo',
+					{
+						withCredentials: true,
+					}
+				);
+				const usernames = response.data;
+				setUsernames(usernames);
+			} catch (error) {
+				console.error(error);
+			}
+		}
+		fetchData();
+	}, []);
+
+	const handleClick = useCallback(async () => {
+		const inputPseudo: string | undefined =
+			document.querySelector<HTMLInputElement>(
+				'.input-wrapper input'
+			)?.value;
+		if (inputPseudo) {
+			const error: string = inputProtectionPseudo(inputPseudo, usernames);
+			if (error === '') {
+				const formData = new FormData();
+				formData.append('username', inputPseudo);
+				formData.append('file', avatar[currentIndex].file);
+				try {
+					await axios.post(
+						'http://localhost:3333/users/config',
+						formData,
+						{
+							withCredentials: true,
+						}
+					);
+					await fetchOrUpdateUser(store);
+					navigate('/login/2faconfig', { state: { prec: true } });
+				} catch (error) {
+					navigate('/login/config');
+				}
+			} else setInputError(error);
+		} else setInputError('Please enter a pseudo');
+	}, [usernames, currentIndex, avatar, navigate, store]);
+
+	if (isConfig === true) return <Navigate to="/" replace />;
+
 	return (
 		<div className="authnameavatar-wrapper">
 			<Title
@@ -63,9 +166,22 @@ export const AuthNameAvatar = () => {
 				input_title="Pseudo"
 				placeholder="enter your pseudo"
 				icon="id_card"
+				error={inputError}
 			/>
-			<Carousel />
-			<Button content="Continue" bottom={true} href="/login/2faconfig" absolut={false} state="config" />
+			<Carousel
+				avatar={avatar}
+				currentIndex={currentIndex}
+				setCurrentIndex={setCurrentIndex}
+				setAvatar={setAvatar}
+			/>
+			<Button
+				onClick={handleClick}
+				content="Continue"
+				bottom={true}
+				href=""
+				absolut={false}
+				state="config"
+			/>
 		</div>
 	);
 };
@@ -73,9 +189,40 @@ export const AuthNameAvatar = () => {
 export const Auth2faConfig = () => {
 	const [statusState, setStatusState] = useState(false);
 	const { state } = useLocation();
+	const navigate = useNavigate();
+	const [inputError, setInputError] = useState('');
+	const store = useStore();
+	const twoFactor = useSelector(selectUserData).twoFactor;
 
-	if (!state || state.prec !== 'config')
-		return <Navigate to="/" replace />
+	const handleClick2fa = useCallback(async () => {
+		const inputKey: string | undefined =
+			document.querySelector<HTMLInputElement>(
+				'.input-wrapper input'
+			)?.value;
+		if (inputKey) {
+			const error: string = inputProtectionQR(inputKey);
+			if (error === '') {
+				try {
+					await axios.post(
+						'http://localhost:3333/auth/2fa/verify',
+						{ inputKey },
+						{
+							withCredentials: true,
+						}
+					);
+					await fetchOrUpdateUser(store);
+					navigate('/');
+				} catch (error) {
+					setInputError('Invalid key');
+				}
+			} else setInputError(error);
+		} else setInputError('Please enter a key');
+	}, [navigate, store]);
+
+	if ((!state && inputError === '') || twoFactor === true) {
+		return <Navigate to="/" replace />;
+	}
+
 	return (
 		<div
 			className={
@@ -98,13 +245,15 @@ export const Auth2faConfig = () => {
 						input_title="Generate code"
 						placeholder="enter the generated code"
 						icon="padlock"
+						error={inputError}
 					/>
 				</div>
 			)}
 			<Button
+				onClick={statusState ? handleClick2fa : undefined}
 				content="Login with 42"
-				bottom={statusState === false ? true : false}
-				href=""
+				bottom={statusState ? false : true}
+				href={!statusState ? '/' : ''}
 				absolut={true}
 			/>
 		</div>

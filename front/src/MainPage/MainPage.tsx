@@ -1,6 +1,9 @@
+
 import * as React from 'react';
 import {useState} from 'react';
 import './MainPage.css';
+/*	SELECTORS	*/
+import { selectUserData } from '../utils/redux/selectors';
 
 //Interface
 import {DataTable} from './types'

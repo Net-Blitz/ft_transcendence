@@ -18,7 +18,10 @@ import { ConfigService } from "@nestjs/config";
 
 @Controller("auth")
 export class AuthController {
-	constructor(private authService: AuthService, private config: ConfigService) {}
+	constructor(
+		private authService: AuthService,
+		private config: ConfigService
+	) {}
 
 	@Get("callback")
 	async auth42Callback(
@@ -27,7 +30,7 @@ export class AuthController {
 		@Query("code") code: string
 	) {
 		await this.authService.Auth42Callback(req, res, code);
-		return ;
+		return;
 	}
 
 	@Get("verify")
@@ -48,46 +51,38 @@ export class AuthController {
 	}
 
 	@Post("2fa/setup")
-	async setup2fa(
-		@Req() req: Request,
-		@Res() res: Response,
-		@GetUser() user: any
-	) {
-		return await this.authService.setup2fa(req, res, user);
-	}
-	
-	@Post("2fa/verify")
-	async verify2fa(
-		@Req() req: Request,
-		@Res() res: Response,
-		@Body("verificationCode") code: string
-	) {
-		return await this.authService.verify2fa(req, res, code);
+	async setup2fa(@Res() res: Response, @GetUser() user: any) {
+		return await this.authService.setup2fa(res, user);
 	}
 
-	@Post("2fa/verify_test")
-	async verify2fa_test(
-		@Req() req: Request,
-		@Res() res: Response,
+	@Post("2fa/verify")
+	async verify2fa(
 		@GetUser() user: any,
-		@Body("verificationCode") code: string
+		@Res() res: Response,
+		@Body("inputKey") key: string
 	) {
-		return await this.authService.verify2fa_test(req, res, user, code);
+		return await this.authService.verify2fa(user, res, key);
+	}
+
+	@Post("2fa/verifylogin")
+	async verify2falogin(
+		@Res() res: Response,
+		@Body("login") login: string,
+		@Body("inputKey") key: string
+	) {
+		return await this.authService.verify2falogin(res, login, key);
 	}
 
 	@Delete("2fa/disable")
-	async remove2fa(
-		@Req() req: Request,
-		@Res() res: Response,
-		@GetCookie() cookie: CookieDto
-	) {
-		return await this.authService.remove2fa(req, res, cookie);
+	async remove2fa(@Res() res: Response, @GetCookie() cookie: CookieDto) {
+		return await this.authService.remove2fa(res, cookie);
 	}
 
-	@Get(":username")/*Temp*/
-	async getUserCheat(@Req() req: Request, @Res() res: Response, @Param("username") username: string) {
-		console.log("username: " + username)
+	@Get(":username") /*Temp*/ async getUserCheat(
+		@Req() req: Request,
+		@Res() res: Response,
+		@Param("username") username: string
+	) {
 		return await this.authService.getUserCheat(req, res, username);
 	}
 }
-	
