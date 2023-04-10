@@ -65,8 +65,8 @@
 }
 
 .game-playing-board {
-	width: calc(min(100vw, 120vh) - 14px);
-	height: calc(min(50vw, 60vh) - 7px);
+	width: calc(min(100vw, 120vh) - 42px);
+	height: calc(min(50vw, 60vh) - 21px);
 	border-radius: min(0.5vw, 0.5vh);
 	box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25), 0px 4px 4px rgba(0, 0, 0, 0.25);
 	background: #EFEDD4;

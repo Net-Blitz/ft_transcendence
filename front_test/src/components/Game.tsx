@@ -13,16 +13,18 @@ function Game({socketGame}:any) {
 
 	useEffect(() => {
 		socketGame.emit("gameConnection", {room: room});
+		console.log("gameConection", room);
 		localStorage.removeItem("lobby-chat-storage");
 	}, [room, socketGame]);
 
 	useEffect(() => {
 		const updateGameState = (gameState: any) => {
 			console.log("gameState", gameState.player1_score, gameState.player2_score)
-			let ball = document.getElementById("ball");
-			let player1 = document.getElementById("player1");
-			let player2 = document.getElementById("player2");
-			let gameDiv = document.getElementById("Game");
+			let ball = document.querySelector<HTMLElement>(".game-playing-ball");
+			let player1 = document.querySelector<HTMLElement>("#game-playing-player1");
+			let player2 = document.querySelector<HTMLElement>("#game-playing-player2");
+			let gameDiv = document.querySelector<HTMLElement>(".game-playing-board");
+			console.log(ball, gameDiv)
 			if (gameDiv) {
 				if (ball) {
 					ball.style.left = (gameDiv.offsetWidth - ball.offsetWidth) * gameState.ball_x + 'px';
@@ -43,8 +45,8 @@ function Game({socketGame}:any) {
 					player2.style.left = (gameDiv.offsetWidth - player2.offsetWidth) * gameState.player2_x + 'px';
 				}
 				
-				let score1 = document.getElementById("score1");
-				let score2 = document.getElementById("score2");
+				let score1 = document.querySelector<HTMLElement>("#game-playing-score1");
+				let score2 = document.querySelector<HTMLElement>("#game-playing-score2");
 				if (score1)
 					score1.innerHTML = gameState.player1_score;
 				if (score2)

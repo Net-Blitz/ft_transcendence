@@ -304,6 +304,7 @@
 	
 	.game-waiting-chat {
 		width: calc(100% - 14px - 14px);
+		height: 28vh;
 	}
 
 	.game-waiting-button-cancel {
