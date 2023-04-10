@@ -27,7 +27,6 @@ export function useAxios(url: string) {
 		}
 		fetchData();
 	}, [url]);
-
 	return { isLoading, data, error };
 }
 

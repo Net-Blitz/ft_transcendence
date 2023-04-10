@@ -5,24 +5,14 @@ import Background from './Components/Background/Background';
 import {
 	AuthStart,
 	Auth2fa,
-	AuthNameAvatar,
+	AuthConfig,
 	Auth2faConfig,
 } from './Components/Auth/Auth';
 
-interface LoginPages {
-	[key: string]: JSX.Element;
-}
-
-const Login = () => {
-	const loginPages: LoginPages = {
-		'/login': <AuthStart />,
-		'/login/2fa': <Auth2fa />,
-		'/login/name&avatar': <AuthNameAvatar />,
-		'/login/2faconfig': <Auth2faConfig />,
-	};
+export const Login = () => {
 	return (
 		<div>
-			{loginPages[window.location.pathname]}
+			<AuthStart />
 			<div className="login-background">
 				<Background />
 			</div>
@@ -30,4 +20,35 @@ const Login = () => {
 	);
 };
 
-export default Login;
+export const Login2fa = () => {
+	return (
+		<div>
+			<Auth2fa />
+			<div className="login-background">
+				<Background />
+			</div>
+		</div>
+	);
+};
+
+export const Config = () => {
+	return (
+		<div>
+			<AuthConfig />
+			<div className="login-background">
+				<Background />
+			</div>
+		</div>
+	);
+};
+
+export const Config2fa = () => {
+	return (
+		<div>
+			<Auth2faConfig />
+			<div className="login-background">
+				<Background />
+			</div>
+		</div>
+	);
+};
