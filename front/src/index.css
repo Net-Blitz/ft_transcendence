@@ -17,17 +17,35 @@ code {
 /* YesevaOne */
 @font-face {
 	font-family: 'YesevaOne';
-	src: local('YesevaOne-Regular'), url('fonts/YesevaOne-Regular.ttf') format(truetype);
+  src: url('fonts/YesevaOne-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
 }
 
 /* Poppins */
 @font-face {
 	font-family: 'Poppins';
-	src: local('Poppins-Regular'), url('fonts/Poppins/Poppins-Regular.ttf') format(truetype);
+  src: url('fonts/Poppins/Poppins-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
 }
 @font-face {
 	font-family: 'Poppins';
+  src: url('fonts/Poppins/Poppins-Light.ttf') format('truetype');
   font-weight: 300;
-	src: local('Poppins-Light'), url('fonts/Poppins/Poppins-Light.ttf') format(truetype);
+  font-style: normal;
+}
+@font-face {
+	font-family: 'Poppins';
+  src: url('fonts/Poppins/Poppins-Medium.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+  
+@font-face {
+	font-family: 'Poppins';
+  src: url('fonts/Poppins/Poppins-SemiBold.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
 }
   
