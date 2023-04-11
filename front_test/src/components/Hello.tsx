@@ -32,7 +32,7 @@ function Hello() {
 	};
 
 	const handleGaming = () => {
-		navigate("/game", {state: {gameId: 1, login: "jean"}})
+		navigate("/game", {state: {gameId: 25, login: "martin"}})
 	};
 
 	return (

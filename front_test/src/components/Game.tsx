@@ -10,6 +10,7 @@ function Game({socketGame}:any) {
 	const location = useLocation();
 	const room = location.state.gameId;
 	const login = location.state.login;
+	const [spectator, updateSpectator] = useState(0);
 
 	useEffect(() => {
 		socketGame.emit("gameConnection", {room: room});
@@ -36,7 +37,6 @@ function Game({socketGame}:any) {
 			let gameDiv = document.querySelector<HTMLElement>(".game-playing-board");
 			// console.log(ball, gameDiv)
 			if (gameDiv) {
-				console.log("gameDiv", gameDiv.offsetWidth, gameDiv.offsetHeight)
 				if (ball) {
 					ball.style.width = (gameDiv.offsetWidth) * gameState.ball_size + 'px';
 					ball.style.height = (gameDiv.offsetWidth) * gameState.ball_size + 'px';
@@ -54,7 +54,6 @@ function Game({socketGame}:any) {
 					player2.style.width = (gameDiv.offsetWidth) * gameState.player_width + 'px';
 					player2.style.top = (gameDiv.offsetHeight - 3 - player2.offsetHeight) * gameState.player2_y + 'px';
 					player2.style.right = (gameDiv.offsetWidth - player2.offsetWidth) * (1 - gameState.player2_x)  + 'px';
-					console.log("player2 top: ", player2.offsetWidth);
 				}
 				
 				let score1 = document.querySelector<HTMLElement>("#game-playing-score1");
@@ -68,6 +67,7 @@ function Game({socketGame}:any) {
 
 		const endGame = (data: any) => {
 			socketGame.emit("gameDisconnection");
+			updateHere(false);
 			navigate("/");
 		}
 
@@ -89,12 +89,18 @@ function Game({socketGame}:any) {
 			}
 		}
 
+		const updateSpectatorFonc = (data: any) => {
+			console.log("spectatorJoin", data.spectator)
+			updateSpectator(data.spectator);
+		}
+
 		if (here === false)
 		{
 			socketGame.off("gameState");
 			socketGame.off("endGame");
 			socketGame.off("error");
 			socketGame.off("quickChatMessageResponse")
+			socketGame.off("updateSpectator")
 			localStorage.removeItem("game-chat-storage-room-" + room);
 		}
 		if (here === true)
@@ -103,10 +109,13 @@ function Game({socketGame}:any) {
 			socketGame.off("endGame");
 			socketGame.off("error");
 			socketGame.off("quickChatMessageResponse");
+			socketGame.off("updateSpectator")
 			socketGame.on("gameState", updateGameState);
 			socketGame.on("endGame", endGame);
 			socketGame.on("error", errorGame);
 			socketGame.on("quickChatMessageResponse", quickChatMessageResponse);
+			socketGame.on("updateSpectator", updateSpectatorFonc)
+			socketGame.emit("getSpectator", {room: room});
 		}
 	}, [here]);
 	
@@ -132,7 +141,6 @@ function Game({socketGame}:any) {
 
 	const surrend = () => {
 		socketGame.emit('surrender', {login: login, room: room});
-		updateHere(false);
 	}
 
 	 
@@ -141,19 +149,11 @@ function Game({socketGame}:any) {
 			<div className="game-playing-top">
 				<div className="game-playing-quick-chat">
 					<ul id="game-playing-chat">
-						<li>Player1 : test</li>
-						<li>Player1 : test</li>
-						<li>Player1 : test</li>
-						<li>Player1 : test</li>
-						<li>Player1 : test</li>
-						<li>Player1 : test</li>
-						<li>Player1 : test</li>
-						<li>Player1 : test</li>
 					</ul>
 				</div>
 				<div className="game-playing-viewer">
 					<img src={eyePNG} alt="Spec" className="game-playing-eye" />
-					  : 5
+					  : {spectator}
 				</div>
 			</div>
 			<div className="game-playing-board">

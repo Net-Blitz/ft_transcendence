@@ -14,7 +14,7 @@ export class GameGateway {
 	server: Server;
 	
 	ConnectedSockets: SocketUser[] = [];
-	GamePlaying = [];
+	GamePlaying : {room: number, specList: string[]}[] = [];
 
 	async sleep(ms: number) {
 		return new Promise(resolve => setTimeout(resolve, ms));
@@ -81,6 +81,7 @@ export class GameGateway {
 
 	private async gameRun(gameRoom: GameRoom, room: number) {
 		let end;
+		let wait = 0;
 
 		while (true) {
 			this.movePlayer(gameRoom, room);
@@ -90,8 +91,17 @@ export class GameGateway {
 			if (end.state)
 				return (end.mode);
 			end = this.checkConnected(room);
-			if (end.state)
+			if (end.state && end.mode === "disconnected")
+			{
+				if (wait > 2500)
+					return (end);
+				else
+					wait += 1;
+			}
+			else if (end.state)
 				return (end);
+			else
+				wait = 0;
 			await this.sleep(5)
 		}
 	}
@@ -101,11 +111,11 @@ export class GameGateway {
 			where: { id: room },
 			data: { state: "ENDED"}
 		})
+		const game = await this.prisma.game.findUnique({where: {id: room}});	
+		if (!game)
+			return (false);
 
 		if (endMode.mode === "normal") {
-			const game = await this.prisma.game.findUnique({where: {id: room}});	
-			if (!game)
-				return (false);
 			if (gameRoom.player1.score > gameRoom.player2.score)
 			{
 				await this.prisma.game.update({
@@ -132,9 +142,6 @@ export class GameGateway {
 			}
 		}
 		else if (endMode.mode === "surrender") {
-			const game = await this.prisma.game.findUnique({where: {id: room}});	
-			if (!game)
-				return (false);
 			if (endMode.player === 2)
 			{
 				await this.prisma.game.update({
@@ -160,8 +167,19 @@ export class GameGateway {
 					data: { state: "ONLINE", losses: { increment: 1 } }})
 			}
 		}
+		else if (endMode.mode === "disconnected") {
+			await this.prisma.user.update({
+				where: { id: game.user2Id },
+				data: { state: "ONLINE"}})
+			await this.prisma.user.update({
+				where: { id: game.user1Id },
+				data: { state: "ONLINE"}})
+
+		}
+			
 		
-		this.GamePlaying.splice(this.GamePlaying.indexOf(room), 1);
+		// this.GamePlaying.splice(this.GamePlaying.indexOf(room), 1);
+		this.GamePlaying.splice(this.GamePlaying.findIndex((game) => game.room === room), 1);
 		//disconnect all socket to the room associated and navigate to the end page
 		this.server.to("game-" + room).emit("endGame", {player1_score: gameRoom.player1.score, player2_score: gameRoom.player2.score});
 		//jE PENSE QU'IL FAUDRAIT AUSSI DELETE ROOM
@@ -197,20 +215,43 @@ export class GameGateway {
 		return ({login: userCookie.login, user, game, room})
 	}
 
+	private addSpecToRoom(room: number, login: string) {
+		const game = this.GamePlaying.find(x => x.room === room);
+		if (game && game.specList.find(x => x === login) === undefined)
+		{
+			game.specList.push(login);
+			this.server.to("game-" + room).emit("updateSpectator", {spectator: game.specList.length});
+		}
+	}
+
+	private removeSpecToRoom(room: number, login: string) {
+		const game = this.GamePlaying.find(x => x.room === room);
+		if (game && game.specList.find(x => x === login) !== undefined)
+		{
+			game.specList.splice(game.specList.findIndex((spec) => spec === login), 1);
+			this.server.to("game-" + room).emit("updateSpectator", {spectator: game.specList.length});
+		}
+	}
+
 	private setupUserSocket(client: Socket, user: User, game: Game, userLogin: string, room: number) {
 		let state : string;
 
 		if (game.user1Id == user.id)
-		state = "player1";
+			state = "player1";
 		else if (game.user2Id == user.id)
 			state = "player2";	
 		else
+		{
 			state = "spectator";
+			this.addSpecToRoom(room, user.login);
+		}
 
 		const sockUser : SocketUser = this.ConnectedSockets.find(x => x.login === user.login);
 
 		if (sockUser != null)
 		{
+			if (sockUser.state === "spectator")
+				this.removeSpecToRoom(parseInt(sockUser.roomName.split("game-")[0]), sockUser.login);
 			if (sockUser.roomName !== "game-" + room)
 			{
 				sockUser.roomName = "game-" + room;
@@ -266,9 +307,9 @@ export class GameGateway {
 				player2_size: 0.2,
 				player2_score: 0,
 			});
-		if (this.GamePlaying.findIndex(x => x === userCheck.room) === -1)
+		if (this.GamePlaying.findIndex(x => x.room === userCheck.room) === -1)
 		{
-			this.GamePlaying.push(userCheck.room);
+			this.GamePlaying.push({room: userCheck.room, specList: []});
 			this.gameLoop(userCheck.room);
 		}
 		return (true);
@@ -302,6 +343,8 @@ export class GameGateway {
 		{
 			client.leave(sockUser.roomName);
 			//this.server.to(client.id).socketsLeave(sockUser.roomName);
+			if (sockUser.state === "spectator")
+				this.removeSpecToRoom(parseInt(sockUser.roomName.split("game-")[0]), sockUser.login);
 			this.ConnectedSockets.splice(this.ConnectedSockets.findIndex(x => x.socketId === client.id), 1);
 		}
 	}
@@ -365,5 +408,18 @@ export class GameGateway {
 			return ;
 
 		this.server.to("game-" + data.room).emit("quickChatMessageResponse", {login: sockUser.login, message: parseInt(data.key)});
+	}
+
+	@SubscribeMessage("getSpectator")
+	HanldeGetSpectator(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+		const sockUser : SocketUser = this.ConnectedSockets.find(x => x.socketId === client.id);
+		if (sockUser === null)
+			return ;
+		
+		const game = this.GamePlaying.find(x => x.room === data.room);
+		if (game === undefined)
+			return ;
+		
+		client.emit("updateSpectator", {spectator: game.specList.length});
 	}
 }
