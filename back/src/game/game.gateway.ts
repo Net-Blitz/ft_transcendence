@@ -254,16 +254,16 @@ export class GameGateway {
 			client.emit("gameState", {
 				ball_x: 0.5,
 				ball_y: 0.5,
-				ball_size: 0.05,
+				ball_size: 0.03,
 				
 				player1_x: 0.006,
 				player1_y: 0.5,
-				player1_size: 0.3,
+				player1_size: 0.2,
 				player1_score: 0,
 	
 				player2_x: 0.994,
 				player2_y: 0.5,
-				player2_size: 0.3,
+				player2_size: 0.2,
 				player2_score: 0,
 			});
 		if (this.GamePlaying.findIndex(x => x === userCheck.room) === -1)
@@ -351,5 +351,19 @@ export class GameGateway {
 			players.player1.surrender = true;
 		if (players.player2 != null && players.player2.login === data.login)
 			players.player2.surrender = true;
+	}
+
+	@SubscribeMessage("quickChatMessage")
+	async HandleQuickChatMessage(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+		const sockUser : SocketUser = this.ConnectedSockets.find(x => x.socketId === client.id);
+		if (sockUser === null)
+			return ;
+		
+		const game = await this.prisma.game.findUnique({where: {id: data.room}});
+
+		if (game === null || game.state === "ENDED" || (game.user1Id !== sockUser.prismaId && game.user2Id !== sockUser.prismaId))
+			return ;
+
+		this.server.to("game-" + data.room).emit("quickChatMessageResponse", {login: sockUser.login, message: parseInt(data.key)});
 	}
 }

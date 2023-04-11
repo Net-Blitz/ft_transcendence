@@ -46,9 +46,9 @@ export class GameRoom {
 	player2: PlayerBar;
 
 	constructor(private roomNumber : number) {
-		this.ball = new Ball(0.5, 0.5, 0.0045 * GameRatio, 0.0045, 0.05, this.getRandomDirection());
-		this.player1 = new PlayerBar(0.006, 0.5, 0.3, 0.0125, 0.015);
-		this.player2 = new PlayerBar(0.994, 0.5, 0.3, 0.0125, 0.015);
+		this.ball = new Ball(0.5, 0.5, 0.0045 * GameRatio, 0.0045, 0.03, this.getRandomDirection());
+		this.player1 = new PlayerBar(0.006, 0.5, 0.2, 0.0125, 0.015);
+		this.player2 = new PlayerBar(0.994, 0.5, 0.2, 0.0125, 0.015);
 	}
 	
 	getGameRoomInfo() {
@@ -76,9 +76,9 @@ export class GameRoom {
 		this.ball.speed_x = 0.0045 * GameRatio;
 		this.ball.speed_y = 0.0045;
 		
-		this.player1.size = 0.3;
-		this.player2.size = 0.3;
-		this.ball.size = 0.05;
+		this.player1.size = 0.2;
+		this.player2.size = 0.2;
+		this.ball.size = 0.03;
 	}
 	
 	getRandomDirection() {
@@ -201,7 +201,7 @@ export class GameRoom {
 	}
 
 	checkEndGame() {
-		if ((this.player1.score >= 10 || this.player2.score >= 10) && Math.abs(this.player1.score - this.player2.score) >= 2)
+		if ((this.player1.score >= 1000 || this.player2.score >= 1000) && Math.abs(this.player1.score - this.player2.score) >= 2)
 			return {state: true, mode: "normal"} /* TEMP */ //return true;
 		return {state: false, mode: "none"}
 	} 

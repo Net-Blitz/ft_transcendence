@@ -158,7 +158,7 @@ function Lobby({socketQueue}:any) {
 		console.log("socketQueue: ", socketQueue); 
 		localStorage.removeItem("lobby-chat-storage");
 		socketQueue.emit("DisconnectFromQueue");
-		socketQueue.off("ConnectToQueueResponse", setPlayer);
+		socketQueue.off("ConnectToQueueResponse");
 		socketQueue.off("GetNewMessage");
 		navigate("/");
 	};

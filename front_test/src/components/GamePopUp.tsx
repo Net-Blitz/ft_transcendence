@@ -43,7 +43,7 @@ const GamePopUp = ({socketQueue}:any) => {
 		const handleGameState = (data:any) => {
 			hidePopUp();
 			update_accept(0);
-			socketQueue.off("GamePopUpResponse", handleGameState);
+			socketQueue.off("GamePopUpResponse");
 			if (data.message === "OK")
 				navigate("/game", {state: {...data}});
 			
@@ -58,7 +58,7 @@ const GamePopUp = ({socketQueue}:any) => {
 			else
 			{
 				hidePopUp();
-				socketQueue.off("GamePopUpResponse", handleGameState);
+				socketQueue.off("GamePopUpResponse");
 			}
 		}
 	
