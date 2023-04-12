@@ -14,3 +14,17 @@ export interface SimpleToggleProps {
 	toggled: boolean;
 	onClick: (isToggled: boolean) => void;
 }
+
+export interface BasicFrameProps {
+	height: string;
+	width: string;
+	title: string;
+	children: React.ReactNode;
+}
+
+export interface AchivementProps {
+	img: string;
+	title: string;
+	description: string;
+	lock?: boolean;
+}
