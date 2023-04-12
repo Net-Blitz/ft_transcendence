@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import './MainInfo.css';
-import { InfoElementProps, MainInfoProps } from './types';
+import { InfoElementProps, MainInfoProps } from '../../types';
 /*	REDUX	*/
 import { useSelector } from 'react-redux';
 import { selectUserData } from '../../../utils/redux/selectors';
+import { SimpleToggle } from '../SimpleToggle/SimpleToggle';
 
 const MainElement = ({ avatar, username }: MainInfoProps) => {
 	return (
@@ -23,11 +24,15 @@ const InfoElement = ({
 	isToggle,
 	border,
 }: InfoElementProps) => {
+	const logToggle = useCallback((state: any) => {
+		console.log(state);
+	}, []);
+
 	return (
 		<div className={border ? 'info-element border' : 'info-element'}>
 			<h3>{title}</h3>
 			{isToggle ? (
-				<button className="toggle">Toggle</button>
+				<SimpleToggle toggled={false} onClick={logToggle} />
 			) : (
 				<p>{content}</p>
 			)}

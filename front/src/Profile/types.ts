@@ -9,3 +9,8 @@ export interface InfoElementProps {
 	isToggle?: boolean;
 	border?: boolean;
 }
+
+export interface SimpleToggleProps {
+	toggled: boolean;
+	onClick: (isToggled: boolean) => void;
+}
