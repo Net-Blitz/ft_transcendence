@@ -5,12 +5,16 @@ import { InfoElementProps, MainInfoProps } from '../../types';
 import { useSelector } from 'react-redux';
 import { selectUserData } from '../../../utils/redux/selectors';
 import { SimpleToggle } from '../SimpleToggle/SimpleToggle';
+/*	RESSOURCES	*/
+import paint_brush from './Ressources/paint_brush.png';
 
 const MainElement = ({ avatar, username }: MainInfoProps) => {
 	return (
 		<div className="main-element">
 			<div className="banner">
-				{/* <button className="edit"></button> */}
+				<div className="edit">
+					<img src={paint_brush} alt="button-edit" />
+				</div>
 				<img src={avatar} alt="avatar" />
 			</div>
 			<h2>{username}</h2>

@@ -6,6 +6,7 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	box-shadow: 2px 2px 15px 2px rgba(206, 206, 206, 0.25);
 }
 
 /* INFO ELEMENT */
@@ -46,6 +47,7 @@
 /* MAIN ELEMENT */
 
 .maininfo-wrapper .main-element {
+	position: relative;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -53,6 +55,7 @@
 	position: relative;
 	bottom: 46px;
 }
+
 .maininfo-wrapper .main-element h2 {
 	font-family: 'Poppins', sans-serif;
 	font-size: 20px;
@@ -64,6 +67,7 @@
 }
 
 .maininfo-wrapper .main-element .banner {
+	position: relative;
 	width: 97px;
 	height: 110px;
 	display: flex;
@@ -77,4 +81,24 @@
 .maininfo-wrapper .main-element .banner img {
 	width: 100%;
 	height: 100%;
+}
+
+.maininfo-wrapper .main-element .edit {
+	cursor: pointer;
+	position: absolute;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	top: -12px;
+	right: -10px;
+	width: 30px;
+	height: 30px;
+	background-color: #F9DA49;
+	box-shadow: 0px 1px 4px 1px rgba(169, 169, 169, 0.3);
+	border-radius: 50%;
+}
+
+.maininfo-wrapper .main-element .edit img {
+	width: 17px;
+	height: 17px;
 }
