@@ -22,7 +22,7 @@ export interface BasicFrameProps {
 	children: React.ReactNode;
 }
 
-export interface AchivementProps {
+export interface AchievementProps {
 	img: string;
 	title: string;
 	description: string;
