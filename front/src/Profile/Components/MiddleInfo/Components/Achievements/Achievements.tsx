@@ -25,7 +25,7 @@ const Achievement = ({ img, title, description, lock }: AchievementProps) => {
 export const Achievements = () => {
 	return (
 		<div className="achievements">
-			<BasicFrame height="254px" width="100%" title="Achievements">
+			<BasicFrame title="Achievements">
 				<Achievement
 					img={achievement1}
 					title="Ace"

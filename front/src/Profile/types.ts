@@ -16,8 +16,8 @@ export interface SimpleToggleProps {
 }
 
 export interface BasicFrameProps {
-	height: string;
-	width: string;
+	height?: string;
+	width?: string;
 	title: string;
 	children: React.ReactNode;
 }
@@ -27,4 +27,10 @@ export interface AchievementProps {
 	title: string;
 	description: string;
 	lock?: boolean;
+}
+
+export interface FriendProps {
+	avatar: string;
+	username: string;
+	level: number;
 }

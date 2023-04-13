@@ -3,10 +3,11 @@ import './MiddleInfo.css';
 import { BasicFrameProps } from '../../types';
 import { DonutLevel } from './Components/DonutLevel/DonutLevel';
 import { Achievements } from './Components/Achievements/Achievements';
+import { Friends } from './Components/Friends/Friends';
 
 export const BasicFrame = ({
-	height,
-	width,
+	height = '254px',
+	width = '100%',
 	title,
 	children,
 }: BasicFrameProps) => {
@@ -25,6 +26,7 @@ export const MiddleInfo = () => {
 		<div className="middleinfo-wrapper">
 			<Achievements />
 			<DonutLevel />
+			<Friends />
 		</div>
 	);
 };
