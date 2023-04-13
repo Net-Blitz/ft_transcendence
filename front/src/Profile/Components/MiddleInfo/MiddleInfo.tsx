@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import './MiddleInfo.css';
 import { AchivementProps, BasicFrameProps } from '../../types';
+import { DonutLevel } from '../DonutLevel/DonutLevel';
 /*	TMP RESSOURCES	*/
 import achievement1 from './Tmp/achievement1.png';
 import achievement2 from './Tmp/achievement2.png';
@@ -35,7 +36,7 @@ const Achievement = ({ img, title, description, lock }: AchivementProps) => {
 const Achievements = () => {
 	return (
 		<div className="achievements">
-			<BasicFrame height="254px" width="39%" title="Achievements">
+			<BasicFrame height="254px" width="100%" title="Achievements">
 				<Achievement
 					img={achievement1}
 					title="Ace"
@@ -49,13 +50,13 @@ const Achievements = () => {
 				<Achievement
 					img={achievement3}
 					title="Quick Reflexes"
-					description="Score a point within the first few seconds of the game"
+					description="Score a point within the first few seconds of the game."
 					lock={true}
 				/>
 				<Achievement
 					img={achievement4}
 					title="Friendly Power"
-					description="Win a game with a friend"
+					description="Win a game with a friend."
 					lock={true}
 				/>
 			</BasicFrame>
@@ -67,6 +68,7 @@ export const MiddleInfo = () => {
 	return (
 		<div className="middleinfo-wrapper">
 			<Achievements />
+			<DonutLevel />
 		</div>
 	);
 };

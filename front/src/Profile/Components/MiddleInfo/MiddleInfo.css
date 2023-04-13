@@ -1,17 +1,22 @@
+.middleinfo-wrapper {
+	width: 100%;
+	display: flex;
+	margin-top: 18px;
+}
+
 /*	BASIC FRAME	*/
 .middleinfo-wrapper .basic-frame {
 	background-color: #0A3D62;
 	box-shadow: 2px 2px 15px 2px rgba(206, 206, 206, 0.25);
 	border-radius: 10px;
 	box-sizing: border-box;
-	margin-top: 18px;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 }
 
 /* FOR SCROLLBAR */
-.middleinfo-wrapper .basic-frame .content-wrapper {
+.middleinfo-wrapper .basic-frame > .content-wrapper {
 	display: flex;
 	flex-direction: column;
 	width: 100%;
@@ -21,7 +26,7 @@
 	scrollbar-width: none;
 }
 
-.middleinfo-wrapper .basic-frame .content-wrapper::-webkit-scrollbar {
+.middleinfo-wrapper .basic-frame > .content-wrapper::-webkit-scrollbar {
 	display: none;
 }
 
@@ -35,7 +40,7 @@
 }
 
 .middleinfo-wrapper .basic-frame .title-wrapper {
-	height: 36px;
+	height: 45px;
 	width: 100%;
 	border-bottom: 0.5px solid #FDFAD0;
 }
@@ -55,7 +60,7 @@
 
 .middleinfo-wrapper .achievement .img-wrapper {
 	height: 47px;
-	width: 52px;
+	width: 47px;
 	background-color: #FDFAD0;
 	border-radius: 10px;
 }
@@ -88,6 +93,11 @@
 }
 
 /*	ACHIEVEMENTS	*/
+.middleinfo-wrapper .achievements {
+	width: 39%;
+	margin-right: 11px;
+}
+
 .middleinfo-wrapper .achievements .basic-frame .content-wrapper:last-child {
 	margin-bottom: 18px;
 }
