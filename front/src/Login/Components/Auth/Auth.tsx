@@ -25,6 +25,9 @@ import {
 	inputProtectionQR,
 } from './Input/inputProtection';
 import { fetchOrUpdateUser } from '../../../utils/redux/user';
+/* RESSOURCES */
+import Padlock from './Input/Ressources/padlock_white.png';
+import IdCard from './Input/Ressources/id_card_white.png';
 
 export const AuthStart = () => {
 	const isAuth = useSelector(selectUserAuth);
@@ -85,7 +88,7 @@ export const Auth2fa = () => {
 			<Input
 				input_title="Generated code"
 				placeholder="enter the generated code"
-				icon="padlock"
+				icon={Padlock}
 				error={inputError}
 			/>
 			<Button
@@ -165,7 +168,7 @@ export const AuthConfig = () => {
 			<Input
 				input_title="Pseudo"
 				placeholder="enter your pseudo"
-				icon="id_card"
+				icon={IdCard}
 				error={inputError}
 			/>
 			<Carousel
@@ -244,7 +247,7 @@ export const Auth2faConfig = () => {
 					<Input
 						input_title="Generate code"
 						placeholder="enter the generated code"
-						icon="padlock"
+						icon={Padlock}
 						error={inputError}
 					/>
 				</div>
