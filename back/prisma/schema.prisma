@@ -8,30 +8,32 @@ datasource db {
 }
 
 model User {
-    id            Int               @id @default(autoincrement())
-    username      String            @unique
-    avatar        String?
-    twoFactor     Boolean           @default(false)
-    status        UserStatus        @default(ONLINE)
-    wins          Int               @default(0)
-    losses        Int               @default(0)
-    elo           Int               @default(300)
-    login         String            @unique
-    secret        String?
-    blockByMe     Blocked[]         @relation("blockByMe")
-    blockOnMe     Blocked[]         @relation("blockOnMe")
-    friend        FriendsRelation[] @relation("friend")
-    friendwith    FriendsRelation[] @relation("friendwith")
-    GameAsPlayer1 Game[]            @relation("player1")
-    GameAsPlayer2 Game[]            @relation("player2")
-    Admin         Admin[]
-    Ban           Ban[]
-    ChatUsers     ChatUsers[]
-    InviteChannel InviteChannel[]
-    Mute          Mute[]
-    channelsOwn   Channel[]         @relation("Owner")
-    messages      Message[]
-    queue         Queue?            @relation("Queue")
+    id                   Int               @id @default(autoincrement())
+    username             String            @unique
+    avatar               String?
+    twoFactor            Boolean           @default(false)
+    status               UserStatus        @default(ONLINE)
+    wins                 Int               @default(0)
+    losses               Int               @default(0)
+    elo                  Int               @default(300)
+    login                String            @unique
+    secret               String?
+    blockByMe            Blocked[]         @relation("blockByMe")
+    blockOnMe            Blocked[]         @relation("blockOnMe")
+    friend               FriendsRelation[] @relation("friend")
+    friendwith           FriendsRelation[] @relation("friendwith")
+    GameAsPlayer1        Game[]            @relation("player1")
+    GameAsPlayer2        Game[]            @relation("player2")
+    Admin                Admin[]
+    Ban                  Ban[]
+    ChatUsers            ChatUsers[]
+    InviteChannel        InviteChannel[]
+    Mute                 Mute[]
+    channelsOwn          Channel[]         @relation("Owner")
+    messages             Message[]
+    queue                Queue?            @relation("Queue")
+    DirectMessageSend    DirectMessage[]   @relation("sender")
+    DirectMessageReceive DirectMessage[]   @relation("receiver")
 }
 
 /// /self many to many database
@@ -54,6 +56,18 @@ model Blocked {
     @@id([blockByMeId, blockOnMeId])
 }
 
+model DirectMessage {
+    id         Int       @id @default(autoincrement())
+    createdAt  DateTime  @default(now())
+    messages   Message[]
+    senderId   Int
+    receiverId Int
+    sender     User      @relation("sender", fields: [senderId], references: [id])
+    receiver   User      @relation("receiver", fields: [receiverId], references: [id])
+
+    @@map("direct_messages")
+}
+
 model Channel {
     id            Int             @id @default(autoincrement())
     name          String          @unique
@@ -72,13 +86,15 @@ model Channel {
 }
 
 model Message {
-    id        Int      @id @default(autoincrement())
-    createdAt DateTime @default(now())
-    message   String
-    channelId Int
-    userId    Int
-    channel   Channel  @relation(fields: [channelId], references: [id])
-    user      User     @relation(fields: [userId], references: [id])
+    id              Int            @id @default(autoincrement())
+    createdAt       DateTime       @default(now())
+    message         String
+    channelId       Int
+    userId          Int
+    channel         Channel        @relation(fields: [channelId], references: [id])
+    user            User           @relation(fields: [userId], references: [id])
+    DirectMessage   DirectMessage? @relation(fields: [directMessageId], references: [id])
+    directMessageId Int?
 
     @@map("messages")
 }

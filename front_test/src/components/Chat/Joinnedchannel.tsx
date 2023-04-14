@@ -4,7 +4,6 @@ import MessageInput from "./MessageInput";
 import { MessageDto } from "./Messages";
 import { ChannelDto } from "./Channel";
 import axios from "axios";
-import { Socket, io } from "socket.io-client";
 import Messages from "./Messages";
 import UsersList from "./UsersList";
 import Notification from "../Notification/Notification";
@@ -12,9 +11,8 @@ import PopupProtected from "./PopupProtected";
 import HandleInvite from "./HandleInvite";
 import CreateChannel from "./CreateChannel";
 
-function JoinnedChannels({ ChannelsList, userInfo }: any) {
+function JoinnedChannels({ ChannelsList, userInfo, socket }: any) {
 	const [selectedChannel, setSelectedChannel] = useState<string>("");
-	const [socket, setSocket] = useState<Socket>();
 	const [messages, setMessages] = useState<MessageDto[]>([]);
 	const [showUsers, setShowUsers] = useState(false);
 	const [notification, setNotification] = useState({ message: "", type: "" });
@@ -53,15 +51,6 @@ function JoinnedChannels({ ChannelsList, userInfo }: any) {
 		};
 		fetchBlocked();
 	}, [messages]);
-
-	useEffect(() => {
-		const newSocket = io("http://localhost:3334");
-		setSocket(newSocket);
-
-		return () => {
-			newSocket.disconnect();
-		};
-	}, []);
 
 	const handleChannelClick = async (channel: ChannelDto) => {
 		const response = await axios.get(

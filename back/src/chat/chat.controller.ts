@@ -157,4 +157,9 @@ export class ChatController {
 	async getBans(@Param("channel") channel: string, @Res() res: Response) {
 		return await this.chatService.getBans(channel, res);
 	}
+
+	@Get("dm")
+	async getDM(@Res() res: Response, @GetUser() user: any) {
+		return await this.chatService.getDMs(res, user);
+	}
 }

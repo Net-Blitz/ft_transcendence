@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import JoinnedChannels from "./Joinnedchannel";
+import DirectMessage, { DirectMessageDto } from "./DirectMessage";
+import { io } from "socket.io-client";
 
 export interface ChannelDto {
 	id: number;
@@ -13,6 +15,17 @@ export interface ChannelDto {
 function Channel() {
 	const [channels, setChannels] = useState<ChannelDto[]>([]);
 	const [userInfo, setUserInfo] = useState<any>();
+	const [DMList, setDMList] = useState<DirectMessageDto[]>([]);
+	const [socket, setSocket] = useState<any>();
+
+	useEffect(() => {
+		const newSocket = io("http://localhost:3334");
+		setSocket(newSocket);
+
+		return () => {
+			newSocket.disconnect();
+		};
+	}, []);
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -22,27 +35,37 @@ function Channel() {
 			setUserInfo(response.data);
 		};
 
-		const fetchChannels = async () => {
+		const fetchChats = async () => {
 			try {
-				const response = await axios.get<ChannelDto[]>(
+				const Channels = await axios.get<ChannelDto[]>(
 					"http://localhost:3333/chat/channels",
 					{ withCredentials: true }
 				);
-				setChannels(response.data);
+				setChannels(Channels.data);
+				const DMS = await axios.get<DirectMessageDto[]>(
+					"http://localhost:3333/chat/dm",
+					{ withCredentials: true }
+				);
+				setDMList(DMS.data);
 			} catch (error) {
 				console.error(error);
 			}
 		};
 
 		fetchData();
-		fetchChannels();
-		const interval = setInterval(fetchChannels, 5000);
+		fetchChats();
+		const interval = setInterval(fetchChats, 5000);
 		return () => clearInterval(interval);
 	}, [userInfo?.username]);
 
 	return (
 		<div>
 			<JoinnedChannels ChannelsList={channels} userInfo={userInfo} />
+			<DirectMessage
+				DMList={DMList}
+				userInfo={userInfo}
+				socket={socket}
+			/>
 		</div>
 	);
 }

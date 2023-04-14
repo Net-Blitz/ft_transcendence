@@ -21,8 +21,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		{ channel: string; username: string }
 	> = new Map();
 
-	handleConnection(client: Socket) {
-		//console.log("Client connected: ", client.id);
+	private DMs: Map<string, Socket> = new Map();
+
+	async handleConnection() {
+		//console.log("Client connected");
 	}
 
 	async handleDisconnect(client: Socket) {
@@ -57,6 +59,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					},
 				});
 			} catch (e) {}
+		}
+		if (this.DMs.get(client.id)) {
+			this.DMs.delete(client.id);
 		}
 	}
 
@@ -144,6 +149,58 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.server.to(channel).emit("chat", message);
 		} catch (e) {
 			console.log(e);
+		}
+	}
+
+	@SubscribeMessage("ConnectedDM")
+	async handleConnectedDM(client: Socket, data: any) {
+		this.DMs.set(data.id, client);
+	}
+
+	@SubscribeMessage("DM")
+	async handleDM(client: Socket, message: any) {
+		try {
+			const { sender, receiver, DMid, content } = message;
+
+			const [senderUser, recipientUser, DM] = await Promise.all([
+				this.prisma.user.findUnique({
+					where: {
+						id: sender,
+					},
+				}),
+				this.prisma.user.findUnique({
+					where: {
+						id: receiver,
+					},
+				}),
+				this.prisma.directMessage.findUnique({
+					where: {
+						id: DMid,
+					},
+				}),
+			]);
+
+			if (!senderUser || !recipientUser) {
+				throw new Error("Invalid sender or receiver");
+			}
+
+			if (!DM) {
+				throw new Error("Invalid DM");
+			}
+
+			if (
+				DM.senderId !== senderUser.id &&
+				DM.senderId !== recipientUser.id
+			) {
+				throw new Error("Invalid DM");
+			}
+
+			const userSocket = this.DMs.get(message.receiver);
+			this.server
+				.to(userSocket.id)
+				.emit("DM", { content, sender, receiver, DMid });
+		} catch (e) {
+			console.error(e);
 		}
 	}
 

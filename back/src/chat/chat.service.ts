@@ -574,4 +574,27 @@ export class ChatService {
 		});
 		return res.status(200).json(users);
 	}
+
+	async getDMs(@Res() res: Response, @GetUser() user: any) {
+		try {
+			const DMs = await this.prisma.directMessage.findMany({
+				where: {
+					OR: [
+						{
+							senderId: user.id,
+						},
+						{
+							receiverId: user.id,
+						},
+					],
+				},
+			});
+			if (!DMs) {
+				return res.status(404).json({ message: "DMs not found" });
+			}
+			return res.status(200).json(DMs);
+		} catch (e) {
+			return res.status(404).json({ message: "DMs not found" });
+		}
+	}
 }
