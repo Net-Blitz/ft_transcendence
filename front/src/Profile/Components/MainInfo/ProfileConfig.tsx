@@ -8,6 +8,7 @@ import { generateAvatars } from '../../../Login/Components/Auth/Carousel/genAvat
 /*	Ressources	*/
 import close from './Ressources/close.svg';
 import id from './Ressources/id.svg';
+import refresh from './Ressources/refresh.svg';
 
 export const PopUp = (props: any) => {
 	return props.trigger ? (
@@ -37,6 +38,7 @@ export const ProfileConfig = (props: any) => {
 				setCurrentIndex={setCurrentIndex}
 				avatar={avatar}
 				setAvatar={setAvatar}
+				refresh={refresh}
 			/>
 		</div>
 	);

@@ -28,6 +28,7 @@ import { fetchOrUpdateUser } from '../../../utils/redux/user';
 /* RESSOURCES */
 import Padlock from './Input/Ressources/padlock_white.png';
 import IdCard from './Input/Ressources/id_card_white.png';
+import refresh from './Carousel/Ressources/refresh.png';
 
 export const AuthStart = () => {
 	const isAuth = useSelector(selectUserAuth);
@@ -176,6 +177,7 @@ export const AuthConfig = () => {
 				currentIndex={currentIndex}
 				setCurrentIndex={setCurrentIndex}
 				setAvatar={setAvatar}
+				refresh={refresh}
 			/>
 			<Button
 				onClick={handleClick}
