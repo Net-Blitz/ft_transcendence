@@ -6,7 +6,7 @@
 }
 
 /*	BASIC FRAME	*/
-.middleinfo-wrapper .basic-frame {
+.profile-wrapper .basic-frame {
 	background-color: #0A3D62;
 	box-shadow: 2px 2px 15px 2px rgba(206, 206, 206, 0.25);
 	border-radius: 10px;
@@ -17,7 +17,7 @@
 }
 
 /* FOR SCROLLBAR */
-.middleinfo-wrapper .basic-frame > .content-wrapper {
+.profile-wrapper .basic-frame > .content-wrapper {
 	display: flex;
 	flex-direction: column;
 	width: 100%;
@@ -27,11 +27,11 @@
 	scrollbar-width: none;
 }
 
-.middleinfo-wrapper .basic-frame > .content-wrapper::-webkit-scrollbar {
+.profile-wrapper .basic-frame > .content-wrapper::-webkit-scrollbar {
 	display: none;
 }
 
-.middleinfo-wrapper .basic-frame h3 {
+.profile-wrapper .basic-frame h3 {
 	font-family: 'YesevaOne', sans-serif;
 	font-style: normal;
 	font-size: 18px;
@@ -40,7 +40,7 @@
 	margin: 8px 0 0 0;
 }
 
-.middleinfo-wrapper .basic-frame .title-wrapper {
+.profile-wrapper .basic-frame .title-wrapper {
 	height: 45px;
 	width: 100%;
 	border-bottom: 0.5px solid #FDFAD0;

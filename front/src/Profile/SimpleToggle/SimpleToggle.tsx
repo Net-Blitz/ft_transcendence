@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
 import './SimpleToggle.css';
-import { SimpleToggleProps } from '../../types';
+import { SimpleToggleProps } from '../types';
 
 export const SimpleToggle = ({ toggled, onClick }: SimpleToggleProps) => {
 	const [isToggled, toggle] = useState(toggled);

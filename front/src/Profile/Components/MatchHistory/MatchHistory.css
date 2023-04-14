@@ -1,0 +1,9 @@
+.match-history {
+	margin-top: 18px;
+	flex-grow: 1;
+	min-height: 200px;
+}
+
+.match-history th {
+	padding-top: 4px;
+}

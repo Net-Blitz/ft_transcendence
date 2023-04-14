@@ -1,0 +1,164 @@
+import React from 'react';
+import './MatchHistory.css';
+import { BasicFrame } from '../MiddleInfo/MiddleInfo';
+import { TeamMatchProps } from '../../types';
+/* Ressources */
+import avatar1 from '../../../MainPage/Components/Ressources/avatar1.svg';
+import avatar2 from '../../../MainPage/Components/Ressources/avatar2.svg';
+import avatar3 from '../../../MainPage/Components/Ressources/avatar3.svg';
+import avatar4 from '../../../MainPage/Components/Ressources/avatar4.svg';
+
+const TeamMatch = ({ img, level, index }: TeamMatchProps) => {
+	return (
+		<div className="teamMatch">
+			<img src={img} alt={`Team member ${index + 1}`} />
+			<p>{level}</p>
+		</div>
+	);
+};
+
+const dataHistory = (history: any) => {
+	return (
+		<tr>
+			<td>{history.gameMode}</td>
+			<td className="teamMatch">
+				{history.team.map((teamMember: any, index: number) => (
+					<TeamMatch
+						img={teamMember.img}
+						level={teamMember.level}
+						index={index}
+					/>
+				))}
+			</td>
+			<td>{history.date}</td>
+			<td>{history.hour}</td>
+			<td>
+				{history.score[0]} - {history.score[1]}
+			</td>
+			<td>{history.duration}</td>
+			<td>{history.difficulty}</td>
+			<td>{history.map}</td>
+			<td>{history.XPgained}</td>
+		</tr>
+	);
+};
+
+export const MatchHistory = () => {
+	const header: string[] = [
+		'Game mode',
+		'Team',
+		'Date',
+		'Hour',
+		'Score',
+		'Duration',
+		'Difficulty',
+		'Map',
+		'XP Gained',
+	];
+
+	const data = [
+		{
+			gameMode: '1v1',
+			team: [
+				{ img: avatar1, level: 1 },
+				{ img: avatar2, level: 2 },
+				{ img: avatar3, level: 10 },
+				{ img: avatar4, level: 9 },
+			],
+			date: '02/04/2023',
+			hour: '3h38',
+			score: [3, 10],
+			duration: '30 min',
+			difficulty: 'easy',
+			map: 'beach',
+			XPgained: 1000,
+		},
+		{
+			gameMode: '1v1',
+			team: [
+				{ img: avatar1, level: 1 },
+				{ img: avatar2, level: 2 },
+				{ img: avatar3, level: 10 },
+				{ img: avatar4, level: 9 },
+			],
+			date: '02/04/2023',
+			hour: '3h38',
+			score: [3, 10],
+			duration: '30 min',
+			difficulty: 'easy',
+			map: 'beach',
+			XPgained: 1000,
+		},
+		{
+			gameMode: '1v1',
+			team: [
+				{ img: avatar1, level: 1 },
+				{ img: avatar2, level: 2 },
+				{ img: avatar3, level: 10 },
+				{ img: avatar4, level: 9 },
+			],
+			date: '02/04/2023',
+			hour: '3h38',
+			score: [3, 10],
+			duration: '30 min',
+			difficulty: 'easy',
+			map: 'beach',
+			XPgained: 1000,
+		},
+		{
+			gameMode: '1v1',
+			team: [
+				{ img: avatar1, level: 1 },
+				{ img: avatar2, level: 2 },
+				{ img: avatar3, level: 10 },
+				{ img: avatar4, level: 9 },
+			],
+			date: '02/04/2023',
+			hour: '3h38',
+			score: [3, 10],
+			duration: '30 min',
+			difficulty: 'easy',
+			map: 'beach',
+			XPgained: 1000,
+		},
+		{
+			gameMode: '1v1',
+			team: [
+				{ img: avatar1, level: 1 },
+				{ img: avatar2, level: 2 },
+				{ img: avatar3, level: 10 },
+				{ img: avatar4, level: 9 },
+			],
+			date: '02/04/2023',
+			hour: '3h38',
+			score: [3, 10],
+			duration: '30 min',
+			difficulty: 'easy',
+			map: 'beach',
+			XPgained: 1000,
+		},
+	];
+
+	return (
+		<div className="match-history">
+			<BasicFrame height="100%" title="Match History">
+				<table>
+					<thead>
+						<tr>
+							{header.map((header, index) => (
+								<th key={index}>{header}</th>
+							))}
+						</tr>
+					</thead>
+					<tbody>
+						{data.map((history, index) => (
+							<React.Fragment key={index}>
+								{dataHistory(history)}
+							</React.Fragment>
+						))}
+					</tbody>
+				</table>
+			</BasicFrame>
+		</div>
+	);
+};

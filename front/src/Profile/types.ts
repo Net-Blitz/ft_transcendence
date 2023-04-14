@@ -34,3 +34,9 @@ export interface FriendProps {
 	username: string;
 	level: number;
 }
+
+export interface TeamMatchProps {
+	img: string;
+	level: number;
+	index: number;
+}
