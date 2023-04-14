@@ -40,3 +40,8 @@ export interface TeamMatchProps {
 	level: number;
 	index: number;
 }
+
+export interface dataHistoryProps {
+	history: any;
+	index: number;
+}

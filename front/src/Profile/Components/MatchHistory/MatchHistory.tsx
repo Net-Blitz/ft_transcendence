@@ -1,7 +1,7 @@
 import React from 'react';
 import './MatchHistory.css';
 import { BasicFrame } from '../MiddleInfo/MiddleInfo';
-import { TeamMatchProps } from '../../types';
+import { TeamMatchProps, dataHistoryProps } from '../../types';
 /* Ressources */
 import avatar1 from '../../../MainPage/Components/Ressources/avatar1.svg';
 import avatar2 from '../../../MainPage/Components/Ressources/avatar2.svg';
@@ -10,36 +10,10 @@ import avatar4 from '../../../MainPage/Components/Ressources/avatar4.svg';
 
 const TeamMatch = ({ img, level, index }: TeamMatchProps) => {
 	return (
-		<div className="teamMatch">
+		<div className="teamMatch ">
 			<img src={img} alt={`Team member ${index + 1}`} />
 			<p>{level}</p>
 		</div>
-	);
-};
-
-const dataHistory = (history: any) => {
-	return (
-		<tr>
-			<td>{history.gameMode}</td>
-			<td className="teamMatch">
-				{history.team.map((teamMember: any, index: number) => (
-					<TeamMatch
-						img={teamMember.img}
-						level={teamMember.level}
-						index={index}
-					/>
-				))}
-			</td>
-			<td>{history.date}</td>
-			<td>{history.hour}</td>
-			<td>
-				{history.score[0]} - {history.score[1]}
-			</td>
-			<td>{history.duration}</td>
-			<td>{history.difficulty}</td>
-			<td>{history.map}</td>
-			<td>{history.XPgained}</td>
-		</tr>
 	);
 };
 
@@ -56,7 +30,7 @@ export const MatchHistory = () => {
 		'XP Gained',
 	];
 
-	const data = [
+	let data = [
 		{
 			gameMode: '1v1',
 			team: [
@@ -139,6 +113,33 @@ export const MatchHistory = () => {
 		},
 	];
 
+	const dataHistory = ({ history, index }: dataHistoryProps) => {
+		return (
+			<tr key={index} className={index % 2 === 0 ? 'odd' : 'even'}>
+				<td>{history.gameMode}</td>
+				<td className="teamMatch">
+					{history.team.map((teamMember: any, index: number) => (
+						<TeamMatch
+							img={teamMember.img}
+							level={teamMember.level}
+							index={index}
+							key={index}
+						/>
+					))}
+				</td>
+				<td>{history.date}</td>
+				<td>{history.hour}</td>
+				<td>
+					{history.score[0]} - {history.score[1]}
+				</td>
+				<td>{history.duration}</td>
+				<td>{history.difficulty}</td>
+				<td>{history.map}</td>
+				<td>{history.XPgained}</td>
+			</tr>
+		);
+	};
+
 	return (
 		<div className="match-history">
 			<BasicFrame height="100%" title="Match History">
@@ -151,11 +152,9 @@ export const MatchHistory = () => {
 						</tr>
 					</thead>
 					<tbody>
-						{data.map((history, index) => (
-							<React.Fragment key={index}>
-								{dataHistory(history)}
-							</React.Fragment>
-						))}
+						{data.map((history, index) =>
+							dataHistory({ history, index })
+						)}
 					</tbody>
 				</table>
 			</BasicFrame>
