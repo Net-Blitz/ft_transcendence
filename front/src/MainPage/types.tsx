@@ -1,3 +1,13 @@
+export interface FilterButtonProps {
+	label: string;
+	options: string[];
+	onFilter: (option: string) => void;
+	isOpen: boolean;
+	setIsOpen: (open: boolean) => void;
+	toggleDropdown: () => void;
+	resetFilter: boolean;
+}
+
 export interface DataTable {
 	gameMode: string;
 	team: { img: string; level: number }[];
@@ -8,9 +18,21 @@ export interface DataTable {
 	map: string;
 	watch: string;
 }
-  
+
 export interface MatchesInProgressProps {
-	header: string[];
-	data: DataTable[];
-	dataGame: (data: DataTable, index: number) => JSX.Element;
+	filters: {
+		sortBy: string;
+		gameMode: string;
+		friends: string;
+		map: string;
+		difficulty: string;
+	};
 }
+
+export type Filters = {
+	sortBy: string;
+	gameMode: string;
+	friends: string;
+	difficulty: string;
+	map: string;
+};
