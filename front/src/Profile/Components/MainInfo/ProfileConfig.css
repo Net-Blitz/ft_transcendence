@@ -16,8 +16,6 @@
 /* Profile Config */
 .popup .profileconfig-wrapper {
 	position: fixed;
-	/* top: 212px; */
-	/* right: 320px; */
 	top: 25%;
 	left: 38%;
 	z-index: 6;
@@ -87,10 +85,12 @@
 	height: 95px;
 	margin: 0;
 	background-color: #FDFAD0;
+	opacity: 0.5;
+	border-radius: 7px;
 }
 
 .popup .profileconfig-wrapper > .carousel-wrapper .empty {
-	background-color: #0A3D62;
+	visibility: hidden;
 }
 
 .popup .profileconfig-wrapper > .carousel-wrapper .carousel-element div:nth-child(2) {
@@ -98,4 +98,44 @@
 	width: 137px;
 	height: 138px;
 	background-color: #F9DA49;
+	box-shadow: 0px 0px 46px 5px rgba(253, 250, 208, 0.44);
+	border-radius: 12px;
+}
+
+.popup .profileconfig-wrapper > .carousel-wrapper .carousel-refresh {
+	width: 244px;
+	height: 23px;
+	margin-top: 16px;
+}
+
+.popup .profileconfig-wrapper > .carousel-wrapper .carousel-refresh label {
+	background-color: #FDFAD0;
+	color: #0A3D62;
+	font-family: 'Poppins';
+	font-style: normal;
+	font-weight: 300;
+	font-size: 12px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.popup .profileconfig-wrapper > .carousel-wrapper .carousel-refresh label:hover {
+	background-color: #FDFAD0;
+	color: #0A3D62;
+}
+
+/* Button */
+.popup .profileconfig-wrapper > .button-wrapper {
+	width: 286px;
+	height: 35px;
+}
+
+.popup .profileconfig-wrapper > .button-wrapper button {
+	border: none;
+}
+
+.popup .profileconfig-wrapper > .button-wrapper:hover button {
+	background-color: #F9DA49;
+	color: #0a3d62;
 }

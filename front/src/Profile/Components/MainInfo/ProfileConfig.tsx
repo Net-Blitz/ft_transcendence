@@ -3,6 +3,7 @@ import './ProfileConfig.css';
 /*	Components	*/
 import Input from '../../../Login/Components/Auth/Input/Input';
 import Carousel from '../../../Login/Components/Auth/Carousel/Carousel';
+import Button from '../../../Login/Components/Auth/Button/Button';
 /*	Functions	*/
 import { generateAvatars } from '../../../Login/Components/Auth/Carousel/genAvatars';
 /*	Ressources	*/
@@ -40,6 +41,7 @@ export const ProfileConfig = (props: any) => {
 				setAvatar={setAvatar}
 				refresh={refresh}
 			/>
+			<Button content="Save" bottom={true} href="" absolut={true} />
 		</div>
 	);
 };
