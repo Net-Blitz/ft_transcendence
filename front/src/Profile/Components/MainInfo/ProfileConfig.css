@@ -1,0 +1,46 @@
+/* Popup */
+.maininfo-wrapper .popup {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100vh;
+	background-color: rgba(255, 255, 255, 0.5);
+	z-index: 1;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+/* Profile Config */
+.popup .profileconfig-wrapper {
+	position: fixed;
+	/* top: 212px; */
+	/* right: 320px; */
+	top: 25%;
+	left: 38%;
+	z-index: 6;
+	width: 349px;
+	height: 447px;
+	background-color: #0A3D62;
+	border-radius: 15px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.popup .profileconfig-wrapper img {
+	align-self: flex-end;
+	padding: 10px 10px 0 0;
+	cursor: pointer;
+}
+
+.popup .profileconfig-wrapper h2 {
+	margin: 0;
+	font-family: 'YesevaOne', sans-serif; /* Probleme de police à revoir */ 
+	font-style: normal;
+	font-weight: 400;
+	font-size: 30px;
+	color: #FDFAD0;
+}

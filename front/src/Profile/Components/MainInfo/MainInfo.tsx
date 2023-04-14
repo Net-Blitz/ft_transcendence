@@ -1,5 +1,7 @@
 import React, { useCallback } from 'react';
 import './MainInfo.css';
+import { PopUp, ProfileConfig } from './ProfileConfig';
+import { AuthConfig } from '../../../Login/Components/Auth/Auth';
 import { InfoElementProps, MainInfoProps } from '../../types';
 /*	REDUX	*/
 import { useSelector } from 'react-redux';
@@ -67,6 +69,9 @@ export const MainInfo = () => {
 				border={true}
 			/>
 			<InfoElement title="2FA Status" content="22/02" isToggle={true} />
+			<PopUp trigger={true}>
+				<ProfileConfig />
+			</PopUp>
 		</div>
 	);
 };
