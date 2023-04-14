@@ -30,7 +30,7 @@
 	align-items: center;
 }
 
-.popup .profileconfig-wrapper img {
+.popup .profileconfig-wrapper > img {
 	align-self: flex-end;
 	padding: 10px 10px 0 0;
 	cursor: pointer;
@@ -38,9 +38,64 @@
 
 .popup .profileconfig-wrapper h2 {
 	margin: 0;
-	font-family: 'YesevaOne', sans-serif; /* Probleme de police à revoir */ 
+	font-family: 'YesevaOne', sans-serif;
 	font-style: normal;
 	font-weight: 400;
 	font-size: 30px;
 	color: #FDFAD0;
+}
+
+/* Input */
+.popup .profileconfig-wrapper > .input-wrapper {
+	width: unset;
+	height: unset;
+	margin-top: 38px;
+}
+
+.popup .profileconfig-wrapper > .input-wrapper .input-box {
+	width: 297px;
+	height: 53px;
+	background-color: #FDFAD0;
+}
+
+.popup .profileconfig-wrapper > .input-wrapper .input-box div:first-child img {
+	width: 29px;
+	height: 25px;
+	border-right: 0.5px solid #B6B6B6;
+}
+
+.popup .profileconfig-wrapper > .input-wrapper .input-box div:last-child input, .popup .profileconfig-wrapper > .input-wrapper .input-box div:last-child input::placeholder {
+	background-color: #FDFAD0;
+	border: none;
+	color: #0A3D62;
+	font-weight: 300;
+}
+
+.popup .profileconfig-wrapper > .input-wrapper .input-box div:last-child p {
+	color: #B6B6B6;
+}
+
+/*	Carousel	*/
+.popup .profileconfig-wrapper > .carousel-wrapper {
+	width: 309px;
+	height: 175px;
+	margin-top: 38px;
+}
+
+.popup .profileconfig-wrapper > .carousel-wrapper .left, .popup .profileconfig-wrapper > .carousel-wrapper .right {
+	width: 73px;
+	height: 95px;
+	margin: 0;
+	background-color: #FDFAD0;
+}
+
+.popup .profileconfig-wrapper > .carousel-wrapper .empty {
+	background-color: #0A3D62;
+}
+
+.popup .profileconfig-wrapper > .carousel-wrapper .carousel-element div:nth-child(2) {
+	margin: 0 12px 0 12px;
+	width: 137px;
+	height: 138px;
+	background-color: #F9DA49;
 }

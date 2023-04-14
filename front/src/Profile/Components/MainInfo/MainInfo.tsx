@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux';
 import { selectUserData } from '../../../utils/redux/selectors';
 import { SimpleToggle } from '../../SimpleToggle/SimpleToggle';
 /*	RESSOURCES	*/
-import paint_brush from './Ressources/paint_brush.png';
+import paint_brush from './Ressources/paint-brush.svg';
 
 const MainElement = ({ avatar, username }: MainInfoProps) => {
 	return (
