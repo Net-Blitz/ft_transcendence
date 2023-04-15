@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { useState } from 'react';
+import React from 'react';
+import { useState, useEffect } from 'react';
 import './MainPage.css';
 /*	SELECTORS	*/
 import { selectUserData } from '../utils/redux/selectors';
@@ -11,9 +11,14 @@ import MatchesInProgress from './Components/Matches/MatchesInProgress';
 //Ressources
 import refresh from './Components/Ressources/refresh.svg';
 import personSad from './Components/Ressources/personSad.svg';
+import filterButtonSVG from './Components/Ressources/filter_blue.svg';
+import avatar1 from './Components/Ressources/avatar1.svg';
+import avatar2 from './Components/Ressources/avatar2.svg';
+import avatar3 from './Components/Ressources/avatar3.svg';
+import avatar4 from './Components/Ressources/avatar4.svg';
 
 //Interface
-import { Filters } from './types';
+import { DataTable, Filters } from './types';
 
 const MainPage = () => {
 	//filter
@@ -49,11 +54,105 @@ const MainPage = () => {
 		map: 'all',
 		difficulty: 'all',
 	});
+	{
+		/** @TODO Lier au back */
+	}
+	const data: DataTable[] = [
+		{
+			gameMode: '1v1',
+			team: [
+				{ img: avatar1, level: 1 },
+				{ img: avatar2, level: 2 },
+				{ img: avatar3, level: 10 },
+				{ img: avatar4, level: 9 },
+			],
+			date: '20/06/2023',
+			hour: '3h38',
+			score: [3, 10, 28, 1],
+			difficulty: 'Hard',
+			map: 'Classic',
+			watch: 'http://localhost:8080/game',
+		},
+		{
+			gameMode: '2v2',
+			team: [
+				{ img: avatar1, level: 1 },
+				{ img: avatar2, level: 2 },
+				{ img: avatar3, level: 10 },
+				{ img: avatar4, level: 9 },
+			],
+			date: '08/06/2023',
+			hour: '3h38',
+			score: [3, 10, 28, 1],
+			difficulty: 'Easy',
+			map: 'Beach',
+			watch: 'http://localhost:8080/game',
+		},
+		{
+			gameMode: '1v1',
+			team: [
+				{ img: avatar1, level: 1 },
+				{ img: avatar2, level: 2 },
+				{ img: avatar3, level: 10 },
+				{ img: avatar4, level: 9 },
+			],
+			date: '01/06/2023',
+			hour: '3h38',
+			score: [3, 10, 28, 1],
+			difficulty: 'Easy',
+			map: 'Beach',
+			watch: 'http://localhost:8080/game',
+		},
+	];
+	const hasManyMatches = data.length > 4;
+	// Mobile design
+	const [mobileFilterVisible, setmobileFilterVisible] = useState(false);
+	const [mobileViewMoreVisible, setmobileViewMoreVisible] = useState(false);
 
+	//Verification rectangle size for the image
+	const [mainRectangleMobile, setMainRectangleMobile] = useState(false);
+	useEffect(() => {
+		const handleResize = () => {
+			const gameDivElement = document.querySelector(
+				'.gameDiv'
+			) as HTMLElement;
+			if (gameDivElement) {
+				const imageLowActivy =
+					data.length * 80 + 190 < gameDivElement.offsetHeight;
+				setMainRectangleMobile(imageLowActivy);
+			}
+		};
+		window.addEventListener('resize', handleResize);
+		handleResize();
+		return () => {
+			window.removeEventListener('resize', handleResize);
+		};
+	}, []);
+
+	console.log('mainRectangle', mainRectangleMobile);
 	return (
 		<div className="rectNoMsg">
 			<p className="mainTitle">Games in progress</p>
-			<div className="filter">
+			<div className="containerFilterMobile">
+				<button
+					className="viewMore"
+					onClick={() =>
+						setmobileViewMoreVisible(!mobileViewMoreVisible)
+					}>
+					View more details
+				</button>
+				<button
+					className="buttonFilterMobile"
+					onClick={() =>
+						setmobileFilterVisible(!mobileFilterVisible)
+					}>
+					<img src={filterButtonSVG} alt="filter button" />
+				</button>
+			</div>
+			<div
+				className={`filter ${
+					mobileFilterVisible ? 'mobileVisible' : ''
+				}`}>
 				{/* <FilterGlobal/> */}
 				<button className="refreshButton" onClick={clearAllFilter}>
 					<img src={refresh} alt="refresh" />
@@ -108,12 +207,15 @@ const MainPage = () => {
 			</div>
 			<div className="gameDiv">
 				<MatchesInProgress filters={filters} />
-				<div className="illustrationGamingActivity">
-					<p>
-						The gaming activity is <br /> relatively low right now
-					</p>
-					<img src={personSad} alt="personsad" />
-				</div>
+				{!hasManyMatches && mainRectangleMobile && (
+					<div className="illustrationGamingActivity">
+						<p>
+							The gaming activity is <br /> relatively low right
+							now
+						</p>
+						<img src={personSad} alt="personsad" />
+					</div>
+				)}
 			</div>
 		</div>
 	);

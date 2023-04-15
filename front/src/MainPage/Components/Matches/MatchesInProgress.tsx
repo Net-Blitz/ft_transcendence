@@ -1,4 +1,6 @@
 import React from 'react';
+import { useEffect, useState } from 'react';
+import './MatchesInProgress.css';
 
 //Ressources
 import avatar1 from '../Ressources/avatar1.svg';
@@ -8,6 +10,23 @@ import avatar4 from '../Ressources/avatar4.svg';
 
 //Interface
 import { DataTable, MatchesInProgressProps, Filters } from '../../types';
+
+//Not working
+const useWindowWidth = () => {
+	const [windowWidth, setwindowWidth] = useState(window.innerWidth);
+	useEffect(() => {
+		const handleResize = () => {
+			setwindowWidth(window.innerWidth);
+		};
+		window.addEventListener('resize', handleResize);
+		handleResize();
+		return () => {
+			window.removeEventListener('resize', handleResize);
+		};
+	}, []);
+	console.log('windowWidth', windowWidth);
+	return windowWidth;
+};
 
 const MatchesInProgress: React.FC<MatchesInProgressProps> = ({ filters }) => {
 	//This specifies that the MatchesInProgress variable is a React component and it expects props of the type
@@ -21,7 +40,8 @@ const MatchesInProgress: React.FC<MatchesInProgressProps> = ({ filters }) => {
 		'Map',
 		'Watch',
 	];
-
+	const headerMobile = ['Game mode', 'Team', 'Score', 'Watch'];
+	const isMobileView = useWindowWidth() < 767;
 	{
 		/** @TODO Lier au back */
 	}
@@ -72,8 +92,6 @@ const MatchesInProgress: React.FC<MatchesInProgressProps> = ({ filters }) => {
 			watch: 'http://localhost:8080/game',
 		},
 	];
-	console.log('filters:', filters);
-
 	const parseDate = (dataString: string): Date => {
 		const [month, day, year] = dataString.split('/').map(Number);
 		return new Date(year, month - 1, day); //date is waiting for January to be 0
@@ -104,7 +122,6 @@ const MatchesInProgress: React.FC<MatchesInProgressProps> = ({ filters }) => {
 		});
 	};
 	const filterAll = (data: DataTable[], filter: Filters): DataTable[] => {
-		// const filterAll = (data: DataTable[], filter: Filters): DataTable[] => {
 		let filteredData = data.filter((match) => {
 			//if it returns false, it is not save. If it returns true, it is save
 			for (const filterKey in filters) {
@@ -128,12 +145,11 @@ const MatchesInProgress: React.FC<MatchesInProgressProps> = ({ filters }) => {
 			filteredData = sortByMap(filteredData);
 		}
 		if (filters.sortBy == 'difficulty') {
-			filteredData = sortByDate(filteredData);
+			filteredData = sortByDifficulty(filteredData);
 		}
 		return filteredData;
 	};
 	const finalData = filterAll(data, filters);
-	console.log('data', finalData);
 	const dataGame = (data: DataTable, index: number) => (
 		<tr className={index % 2 === 0 ? 'odd' : 'even'}>
 			<td>{data.gameMode}</td>
@@ -148,18 +164,20 @@ const MatchesInProgress: React.FC<MatchesInProgressProps> = ({ filters }) => {
 					</div>
 				))}
 			</td>
-			<td>{data.date}</td>
-			<td>{data.hour}</td>
-			<td>
+			{!isMobileView && <td className="dateMatch">{data.date}</td>}
+			{!isMobileView && <td className="hourMatch">{data.hour}</td>}
+			<td className="ScoreMatch">
 				<div className="teamScore">
 					{data.score.map((scoreMember, index) => (
 						<p>{scoreMember}</p>
 					))}
 				</div>
 			</td>
-			<td>{data.difficulty}</td>
-			<td>{data.map}</td>
-			<td>
+			{!isMobileView && (
+				<td className="difficultyMatch">{data.difficulty}</td>
+			)}
+			{!isMobileView && <td className="mapMatch">{data.map}</td>}
+			<td className="watchMatch">
 				<button
 					className="buttonMatch"
 					onClick={() => window.open(data.watch)}>
@@ -170,12 +188,19 @@ const MatchesInProgress: React.FC<MatchesInProgressProps> = ({ filters }) => {
 	);
 
 	return (
-		<table>
+		<table className="matchesInProgress">
 			<thead>
 				<tr>
-					{header.map((header, index) => (
-						<th key={index}>{header}</th>
-					))}
+					{!isMobileView &&
+						header.map((header, index) => (
+							<th key={index}>{header}</th>
+						))}
+					{isMobileView &&
+						headerMobile.map((headerMobile, index) => (
+							<th className={headerMobile} key={index}>
+								{headerMobile}
+							</th>
+						))}
 				</tr>
 			</thead>
 			<tbody>{finalData.map(dataGame)}</tbody>
