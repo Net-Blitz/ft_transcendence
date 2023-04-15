@@ -70,6 +70,7 @@ function DirectMessage({
 				<PopupDM
 					ClosePopup={handleTogglePopupNewDm}
 					setNotification={setNotification}
+					userInfo={userInfo}
 				/>
 			)}
 			<div className="wrapper">

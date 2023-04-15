@@ -2,11 +2,12 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
-function PopupDM({ ClosePopup, setNotification }: any) {
+function PopupDM({ ClosePopup, setNotification, userInfo }: any) {
 	const [users, setUsers] = useState<any[]>([]);
 	const PopupRef = useRef<HTMLDivElement>(null);
 	const [searchTerm, setSearchTerm] = useState("");
 	const [searchResults, setSearchResults] = useState<any[]>([]);
+	const [blocked, setBlocked] = useState<any[]>([]);
 
 	useEffect(() => {
 		const fetchUsers = async () => {
@@ -16,12 +17,36 @@ function PopupDM({ ClosePopup, setNotification }: any) {
 					withCredentials: true,
 				}
 			);
-			setUsers(response.data);
+			setUsers(
+				response.data.filter(
+					(user: any) => user.username !== userInfo?.username
+				)
+			);
 		};
 		fetchUsers();
-	}, []);
+
+		const fetchBlocked = async () => {
+			try {
+				const response = await axios.get(
+					"http://localhost:3333/friend/blocked",
+					{
+						withCredentials: true,
+					}
+				);
+				setBlocked(response.data);
+			} catch (error) {}
+		};
+		fetchBlocked();
+	}, [userInfo?.username]);
 
 	const handleDM = async (username: string) => {
+		if (blocked?.find((blocked: any) => blocked.username === username)) {
+			setNotification({
+				message: "You are blocked from this user",
+				type: "error",
+			});
+			return;
+		}
 		try {
 			await axios.post(
 				"http://localhost:3333/chat/dm/create",

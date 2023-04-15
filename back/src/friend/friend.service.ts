@@ -284,6 +284,20 @@ export class FriendService {
 					status: "BLOCKED",
 				},
 			});
+			await this.prisma.directMessage.deleteMany({
+				where: {
+					OR: [
+						{
+							senderId: user.id,
+							receiverId: friend.id,
+						},
+						{
+							senderId: friend.id,
+							receiverId: user.id,
+						},
+					],
+				},
+			});
 		} catch (e) {
 			await this.prisma.friendsRelation.create({
 				data: {
@@ -298,6 +312,20 @@ export class FriendService {
 
 					friendwithId: user.id,
 					status: "BLOCKED",
+				},
+			});
+			await this.prisma.directMessage.deleteMany({
+				where: {
+					OR: [
+						{
+							senderId: user.id,
+							receiverId: friend.id,
+						},
+						{
+							senderId: friend.id,
+							receiverId: user.id,
+						},
+					],
 				},
 			});
 			return res.status(200).json({ message: "Friend relation blocked" });
