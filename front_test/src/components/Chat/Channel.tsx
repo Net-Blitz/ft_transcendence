@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import JoinnedChannels from "./Joinnedchannel";
 import DirectMessage, { DirectMessageDto } from "./DirectMessage";
@@ -13,6 +13,7 @@ export interface ChannelDto {
 }
 
 function Channel() {
+	const [channelOrDM, setChannelOrDM] = useState<"channel" | "dm">("channel");
 	const [channels, setChannels] = useState<ChannelDto[]>([]);
 	const [userInfo, setUserInfo] = useState<any>();
 	const [DMList, setDMList] = useState<DirectMessageDto[]>([]);
@@ -58,14 +59,31 @@ function Channel() {
 		return () => clearInterval(interval);
 	}, [userInfo?.username]);
 
+	const handleOptionChange = (
+		event: React.ChangeEvent<HTMLSelectElement>
+	) => {
+		setChannelOrDM(event.target.value as "channel" | "dm");
+	};
+
 	return (
 		<div>
-			<JoinnedChannels ChannelsList={channels} userInfo={userInfo} />
-			<DirectMessage
-				DMList={DMList}
-				userInfo={userInfo}
-				socket={socket}
-			/>
+			{channelOrDM === "channel" ? (
+				<JoinnedChannels
+					ChannelsList={channels}
+					userInfo={userInfo}
+					channelOrDM={channelOrDM}
+					handleOptionChange={handleOptionChange}
+					socket={socket}
+				/>
+			) : (
+				<DirectMessage
+					DMList={DMList}
+					userInfo={userInfo}
+					socket={socket}
+					channelOrDM={channelOrDM}
+					handleOptionChange={handleOptionChange}
+				/>
+			)}
 		</div>
 	);
 }

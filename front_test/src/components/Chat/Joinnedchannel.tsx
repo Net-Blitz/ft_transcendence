@@ -11,7 +11,13 @@ import PopupProtected from "./PopupProtected";
 import HandleInvite from "./HandleInvite";
 import CreateChannel from "./CreateChannel";
 
-function JoinnedChannels({ ChannelsList, userInfo, socket }: any) {
+function JoinnedChannels({
+	ChannelsList,
+	userInfo,
+	socket,
+	channelOrDM,
+	handleOptionChange,
+}: any) {
 	const [selectedChannel, setSelectedChannel] = useState<string>("");
 	const [messages, setMessages] = useState<MessageDto[]>([]);
 	const [showUsers, setShowUsers] = useState(false);
@@ -179,7 +185,14 @@ function JoinnedChannels({ ChannelsList, userInfo, socket }: any) {
 				<div className="container">
 					<div className="left">
 						<div className="top">
-							<p>Channels</p>
+							<select
+								id="channelOrDM"
+								value={channelOrDM}
+								onChange={handleOptionChange}
+							>
+								<option value="channel">Channels</option>
+								<option value="dm">Direct Message</option>
+							</select>
 							<button onClick={handleToggleCreateChannel}>
 								Create
 							</button>

@@ -13,7 +13,13 @@ export interface DirectMessageDto {
 	receiver: any;
 }
 
-function DirectMessage({ DMList, userInfo, socket }: any) {
+function DirectMessage({
+	DMList,
+	userInfo,
+	socket,
+	channelOrDM,
+	handleOptionChange,
+}: any) {
 	const [selectedDM, setSelectedDM] = useState<number>(0);
 	const [messages, setMessages] = useState<any[]>([]);
 	const [notification, setNotification] = useState({ message: "", type: "" });
@@ -70,7 +76,14 @@ function DirectMessage({ DMList, userInfo, socket }: any) {
 				<div className="container">
 					<div className="left">
 						<div className="top">
-							<p>Direct Messages</p>
+							<select
+								id="channelOrDM"
+								value={channelOrDM}
+								onChange={handleOptionChange}
+							>
+								<option value="channel">Channels</option>
+								<option value="dm">Direct Message</option>
+							</select>
 							<button onClick={handleTogglePopupNewDm}>
 								New DM
 							</button>

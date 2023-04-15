@@ -5,6 +5,8 @@ import { Link } from "react-router-dom";
 function PopupDM({ ClosePopup, setNotification }: any) {
 	const [users, setUsers] = useState<any[]>([]);
 	const PopupRef = useRef<HTMLDivElement>(null);
+	const [searchTerm, setSearchTerm] = useState("");
+	const [searchResults, setSearchResults] = useState<any[]>([]);
 
 	useEffect(() => {
 		const fetchUsers = async () => {
@@ -39,6 +41,17 @@ function PopupDM({ ClosePopup, setNotification }: any) {
 		}
 	};
 
+	useEffect(() => {
+		const searchUsers = (searchTerm: string) => {
+			const results = users.filter((user) =>
+				user.username.toLowerCase().includes(searchTerm.toLowerCase())
+			);
+			setSearchResults(results);
+		};
+
+		searchUsers(searchTerm);
+	}, [searchTerm, users]);
+
 	return (
 		<div ref={PopupRef} className="overlay">
 			<div className="popup center">
@@ -47,8 +60,16 @@ function PopupDM({ ClosePopup, setNotification }: any) {
 				</label>
 				<h2>New Direct Message</h2>
 				<div className="content-dm">
+					<input
+						type="text"
+						placeholder="Search a user"
+						value={searchTerm}
+						onChange={(e) => {
+							setSearchTerm(e.target.value);
+						}}
+					/>
 					<ul className="users">
-						{users.map((user) => (
+						{searchResults.map((user) => (
 							<li className="person" key={user.id}>
 								<Link to={"/profile/" + user.username}>
 									<div className="users-list">
