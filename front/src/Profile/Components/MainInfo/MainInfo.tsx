@@ -59,7 +59,7 @@ const InfoElement = ({
 
 export const MainInfo = () => {
 	const userData = useSelector(selectUserData);
-	const [trigger, setTrigger] = useState(true);
+	const [trigger, setTrigger] = useState(false);
 
 	const handleTrigger = useCallback(() => {
 		setTrigger(!trigger);

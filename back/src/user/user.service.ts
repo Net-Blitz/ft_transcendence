@@ -108,8 +108,51 @@ export class UserService {
 			"uploads",
 			user.id + "-" + uuidv4() + extension
 		);
-		await fs.promises.writeFile(filepath, file.buffer);
+		try {
+			await fs.promises.writeFile(filepath, file.buffer);
+		} catch (error) {
+			return res.status(400).json({ message: "Write File error" });
+		}
+		if (!user) {
+			return res.status(404).json({ message: `User not found` });
+		}
+		if (text) user.username = text;
+		if (file) user.avatar = filepath;
+		user.config = true;
+		const updatedUser = await this.prisma.user.update({
+			where: {
+				login: user.login,
+			},
+			data: user,
+		});
+		return res.status(200).json(updatedUser);
+	}
 
+	async UpdateUserConfig(
+		@Req() req: Request,
+		@Res() res: Response,
+		file: any,
+		text: string
+	) {
+		const user = await this.getUser(req);
+		if ((await this.fileservice.checkFile(file)) === false)
+			return res.status(400).json({ message: "Bad file" });
+		try {
+			await fs.promises.unlink(user.avatar);
+		} catch (error) {
+			return res.status(400).json({ message: "Delete File error" });
+		}
+		const extension = path.extname(file.originalname);
+		const filepath: string = path.join(
+			"public",
+			"uploads",
+			user.id + "-" + uuidv4() + extension
+		);
+		try {
+			await fs.promises.writeFile(filepath, file.buffer);
+		} catch (error) {
+			return res.status(400).json({ message: "Write File error" });
+		}
 		if (!user) {
 			return res.status(404).json({ message: `User not found` });
 		}
