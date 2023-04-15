@@ -1,9 +1,15 @@
 import React from 'react';
 import './MiddleInfo.css';
-import { BasicFrameProps } from '../../types';
 import { DonutLevel } from './Components/DonutLevel/DonutLevel';
 import { Achievements } from './Components/Achievements/Achievements';
 import { Friends } from './Components/Friends/Friends';
+
+interface BasicFrameProps {
+	height?: string;
+	width?: string;
+	title: string;
+	children: React.ReactNode;
+}
 
 export const BasicFrame = ({
 	height = '254px',

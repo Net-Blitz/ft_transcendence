@@ -1,12 +1,18 @@
 import React from 'react';
 import './Achievements.css';
 import { BasicFrame } from '../../MiddleInfo';
-import { AchievementProps } from '../../../../types';
 /*	TMP RESSOURCES	*/
 import achievement1 from './Tmp/achievement1.png';
 import achievement2 from './Tmp/achievement2.png';
 import achievement3 from './Tmp/achievement3.png';
 import achievement4 from './Tmp/achievement4.png';
+
+interface AchievementProps {
+	img: string;
+	title: string;
+	description: string;
+	lock?: boolean;
+}
 
 const Achievement = ({ img, title, description, lock }: AchievementProps) => {
 	return (

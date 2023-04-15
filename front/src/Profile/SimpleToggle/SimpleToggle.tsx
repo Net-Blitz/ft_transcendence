@@ -1,7 +1,11 @@
 import React from 'react';
 import { useState } from 'react';
 import './SimpleToggle.css';
-import { SimpleToggleProps } from '../types';
+
+interface SimpleToggleProps {
+	toggled: boolean;
+	onClick: (isToggled: boolean) => void;
+}
 
 export const SimpleToggle = ({ toggled, onClick }: SimpleToggleProps) => {
 	const [isToggled, toggle] = useState(toggled);

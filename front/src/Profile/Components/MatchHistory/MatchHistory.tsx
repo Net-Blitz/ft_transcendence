@@ -1,12 +1,22 @@
 import React from 'react';
 import './MatchHistory.css';
 import { BasicFrame } from '../MiddleInfo/MiddleInfo';
-import { TeamMatchProps, dataHistoryProps } from '../../types';
 /* Ressources */
 import avatar1 from '../../../MainPage/Components/Ressources/avatar1.svg';
 import avatar2 from '../../../MainPage/Components/Ressources/avatar2.svg';
 import avatar3 from '../../../MainPage/Components/Ressources/avatar3.svg';
 import avatar4 from '../../../MainPage/Components/Ressources/avatar4.svg';
+
+interface TeamMatchProps {
+	img: string;
+	level: number;
+	index: number;
+}
+
+interface dataHistoryProps {
+	history: any;
+	index: number;
+}
 
 const TeamMatch = ({ img, level, index }: TeamMatchProps) => {
 	return (

@@ -1,13 +1,25 @@
 import React, { useCallback, useState } from 'react';
 import './MainInfo.css';
 import { PopUp, ProfileConfig } from './ProfileConfig';
-import { InfoElementProps, MainInfoProps } from '../../types';
 /*	REDUX	*/
 import { useSelector } from 'react-redux';
 import { selectUserData } from '../../../utils/redux/selectors';
 import { SimpleToggle } from '../../SimpleToggle/SimpleToggle';
 /*	RESSOURCES	*/
 import paint_brush from './Ressources/paint-brush.svg';
+
+interface MainInfoProps {
+	avatar: string;
+	username: string;
+	handleTrigger: () => void;
+}
+
+interface InfoElementProps {
+	title: string;
+	content: string;
+	isToggle?: boolean;
+	border?: boolean;
+}
 
 const MainElement = ({ avatar, username, handleTrigger }: MainInfoProps) => {
 	return (

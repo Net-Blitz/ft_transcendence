@@ -1,9 +1,14 @@
 import React from 'react';
 import './Friends.css';
 import { BasicFrame } from '../../MiddleInfo';
-import { FriendProps } from '../../../../types';
 /*	TMP RESSOURCES	*/
 import friend1 from './Tmp/friend1.png';
+
+interface FriendProps {
+	avatar: string;
+	username: string;
+	level: number;
+}
 
 const Friend = ({ avatar, username, level }: FriendProps) => {
 	return (
