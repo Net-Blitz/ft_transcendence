@@ -1,7 +1,6 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import './MainInfo.css';
 import { PopUp, ProfileConfig } from './ProfileConfig';
-import { AuthConfig } from '../../../Login/Components/Auth/Auth';
 import { InfoElementProps, MainInfoProps } from '../../types';
 /*	REDUX	*/
 import { useSelector } from 'react-redux';
@@ -10,11 +9,11 @@ import { SimpleToggle } from '../../SimpleToggle/SimpleToggle';
 /*	RESSOURCES	*/
 import paint_brush from './Ressources/paint-brush.svg';
 
-const MainElement = ({ avatar, username }: MainInfoProps) => {
+const MainElement = ({ avatar, username, handleTrigger }: MainInfoProps) => {
 	return (
 		<div className="main-element">
 			<div className="banner">
-				<div className="edit">
+				<div className="edit" onClick={handleTrigger}>
 					<img src={paint_brush} alt="button-edit" />
 				</div>
 				<img src={avatar} alt="avatar" />
@@ -48,6 +47,11 @@ const InfoElement = ({
 
 export const MainInfo = () => {
 	const userData = useSelector(selectUserData);
+	const [trigger, setTrigger] = useState(true);
+
+	const handleTrigger = useCallback(() => {
+		setTrigger(!trigger);
+	}, [trigger, setTrigger]);
 
 	return (
 		<div className="maininfo-wrapper">
@@ -57,6 +61,7 @@ export const MainInfo = () => {
 			<MainElement
 				avatar={userData.avatar}
 				username={userData.username}
+				handleTrigger={handleTrigger}
 			/>
 			<InfoElement
 				title="42login"
@@ -69,8 +74,8 @@ export const MainInfo = () => {
 				border={true}
 			/>
 			<InfoElement title="2FA Status" content="22/02" isToggle={true} />
-			<PopUp trigger={true}>
-				<ProfileConfig />
+			<PopUp trigger={trigger}>
+				<ProfileConfig handleTrigger={handleTrigger} />
 			</PopUp>
 		</div>
 	);

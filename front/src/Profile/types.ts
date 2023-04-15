@@ -1,6 +1,7 @@
 export interface MainInfoProps {
 	avatar: string;
 	username: string;
+	handleTrigger: () => void;
 }
 
 export interface InfoElementProps {

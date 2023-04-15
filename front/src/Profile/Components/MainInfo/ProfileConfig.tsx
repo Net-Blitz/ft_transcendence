@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './ProfileConfig.css';
 /*	Components	*/
 import Input from '../../../Login/Components/Auth/Input/Input';
@@ -11,23 +11,35 @@ import close from './Ressources/close.svg';
 import id from './Ressources/id.svg';
 import refresh from './Ressources/refresh.svg';
 
-export const PopUp = (props: any) => {
-	return props.trigger ? (
-		<div className="popup">
-			<div className="popup-inner">{props.children}</div>
-		</div>
-	) : (
-		<div></div>
-	);
+interface PopUpProps {
+	trigger: boolean;
+	children: any;
+}
+
+interface ProfileConfigProps {
+	handleTrigger: () => void;
+}
+
+export const PopUp = ({ trigger, children }: PopUpProps) => {
+	return trigger ? <div className="popup">{children}</div> : <div></div>;
 };
 
-export const ProfileConfig = (props: any) => {
+export const ProfileConfig = ({ handleTrigger }: ProfileConfigProps) => {
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [avatar, setAvatar] = useState(generateAvatars(12));
+	const me = document.getElementsByClassName('popup');
+
+	useEffect(() => {
+		window.onclick = (event: any) => {
+			if (event.target === me[0]) {
+				handleTrigger();
+			}
+		};
+	}, [me, handleTrigger]);
 
 	return (
 		<div className="profileconfig-wrapper">
-			<img src={close} alt="close-button" />
+			<img src={close} alt="close-button" onClick={handleTrigger} />
 			<h2>My profile</h2>
 			<Input
 				input_title="Pseudo"
