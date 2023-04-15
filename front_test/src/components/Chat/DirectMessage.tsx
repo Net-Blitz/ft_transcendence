@@ -1,7 +1,7 @@
 import MessageInput from "./MessageInput";
-import Messages from "./Messages";
 import Notification from "../Notification/Notification";
 import { useEffect, useState } from "react";
+import PopupDM from "./PopupDM";
 
 export interface DirectMessageDto {
 	id: number;
@@ -17,6 +17,7 @@ function DirectMessage({ DMList, userInfo, socket }: any) {
 	const [selectedDM, setSelectedDM] = useState<number>(0);
 	const [messages, setMessages] = useState<any[]>([]);
 	const [notification, setNotification] = useState({ message: "", type: "" });
+	const [PopupNewDm, setPopupNewDm] = useState(false);
 
 	const handleDMClick = async (DM: DirectMessageDto) => {
 		if (DM.id === selectedDM) return;
@@ -49,18 +50,30 @@ function DirectMessage({ DMList, userInfo, socket }: any) {
 		setMessages((messages) => [...messages, message]);
 	};
 
+	const handleTogglePopupNewDm = () => {
+		setPopupNewDm(!PopupNewDm);
+	};
+
 	return (
 		<>
 			<Notification
 				message={notification.message}
 				type={notification.type}
 			/>
+			{PopupNewDm && (
+				<PopupDM
+					ClosePopup={handleTogglePopupNewDm}
+					setNotification={setNotification}
+				/>
+			)}
 			<div className="wrapper">
 				<div className="container">
 					<div className="left">
 						<div className="top">
 							<p>Direct Messages</p>
-							<button>New DM</button>
+							<button onClick={handleTogglePopupNewDm}>
+								New DM
+							</button>
 						</div>
 						<ul className="channel">
 							{DMList.map((DM: DirectMessageDto) => (
@@ -71,10 +84,19 @@ function DirectMessage({ DMList, userInfo, socket }: any) {
 									}`}
 									onClick={() => handleDMClick(DM)}
 								>
+									<img
+										className="friend-img"
+										src={
+											userInfo.id === DM.senderId
+												? DM.receiver.avatar
+												: DM.sender.avatar
+										}
+										alt="avatar"
+									/>
 									<span className="name">
 										{userInfo.id === DM.senderId
-											? DM.receiverId
-											: DM.senderId}
+											? DM.receiver.username
+											: DM.sender.username}
 									</span>
 								</li>
 							))}
@@ -87,7 +109,18 @@ function DirectMessage({ DMList, userInfo, socket }: any) {
 								<span className="name">
 									{selectedDM === 0
 										? "No Chat selected"
-										: selectedDM}
+										: DMList.find(
+												(DM: DirectMessageDto) =>
+													DM.id === selectedDM
+										  )?.senderId === userInfo.id
+										? DMList.find(
+												(DM: DirectMessageDto) =>
+													DM.id === selectedDM
+										  )?.receiver.username
+										: DMList.find(
+												(DM: DirectMessageDto) =>
+													DM.id === selectedDM
+										  )?.sender.username}
 								</span>
 							</span>
 						</div>

@@ -1,0 +1,83 @@
+import axios from "axios";
+import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
+
+function PopupDM({ ClosePopup, setNotification }: any) {
+	const [users, setUsers] = useState<any[]>([]);
+	const PopupRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		const fetchUsers = async () => {
+			const response = await axios.get(
+				"http://localhost:3333/users/login",
+				{
+					withCredentials: true,
+				}
+			);
+			setUsers(response.data);
+		};
+		fetchUsers();
+	}, []);
+
+	const handleDM = async (username: string) => {
+		try {
+			await axios.post(
+				"http://localhost:3333/chat/dm/create",
+				{ username: username },
+				{ withCredentials: true }
+			);
+			setNotification({
+				message: "DM created",
+				type: "success",
+			});
+			ClosePopup();
+		} catch (error) {
+			setNotification({
+				message: "DM already exist",
+				type: "error",
+			});
+		}
+	};
+
+	return (
+		<div ref={PopupRef} className="overlay">
+			<div className="popup center">
+				<label className="close" onClick={ClosePopup}>
+					&times;
+				</label>
+				<h2>New Direct Message</h2>
+				<div className="content-dm">
+					<ul className="users">
+						{users.map((user) => (
+							<li className="person" key={user.id}>
+								<Link to={"/profile/" + user.username}>
+									<div className="users-list">
+										<img
+											className="friend-img"
+											src={user.avatar}
+											alt="avatar"
+										/>
+										<span className="name">
+											{user.username}
+										</span>
+									</div>
+								</Link>
+								<button
+									onClick={() => {
+										handleDM(user.username);
+									}}
+									value={user.username}
+									className="btn btn-primary"
+								>
+									DM
+								</button>
+							</li>
+						))}
+					</ul>
+				</div>
+			</div>
+		</div>
+	);
+}
+
+export default PopupDM;

@@ -162,4 +162,13 @@ export class ChatController {
 	async getDM(@Res() res: Response, @GetUser() user: any) {
 		return await this.chatService.getDMs(res, user);
 	}
+
+	@Post("dm/create")
+	async CreateDM(
+		@Body("username") username: string,
+		@Res() res: Response,
+		@GetUser() user: any
+	) {
+		return await this.chatService.CreateDM(username, res, user);
+	}
 }

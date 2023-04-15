@@ -592,9 +592,90 @@ export class ChatService {
 			if (!DMs) {
 				return res.status(404).json({ message: "DMs not found" });
 			}
+
+			const sender = await this.prisma.user.findMany({
+				where: {
+					id: {
+						in: DMs.map((DM) => DM.senderId),
+					},
+				},
+			});
+
+			const receiver = await this.prisma.user.findMany({
+				where: {
+					id: {
+						in: DMs.map((DM) => DM.receiverId),
+					},
+				},
+			});
+
+			DMs.forEach((DM) => {
+				DM["sender"] = sender.find((user) => user.id === DM.senderId);
+				DM["receiver"] = receiver.find(
+					(user) => user.id === DM.receiverId
+				);
+			});
+
 			return res.status(200).json(DMs);
 		} catch (e) {
 			return res.status(404).json({ message: "DMs not found" });
+		}
+	}
+
+	async CreateDM(
+		@Body("username") username: string,
+		@Res() res: Response,
+		@GetUser() user: any
+	) {
+		try {
+			const userExists = await this.prisma.user.findUnique({
+				where: {
+					login: username,
+				},
+			});
+			if (!userExists) {
+				return res.status(404).json({ message: "User not found" });
+			}
+
+			const dm = await this.prisma.directMessage.findFirst({
+				where: {
+					OR: [
+						{
+							AND: [
+								{
+									senderId: user.id,
+								},
+								{
+									receiverId: userExists.id,
+								},
+							],
+						},
+						{
+							AND: [
+								{
+									senderId: userExists.id,
+								},
+								{
+									receiverId: user.id,
+								},
+							],
+						},
+					],
+				},
+			});
+			if (dm) {
+				return res.status(404).json({ message: "DM already exist" });
+			}
+
+			const DM = await this.prisma.directMessage.create({
+				data: {
+					senderId: user.id,
+					receiverId: userExists.id,
+				},
+			});
+			return res.status(200).json(DM);
+		} catch (e) {
+			return res.status(404).json({ message: "DM already exist" });
 		}
 	}
 }

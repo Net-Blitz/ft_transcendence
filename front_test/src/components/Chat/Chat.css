@@ -253,6 +253,13 @@ input[type="text"]:focus {
 	max-height: 400px;
 	overflow: auto;
 }
+.content-dm {
+	max-height: 400px;
+	overflow: auto;
+	display: flex;
+	flex-direction: column;
+	width: -webkit-fill-available;
+}
 
 .popup.p {
 	margin: 0 0 1rem;
