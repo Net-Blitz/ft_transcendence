@@ -28,7 +28,10 @@ const useWindowWidth = () => {
 	return windowWidth;
 };
 
-const MatchesInProgress: React.FC<MatchesInProgressProps> = ({ filters }) => {
+const MatchesInProgress: React.FC<MatchesInProgressProps> = ({
+	filters,
+	viewMoreButton,
+}) => {
 	//This specifies that the MatchesInProgress variable is a React component and it expects props of the type
 	const header = [
 		'Game mode',
@@ -41,7 +44,17 @@ const MatchesInProgress: React.FC<MatchesInProgressProps> = ({ filters }) => {
 		'Watch',
 	];
 	const headerMobile = ['Game mode', 'Team', 'Score', 'Watch'];
+	const headerMobilePart1 = ['Game mode', 'Team', 'Score', 'Map'];
+	const headerMobilePart2 = ['Date', 'Hour', 'Difficulty', 'Watch'];
 	const isMobileView = useWindowWidth() < 767;
+	const [columnCount, setColumnCount] = useState(0);
+	useEffect(() => {
+		const table = document.querySelector('table');
+		if (table) {
+			const columnCount = table.rows[0]?.cells.length || 0; //calculate the number of columns for the colSpan
+			setColumnCount(columnCount);
+		}
+	});
 	{
 		/** @TODO Lier au back */
 	}
@@ -150,45 +163,100 @@ const MatchesInProgress: React.FC<MatchesInProgressProps> = ({ filters }) => {
 		return filteredData;
 	};
 	const finalData = filterAll(data, filters);
+	console.log('isMobileView', isMobileView);
 	const dataGame = (data: DataTable, index: number) => (
-		<tr className={index % 2 === 0 ? 'odd' : 'even'}>
-			<td>{data.gameMode}</td>
-			<td className="teamMatch">
-				{data.team.map((teamMember, index) => (
-					<div className="teamMemberLevel" key={index}>
-						<img
-							src={teamMember.img}
-							alt={`Team member ${index + 1}`}
-						/>
-						<p>{teamMember.level}</p>
-					</div>
-				))}
-			</td>
-			{!isMobileView && <td className="dateMatch">{data.date}</td>}
-			{!isMobileView && <td className="hourMatch">{data.hour}</td>}
-			<td className="ScoreMatch">
-				<div className="teamScore">
-					{data.score.map((scoreMember, index) => (
-						<p>{scoreMember}</p>
+		<>
+			<tr
+				className={`${index % 2 === 0 ? 'odd' : 'even'} ${
+					viewMoreButton ? 'viewMoreActive' : 'viewMoreInactive'
+				}`}>
+				<td className="gameModeMatches">{data.gameMode}</td>
+				<td className="teamMatch">
+					{data.team.map((teamMember, index) => (
+						<div className="teamMemberLevel" key={index}>
+							<img
+								src={teamMember.img}
+								alt={`Team member ${index + 1}`}
+							/>
+							<p>{teamMember.level}</p>
+						</div>
 					))}
-				</div>
-			</td>
-			{!isMobileView && (
-				<td className="difficultyMatch">{data.difficulty}</td>
+				</td>
+				{!isMobileView && <td className="dateMatch">{data.date}</td>}
+				{!isMobileView && <td className="hourMatch">{data.hour}</td>}
+				<td className="ScoreMatch">
+					<div className="teamScore">
+						{data.score.map((scoreMember, index) => (
+							<p>{scoreMember}</p>
+						))}
+					</div>
+				</td>
+				{!isMobileView && (
+					<td className="difficultyMatch">{data.difficulty}</td>
+				)}
+				{!isMobileView && <td className="mapMatch">{data.map}</td>}
+				{viewMoreButton && isMobileView && (
+					<td className="mapMatch">{data.map}</td>
+				)}
+				{!viewMoreButton && (
+					<td className="watchMatch">
+						<button
+							className="buttonMatch"
+							onClick={() => window.open(data.watch)}>
+							Watch
+						</button>
+					</td>
+				)}
+			</tr>
+			{isMobileView && viewMoreButton && (
+				<tr
+					className={`headerRowMobile ${
+						index % 2 === 0 ? 'odd' : 'even'
+					} headerPart1`}>
+					{headerMobilePart1.map((headerText, index) => (
+						<th className={headerText} key={index}>
+							{headerText}
+						</th>
+					))}
+				</tr>
 			)}
-			{!isMobileView && <td className="mapMatch">{data.map}</td>}
-			<td className="watchMatch">
-				<button
-					className="buttonMatch"
-					onClick={() => window.open(data.watch)}>
-					Watch
-				</button>
-			</td>
-		</tr>
+			{isMobileView && viewMoreButton && (
+				<tr
+					className={`${index % 2 === 0 ? 'odd' : 'even'} ${
+						viewMoreButton ? 'viewMoreActive' : 'viewMoreInactive'
+					}`}>
+					<td className="dateMatch">{data.date}</td>
+					<td className="hourMatch">{data.hour}</td>
+					<td className="difficultyMatch">{data.difficulty}</td>
+					<td className="watchMatch">
+						<button
+							className="buttonMatch"
+							onClick={() => window.open(data.watch)}>
+							Watch
+						</button>
+					</td>
+				</tr>
+			)}
+			{isMobileView && viewMoreButton && (
+				<tr
+					className={`headerRowMobile ${
+						index % 2 === 0 ? 'odd' : 'even'
+					} headerPart2`}>
+					{headerMobilePart2.map((headerText, index) => (
+						<th className={headerText} key={index}>
+							{headerText}
+						</th>
+					))}
+				</tr>
+			)}
+		</>
 	);
 
 	return (
-		<table className="matchesInProgress">
+		<table
+			className={`matchesInProgress ${
+				viewMoreButton ? 'viewMoreActive' : 'viewMoreInactive'
+			}`}>
 			<thead>
 				<tr>
 					{!isMobileView &&
@@ -196,6 +264,7 @@ const MatchesInProgress: React.FC<MatchesInProgressProps> = ({ filters }) => {
 							<th key={index}>{header}</th>
 						))}
 					{isMobileView &&
+						!viewMoreButton &&
 						headerMobile.map((headerMobile, index) => (
 							<th className={headerMobile} key={index}>
 								{headerMobile}

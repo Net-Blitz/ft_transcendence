@@ -27,6 +27,7 @@ export interface MatchesInProgressProps {
 		map: string;
 		difficulty: string;
 	};
+	viewMoreButton: boolean;
 }
 
 export type Filters = {

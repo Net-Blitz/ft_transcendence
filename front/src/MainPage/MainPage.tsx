@@ -139,7 +139,9 @@ const MainPage = () => {
 					onClick={() =>
 						setmobileViewMoreVisible(!mobileViewMoreVisible)
 					}>
-					View more details
+					{mobileViewMoreVisible
+						? 'View less details'
+						: 'View more details'}
 				</button>
 				<button
 					className="buttonFilterMobile"
@@ -206,7 +208,10 @@ const MainPage = () => {
 				/>
 			</div>
 			<div className="gameDiv">
-				<MatchesInProgress filters={filters} />
+				<MatchesInProgress
+					filters={filters}
+					viewMoreButton={mobileViewMoreVisible}
+				/>
 				{!hasManyMatches && mainRectangleMobile && (
 					<div className="illustrationGamingActivity">
 						<p>
