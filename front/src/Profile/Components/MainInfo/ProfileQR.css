@@ -6,7 +6,7 @@
 	transform: translate(-50%, -50%);
 	z-index: 6;
 	width: 436px;
-	height: 488px;
+	height: 414px;
 	background-color: #F9DA49;
 	border-radius: 15px;
 	display: flex;
@@ -34,15 +34,30 @@
 }
 
 .popup .profileqr-wrapper > p {
-	font-family: 'Poppins';
+	font-family: 'Poppins', sans-serif;
 	font-style: normal;
 	font-weight: 300;
 	font-size: 12px;
 	text-align: center;
 	color: #0A3D62;
 	margin: 6px 0 0 0;
+	width: 363px;
 }
 
+.popup .profileqr-wrapper > .code-button {
+	all: unset;
+	width: 210px;
+	height: 23px;
+	font-family: 'Poppins', sans-serif;
+	font-style: normal;
+	font-weight: 300;
+	font-size: 12px;
+	text-align: center;
+	color: #0A3D62;
+	background-color: #FDFAD0;
+	border-radius: 19px;
+	margin-top: 10px;
+}
 /* Input */
 .popup .profileqr-wrapper > .input-wrapper {
 	width: unset;

@@ -1,10 +1,13 @@
 import React, { useCallback, useState } from 'react';
+import axios from 'axios';
 import './MainInfo.css';
 /*	Components	*/
 import { ProfileConfig } from './ProfileConfig';
 import { ProfileQR } from './ProfileQR';
+/* Functions */
+import { fetchOrUpdateUser } from '../../../utils/redux/user';
 /*	Redux	*/
-import { useSelector } from 'react-redux';
+import { useSelector, useStore } from 'react-redux';
 import { selectUserData } from '../../../utils/redux/selectors';
 import { SimpleToggle } from '../../SimpleToggle/SimpleToggle';
 /*	Ressources	*/
@@ -59,7 +62,7 @@ const InfoElement = ({
 	return (
 		<div className={border ? 'info-element border' : 'info-element'}>
 			<h3>{title}</h3>
-			{isToggle && toggle !== undefined && handleToggle != undefined ? (
+			{isToggle && toggle !== undefined && handleToggle !== undefined ? (
 				<SimpleToggle toggled={toggle} handleToggle={handleToggle} />
 			) : (
 				<p>{content}</p>
@@ -72,7 +75,8 @@ export const MainInfo = () => {
 	const userData = useSelector(selectUserData);
 	const [trigger, setTrigger] = useState(false);
 	const [triggerQR, setTriggerQR] = useState(false);
-	const defaultToggle: boolean = userData.twoFactor;
+	const [defaultToggle, setDefaultToggle] = useState(userData.twoFactor);
+	const store = useStore();
 
 	const handleTrigger = useCallback(() => {
 		setTrigger(!trigger);
@@ -82,13 +86,20 @@ export const MainInfo = () => {
 		setTriggerQR(!triggerQR);
 	}, [triggerQR, setTriggerQR]);
 
-	const handleToggle = useCallback(() => {
+	const handleToggle = useCallback(async () => {
 		if (defaultToggle === false) {
 			setTriggerQR(true);
 		} else {
-			console.log('toggle off');
+			try {
+				await axios.delete('http://localhost:3333/auth/2fa/disable', {
+					withCredentials: true,
+				});
+				setDefaultToggle(false);
+			} catch (error) {
+				console.log(error);
+			}
 		}
-	}, []);
+	}, [defaultToggle]);
 
 	return (
 		<div className="maininfo-wrapper">
@@ -120,8 +131,7 @@ export const MainInfo = () => {
 				toggle={defaultToggle}
 				handleToggle={handleToggle}
 			/>
-			{/* <PopUp trigger={triggerQR}> */}
-			<PopUp trigger={true}>
+			<PopUp trigger={triggerQR}>
 				<ProfileQR handleTrigger={handleTriggerQR} />
 			</PopUp>
 		</div>
