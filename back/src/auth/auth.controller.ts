@@ -76,16 +76,6 @@ export class AuthController {
 		return await this.authService.verify2fa(req, res, code);
 	}
 
-	@Post("2fa/verify_test")
-	async verify2fa_test(
-		@Req() req: Request,
-		@Res() res: Response,
-		@GetUser() user: any,
-		@Body("verificationCode") code: string
-	) {
-		return await this.authService.verify2fa_test(req, res, user, code);
-	}
-
 	@Delete("2fa/disable")
 	async remove2fa(
 		@Req() req: Request,

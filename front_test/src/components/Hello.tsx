@@ -41,6 +41,7 @@ function Hello() {
 			<button onClick={handleClick}>Dashboard</button>
 			<button onClick={handleLogout}>Logout</button>
 			<button onClick={() => navigate("/friend")}>Friend</button>
+			<button onClick={() => navigate("/chat")}>Chat</button>
 			<button onClick={() => navigate("/2fa")}>2FA</button>
 			<button onClick={handleGame}>JoinGame</button>
 		</div>

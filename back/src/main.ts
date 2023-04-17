@@ -10,7 +10,8 @@ async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
 	const config = app.get(ConfigService);
 	app.enableCors({
-		origin: "http://" + config.get("HOST_T") + ":" + config.get("PORT_GLOBAL"),
+		origin:
+			"http://" + config.get("HOST_T") + ":" + config.get("PORT_GLOBAL"),
 		preflightContinue: true,
 		methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
 		credentials: true,

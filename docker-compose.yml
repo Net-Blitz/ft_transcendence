@@ -41,6 +41,7 @@ services:
         ports:
             - "5555:5555"
             - "3333:3333"
+            - "3334:3334"
 
     dev-db:
         container_name: dev-db
@@ -60,7 +61,7 @@ volumes:
             type: 'none'
             device: '$PWD/front'
             o: bind
-    
+
     front_testVolume:
         driver: local
         driver_opts:

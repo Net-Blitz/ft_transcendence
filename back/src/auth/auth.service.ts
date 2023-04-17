@@ -28,7 +28,6 @@ export class AuthService {
 		}
 		return user;
 	}
-	//eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImxvZ2luIjoiamVhbiIsImlhdCI6MTY3ODQ2NDQ5MiwiZXhwIjoxNjc4NDcxNjkyfQ.gK4NF2HcjxMvgf9KOj_H3TU2R8vyzEwCVxqRYij_nP4
 
 	async Auth42Callback(
 		@Req() req: Request,
@@ -52,7 +51,7 @@ export class AuthService {
 				return this.getUserInfo(req, res, response.data.access_token);
 			});
 		} catch (error) {
-			//console.log(error);
+			console.log(error);
 			throw new ForbiddenException("callback error");
 		}
 	}
@@ -144,13 +143,13 @@ export class AuthService {
 		//return res.redirect("http://localhost:8080");
 
 		// temporary token generator for testing
-		//const payload2 = { sub: 2, login: "Ubuntu" };
-		//const token2 = this.jwt.sign(payload2, { expiresIn: "120min", secret });
-		//console.log("Ubuntu token: " + token2);
+		const payload2 = { sub: 2, login: "Ubuntu" };
+		const token2 = this.jwt.sign(payload2, { expiresIn: "480min", secret });
+		console.log("Ubuntu token: " + token2);
 
-		//const payload3 = { sub: 3, login: "Fedora" };
-		//const token3 = this.jwt.sign(payload3, { expiresIn: "120min", secret });
-		//console.log("Fedora token: " + token3);
+		const payload3 = { sub: 3, login: "Fedora" };
+		const token3 = this.jwt.sign(payload3, { expiresIn: "120min", secret });
+		console.log("Fedora token: " + token3);
 
 		return { access_token: token };
 	}
@@ -214,30 +213,6 @@ export class AuthService {
 		if (verified) {
 			const token = await this.signToken(req, res, user);
 			return res.status(200).json(token);
-		} else {
-			return res.status(400).json({ message: "UNVALID" });
-		}
-	}
-
-	async verify2fa_test(
-		@Req() req: Request,
-		@Res() res: Response,
-		@GetUser() user: any,
-		code: string
-	) {
-		if (!user || !user.twoFactor || !user.secret) {
-			return res.status(400).json({
-				message: "NO 2FA",
-			});
-		}
-
-		const verified = authenticator.verify({
-			secret: user.secret,
-			token: code,
-		});
-
-		if (verified) {
-			return res.status(200).json({ message: "OK" });
 		} else {
 			return res.status(400).json({ message: "UNVALID" });
 		}

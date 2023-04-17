@@ -3,7 +3,7 @@ import axios from "axios";
 import "./Dashboard.css";
 import { Link } from "react-router-dom";
 
-interface User {
+export interface User {
 	avatar: string;
 	elo: number;
 	id: number;
