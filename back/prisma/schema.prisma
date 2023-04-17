@@ -89,12 +89,12 @@ model Message {
     id              Int            @id @default(autoincrement())
     createdAt       DateTime       @default(now())
     message         String
-    channelId       Int
-    userId          Int
-    channel         Channel        @relation(fields: [channelId], references: [id])
-    user            User           @relation(fields: [userId], references: [id])
-    DirectMessage   DirectMessage? @relation(fields: [directMessageId], references: [id])
+    channelId       Int?
+    channel         Channel?       @relation(fields: [channelId], references: [id])
     directMessageId Int?
+    DirectMessage   DirectMessage? @relation(fields: [directMessageId], references: [id])
+    userId          Int
+    user            User           @relation(fields: [userId], references: [id])
 
     @@map("messages")
 }

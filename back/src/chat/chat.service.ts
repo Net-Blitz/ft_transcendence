@@ -678,4 +678,34 @@ export class ChatService {
 			return res.status(404).json({ message: "DM already exist" });
 		}
 	}
+
+	async getDMMessages(
+		@Param("id") id: string,
+		@Res() res: Response,
+		@GetUser() user: any
+	) {
+		try {
+			const DM = await this.prisma.directMessage.findUnique({
+				where: {
+					id: parseInt(id),
+				},
+			});
+			if (!DM) {
+				return res.status(404).json({ message: "DM not found" });
+			}
+			if (DM.senderId !== user.id && DM.receiverId !== user.id) {
+				return res.status(403).json({ message: "Forbidden" });
+			}
+
+			const messages = await this.prisma.message.findMany({
+				where: {
+					directMessageId: DM.id,
+				},
+			});
+
+			return res.status(200).json(messages);
+		} catch (e) {
+			return res.status(404).json({ message: "Messages not found" });
+		}
+	}
 }

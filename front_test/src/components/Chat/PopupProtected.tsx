@@ -84,7 +84,7 @@ function PopupProtected({
 						<label className="close" onClick={ClosePopupPassword}>
 							&times;
 						</label>
-						<h2>Private Channel</h2>
+						<h2>Protected Channel</h2>
 						<div className="content">
 							<p>Enter the password of the channel</p>
 							<input

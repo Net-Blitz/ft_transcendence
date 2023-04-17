@@ -195,6 +195,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				throw new Error("Invalid DM");
 			}
 
+			await this.prisma.message.create({
+				data: {
+					userId: senderUser.id,
+					message: content,
+					directMessageId: DM.id,
+				},
+			});
+
 			const userSocket = this.DMs.get(message.receiver);
 			this.server
 				.to(userSocket.id)

@@ -171,4 +171,13 @@ export class ChatController {
 	) {
 		return await this.chatService.CreateDM(username, res, user);
 	}
+
+	@Get("dm/messages/:id")
+	async getDMMessages(
+		@Param("id") id: string,
+		@Res() res: Response,
+		@GetUser() user: any
+	) {
+		return await this.chatService.getDMMessages(id, res, user);
+	}
 }

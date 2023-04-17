@@ -2,6 +2,7 @@ import MessageInput from "./MessageInput";
 import Notification from "../Notification/Notification";
 import { useEffect, useState } from "react";
 import PopupDM from "./PopupDM";
+import axios from "axios";
 
 export interface DirectMessageDto {
 	id: number;
@@ -31,16 +32,39 @@ function DirectMessage({
 	};
 
 	useEffect(() => {
+		if (selectedDM === 0) return;
+		const getMessages = async () => {
+			try {
+				const reponse = await axios.get(
+					"http://localhost:3333/chat/dm/messages/" + selectedDM,
+					{ withCredentials: true }
+				);
+				reponse.data.map((message: any) => {
+					return (
+						message.userId === userInfo.id
+							? (message.username = userInfo.username)
+							: (message.username = ""),
+						(message.content = message.message)
+					);
+				});
+				setMessages(reponse.data);
+			} catch (error) {
+				console.log(error);
+			}
+		};
+
 		socket?.on("DM", (message: any) => {
 			if (message.DMid === selectedDM)
 				setMessages((messages) => [...messages, message]);
 		});
 		socket?.emit("ConnectedDM", { id: userInfo?.id });
 
+		getMessages();
+
 		return () => {
 			socket?.off("DM");
 		};
-	}, [selectedDM, socket, userInfo?.id]);
+	}, [selectedDM, socket, userInfo?.id, userInfo?.username]);
 
 	const sendMessage = (message: any) => {
 		if (!message.content) return;
