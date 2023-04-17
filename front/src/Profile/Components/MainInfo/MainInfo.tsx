@@ -1,11 +1,13 @@
 import React, { useCallback, useState } from 'react';
 import './MainInfo.css';
-import { PopUp, ProfileConfig } from './ProfileConfig';
-/*	REDUX	*/
+/*	Components	*/
+import { ProfileConfig } from './ProfileConfig';
+import { ProfileQR } from './ProfileQR';
+/*	Redux	*/
 import { useSelector } from 'react-redux';
 import { selectUserData } from '../../../utils/redux/selectors';
 import { SimpleToggle } from '../../SimpleToggle/SimpleToggle';
-/*	RESSOURCES	*/
+/*	Ressources	*/
 import paint_brush from './Ressources/paint-brush.svg';
 
 interface MainInfoProps {
@@ -19,7 +21,18 @@ interface InfoElementProps {
 	content: string;
 	isToggle?: boolean;
 	border?: boolean;
+	toggle?: boolean;
+	handleToggle?: () => void;
 }
+
+interface PopUpProps {
+	trigger: boolean;
+	children: any;
+}
+
+export const PopUp = ({ trigger, children }: PopUpProps) => {
+	return trigger ? <div className="popup">{children}</div> : <div></div>;
+};
 
 const MainElement = ({ avatar, username, handleTrigger }: MainInfoProps) => {
 	return (
@@ -40,16 +53,14 @@ const InfoElement = ({
 	content,
 	isToggle,
 	border,
+	toggle,
+	handleToggle,
 }: InfoElementProps) => {
-	const logToggle = useCallback((state: any) => {
-		console.log(state);
-	}, []);
-
 	return (
 		<div className={border ? 'info-element border' : 'info-element'}>
 			<h3>{title}</h3>
-			{isToggle ? (
-				<SimpleToggle toggled={false} onClick={logToggle} />
+			{isToggle && toggle !== undefined && handleToggle != undefined ? (
+				<SimpleToggle toggled={toggle} handleToggle={handleToggle} />
 			) : (
 				<p>{content}</p>
 			)}
@@ -60,10 +71,24 @@ const InfoElement = ({
 export const MainInfo = () => {
 	const userData = useSelector(selectUserData);
 	const [trigger, setTrigger] = useState(false);
+	const [triggerQR, setTriggerQR] = useState(false);
+	const defaultToggle: boolean = userData.twoFactor;
 
 	const handleTrigger = useCallback(() => {
 		setTrigger(!trigger);
 	}, [trigger, setTrigger]);
+
+	const handleTriggerQR = useCallback(() => {
+		setTriggerQR(!triggerQR);
+	}, [triggerQR, setTriggerQR]);
+
+	const handleToggle = useCallback(() => {
+		if (defaultToggle === false) {
+			setTriggerQR(true);
+		} else {
+			console.log('toggle off');
+		}
+	}, []);
 
 	return (
 		<div className="maininfo-wrapper">
@@ -75,6 +100,9 @@ export const MainInfo = () => {
 				username={userData.username}
 				handleTrigger={handleTrigger}
 			/>
+			<PopUp trigger={trigger}>
+				<ProfileConfig handleTrigger={handleTrigger} />
+			</PopUp>
 			<InfoElement
 				title="42login"
 				content={userData.login}
@@ -85,9 +113,16 @@ export const MainInfo = () => {
 				content="22/02"
 				border={true}
 			/>
-			<InfoElement title="2FA Status" content="22/02" isToggle={true} />
-			<PopUp trigger={trigger}>
-				<ProfileConfig handleTrigger={handleTrigger} />
+			<InfoElement
+				title="2FA Status"
+				content="22/02"
+				isToggle={true}
+				toggle={defaultToggle}
+				handleToggle={handleToggle}
+			/>
+			{/* <PopUp trigger={triggerQR}> */}
+			<PopUp trigger={true}>
+				<ProfileQR handleTrigger={handleTriggerQR} />
 			</PopUp>
 		</div>
 	);

@@ -9,24 +9,15 @@ import Button from '../../../Login/Components/Auth/Button/Button';
 /*	Functions	*/
 import { generateAvatars } from '../../../Login/Components/Auth/Carousel/genAvatars';
 import { inputProtectionPseudo } from '../../../Login/Components/Auth/Input/inputProtection';
+import { fetchOrUpdateUser } from '../../../utils/redux/user';
 /*	Ressources	*/
 import close from './Ressources/close.svg';
 import id from './Ressources/id.svg';
 import refresh from './Ressources/refresh.svg';
-import { fetchOrUpdateUser } from '../../../utils/redux/user';
-
-interface PopUpProps {
-	trigger: boolean;
-	children: any;
-}
 
 interface ProfileConfigProps {
 	handleTrigger: () => void;
 }
-
-export const PopUp = ({ trigger, children }: PopUpProps) => {
-	return trigger ? <div className="popup">{children}</div> : <div></div>;
-};
 
 export const ProfileConfig = ({ handleTrigger }: ProfileConfigProps) => {
 	const [currentIndex, setCurrentIndex] = useState(0);

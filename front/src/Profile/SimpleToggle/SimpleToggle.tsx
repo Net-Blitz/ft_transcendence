@@ -4,23 +4,16 @@ import './SimpleToggle.css';
 
 interface SimpleToggleProps {
 	toggled: boolean;
-	onClick: (isToggled: boolean) => void;
+	handleToggle: () => void;
 }
 
-export const SimpleToggle = ({ toggled, onClick }: SimpleToggleProps) => {
-	const [isToggled, toggle] = useState(toggled);
-
-	const callback = () => {
-		toggle(!isToggled);
-		onClick(!isToggled);
-	};
-
+export const SimpleToggle = ({ toggled, handleToggle }: SimpleToggleProps) => {
 	return (
 		<label className="simpletoggle-wrapper">
 			<input
 				type="checkbox"
-				defaultChecked={isToggled}
-				onClick={callback}
+				defaultChecked={toggled}
+				onClick={handleToggle}
 			/>
 			<span />
 		</label>

@@ -5,7 +5,6 @@ import './QrCode.css';
 
 const QrCode = () => {
 	const [qrCodeUrl, setQrCodeUrl] = useState('');
-	const [verificationCode, setVerificationCode] = useState('');
 
 	useEffect(() => {
 		async function fetchQR() {
