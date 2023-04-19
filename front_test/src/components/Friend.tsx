@@ -3,7 +3,7 @@ import axios from "axios";
 import "./Dashboard.css";
 import { Link } from "react-router-dom";
 
-interface User {
+export interface User {
 	avatar: string;
 	elo: number;
 	id: number;
@@ -138,7 +138,7 @@ function Friend() {
 				{friends.map((friend) => (
 					<li key={friend.id}>
 						<div className="friend-info">
-							<Link to={"/profile/" + friend.login}>
+							<Link to={"/profile/" + friend.username}>
 								<img
 									className="friend-img"
 									src={friend.avatar}
@@ -151,7 +151,7 @@ function Friend() {
 						</div>
 						<button
 							className="add-friend"
-							onClick={() => RemoveFriend(friend.login)}
+							onClick={() => RemoveFriend(friend.username)}
 						>
 							Remove friend
 						</button>
@@ -163,7 +163,7 @@ function Friend() {
 				{pending.map((friend) => (
 					<li key={friend.id}>
 						<div className="friend-info">
-							<Link to={"/profile/" + friend.login}>
+							<Link to={"/profile/" + friend.username}>
 								<img
 									className="friend-img"
 									src={friend.avatar}
@@ -176,13 +176,13 @@ function Friend() {
 						</div>
 						<button
 							className="add-friend"
-							onClick={() => AcceptFriend(friend.login)}
+							onClick={() => AcceptFriend(friend.username)}
 						>
 							Accept
 						</button>
 						<button
 							className="add-friend"
-							onClick={() => DeclineFriend(friend.login)}
+							onClick={() => DeclineFriend(friend.username)}
 						>
 							Reject
 						</button>
@@ -194,7 +194,7 @@ function Friend() {
 				{demands.map((friend) => (
 					<li key={friend.id}>
 						<div className="friend-info">
-							<Link to={"/profile/" + friend.login}>
+							<Link to={"/profile/" + friend.username}>
 								<img
 									className="friend-img"
 									src={friend.avatar}
@@ -214,7 +214,7 @@ function Friend() {
 				{filteredUsers.map((user) => (
 					<li key={user.id}>
 						<div className="friend-info">
-							<Link to={"/profile/" + user.login}>
+							<Link to={"/profile/" + user.username}>
 								<img
 									className="friend-img"
 									src={user.avatar}
@@ -227,7 +227,7 @@ function Friend() {
 						</div>
 						<button
 							className="add-friend"
-							onClick={() => AddFriend(user.login)}
+							onClick={() => AddFriend(user.username)}
 						>
 							Add friend
 						</button>

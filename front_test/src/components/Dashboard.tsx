@@ -33,28 +33,32 @@ function Dashboard() {
 	}, []);
 	//console.log(userInfo);
 
-	const handleInputChange = (
-		event: React.ChangeEvent<HTMLInputElement>
-	) => {
+	const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = event.target;
 		setNewUserInfo((prevState: any) => ({ ...prevState, [name]: value }));
 	};
 
 	const handleUpdateClick = async () => {
-		await axios.put("http://localhost:3333/users/update", newUserInfo, {
-			withCredentials: true,
-			headers: {
-				'Content-Type': 'application/json',
-				'Access-Control-Allow-Origin': '*',
-				'Access-Control-Allow-Methods': 'PUT',
-				'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-			},
-		});
-		const response = await axios.get("http://localhost:3333/users/me", {
-			withCredentials: true,
-		});
-		setUserInfo(response.data);
-		setNewUserInfo({});
+		if (!newUserInfo.username && !newUserInfo.avatar) {
+			return;
+		}
+
+		// length of username must be between 4 and 20 characters
+		// see user.dto in backend
+		try {
+			await axios.put(
+				"http://localhost:3333/users/update",
+				{ updateUser: newUserInfo },
+				{ withCredentials: true }
+			);
+			const response = await axios.get("http://localhost:3333/users/me", {
+				withCredentials: true,
+			});
+			setUserInfo(response.data);
+			setNewUserInfo({});
+		} catch (error) {
+			console.log(error);
+		}
 	};
 
 	return (
@@ -63,7 +67,11 @@ function Dashboard() {
 			<h2>User information:</h2>
 			{userInfo ? (
 				<div>
-					<img className="user-img" src={userInfo.avatar} alt="avatar" />
+					<img
+						className="user-img"
+						src={userInfo.avatar}
+						alt="avatar"
+					/>
 					<h3>Username: {userInfo.username}</h3>
 					<p>Elo: {userInfo.elo}</p>
 					<p>Wins: {userInfo.wins}</p>
@@ -90,6 +98,6 @@ function Dashboard() {
 			)}
 		</div>
 	);
-};
+}
 
 export default Dashboard;

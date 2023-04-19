@@ -7,44 +7,76 @@ import { GetUser } from "src/auth/decorator";
 export class FriendController {
 	constructor(private friendService: FriendService) {}
 
-	@Post("add/:login")
+	@Post("add/:username")
 	async AddFriend(
-		@Param("login") login: string,
+		@Param("username") username: string,
 		@Res() res: Response,
 		@GetUser() user: any
 	) {
-		return this.friendService.AddFriend(login, res, user);
+		return await this.friendService.AddFriend(username, res, user);
 	}
 
-	@Post("remove/:login")
+	@Post("remove/:username")
 	async RemoveFriend(
-		@Param("login") login: string,
+		@Param("username") username: string,
 		@Res() res: Response,
 		@GetUser() user: any
 	) {
-		return this.friendService.RemoveFriend(login, res, user);
+		return await this.friendService.RemoveFriend(username, res, user);
 	}
 
-	@Patch("accept/:login")
+	@Patch("accept/:username")
 	async AcceptFriend(
-		@Param("login") login: string,
+		@Param("username") username: string,
 		@Res() res: Response,
 		@GetUser() user: any
 	) {
-		return this.friendService.AcceptFriend(login, res, user);
+		return await this.friendService.AcceptFriend(username, res, user);
 	}
 
-	@Patch("decline/:login")
+	@Patch("decline/:username")
 	async DeclineFriend(
-		@Param("login") login: string,
+		@Param("username") username: string,
 		@Res() res: Response,
 		@GetUser() user: any
 	) {
-		return this.friendService.DeclineFriend(login, res, user);
+		return await this.friendService.DeclineFriend(username, res, user);
 	}
 
 	@Get("friends")
 	async GetFriends(@Res() res: Response, @GetUser() user: any) {
-		return this.friendService.GetFriends(res, user);
+		return await this.friendService.GetFriends(res, user);
+	}
+
+	@Post("block/:username")
+	async BlockUser(
+		@Param("username") username: string,
+		@Res() res: Response,
+		@GetUser() user: any
+	) {
+		return await this.friendService.BlockUser(username, res, user);
+	}
+
+	@Post("unblock/:username")
+	async UnblockUser(
+		@Param("username") username: string,
+		@Res() res: Response,
+		@GetUser() user: any
+	) {
+		return await this.friendService.UnblockUser(username, res, user);
+	}
+
+	@Get("blocked")
+	async GetBlocked(@Res() res: Response, @GetUser() user: any) {
+		return await this.friendService.GetBlockedUsers(res, user);
+	}
+
+	@Get("blockbyme/:username")
+	async GetIBlocked(
+		@Param("username") username: string,
+		@Res() res: Response,
+		@GetUser() user: any
+	) {
+		return await this.friendService.UserBlockThisUser(username, res, user);
 	}
 }

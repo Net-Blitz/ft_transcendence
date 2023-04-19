@@ -8,13 +8,13 @@ export class FriendService {
 	constructor(private prisma: PrismaService) {}
 
 	async AddFriend(
-		@Param("login") login: string,
+		@Param("username") username: string,
 		@Res() res: Response,
 		@GetUser() user: any
 	) {
 		const friend = await this.prisma.user.findUnique({
 			where: {
-				login: login,
+				username: username,
 			},
 		});
 		if (!user) {
@@ -48,13 +48,13 @@ export class FriendService {
 	}
 
 	async RemoveFriend(
-		@Param("login") login: string,
+		@Param("username") username: string,
 		@Res() res: Response,
 		@GetUser() user: any
 	) {
 		const friend = await this.prisma.user.findUnique({
 			where: {
-				login: login,
+				username: username,
 			},
 		});
 		if (!user) {
@@ -89,13 +89,13 @@ export class FriendService {
 	}
 
 	async AcceptFriend(
-		@Param("login") login: string,
+		@Param("username") username: string,
 		@Res() res: Response,
 		@GetUser() user: any
 	) {
 		const friend = await this.prisma.user.findUnique({
 			where: {
-				login: login,
+				username: username,
 			},
 		});
 		if (!user) {
@@ -158,13 +158,13 @@ export class FriendService {
 	}
 
 	async DeclineFriend(
-		@Param("login") login: string,
+		@Param("username") username: string,
 		@Res() res: Response,
 		@GetUser() user: any
 	) {
 		const friend = await this.prisma.user.findUnique({
 			where: {
-				login: login,
+				username: username,
 			},
 		});
 		if (!user) {
@@ -242,5 +242,214 @@ export class FriendService {
 			}
 		}
 		return res.status(200).json({ friendsList, pendingList, demandList });
+	}
+
+	async BlockUser(
+		@Param("username") username: string,
+		@Res() res: Response,
+		@GetUser() user: any
+	) {
+		const friend = await this.prisma.user.findUnique({
+			where: {
+				username: username,
+			},
+		});
+		if (!user) {
+			return res.status(404).json({ message: "User not found" });
+		}
+		if (!friend) {
+			return res.status(404).json({ message: "Friend not found" });
+		}
+
+		try {
+			await this.prisma.friendsRelation.update({
+				where: {
+					friendId_friendwithId: {
+						friendId: user.id,
+						friendwithId: friend.id,
+					},
+				},
+				data: {
+					status: "BLOCKED",
+				},
+			});
+			await this.prisma.friendsRelation.update({
+				where: {
+					friendId_friendwithId: {
+						friendId: friend.id,
+						friendwithId: user.id,
+					},
+				},
+				data: {
+					status: "BLOCKED",
+				},
+			});
+			await this.prisma.directMessage.deleteMany({
+				where: {
+					OR: [
+						{
+							senderId: user.id,
+							receiverId: friend.id,
+						},
+						{
+							senderId: friend.id,
+							receiverId: user.id,
+						},
+					],
+				},
+			});
+		} catch (e) {
+			await this.prisma.friendsRelation.create({
+				data: {
+					friendId: user.id,
+					friendwithId: friend.id,
+					status: "BLOCKED",
+				},
+			});
+			await this.prisma.friendsRelation.create({
+				data: {
+					friendId: friend.id,
+
+					friendwithId: user.id,
+					status: "BLOCKED",
+				},
+			});
+			await this.prisma.directMessage.deleteMany({
+				where: {
+					OR: [
+						{
+							senderId: user.id,
+							receiverId: friend.id,
+						},
+						{
+							senderId: friend.id,
+							receiverId: user.id,
+						},
+					],
+				},
+			});
+			return res.status(200).json({ message: "Friend relation blocked" });
+		}
+		return res.status(200).json({ message: "Friend relation blocked" });
+	}
+
+	async UnblockUser(
+		@Param("username") username: string,
+		@Res() res: Response,
+		@GetUser() user: any
+	) {
+		const friend = await this.prisma.user.findUnique({
+			where: {
+				username: username,
+			},
+		});
+		if (!user) {
+			return res.status(404).json({ message: "User not found" });
+		}
+		if (!friend) {
+			return res.status(404).json({ message: "Friend not found" });
+		}
+
+		try {
+			await this.prisma.friendsRelation.delete({
+				where: {
+					friendId_friendwithId: {
+						friendId: user.id,
+						friendwithId: friend.id,
+					},
+				},
+			});
+			await this.prisma.friendsRelation.delete({
+				where: {
+					friendId_friendwithId: {
+						friendId: friend.id,
+						friendwithId: user.id,
+					},
+				},
+			});
+		} catch (e) {
+			return res
+				.status(400)
+				.json({ message: "Friend relation not found" });
+		}
+		return res.status(200).json({ message: "Friend relation unblocked" });
+	}
+
+	async GetBlockedUsers(@Res() res: Response, @GetUser() user: any) {
+		if (!user) {
+			return res.status(404).json({ message: "User not found" });
+		}
+
+		const friends = await this.prisma.user.findUnique({
+			where: {
+				login: user.login,
+			},
+			include: {
+				friendwith: true,
+			},
+		});
+
+		if (!friends) {
+			return res.status(404).json({ message: "friends not found" });
+		}
+
+		const blockedList = [];
+		let j = 0;
+		for (let i = 0; i < friends.friendwith.length; i++) {
+			const friend = await this.prisma.user.findUnique({
+				where: {
+					id: friends.friendwith[i].friendId,
+				},
+				select: {
+					username: true,
+				},
+			});
+			if (friends.friendwith[i].status === "BLOCKED") {
+				blockedList[j] = friend;
+				j++;
+			}
+		}
+		return res.status(200).json(blockedList);
+	}
+
+	async UserBlockThisUser(
+		@Param("username") username: string,
+		@Res() res: Response,
+		@GetUser() user: any
+	) {
+		const friend = await this.prisma.user.findUnique({
+			where: {
+				username: username,
+			},
+		});
+		if (!user) {
+			return res.status(404).json({ message: "User not found" });
+		}
+		if (!friend) {
+			return res.status(404).json({ message: "Friend not found" });
+		}
+		try {
+			const relation = await this.prisma.friendsRelation.findUnique({
+				where: {
+					friendId_friendwithId: {
+						friendId: user.id,
+						friendwithId: friend.id,
+					},
+				},
+			});
+			if (relation.status === "BLOCKED") {
+				return res.status(200).json({
+					message: "User blocked this user",
+					isBlocked: true,
+				});
+			}
+		} catch (e) {
+			return res
+				.status(200)
+				.json({ message: "Relation not found", isBlocked: false });
+		}
+		return res
+			.status(200)
+			.json({ message: "User not blocked this user", isBlocked: false });
 	}
 }

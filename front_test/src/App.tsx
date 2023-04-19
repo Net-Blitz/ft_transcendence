@@ -11,6 +11,7 @@ import Lobby from "./components/Lobby";
 import Game from "./components/Game";
 import Friend from "./components/Friend";
 import Profile from "./components/Profile";
+import Channel from "./components/Chat/Channel";
 
 function App(this: any) {
 	return (
@@ -79,6 +80,14 @@ function App(this: any) {
 					element={
 						<PrivateRoute>
 							<Friend />
+						</PrivateRoute>
+					}
+				/>
+				<Route
+					path="/chat"
+					element={
+						<PrivateRoute>
+							<Channel />
 						</PrivateRoute>
 					}
 				/>
