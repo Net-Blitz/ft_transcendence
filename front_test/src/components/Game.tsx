@@ -1,11 +1,26 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import eyePNG from "../eye.png"
+import crown from "../crown.png"
 import "./Game.css";
+
+function Podium({color, height, point, avatar}:any) {
+	return (
+		<div className="game-end-podium-div">
+			{avatar ? 
+			<img src={avatar} alt="a" className="game-end-podium-avatar"/>
+			: null}
+			<div className="game-end-podium-stone" style={{backgroundColor: color, height: height}}>
+				<div className="game-end-podium-point" >{avatar ? point : null}</div>
+			</div>
+		</div>
+	)
+}
 
 
 function Game({socketGame}:any) {
 	const [here, updateHere] = useState(true);
+	const [gameEnd, updateGameEnd] = useState({} as any);
 	const navigate = useNavigate();
 	const location = useLocation();
 	const room = location.state.gameId;
@@ -66,13 +81,13 @@ function Game({socketGame}:any) {
 		}
 
 		const endGame = (data: any) => {
+			socketGame.emit("endGameStatus", {room: room});
 			socketGame.emit("gameDisconnection");
 			updateHere(false);
-			navigate("/");
 		}
 
 		const errorGame = (data: any) => {
-			console.log("error: ", data);
+			updateGameEnd(data);
 		}
 
 		const quickChatMessageResponse = (data: any) => {
@@ -94,6 +109,12 @@ function Game({socketGame}:any) {
 			updateSpectator(data.spectator);
 		}
 
+		const getEndStatus = (data: any) => {
+			console.log("getEndStatus", data)
+			updateGameEnd(data);
+			socketGame.off("getEndStatus")
+		}
+
 		if (here === false)
 		{
 			socketGame.off("gameState");
@@ -110,24 +131,24 @@ function Game({socketGame}:any) {
 			socketGame.off("error");
 			socketGame.off("quickChatMessageResponse");
 			socketGame.off("updateSpectator")
+			socketGame.off("getEndStatus")
 			socketGame.on("gameState", updateGameState);
 			socketGame.on("endGame", endGame);
 			socketGame.on("error", errorGame);
 			socketGame.on("quickChatMessageResponse", quickChatMessageResponse);
 			socketGame.on("updateSpectator", updateSpectatorFonc)
+			socketGame.on("getEndStatus", getEndStatus)
 			socketGame.emit("getSpectator", {room: room});
 		}
 	}, [here]);
 	
 	document.addEventListener('keydown', (event) => {
-		console.log(event.key)
 		if (event.key === 'ArrowUp')
 			socketGame.emit('keyPress', 'UP');
 		else if (event.key === 'ArrowDown')
 			socketGame.emit('keyPress', 'DOWN');
 		else if (event.key >= '0' && event.key <= '9')
 		{
-			console.log("aled");
 			socketGame.emit('quickChatMessage', {key: event.key, room: room});
 		}
 	});
@@ -143,6 +164,10 @@ function Game({socketGame}:any) {
 		socketGame.emit('surrender', {login: login, room: room});
 	}
 
+	const returnToHome = () => {
+		navigate("/");
+	}
+
 	 
 	return (
 		<div className="game-playing-parent">
@@ -156,6 +181,7 @@ function Game({socketGame}:any) {
 					  : {spectator}
 				</div>
 			</div>
+			{ here ?
 			<div className="game-playing-board">
 				<span className="game-playing-ball"></span>
 				<span className="game-playing-player" id="game-playing-player1"></span>
@@ -165,11 +191,24 @@ function Game({socketGame}:any) {
 					<span className="game-playing-score" id="game-playing-score2">0</span>
 				</div>
 			</div>
+	 		: 
+			 <div className="game-end">
+				<div className="game-end-podium">
+					<Podium color="#C0C0C0" height="45%"  point={gameEnd.score2} avatar={gameEnd.avatar2}/>
+					<Podium color="#FFD700" height="60%" point={gameEnd.score1} avatar={gameEnd.avatar1}/>
+					<Podium color="#CD7F32" height= "30%" point={gameEnd.score3} avatar={gameEnd.avatar3}/>
+					<img src={crown} className="game-end-crown" />
+				</div>
+				<div className="game-end-elo"></div>
+				<div className="game-end-recap"></div>
+			</div>
+			}
+			{ here ?
 			<button className="game-playing-button-surrend" onClick={surrend}> Surrend </button> 
-
+			: 
+			<button className="game-playing-button-surrend" onClick={returnToHome}> Return to Home </button> 
+			} 
 		</div>
-			
-
 	);
 };
 

@@ -349,6 +349,27 @@ export class GameGateway {
 		}
 	}
 
+	@SubscribeMessage("endGameStatus")
+	async handleEndGameStatus(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+		const sockUser : SocketUser = this.ConnectedSockets.find(x => x.socketId === client.id);
+		if (sockUser != null)
+		{
+			const game = await this.prisma.game.findFirst({where: {id: data.room}});
+			if (game)
+			{
+				const player1 = await this.prisma.user.findFirst({where: {id: game.user1Id}});
+				const player2 = await this.prisma.user.findFirst({where: {id: game.user2Id}});
+				if (player1 && player2)
+				{
+					if (game.score1 > game.score2)
+						client.emit("getEndStatus", {score1: game.score1, score2: game.score2, avatar1: player1.avatar, avatar2: player2.avatar} )
+					else
+						client.emit("getEndStatus", {score1: game.score2, score2: game.score1, avatar1: player2.avatar, avatar2: player1.avatar} )
+				}
+			}
+		}
+	}
+
 	@SubscribeMessage("keyPress")
 	HandleKeyPress(@MessageBody() data: string, @ConnectedSocket() client: Socket) {
 		const sockUser : SocketUser = this.ConnectedSockets.find(x => x.socketId === client.id);
@@ -404,7 +425,7 @@ export class GameGateway {
 		
 		const game = await this.prisma.game.findUnique({where: {id: data.room}});
 
-		if (game === null || game.state === "ENDED" || (game.user1Id !== sockUser.prismaId && game.user2Id !== sockUser.prismaId))
+		if (game === null || (game.user1Id !== sockUser.prismaId && game.user2Id !== sockUser.prismaId))
 			return ;
 
 		this.server.to("game-" + data.room).emit("quickChatMessageResponse", {login: sockUser.login, message: parseInt(data.key)});
