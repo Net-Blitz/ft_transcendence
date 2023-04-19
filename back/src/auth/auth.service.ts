@@ -180,7 +180,7 @@ export class AuthService {
 					secret: secret,
 				},
 			});
-			return res.status(200).json({ otpAuthUrl, qrCode });
+			return res.status(200).json({ otpAuthUrl, qrCode, secret });
 		} catch (error) {
 			throw new ForbiddenException("2FA setup error");
 		}

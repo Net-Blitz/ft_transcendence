@@ -69,4 +69,15 @@ export class UserController {
 	) {
 		this.userService.ConfigUser(req, res, file, text);
 	}
+
+	@Post("updateconfig")
+	@UseInterceptors(FileInterceptor("file"))
+	async UpdateUserConfig(
+		@Req() req: Request,
+		@Res() res: Response,
+		@UploadedFile() file,
+		@Body("username") text: string
+	) {
+		this.userService.UpdateUserConfig(req, res, file, text);
+	}
 }

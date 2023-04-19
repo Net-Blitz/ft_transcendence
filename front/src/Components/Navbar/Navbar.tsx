@@ -19,55 +19,94 @@ import game_white from './Ressources/game_white.svg';
 import notif_white from './Ressources/notif_white.svg';
 
 const Navbar = () => {
-//   const avatar = useSelector(selectUserData).pseudo;
-  const location = useLocation();
-  const currentPath = location.pathname;
-  const buttons = [
-    { content: 'Home', href: '/', imgSrc: logo},
-    { content: 'Contact', href: '/contact', imgSrc: contact_blue, activeImgSrc:contact_white},
-    { content: 'Game', href: '/game', imgSrc: game_blue, activeImgSrc:game_white},
-    { content: 'Chat', href: '/chat', imgSrc: chat_blue, activeImgSrc:chat_white},
-    { content: 'Notification', href: '/notification', imgSrc: notif_blue, activeImgSrc:notif_white},
-    { content: 'Profile', href: '/profile', imgSrc: avatar},
-  ];
+	/* 	SELECTORS	*/
+	const userData = useSelector(selectUserData);
+	//   const avatar = useSelector(selectUserData).pseudo;
+	const location = useLocation();
+	const currentPath = location.pathname;
+	const buttons = [
+		{ content: 'Home', href: '/', imgSrc: logo },
+		{
+			content: 'Contact',
+			href: '/contact',
+			imgSrc: contact_blue,
+			activeImgSrc: contact_white,
+		},
+		{
+			content: 'Game',
+			href: '/game',
+			imgSrc: game_blue,
+			activeImgSrc: game_white,
+		},
+		{
+			content: 'Chat',
+			href: '/chat',
+			imgSrc: chat_blue,
+			activeImgSrc: chat_white,
+		},
+		{
+			content: 'Notification',
+			href: '/notification',
+			imgSrc: notif_blue,
+			activeImgSrc: notif_white,
+		},
+		{ content: 'Profile', href: '/profile', imgSrc: userData.avatar },
+	];
 
+	return (
+		<div className="parent_container">
+			<div className="background_navbar">
+				{buttons.map((button) => {
+					return (
+						<Link
+							key={button.content}
+							to={button.href}
+							className={button.content}>
+							{(() => {
+								//IIFE : function that is defined and executed after its creation
+								const isMatchingPath =
+									currentPath === button.href &&
+									button.href !== '/' &&
+									button.href !== '/profile';
 
-return (
-	<div className='parent_container'>
-		<div className="background_navbar">
-			{buttons.map((button) => {
-			return (
-				<Link key={button.content} to={button.href} className={button.content}>
-				{(() => { //IIFE : function that is defined and executed after its creation
-					const isMatchingPath =
-					currentPath === button.href &&
-					button.href !== '/' &&
-					button.href !== '/profile';
-
-					return button.content === 'Profile' ? (
-					<div>
-						<div className="profile-img">
-						<img
-							src={isMatchingPath ? button.activeImgSrc : button.imgSrc}
-							alt={button.content}
-							/>
-						</div>
-						<p>Pseudo</p>
-					</div>
-					) : (
-					<div className={isMatchingPath ? 'active' : 'inactive'}>
-						<img
-							src={isMatchingPath ? button.activeImgSrc : button.imgSrc}
-							alt={button.content}
-						/>
-					</div>
+								return button.content === 'Profile' ? (
+									<div>
+										<div className="profile-img">
+											<img
+												src={
+													isMatchingPath
+														? button.activeImgSrc
+														: button.imgSrc
+												}
+												alt={button.content}
+											/>
+										</div>
+										<p>{userData.username}</p>
+									</div>
+								) : (
+									<div
+										className={
+											isMatchingPath
+												? 'active'
+												: 'inactive'
+										}>
+										<img
+											src={
+												isMatchingPath
+													? button.activeImgSrc
+													: button.imgSrc
+											}
+											alt={button.content}
+										/>
+									</div>
+								);
+							})()}
+						</Link>
 					);
-				})()}
-				</Link>
-			);
-			})}
+				})}
+			</div>
 		</div>
-	</div>
-)};
+	);
+};
 
 export default Navbar;
