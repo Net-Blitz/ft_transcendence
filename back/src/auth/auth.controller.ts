@@ -25,12 +25,7 @@ export class AuthController {
 	@Get("callback")
 	async auth42Callback(@Res() res: Response, @Query("code") code: string) {
 		await this.authService.Auth42Callback(res, code);
-		return res.redirect(
-			"http://" +
-				this.config.get("HOST_T") +
-				":" +
-				this.config.get("PORT_GLOBAL")
-		);
+		return;
 	}
 
 	@Get("verify")
@@ -55,7 +50,6 @@ export class AuthController {
 		return await this.authService.setup2fa(res, user);
 	}
 
-
 	@Post("2fa/verify")
 	async verify2fa(
 		@GetUser() user: any,
@@ -71,7 +65,7 @@ export class AuthController {
 		@Body("login") login: string,
 		@Body("inputKey") key: string
 	) {
-		return await this.authService.verify2fa(res, user, code);
+		return await this.authService.verify2falogin(res, login, key);
 	}
 
 	@Delete("2fa/disable")

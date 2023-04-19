@@ -5,7 +5,6 @@ import {
 	Param,
 	Post,
 	Put,
-	Req,
 	Res,
 	UseInterceptors,
 	UploadedFile,
@@ -54,8 +53,8 @@ export class UserController {
 	}
 
 	@Get("logout")
-	Logout(@Req() req: Request, @Res() res: Response) {
-		return this.userService.Logout(req, res);
+	Logout(@Res() res: Response) {
+		return this.userService.Logout(res);
 	}
 
 	@Get("/all/pseudo")
@@ -66,22 +65,22 @@ export class UserController {
 	@Post("config")
 	@UseInterceptors(FileInterceptor("file"))
 	async ConfigUser(
-		@Req() req: Request,
+		@GetUser() user: any,
 		@Res() res: Response,
 		@UploadedFile() file,
 		@Body("username") text: string
 	) {
-		this.userService.ConfigUser(req, res, file, text);
+		this.userService.ConfigUser(user, res, file, text);
 	}
 
 	@Post("updateconfig")
 	@UseInterceptors(FileInterceptor("file"))
 	async UpdateUserConfig(
-		@Req() req: Request,
+		@GetUser() user: any,
 		@Res() res: Response,
 		@UploadedFile() file,
 		@Body("username") text: string
 	) {
-		this.userService.UpdateUserConfig(req, res, file, text);
+		this.userService.UpdateUserConfig(user, res, file, text);
 	}
 }

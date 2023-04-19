@@ -79,7 +79,21 @@ export class AuthService {
 				);
 			}
 			if (existingUser) {
-				return this.signToken(res, existingUser);
+				this.signToken(res, existingUser);
+				if (existingUser.config)
+					return res.redirect(
+						"http://" +
+							this.config.get("HOST_T") +
+							":" +
+							this.config.get("PORT_GLOBAL")
+					);
+				return res.redirect(
+					"http://" +
+						this.config.get("HOST_T") +
+						":" +
+						this.config.get("PORT_GLOBAL") +
+						"/login/config"
+				);
 			}
 			const createdUser = await this.prisma.user.create({
 				data: {
@@ -87,7 +101,14 @@ export class AuthService {
 					username: user.login,
 				},
 			});
-			return this.signToken(res, createdUser);
+			this.signToken(res, createdUser);
+			return res.redirect(
+				"http://" +
+					this.config.get("HOST_T") +
+					":" +
+					this.config.get("PORT_GLOBAL") +
+					"/login/config"
+			);
 		} catch (error) {
 			if (error instanceof PrismaClientKnownRequestError) {
 				if (error.code === "P2002") {
@@ -155,7 +176,7 @@ export class AuthService {
 		});
 
 		if (verified) {
-			const token = await this.signToken(null, res, user);
+			const token = await this.signToken(res, user);
 			if (user.twoFactor === false) {
 				await this.prisma.user.update({
 					where: {
@@ -166,6 +187,27 @@ export class AuthService {
 					},
 				});
 			}
+			return res.status(200).json(token);
+		} else {
+			return res.status(400).json({ message: "UNVALID" });
+		}
+	}
+
+	async verify2falogin(@Res() res: Response, login: string, key: string) {
+		const user = await this.prisma.user.findUnique({
+			where: {
+				login: login,
+			},
+		});
+		if (!user) {
+			return res.status(400).json({ message: "UNVALID" });
+		}
+		const verified = authenticator.verify({
+			secret: user.secret,
+			token: key,
+		});
+		if (verified) {
+			const token = await this.signToken(res, user);
 			return res.status(200).json(token);
 		} else {
 			return res.status(400).json({ message: "UNVALID" });

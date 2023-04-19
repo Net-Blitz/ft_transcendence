@@ -1,4 +1,4 @@
-import { Body, Injectable, Param, Res } from "@nestjs/common";
+import { Body, Inject, Injectable, Param, Res } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { Response } from "express";
 import { UpdateUserDto } from "./dto";
@@ -8,6 +8,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { ConfigService } from "@nestjs/config";
 import { v4 as uuidv4 } from "uuid";
+import { AuthService } from "src/auth/auth.service";
 
 @Injectable()
 export class UserService {
@@ -87,13 +88,11 @@ export class UserService {
 	}
 
 	async ConfigUser(
-		@Req() req: Request,
+		@GetUser() user: any,
 		@Res() res: Response,
 		file: any,
 		text: string
 	) {
-		const user = await this.getUser(req);
-
 		if ((await this.fileservice.checkFile(file)) === false)
 			return res.status(400).json({ message: "Bad file" });
 		const extension = path.extname(file.originalname);
@@ -105,6 +104,7 @@ export class UserService {
 		try {
 			await fs.promises.writeFile(filepath, file.buffer);
 		} catch (error) {
+			console.log(error);
 			return res.status(400).json({ message: "Write File error" });
 		}
 		if (!user) {
@@ -119,16 +119,16 @@ export class UserService {
 			},
 			data: user,
 		});
+		console.log(user);
 		return res.status(200).json(updatedUser);
 	}
 
 	async UpdateUserConfig(
-		@Req() req: Request,
+		@GetUser() user: any,
 		@Res() res: Response,
 		file: any,
 		text: string
 	) {
-		const user = await this.getUser(req);
 		if ((await this.fileservice.checkFile(file)) === false)
 			return res.status(400).json({ message: "Bad file" });
 		try {
