@@ -37,5 +37,6 @@ lerna-debug.log*
 !.vscode/launch.json
 !.vscode/extensions.json
 
-public/*
+public/uploads/*
 !public/.gitkeep
+!public/uploads/.gitkeep
