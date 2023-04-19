@@ -1,7 +1,7 @@
-import { ForbiddenException, Injectable, Req, Res } from "@nestjs/common";
+import { ForbiddenException, Injectable, Res } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
-import { Request, Response } from "express";
+import { Response } from "express";
 import { PrismaService } from "src/prisma/prisma.service";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import axios from "axios";
@@ -19,21 +19,7 @@ export class AuthService {
 		private config: ConfigService
 	) {}
 
-	async getUserCheat(req: Request, res: Response, username: string) {
-		const user = await this.prisma.user.findUnique({
-			where: { username },
-		});
-		if (user) {
-			return await this.signToken(req, res, user);
-		}
-		return user;
-	}
-
-	async Auth42Callback(
-		@Req() req: Request,
-		@Res() res: Response,
-		code: string
-	) {
+	async Auth42Callback(@Res() res: Response, code: string) {
 		const payload = {
 			grant_type: "authorization_code",
 			client_id: this.config.get("CLIENT_ID"),
@@ -48,18 +34,14 @@ export class AuthService {
 				data: JSON.stringify(payload),
 				headers: { "Content-Type": "application/json" },
 			}).then((response) => {
-				return this.getUserInfo(req, res, response.data.access_token);
+				return this.getUserInfo(res, response.data.access_token);
 			});
 		} catch (error) {
 			throw new ForbiddenException("callback error");
 		}
 	}
 
-	async getUserInfo(
-		@Req() req: Request,
-		@Res() res: Response,
-		token: string
-	) {
+	async getUserInfo(@Res() res: Response, token: string) {
 		try {
 			await axios({
 				method: "get",
@@ -71,14 +53,14 @@ export class AuthService {
 				const user = new UserDto();
 				user.login = response.data.login;
 				user.avatar = response.data.image.link;
-				return this.createUser(req, res, user);
+				return this.createUser(res, user);
 			});
 		} catch (error) {
 			throw new ForbiddenException("callback error");
 		}
 	}
 
-	async createUser(@Req() req: Request, @Res() res: Response, user: UserDto) {
+	async createUser(@Res() res: Response, user: UserDto) {
 		try {
 			const existingUser = await this.prisma.user.findUnique({
 				where: {
@@ -92,26 +74,12 @@ export class AuthService {
 						this.config.get("HOST_T") +
 						":" +
 						this.config.get("PORT_GLOBAL") +
-						"/login/2fa/" +
+						"/login/2fa?login=" +
 						user.login
 				);
 			}
 			if (existingUser) {
-				this.signToken(req, res, existingUser);
-				if (existingUser.config)
-					return res.redirect(
-						"http://" +
-							this.config.get("HOST_T") +
-							":" +
-							this.config.get("PORT_GLOBAL")
-					);
-				return res.redirect(
-					"http://" +
-						this.config.get("HOST_T") +
-						":" +
-						this.config.get("PORT_GLOBAL") +
-						"/login/config"
-				);
+				return this.signToken(res, existingUser);
 			}
 			const createdUser = await this.prisma.user.create({
 				data: {
@@ -119,14 +87,7 @@ export class AuthService {
 					username: user.login,
 				},
 			});
-			this.signToken(req, res, createdUser);
-			return res.redirect(
-				"http://" +
-					this.config.get("HOST_T") +
-					":" +
-					this.config.get("PORT_GLOBAL") +
-					"/login/config"
-			);
+			return this.signToken(res, createdUser);
 		} catch (error) {
 			if (error instanceof PrismaClientKnownRequestError) {
 				if (error.code === "P2002") {
@@ -135,14 +96,14 @@ export class AuthService {
 							login: user.login,
 						},
 					});
-					return this.signToken(req, res, existingUser);
+					return this.signToken(res, existingUser);
 				}
 			}
 			throw new ForbiddenException("prisma error");
 		}
 	}
 
-	async signToken(@Req() req: Request, @Res() res: Response, user: UserDto) {
+	async signToken(@Res() res: Response, user: UserDto) {
 		const payload = { sub: user.id, login: user.login };
 		const secret = this.config.get("JWT_SECRET");
 		const token = this.jwt.sign(payload, { expiresIn: "120min", secret });
@@ -166,6 +127,7 @@ export class AuthService {
 		}
 		try {
 			const secret = authenticator.generateSecret();
+
 			const otpAuthUrl = authenticator.keyuri(
 				user.login,
 				"NetBlitz",
@@ -186,7 +148,7 @@ export class AuthService {
 		}
 	}
 
-	async verify2fa(@GetUser() user: any, @Res() res: Response, code: string) {
+	async verify2fa(@Res() res: Response, @GetUser() user: any, code: string) {
 		const verified = authenticator.verify({
 			secret: user.secret,
 			token: code,
@@ -204,27 +166,6 @@ export class AuthService {
 					},
 				});
 			}
-			return res.status(200).json(token);
-		} else {
-			return res.status(400).json({ message: "UNVALID" });
-		}
-	}
-
-	async verify2falogin(@Res() res: Response, login: string, key: string) {
-		const user = await this.prisma.user.findUnique({
-			where: {
-				login: login,
-			},
-		});
-		if (!user) {
-			return res.status(400).json({ message: "UNVALID" });
-		}
-		const verified = authenticator.verify({
-			secret: user.secret,
-			token: key,
-		});
-		if (verified) {
-			const token = await this.signToken(null, res, user);
 			return res.status(200).json(token);
 		} else {
 			return res.status(400).json({ message: "UNVALID" });

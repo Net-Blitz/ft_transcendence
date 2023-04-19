@@ -3,7 +3,6 @@ import {
 	Controller,
 	Delete,
 	Get,
-	Param,
 	Post,
 	Query,
 	Req,
@@ -24,13 +23,14 @@ export class AuthController {
 	) {}
 
 	@Get("callback")
-	async auth42Callback(
-		@Req() req: Request,
-		@Res() res: Response,
-		@Query("code") code: string
-	) {
-		await this.authService.Auth42Callback(req, res, code);
-		return;
+	async auth42Callback(@Res() res: Response, @Query("code") code: string) {
+		await this.authService.Auth42Callback(res, code);
+		return res.redirect(
+			"http://" +
+				this.config.get("HOST_T") +
+				":" +
+				this.config.get("PORT_GLOBAL")
+		);
 	}
 
 	@Get("verify")
@@ -55,6 +55,7 @@ export class AuthController {
 		return await this.authService.setup2fa(res, user);
 	}
 
+
 	@Post("2fa/verify")
 	async verify2fa(
 		@GetUser() user: any,
@@ -70,19 +71,11 @@ export class AuthController {
 		@Body("login") login: string,
 		@Body("inputKey") key: string
 	) {
-		return await this.authService.verify2falogin(res, login, key);
+		return await this.authService.verify2fa(res, user, code);
 	}
 
 	@Delete("2fa/disable")
 	async remove2fa(@Res() res: Response, @GetCookie() cookie: CookieDto) {
 		return await this.authService.remove2fa(res, cookie);
-	}
-
-	@Get(":username") /*Temp*/ async getUserCheat(
-		@Req() req: Request,
-		@Res() res: Response,
-		@Param("username") username: string
-	) {
-		return await this.authService.getUserCheat(req, res, username);
 	}
 }
