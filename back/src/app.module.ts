@@ -4,9 +4,7 @@ import { ConfigModule } from "@nestjs/config";
 import { PrismaModule } from "./prisma/prisma.module";
 import { UserModule } from "./user/user.module";
 import { JwtModule } from "@nestjs/jwt";
-import { GameModule } from './game/game.module';
-import { QueueModule } from './queue/queue.module';
-import { FileModule } from "./file/file.module";
+import { ChatGateway } from "./chat/chat.gateway";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
 
@@ -20,13 +18,11 @@ import { join } from "path";
 			secret: process.env.JWT_SECRET,
 			signOptions: { expiresIn: "120min" },
 		}),
-		GameModule,
-		QueueModule,
-		FileModule,
 		ServeStaticModule.forRoot({
 			rootPath: join(__dirname, "..", "public"),
 			serveRoot: "/public",
 		}),
 	],
+	providers: [ChatGateway],
 })
-export class AppModule {};
+export class AppModule {}

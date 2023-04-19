@@ -41,7 +41,6 @@ export const GetUser = createParamDecorator(
 				return user.data;
 			}
 		} catch (err) {
-			console.log(err);
 			throw new ForbiddenException("Invalid token");
 		}
 	}
