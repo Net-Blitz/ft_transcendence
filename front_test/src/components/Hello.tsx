@@ -16,11 +16,15 @@ function Hello() {
 		});
 		navigate("/login");
 	};
+
 	const handleGame = () => {
-		axios.post("http://localhost:3333/queue/add", {mode: "1v1"}, { withCredentials: true })
+		axios.get("http://localhost:3333/queues/joinable", { withCredentials: true })
 		.then((res) => {
-			console.log(res);
-			navigate("/lobby");
+			console.log("res: ", res.data.canJoin);
+			if (res.data.canJoin)
+				navigate("/lobby", { state: { mode: "1v1", login: res.data.login } } );
+			if (res.data.reason === "playing")
+				navigate("/game", { state: { gameId: res.data.gameId, login: res.data.login } } );
 		})
 		.catch((err) => {
 			console.log(err);
