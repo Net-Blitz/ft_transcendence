@@ -217,8 +217,15 @@
 		display:none;
 	}
 	.filter.mobileVisible{
+		width: 75%;
 		display: flex;
 		flex-direction: column;
+		position: absolute;
+		z-index: 2;
+		background-color: #0A3D62;
+		border-radius: 10px;
+		box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+		padding: 10px;
 	}
 	.mainTitle{
 		font-size:25px;
@@ -270,6 +277,9 @@
 		margin:15px;
 		border-radius: 10px;
 	}
+	.gameDiv.FilterActive{
+		opacity: 30%;
+	}
 	.matchesInProgress .Watch {
 		padding-right: 30px ;
 	}
@@ -296,6 +306,7 @@
 	}
 	.rectNoMsg{
 		height: auto;
+		overflow: visible;
 	}
 	  
 }

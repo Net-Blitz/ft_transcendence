@@ -135,7 +135,9 @@ const MainPage = () => {
 			<p className="mainTitle">Games in progress</p>
 			<div className="containerFilterMobile">
 				<button
-					className="viewMore"
+					className={`viewMore ${
+						mobileFilterVisible ? 'FilterActive' : 'FilterInactive'
+					}`}
 					onClick={() =>
 						setmobileViewMoreVisible(!mobileViewMoreVisible)
 					}>
@@ -155,9 +157,18 @@ const MainPage = () => {
 				className={`filter ${
 					mobileFilterVisible ? 'mobileVisible' : ''
 				}`}>
+				<div className="filterMobileUp">
+					<button
+						className="refreshButtonviewMoreActive"
+						onClick={clearAllFilter}>
+						Reset
+					</button>
+					<p className="FilterTxtMobile">Filter</p>
+				</div>
+				<hr className="filterDivider" />
 				{/* <FilterGlobal/> */}
 				<button className="refreshButton" onClick={clearAllFilter}>
-					<img src={refresh} alt="refresh" />
+					<img className="refreshImg" src={refresh} alt="refresh" />
 				</button>
 				<FilterButton
 					label="Sort By"
@@ -170,6 +181,7 @@ const MainPage = () => {
 					//update the state openFilter
 					resetFilter={resetFilter}
 				/>
+				<hr className="filterDivider" />
 				<FilterButton
 					label="Game Mode"
 					options={['1v1', '2v2']}
@@ -179,6 +191,7 @@ const MainPage = () => {
 					toggleDropdown={() => toggleDropdown('Game Mode')}
 					resetFilter={resetFilter}
 				/>
+				<hr className="filterDivider" />
 				<FilterButton
 					label="Friends"
 					options={['Only my friends', 'Everyone']}
@@ -188,6 +201,7 @@ const MainPage = () => {
 					toggleDropdown={() => toggleDropdown('Friends')}
 					resetFilter={resetFilter}
 				/>
+				<hr className="filterDivider" />
 				<FilterButton
 					label="Map"
 					options={['Classic', 'Beach', 'Space']}
@@ -197,6 +211,7 @@ const MainPage = () => {
 					toggleDropdown={() => toggleDropdown('Map')}
 					resetFilter={resetFilter}
 				/>
+				<hr className="filterDivider" />
 				<FilterButton
 					label="Difficulty"
 					options={['Easy', 'Hard']}
@@ -207,7 +222,10 @@ const MainPage = () => {
 					resetFilter={resetFilter}
 				/>
 			</div>
-			<div className="gameDiv">
+			<div
+				className={`gameDiv ${
+					mobileFilterVisible ? 'FilterActive' : 'FilterInactive'
+				}`}>
 				<MatchesInProgress
 					filters={filters}
 					viewMoreButton={mobileViewMoreVisible}
