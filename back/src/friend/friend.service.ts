@@ -8,13 +8,13 @@ export class FriendService {
 	constructor(private prisma: PrismaService) {}
 
 	async AddFriend(
-		@Param("login") login: string,
+		@Param("username") username: string,
 		@Res() res: Response,
 		@GetUser() user: any
 	) {
 		const friend = await this.prisma.user.findUnique({
 			where: {
-				login: login,
+				username: username,
 			},
 		});
 		if (!user) {
@@ -48,13 +48,13 @@ export class FriendService {
 	}
 
 	async RemoveFriend(
-		@Param("login") login: string,
+		@Param("username") username: string,
 		@Res() res: Response,
 		@GetUser() user: any
 	) {
 		const friend = await this.prisma.user.findUnique({
 			where: {
-				login: login,
+				username: username,
 			},
 		});
 		if (!user) {
@@ -89,13 +89,13 @@ export class FriendService {
 	}
 
 	async AcceptFriend(
-		@Param("login") login: string,
+		@Param("username") username: string,
 		@Res() res: Response,
 		@GetUser() user: any
 	) {
 		const friend = await this.prisma.user.findUnique({
 			where: {
-				login: login,
+				username: username,
 			},
 		});
 		if (!user) {
@@ -158,13 +158,13 @@ export class FriendService {
 	}
 
 	async DeclineFriend(
-		@Param("login") login: string,
+		@Param("username") username: string,
 		@Res() res: Response,
 		@GetUser() user: any
 	) {
 		const friend = await this.prisma.user.findUnique({
 			where: {
-				login: login,
+				username: username,
 			},
 		});
 		if (!user) {
@@ -251,7 +251,7 @@ export class FriendService {
 	) {
 		const friend = await this.prisma.user.findUnique({
 			where: {
-				login: username,
+				username: username,
 			},
 		});
 		if (!user) {
@@ -340,7 +340,7 @@ export class FriendService {
 	) {
 		const friend = await this.prisma.user.findUnique({
 			where: {
-				login: username,
+				username: username,
 			},
 		});
 		if (!user) {
@@ -419,7 +419,7 @@ export class FriendService {
 	) {
 		const friend = await this.prisma.user.findUnique({
 			where: {
-				login: username,
+				username: username,
 			},
 		});
 		if (!user) {

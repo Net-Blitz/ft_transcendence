@@ -47,17 +47,17 @@ function DropdownMenu({
 		}
 	};
 
-	const handlePromote = async (login: string) => {
+	const handlePromote = async (username: string) => {
 		try {
 			await axios.post(
 				"http://localhost:3333/chat/admin/promote/" + channel,
 				{
-					login: login,
+					username: username,
 				},
 				{ withCredentials: true }
 			);
 			setNotification({
-				message: login + " has been promoted",
+				message: username + " has been promoted",
 				type: "success",
 			});
 		} catch (error) {
@@ -69,17 +69,17 @@ function DropdownMenu({
 		}
 	};
 
-	const handleDemote = async (login: string) => {
+	const handleDemote = async (username: string) => {
 		try {
 			await axios.post(
 				"http://localhost:3333/chat/admin/demote/" + channel,
 				{
-					login: login,
+					username: username,
 				},
 				{ withCredentials: true }
 			);
 			setNotification({
-				message: login + " has been demoted",
+				message: username + " has been demoted",
 				type: "success",
 			});
 		} catch (error) {
@@ -91,63 +91,63 @@ function DropdownMenu({
 		}
 	};
 
-	const handleKick = async (login: string) => {
+	const handleKick = async (username: string) => {
 		socket?.emit("ToKick", {
 			username: userInfo.username,
 			channel: channel,
-			login: login,
+			login: username,
 		});
 		setNotification({
-			message: login + " has been kicked",
+			message: username + " has been kicked",
 			type: "success",
 		});
 	};
 
-	const handleBan = async (login: string) => {
+	const handleBan = async (username: string) => {
 		socket?.emit("ToBan", {
 			username: userInfo.username,
 			channel: channel,
-			login: login,
+			login: username,
 		});
 		setNotification({
-			message: login + " has been banned",
+			message: username + " has been banned",
 			type: "success",
 		});
 	};
 
-	const handleMute = async (login: string) => {
+	const handleMute = async (username: string) => {
 		socket?.emit("ToMute", {
 			username: userInfo.username,
 			channel: channel,
-			login: login,
+			login: username,
 		});
 		setNotification({
-			message: login + " has been muted",
+			message: username + " has been muted",
 			type: "success",
 		});
 	};
 
-	const handleUnmute = async (login: string) => {
+	const handleUnmute = async (username: string) => {
 		socket?.emit("ToUnmute", {
 			username: userInfo.username,
 			channel: channel,
-			login: login,
+			login: username,
 		});
 		setNotification({
-			message: login + " has been unmuted",
+			message: username + " has been unmuted",
 			type: "success",
 		});
 	};
 
-	const handleBlock = async (login: string) => {
+	const handleBlock = async (username: string) => {
 		try {
 			await axios.post(
-				"http://localhost:3333/friend/block/" + login,
+				"http://localhost:3333/friend/block/" + username,
 				{},
 				{ withCredentials: true }
 			);
 			setNotification({
-				message: login + " has been blocked",
+				message: username + " has been blocked",
 				type: "success",
 			});
 		} catch (error) {
@@ -159,15 +159,15 @@ function DropdownMenu({
 		}
 	};
 
-	const handleUnblock = async (login: string) => {
+	const handleUnblock = async (username: string) => {
 		try {
 			await axios.post(
-				"http://localhost:3333/friend/unblock/" + login,
+				"http://localhost:3333/friend/unblock/" + username,
 				{},
 				{ withCredentials: true }
 			);
 			setNotification({
-				message: login + " has been unblocked",
+				message: username + " has been unblocked",
 				type: "success",
 			});
 		} catch (error) {
@@ -192,7 +192,7 @@ function DropdownMenu({
 			}
 		};
 		getIsBlocked();
-	}, [user.username, handleBlock, handleUnblock]);
+	}, [setNotification, user?.username]);
 
 	return (
 		<>

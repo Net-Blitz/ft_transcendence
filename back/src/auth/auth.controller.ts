@@ -3,7 +3,6 @@ import {
 	Controller,
 	Delete,
 	Get,
-	Param,
 	Post,
 	Query,
 	Req,
@@ -24,26 +23,19 @@ export class AuthController {
 	) {}
 
 	@Get("callback")
-	async auth42Callback(
-		@Req() req: Request,
-		@Res() res: Response,
-		@Query("code") code: string
-	) {
-		console.log("HOST: ", this.config.get("HOST_T"));
-		await this.authService.Auth42Callback(req, res, code);
+	async auth42Callback(@Res() res: Response, @Query("code") code: string) {
+		await this.authService.Auth42Callback(res, code);
 		return res.redirect(
 			"http://" +
 				this.config.get("HOST_T") +
 				":" +
 				this.config.get("PORT_GLOBAL")
 		);
-		// return res.redirect("http://localhost:8080/");
 	}
 
 	@Get("verify")
 	async verify(@Req() req: Request, @Res() res: Response) {
 		const token = req.cookies.jwt;
-		//console.log("token2: " + token);
 		if (!token) {
 			res.status(401).send("Unauthorized: No token provided");
 			return { valid: false };
@@ -59,38 +51,21 @@ export class AuthController {
 	}
 
 	@Post("2fa/setup")
-	async setup2fa(
-		@Req() req: Request,
-		@Res() res: Response,
-		@GetUser() user: any
-	) {
-		return await this.authService.setup2fa(req, res, user);
+	async setup2fa(@Res() res: Response, @GetUser() user: any) {
+		return await this.authService.setup2fa(res, user);
 	}
 
 	@Post("2fa/verify")
 	async verify2fa(
-		@Req() req: Request,
 		@Res() res: Response,
+		@GetUser() user: any,
 		@Body("verificationCode") code: string
 	) {
-		return await this.authService.verify2fa(req, res, code);
+		return await this.authService.verify2fa(res, user, code);
 	}
 
 	@Delete("2fa/disable")
-	async remove2fa(
-		@Req() req: Request,
-		@Res() res: Response,
-		@GetCookie() cookie: CookieDto
-	) {
-		return await this.authService.remove2fa(req, res, cookie);
-	}
-
-	@Get(":username") /*Temp*/ async getUserCheat(
-		@Req() req: Request,
-		@Res() res: Response,
-		@Param("username") username: string
-	) {
-		console.log("username: " + username);
-		return await this.authService.getUserCheat(req, res, username);
+	async remove2fa(@Res() res: Response, @GetCookie() cookie: CookieDto) {
+		return await this.authService.remove2fa(res, cookie);
 	}
 }

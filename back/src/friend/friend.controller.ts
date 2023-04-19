@@ -7,40 +7,40 @@ import { GetUser } from "src/auth/decorator";
 export class FriendController {
 	constructor(private friendService: FriendService) {}
 
-	@Post("add/:login")
+	@Post("add/:username")
 	async AddFriend(
-		@Param("login") login: string,
+		@Param("username") username: string,
 		@Res() res: Response,
 		@GetUser() user: any
 	) {
-		return await this.friendService.AddFriend(login, res, user);
+		return await this.friendService.AddFriend(username, res, user);
 	}
 
-	@Post("remove/:login")
+	@Post("remove/:username")
 	async RemoveFriend(
-		@Param("login") login: string,
+		@Param("username") username: string,
 		@Res() res: Response,
 		@GetUser() user: any
 	) {
-		return await this.friendService.RemoveFriend(login, res, user);
+		return await this.friendService.RemoveFriend(username, res, user);
 	}
 
-	@Patch("accept/:login")
+	@Patch("accept/:username")
 	async AcceptFriend(
-		@Param("login") login: string,
+		@Param("username") username: string,
 		@Res() res: Response,
 		@GetUser() user: any
 	) {
-		return await this.friendService.AcceptFriend(login, res, user);
+		return await this.friendService.AcceptFriend(username, res, user);
 	}
 
-	@Patch("decline/:login")
+	@Patch("decline/:username")
 	async DeclineFriend(
-		@Param("login") login: string,
+		@Param("username") username: string,
 		@Res() res: Response,
 		@GetUser() user: any
 	) {
-		return await this.friendService.DeclineFriend(login, res, user);
+		return await this.friendService.DeclineFriend(username, res, user);
 	}
 
 	@Get("friends")

@@ -73,13 +73,13 @@ export class ChatController {
 	@Post("invite/:channel")
 	async InviteUser(
 		@Param("channel") channel: string,
-		@Body("login") login: string,
+		@Body("username") username: string,
 		@Res() res: Response,
 		@GetUser() user: any
 	) {
 		return await this.chatService.InviteToChannel(
 			channel,
-			login,
+			username,
 			res,
 			user
 		);
@@ -102,23 +102,28 @@ export class ChatController {
 	@Post("admin/promote/:channel")
 	async AddAdminUser(
 		@Param("channel") channel: string,
-		@Body("login") login: string,
+		@Body("username") username: string,
 		@Res() res: Response,
 		@GetUser() user: any
 	) {
-		return await this.chatService.AddAdminUser(channel, login, res, user);
+		return await this.chatService.AddAdminUser(
+			channel,
+			username,
+			res,
+			user
+		);
 	}
 
 	@Post("admin/demote/:channel")
 	async RemoveAdminUser(
 		@Param("channel") channel: string,
-		@Body("login") login: string,
+		@Body("username") username: string,
 		@Res() res: Response,
 		@GetUser() user: any
 	) {
 		return await this.chatService.RemoveAdminUser(
 			channel,
-			login,
+			username,
 			res,
 			user
 		);

@@ -40,16 +40,18 @@ function UsersList({ channel, socket }: { channel: string; socket: any }) {
 		fetchData();
 		fetchChannel();
 
+		const interval = setInterval(fetchChannel, 5000);
+		return () => clearInterval(interval);
+	}, [channel, userInfo?.id]);
+
+	useEffect(() => {
 		const me = users?.find((user: any) => user.id === userInfo?.id);
 		if (me?.role === "admin") {
 			setIsAdmin(true);
 		} else {
 			setIsAdmin(false);
 		}
-
-		const interval = setInterval(fetchChannel, 5000);
-		return () => clearInterval(interval);
-	}, [channel, userInfo?.id, users]);
+	}, [users, userInfo?.id]);
 
 	const handleUnban = async (login: string) => {
 		socket?.emit("ToUnban", {

@@ -67,7 +67,7 @@ function DirectMessage({
 	}, [selectedDM, socket, userInfo?.id, userInfo?.username]);
 
 	const sendMessage = (message: any) => {
-		if (!message.content) return;
+		if (!message.content || !selectedDM) return;
 		const DM = DMList.find((DM: DirectMessageDto) => DM.id === selectedDM);
 		const receiver =
 			DM?.senderId === userInfo.id ? DM?.receiverId : DM?.senderId;

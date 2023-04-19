@@ -8,7 +8,7 @@ function InviteUser({ channelName }: { channelName: string }) {
 		try {
 			await axios.post(
 				"http://localhost:3333/chat/invite/" + channelName,
-				{ login: username },
+				{ username: username },
 				{ withCredentials: true }
 			);
 		} catch (error) {

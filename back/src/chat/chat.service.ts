@@ -232,7 +232,7 @@ export class ChatService {
 
 	async InviteToChannel(
 		@Param("channel") channel: string,
-		@Body("login") login: string,
+		@Body("username") username: string,
 		@Res() res: Response,
 		@GetUser() user: any
 	) {
@@ -246,12 +246,12 @@ export class ChatService {
 		}
 		if (channelExists.state !== "PRIVATE")
 			return res.status(400).json({ message: "Channel is not private" });
-		if (!login)
-			return res.status(400).json({ message: "Login is required" });
+		if (!username)
+			return res.status(400).json({ message: "username is required" });
 
 		const InvitedUser = await this.prisma.user.findUnique({
 			where: {
-				login: login,
+				username: username,
 			},
 		});
 		if (!InvitedUser) {
@@ -330,7 +330,7 @@ export class ChatService {
 
 	async AddAdminUser(
 		@Param("channel") channel: string,
-		@Body("login") login: string,
+		@Body("username") username: string,
 		@Res() res: Response,
 		@GetUser() user: any
 	) {
@@ -342,12 +342,12 @@ export class ChatService {
 		if (!channelExists) {
 			return res.status(404).json({ message: "Channel not found" });
 		}
-		if (!login)
-			return res.status(400).json({ message: "Login is required" });
+		if (!username)
+			return res.status(400).json({ message: "username is required" });
 
 		const PromotedUser = await this.prisma.user.findUnique({
 			where: {
-				login: login,
+				username: username,
 			},
 		});
 		if (!PromotedUser) {
@@ -373,7 +373,7 @@ export class ChatService {
 
 	async RemoveAdminUser(
 		@Param("channel") channel: string,
-		@Body("login") login: string,
+		@Body("username") username: string,
 		@Res() res: Response,
 		@GetUser() user: any
 	) {
@@ -385,12 +385,12 @@ export class ChatService {
 		if (!channelExists) {
 			return res.status(404).json({ message: "Channel not found" });
 		}
-		if (!login)
-			return res.status(400).json({ message: "Login is required" });
+		if (!username)
+			return res.status(400).json({ message: "username is required" });
 
 		const DemotedUser = await this.prisma.user.findUnique({
 			where: {
-				login: login,
+				username: username,
 			},
 		});
 		if (!DemotedUser) {
@@ -521,7 +521,7 @@ export class ChatService {
 	async getBan(@Param("username") username: string, @Res() res: Response) {
 		const userExists = await this.prisma.user.findUnique({
 			where: {
-				login: username,
+				username: username,
 			},
 		});
 		if (!userExists) {
@@ -630,7 +630,7 @@ export class ChatService {
 		try {
 			const userExists = await this.prisma.user.findUnique({
 				where: {
-					login: username,
+					username: username,
 				},
 			});
 			if (!userExists) {
