@@ -45,3 +45,11 @@
 	width: 100%;
 	border-bottom: 0.5px solid #FDFAD0;
 }
+
+
+/* Mobile */
+@media screen and (min-width: 320px) and (max-width: 767px) {
+	.middleinfo-wrapper {
+		flex-wrap: wrap;
+	}
+}

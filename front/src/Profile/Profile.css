@@ -19,7 +19,6 @@
 	font-size: 36px;
 	font-weight: 400;
 	color:#0A3D62;
-	padding-right: 72px;
 }
 
 .profile-wrapper .main-wrapper {
@@ -32,8 +31,16 @@
 }
 
 /* Ipad */
-@media screen and (min-width: 320px) and (max-width: 1020px) {
+@media screen and (min-width: 768px) and (max-width: 1020px) {
     .profile-wrapper {
 		height: 88vh;
 	}
 }
+
+/* Mobile */
+@media screen and (min-width: 320px) and (max-width: 767px) {
+	.profile-wrapper h1{
+		font-size: 25px;
+	}
+}
+	

@@ -103,9 +103,11 @@ export const MainInfo = () => {
 
 	return (
 		<div className="maininfo-wrapper">
-			<InfoElement title="Status" content="Online" border={true} />
-			<InfoElement title="Total game" content="1976" border={true} />
-			<InfoElement title="Win" content="68%" />
+			<div className="infoMainLeft">
+				<InfoElement title="Status" content="Online" border={true} />
+				<InfoElement title="Total game" content="1976" border={true} />
+				<InfoElement title="Win" content="68%" />
+			</div>
 			<MainElement
 				avatar={userData.avatar}
 				username={userData.username}
@@ -114,23 +116,25 @@ export const MainInfo = () => {
 			<PopUp trigger={trigger}>
 				<ProfileConfig handleTrigger={handleTrigger} />
 			</PopUp>
-			<InfoElement
-				title="42login"
-				content={userData.login}
-				border={true}
-			/>
-			<InfoElement
-				title="Registration date"
-				content="22/02"
-				border={true}
-			/>
-			<InfoElement
-				title="2FA Status"
-				content="22/02"
-				isToggle={true}
-				toggle={defaultToggle}
-				handleToggle={handleToggle}
-			/>
+			<div className="infoMainRight">
+				<InfoElement
+					title="42login"
+					content={userData.login}
+					border={true}
+				/>
+				<InfoElement
+					title="Registration date"
+					content="22/02"
+					border={true}
+				/>
+				<InfoElement
+					title="2FA Status"
+					content="22/02"
+					isToggle={true}
+					toggle={defaultToggle}
+					handleToggle={handleToggle}
+				/>
+			</div>
 			<PopUp trigger={triggerQR}>
 				<ProfileQR handleTrigger={handleTriggerQR} />
 			</PopUp>

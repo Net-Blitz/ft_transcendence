@@ -153,7 +153,7 @@ export const MatchHistory = () => {
 	return (
 		<div className="match-history">
 			<BasicFrame height="100%" title="Match History">
-				<table>
+				<table className="matchesInProgress">
 					<thead>
 						<tr>
 							{header.map((header, index) => (
