@@ -76,3 +76,19 @@
 	background-color: #F9DA49;
 	border: none;
 }
+
+
+/* Mobile */
+@media screen and (min-width: 320px) and (max-width: 767px) {
+	.filterButton button{
+		font-size: 12px;
+	}
+	.filterDropdown{
+		position: relative;
+		background-color: #0A3D62;
+		color: #FDFAD0;
+	}
+	.rectSubFilter{
+		border: solid 0.5px #FDFAD0;
+	}
+}
