@@ -2,17 +2,22 @@ import React, { useEffect, useState } from 'react';
 import './Carousel.css';
 /*	Functions	*/
 import { generateAvatars } from './genAvatars';
-/*	Ressources	*/
-import refresh from './Ressources/refresh.png';
 
 interface CarouselProps {
 	currentIndex: number;
 	setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
 	avatar: any;
 	setAvatar: React.Dispatch<React.SetStateAction<any>>;
+	refresh: string;
 }
 
-const Carousel = ({currentIndex, setCurrentIndex, avatar, setAvatar}: CarouselProps) => {
+const Carousel = ({
+	currentIndex,
+	setCurrentIndex,
+	avatar,
+	setAvatar,
+	refresh,
+}: CarouselProps) => {
 	/*	HOOK settings	*/
 	const [length, setLenght] = useState(avatar.length);
 

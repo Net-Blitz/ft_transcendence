@@ -10,7 +10,8 @@ import Chat from './Chat/Chat';
 import AppLayout from './AppLayout';
 import Game from './Game/Game';
 import Notification from './Notification/Notification';
-import { AuthRoutes} from './utils/PrivateRoutes';
+import { Profile } from './Profile/Profile';
+import { AuthRoutes } from './utils/PrivateRoutes';
 import { useSelector } from 'react-redux';
 /*	HOOKS	*/
 import { useGetUser } from './utils/hooks';
@@ -35,17 +36,66 @@ function App(this: any) {
 		<div>
 			<Routes>
 				<Route element={<AuthRoutes />}>
-					<Route path="/"element={<AppLayout> <MainPage /></AppLayout>} />
+					<Route
+						path="/"
+						element={
+							<AppLayout>
+								{' '}
+								<MainPage />
+							</AppLayout>
+						}
+					/>
 					<Route path="/login/config" element={<Config />} />
 					<Route path="/login/2faconfig" element={<Config2fa />} />
-					<Route path="/contact" element={<AppLayout> <Contact /></AppLayout>} />
-					<Route path="/chat" element={<AppLayout> <Chat /></AppLayout>} />
-					<Route path="/game" element={<AppLayout> <Game /></AppLayout>} />
-					<Route path="/notification" element={<AppLayout> <Notification /></AppLayout>} />
+					<Route
+						path="/contact"
+						element={
+							<AppLayout>
+								{' '}
+								<Contact />
+							</AppLayout>
+						}
+					/>
+					<Route
+						path="/chat"
+						element={
+							<AppLayout>
+								{' '}
+								<Chat />
+							</AppLayout>
+						}
+					/>
+					<Route
+						path="/game"
+						element={
+							<AppLayout>
+								{' '}
+								<Game />
+							</AppLayout>
+						}
+					/>
+					<Route
+						path="/notification"
+						element={
+							<AppLayout>
+								{' '}
+								<Notification />
+							</AppLayout>
+						}
+					/>
+					<Route
+						path="/profile"
+						element={
+							<AppLayout>
+								{' '}
+								<Profile />
+							</AppLayout>
+						}
+					/>
 				</Route>
 				<Route path="/login" element={<Login />} />
-        <Route path="/login/2fa/:login" element={<Login2fa />} />
-        <Route path="*" element={<NotFound />} />
+				<Route path="/login/2fa/:login" element={<Login2fa />} />
+				<Route path="*" element={<NotFound />} />
 			</Routes>
 		</div>
 	);
