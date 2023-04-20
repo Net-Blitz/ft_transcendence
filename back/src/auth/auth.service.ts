@@ -1,7 +1,7 @@
-import { ForbiddenException, Injectable, Req, Res } from "@nestjs/common";
+import { ForbiddenException, Injectable, Res } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
-import { Request, Response } from "express";
+import { Response } from "express";
 import { PrismaService } from "src/prisma/prisma.service";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import axios from "axios";
@@ -19,11 +19,7 @@ export class AuthService {
 		private config: ConfigService
 	) {}
 
-	async Auth42Callback(
-		@Req() req: Request,
-		@Res() res: Response,
-		code: string
-	) {
+	async Auth42Callback(@Res() res: Response, code: string) {
 		const payload = {
 			grant_type: "authorization_code",
 			client_id: this.config.get("CLIENT_ID"),
@@ -38,20 +34,14 @@ export class AuthService {
 				data: JSON.stringify(payload),
 				headers: { "Content-Type": "application/json" },
 			}).then((response) => {
-				return this.getUserInfo(req, res, response.data.access_token);
+				return this.getUserInfo(res, response.data.access_token);
 			});
 		} catch (error) {
-			console.log(error);
 			throw new ForbiddenException("callback error");
 		}
 	}
 
-	async getUserInfo(
-		@Req() req: Request,
-		@Res() res: Response,
-		token: string
-	) {
-		//console.log("token: " + token);
+	async getUserInfo(@Res() res: Response, token: string) {
 		try {
 			await axios({
 				method: "get",
@@ -63,16 +53,14 @@ export class AuthService {
 				const user = new UserDto();
 				user.login = response.data.login;
 				user.avatar = response.data.image.link;
-				return this.createUser(req, res, user);
+				return this.createUser(res, user);
 			});
 		} catch (error) {
-			console.log(error);
 			throw new ForbiddenException("callback error");
 		}
 	}
 
-	async createUser(@Req() req: Request, @Res() res: Response, user: UserDto) {
-		//console.log("User: " + user.login);
+	async createUser(@Res() res: Response, user: UserDto) {
 		try {
 			const existingUser = await this.prisma.user.findUnique({
 				where: {
@@ -80,21 +68,47 @@ export class AuthService {
 				},
 			});
 			if (existingUser && existingUser.twoFactor === true) {
+				// User deja log avec 2fa true
 				return res.redirect(
-					"http://localhost:8080/login/2fa?login=" + user.login
+					"http://" +
+						this.config.get("HOST_T") +
+						":" +
+						this.config.get("PORT_GLOBAL") +
+						"/login/2fa?login=" +
+						user.login
 				);
 			}
 			if (existingUser) {
-				return this.signToken(req, res, existingUser);
+				this.signToken(res, existingUser);
+				if (existingUser.config)
+					return res.redirect(
+						"http://" +
+							this.config.get("HOST_T") +
+							":" +
+							this.config.get("PORT_GLOBAL")
+					);
+				return res.redirect(
+					"http://" +
+						this.config.get("HOST_T") +
+						":" +
+						this.config.get("PORT_GLOBAL") +
+						"/login/config"
+				);
 			}
 			const createdUser = await this.prisma.user.create({
 				data: {
 					login: user.login,
-					avatar: user.avatar,
 					username: user.login,
 				},
 			});
-			return this.signToken(req, res, createdUser);
+			this.signToken(res, createdUser);
+			return res.redirect(
+				"http://" +
+					this.config.get("HOST_T") +
+					":" +
+					this.config.get("PORT_GLOBAL") +
+					"/login/config"
+			);
 		} catch (error) {
 			if (error instanceof PrismaClientKnownRequestError) {
 				if (error.code === "P2002") {
@@ -103,19 +117,17 @@ export class AuthService {
 							login: user.login,
 						},
 					});
-					return this.signToken(req, res, existingUser);
+					return this.signToken(res, existingUser);
 				}
 			}
-			console.log(error);
 			throw new ForbiddenException("prisma error");
 		}
 	}
 
-	async signToken(@Req() req: Request, @Res() res: Response, user: UserDto) {
+	async signToken(@Res() res: Response, user: UserDto) {
 		const payload = { sub: user.id, login: user.login };
 		const secret = this.config.get("JWT_SECRET");
 		const token = this.jwt.sign(payload, { expiresIn: "120min", secret });
-		//console.log("jwt: " + token);
 		try {
 			res.cookie("jwt", token, {
 				httpOnly: true,
@@ -125,15 +137,10 @@ export class AuthService {
 		} catch (error) {
 			throw new ForbiddenException("Sign token error");
 		}
-		//return res.redirect("http://localhost:8080");
 		return { access_token: token };
 	}
 
-	async setup2fa(
-		@Req() req: Request,
-		@Res() res: Response,
-		@GetUser() user: any
-	) {
+	async setup2fa(@Res() res: Response, @GetUser() user: any) {
 		if (!user || user.twoFactor) {
 			return res.status(400).json({
 				message: "2FA already setup",
@@ -141,7 +148,6 @@ export class AuthService {
 		}
 		try {
 			const secret = authenticator.generateSecret();
-			//console.log("🚀 ~ secret:", secret);
 
 			const otpAuthUrl = authenticator.keyuri(
 				user.login,
@@ -149,79 +155,66 @@ export class AuthService {
 				secret
 			);
 			const qrCode = await QRCode.toDataURL(otpAuthUrl);
-
 			await this.prisma.user.update({
 				where: {
 					login: user.login,
 				},
 				data: {
-					twoFactor: true,
 					secret: secret,
 				},
 			});
-			return res.status(200).json({ otpAuthUrl, qrCode });
+			return res.status(200).json({ otpAuthUrl, qrCode, secret });
 		} catch (error) {
 			throw new ForbiddenException("2FA setup error");
 		}
 	}
 
-	async verify2fa(@Req() req: Request, @Res() res: Response, code: string) {
-		const login = req.query.login;
-
-		if (!login) {
-			return res.status(400).json({
-				message: "NO LOGIN",
-			});
-		}
-
-		const user = await this.prisma.user.findUnique({
-			where: {
-				login: login as string,
-			},
-		});
-
+	async verify2fa(@Res() res: Response, @GetUser() user: any, code: string) {
 		const verified = authenticator.verify({
 			secret: user.secret,
 			token: code,
 		});
 
 		if (verified) {
-			const token = await this.signToken(req, res, user);
+			const token = await this.signToken(res, user);
+			if (user.twoFactor === false) {
+				await this.prisma.user.update({
+					where: {
+						login: user.login,
+					},
+					data: {
+						twoFactor: true,
+					},
+				});
+			}
 			return res.status(200).json(token);
 		} else {
 			return res.status(400).json({ message: "UNVALID" });
 		}
 	}
 
-	async verify2fa_test(
-		@Req() req: Request,
-		@Res() res: Response,
-		@GetUser() user: any,
-		code: string
-	) {
-		if (!user || !user.twoFactor || !user.secret) {
-			return res.status(400).json({
-				message: "NO 2FA",
-			});
+	async verify2falogin(@Res() res: Response, login: string, key: string) {
+		const user = await this.prisma.user.findUnique({
+			where: {
+				login: login,
+			},
+		});
+		if (!user) {
+			return res.status(400).json({ message: "UNVALID" });
 		}
-
 		const verified = authenticator.verify({
 			secret: user.secret,
-			token: code,
+			token: key,
 		});
-
 		if (verified) {
-			return res.status(200).json({ message: "OK" });
+			const token = await this.signToken(res, user);
+			return res.status(200).json(token);
 		} else {
 			return res.status(400).json({ message: "UNVALID" });
 		}
 	}
 
-	async remove2fa(
-		@Req() req: Request,
-		@Res() res: Response,
-		@GetCookie() cookie: CookieDto
-	) {
+	async remove2fa(@Res() res: Response, @GetCookie() cookie: CookieDto) {
 		await this.prisma.user.update({
 			where: {
 				login: cookie.login,

@@ -1,0 +1,29 @@
+/* * {
+	outline: 1px solid red;
+  } */
+
+.app-layout {
+	display: flex;
+}
+
+.app-content {
+	flex: 1;
+	padding: 2vh 30px 30px 100px;
+
+}
+.parent_container{
+	position: fixed;
+	z-index: 1;
+}
+
+
+/* Ipad */
+@media screen and (min-width: 320px) and (max-width: 1020px) {
+	.app-layout {
+		display: block;
+	}
+	.app-content {
+		flex: 1;
+		padding: 2vh 30px 100px 30px;
+	}
+}

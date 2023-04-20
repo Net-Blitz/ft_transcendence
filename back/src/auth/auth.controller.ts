@@ -13,26 +13,24 @@ import { Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
 import { GetCookie, GetUser } from "./decorator";
 import { CookieDto } from "./decorator/cookie.dto";
+import { ConfigService } from "@nestjs/config";
 
 @Controller("auth")
 export class AuthController {
-	constructor(private authService: AuthService) {}
+	constructor(
+		private authService: AuthService,
+		private config: ConfigService
+	) {}
 
 	@Get("callback")
-	async auth42Callback(
-		@Req() req: Request,
-		@Res() res: Response,
-		@Query("code") code: string
-	) {
-		//console.log("code: " + code);
-		await this.authService.Auth42Callback(req, res, code);
-		return res.redirect("http://localhost:8080");
+	async auth42Callback(@Res() res: Response, @Query("code") code: string) {
+		await this.authService.Auth42Callback(res, code);
+		return;
 	}
 
 	@Get("verify")
 	async verify(@Req() req: Request, @Res() res: Response) {
 		const token = req.cookies.jwt;
-		//console.log("token2: " + token);
 		if (!token) {
 			res.status(401).send("Unauthorized: No token provided");
 			return { valid: false };
@@ -48,39 +46,30 @@ export class AuthController {
 	}
 
 	@Post("2fa/setup")
-	async setup2fa(
-		@Req() req: Request,
-		@Res() res: Response,
-		@GetUser() user: any
-	) {
-		return await this.authService.setup2fa(req, res, user);
+	async setup2fa(@Res() res: Response, @GetUser() user: any) {
+		return await this.authService.setup2fa(res, user);
 	}
 
 	@Post("2fa/verify")
 	async verify2fa(
-		@Req() req: Request,
+		@GetUser() user: any,
 		@Res() res: Response,
-		@Body("verificationCode") code: string
+		@Body("inputKey") key: string
 	) {
-		return await this.authService.verify2fa(req, res, code);
+		return await this.authService.verify2fa(user, res, key);
 	}
 
-	@Post("2fa/verify_test")
-	async verify2fa_test(
-		@Req() req: Request,
+	@Post("2fa/verifylogin")
+	async verify2falogin(
 		@Res() res: Response,
-		@GetUser() user: any,
-		@Body("verificationCode") code: string
+		@Body("login") login: string,
+		@Body("inputKey") key: string
 	) {
-		return await this.authService.verify2fa_test(req, res, user, code);
+		return await this.authService.verify2falogin(res, login, key);
 	}
 
 	@Delete("2fa/disable")
-	async remove2fa(
-		@Req() req: Request,
-		@Res() res: Response,
-		@GetCookie() cookie: CookieDto
-	) {
-		return await this.authService.remove2fa(req, res, cookie);
+	async remove2fa(@Res() res: Response, @GetCookie() cookie: CookieDto) {
+		return await this.authService.remove2fa(res, cookie);
 	}
 }

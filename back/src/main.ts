@@ -4,11 +4,14 @@ import { ValidationPipe } from "@nestjs/common";
 import * as cookieParser from "cookie-parser";
 import { verifyToken } from "./auth/middleware/verifyToken.middleware";
 import { NextFunction, Request, Response } from "express";
+import { ConfigService } from "@nestjs/config";
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
+	const config = app.get(ConfigService);
 	app.enableCors({
-		origin: "http://localhost:8080",
+		origin:
+			"http://" + config.get("HOST_T") + ":" + config.get("PORT_GLOBAL"),
 		preflightContinue: true,
 		methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
 		credentials: true,
@@ -27,6 +30,6 @@ async function bootstrap() {
 			whitelist: true,
 		})
 	);
-	await app.listen(3333);
+	await app.listen(parseInt(config.get("PORT_BACK")));
 }
 bootstrap();
