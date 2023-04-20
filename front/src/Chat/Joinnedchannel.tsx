@@ -1,15 +1,15 @@
-import { useEffect, useState } from "react";
-import "./Chat.css";
-import MessageInput from "./MessageInput";
-import { MessageDto } from "./Messages";
-import { ChannelDto } from "./Channel";
-import axios from "axios";
-import Messages from "./Messages";
-import UsersList from "./UsersList";
-import Alert from "../Alert/Alert";
-import PopupProtected from "./PopupProtected";
-import HandleInvite from "./HandleInvite";
-import CreateChannel from "./CreateChannel";
+import { useEffect, useState } from 'react';
+import './Chat.css';
+import MessageInput from './MessageInput';
+import { MessageDto } from './Messages';
+import { ChannelDto } from './Chat';
+import axios from 'axios';
+import Messages from './Messages';
+import UsersList from './UsersList';
+import Alert from './Alert';
+import PopupProtected from './PopupProtected';
+import HandleInvite from './HandleInvite';
+import CreateChannel from './CreateChannel';
 
 function JoinnedChannels({
 	ChannelsList,
@@ -18,11 +18,11 @@ function JoinnedChannels({
 	channelOrDM,
 	handleOptionChange,
 }: any) {
-	const [selectedChannel, setSelectedChannel] = useState<string>("");
+	const [selectedChannel, setSelectedChannel] = useState<string>('');
 	const [messages, setMessages] = useState<MessageDto[]>([]);
 	const [showUsers, setShowUsers] = useState(false);
-	const [Alert, setAlert] = useState({ message: "", type: "" });
-	const [PopupPassword, setPopupPassword] = useState<string>(""); // <-- name of protected channel
+	const [alert, setAlert] = useState({ message: '', type: '' });
+	const [PopupPassword, setPopupPassword] = useState<string>(''); // <-- name of protected channel
 	const [SaveChannel, setSaveChannel] = useState<string[]>([]); // <--- Save all joinned protected || private channel
 	const [PopupCreateChannel, setPopupCreateChannel] = useState(false);
 	const [ban, setBan] = useState<any[]>([]); // <--- Save all ban channel
@@ -32,7 +32,7 @@ function JoinnedChannels({
 		const fetchBan = async () => {
 			if (!userInfo?.username) return;
 			const response = await axios.get(
-				"http://localhost:3333/chat/ban/" + userInfo?.username,
+				'http://localhost:3333/chat/ban/' + userInfo?.username,
 				{
 					withCredentials: true,
 				}
@@ -47,7 +47,7 @@ function JoinnedChannels({
 		const fetchBlocked = async () => {
 			try {
 				const response = await axios.get(
-					"http://localhost:3333/friend/blocked",
+					'http://localhost:3333/friend/blocked',
 					{
 						withCredentials: true,
 					}
@@ -60,7 +60,7 @@ function JoinnedChannels({
 
 	const handleChannelClick = async (channel: ChannelDto) => {
 		const response = await axios.get(
-			"http://localhost:3333/chat/ban/" + userInfo?.username,
+			'http://localhost:3333/chat/ban/' + userInfo?.username,
 			{
 				withCredentials: true,
 			}
@@ -68,35 +68,35 @@ function JoinnedChannels({
 		setBan(response.data);
 		if (ban?.find((ban: any) => ban.name === channel.name)) {
 			setAlert({
-				message: "You are banned from this channel",
-				type: "error",
+				message: 'You are banned from this channel',
+				type: 'error',
 			});
-		} else if (channel?.state === "PUBLIC") {
+		} else if (channel?.state === 'PUBLIC') {
 			setSelectedChannel(channel.name);
 			setMessages([]);
-			socket?.emit("join", {
+			socket?.emit('join', {
 				channel: channel.name,
 				username: userInfo?.username,
 			});
-		} else if (channel?.state === "PROTECTED") {
+		} else if (channel?.state === 'PROTECTED') {
 			if (
 				SaveChannel.find((channelName) => channelName === channel.name)
 			) {
 				setSelectedChannel(channel.name);
 				setMessages([]);
-				socket?.emit("join", {
+				socket?.emit('join', {
 					channel: channel.name,
 					username: userInfo?.username,
 				});
-				handleTogglePopupPassword("");
+				handleTogglePopupPassword('');
 			} else {
 				handleTogglePopupPassword(channel.name);
 			}
-		} else if (channel?.state === "PRIVATE") {
+		} else if (channel?.state === 'PRIVATE') {
 			if (channel.ownerId === userInfo.id) {
 				setSelectedChannel(channel.name);
 				setMessages([]);
-				socket?.emit("join", {
+				socket?.emit('join', {
 					channel: channel.name,
 					username: userInfo?.username,
 				});
@@ -105,14 +105,14 @@ function JoinnedChannels({
 			) {
 				setSelectedChannel(channel.name);
 				setMessages([]);
-				socket?.emit("join", {
+				socket?.emit('join', {
 					channel: channel.name,
 					username: userInfo?.username,
 				});
 			} else {
 				setAlert({
-					message: "This channel is private, you have to be invited",
-					type: "error",
+					message: 'This channel is private, you have to be invited',
+					type: 'error',
 				});
 			}
 		}
@@ -124,37 +124,37 @@ function JoinnedChannels({
 				setMessages([...messages, message]);
 		};
 
-		socket?.on("chat", handleMessage);
-		socket?.on("kick", (data: any) => {
+		socket?.on('chat', handleMessage);
+		socket?.on('kick', (data: any) => {
 			if (data?.username === userInfo?.username) {
-				setSelectedChannel("");
+				setSelectedChannel('');
 				setMessages([]);
 				setAlert({
 					message: `You have been kicked from ${data?.channel}`,
-					type: "error",
+					type: 'error',
 				});
 			}
 		});
-		socket?.on("ban", (data: any) => {
+		socket?.on('ban', (data: any) => {
 			if (data?.username === userInfo?.username) {
-				setSelectedChannel("");
+				setSelectedChannel('');
 				setMessages([]);
 				setAlert({
 					message: `You have been banned from ${data?.channel}`,
-					type: "error",
+					type: 'error',
 				});
 			}
 		});
 		return () => {
-			socket?.off("chat", handleMessage);
-			socket?.off("kick");
-			socket?.off("ban");
+			socket?.off('chat', handleMessage);
+			socket?.off('kick');
+			socket?.off('ban');
 		};
 	}, [blocked, messages, selectedChannel, socket, userInfo?.username]);
 
 	const sendMessage = (message: MessageDto) => {
 		if (!message.content) return;
-		socket?.emit("chat", { ...message, channel: selectedChannel });
+		socket?.emit('chat', { ...message, channel: selectedChannel });
 	};
 
 	const handleToggleUsers = () => {
@@ -171,22 +171,21 @@ function JoinnedChannels({
 
 	return (
 		<>
-			<Alert message={Alert.message} type={Alert.type} />
+			<Alert message={alert.message} type={alert.type} />
 			{PopupCreateChannel && (
 				<CreateChannel
 					ClosePopup={handleToggleCreateChannel}
 					setAlert={setAlert}
 				/>
 			)}
-			<div className="wrapper">
-				<div className="container">
-					<div className="left">
-						<div className="top">
+			<div className="chat-wrapper">
+				<div className="chat-container">
+					<div className="chat-left">
+						<div className="chat-top">
 							<select
 								id="channelOrDM"
 								value={channelOrDM}
-								onChange={handleOptionChange}
-							>
+								onChange={handleOptionChange}>
 								<option value="channel">Channels</option>
 								<option value="dm">Direct Message</option>
 							</select>
@@ -195,18 +194,17 @@ function JoinnedChannels({
 							</button>
 							<button onClick={handleToggleUsers}>Users</button>
 						</div>
-						<ul className="channel">
+						<ul className="chat-channel">
 							{ChannelsList.map((channel: ChannelDto) => (
 								<li
 									key={channel.id}
-									className={`person ${
+									className={`chat-person ${
 										selectedChannel === channel.name
-											? "active"
-											: ""
+											? 'chat-active'
+											: ''
 									}`}
-									onClick={() => handleChannelClick(channel)}
-								>
-									{PopupPassword !== "" && (
+									onClick={() => handleChannelClick(channel)}>
+									{PopupPassword !== '' && (
 										<PopupProtected
 											channel={PopupPassword}
 											socket={socket}
@@ -220,8 +218,10 @@ function JoinnedChannels({
 											setAlert={setAlert}
 										/>
 									)}
-									<span className="name">{channel.name}</span>
-									<span className="role">
+									<span className="chat-name">
+										{channel.name}
+									</span>
+									<span className="chat-role">
 										{channel.state}
 									</span>
 								</li>
@@ -240,24 +240,24 @@ function JoinnedChannels({
 					{showUsers && (
 						<UsersList channel={selectedChannel} socket={socket} />
 					)}
-					<div className="right">
-						<div className="top">
+					<div className="chat-right">
+						<div className="chat-top">
 							<span>
-								To:{" "}
-								<span className="name">
-									{selectedChannel === ""
-										? "No Channel selected"
+								To:{' '}
+								<span className="chat-name">
+									{selectedChannel === ''
+										? 'No Channel selected'
 										: selectedChannel}
 								</span>
 							</span>
 						</div>
-						{selectedChannel === "" && (
-							<div className="chat center">
+						{selectedChannel === '' && (
+							<div className="chat-chat center">
 								<p>No Channel selected</p>
 							</div>
 						)}
 						<Messages messages={messages} userInfo={userInfo} />
-						<div className="write">
+						<div className="chat-write">
 							<MessageInput
 								sendMessage={sendMessage}
 								userInfo={userInfo}

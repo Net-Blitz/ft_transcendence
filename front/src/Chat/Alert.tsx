@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import "./Alert.css";
+import { useEffect, useState } from 'react';
+import './Alert.css';
 
 function Alert({ message, type }: { message: string; type: string }) {
 	const [show, setShow] = useState(false);
@@ -16,7 +16,7 @@ function Alert({ message, type }: { message: string; type: string }) {
 
 	return (
 		<>
-			<div className={`Alert ${type} ${show ? "show" : ""}`}>
+			<div className={`Alert ${type} ${show ? 'show' : ''}`}>
 				<p>{message}</p>
 			</div>
 		</>
