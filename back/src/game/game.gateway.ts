@@ -14,7 +14,7 @@ export class GameGateway {
 	server: Server;
 	
 	ConnectedSockets: SocketUser[] = [];
-	GamePlaying : {room: number, specList: string[]}[] = [];
+	GamePlaying = [];
 
 	async sleep(ms: number) {
 		return new Promise(resolve => setTimeout(resolve, ms));
@@ -57,7 +57,6 @@ export class GameGateway {
 	private async waitingPlayerConnection(room: number) {
 		while (this.ConnectedSockets.findIndex((socket) => socket.roomName === "game-" + room && socket.state === "player1") === -1 ||
 				this.ConnectedSockets.findIndex((socket) => socket.roomName === "game-" + room && socket.state === "player2") === -1) {
-				console.log("waiting for player connection");
 				await this.sleep(1000); // can add a timeout here --> if timeout, delete the game or make cancel state
 		}
 		await this.prisma.game.update({
@@ -81,7 +80,6 @@ export class GameGateway {
 
 	private async gameRun(gameRoom: GameRoom, room: number) {
 		let end;
-		let wait = 0;
 
 		while (true) {
 			this.movePlayer(gameRoom, room);
@@ -91,17 +89,8 @@ export class GameGateway {
 			if (end.state)
 				return (end.mode);
 			end = this.checkConnected(room);
-			if (end.state && end.mode === "disconnected")
-			{
-				if (wait > 2500)
-					return (end);
-				else
-					wait += 1;
-			}
-			else if (end.state)
+			if (end.state)
 				return (end);
-			else
-				wait = 0;
 			await this.sleep(5)
 		}
 	}
@@ -111,11 +100,11 @@ export class GameGateway {
 			where: { id: room },
 			data: { state: "ENDED"}
 		})
-		const game = await this.prisma.game.findUnique({where: {id: room}});	
-		if (!game)
-			return (false);
 
 		if (endMode.mode === "normal") {
+			const game = await this.prisma.game.findUnique({where: {id: room}});	
+			if (!game)
+				return (false);
 			if (gameRoom.player1.score > gameRoom.player2.score)
 			{
 				await this.prisma.game.update({
@@ -142,6 +131,9 @@ export class GameGateway {
 			}
 		}
 		else if (endMode.mode === "surrender") {
+			const game = await this.prisma.game.findUnique({where: {id: room}});	
+			if (!game)
+				return (false);
 			if (endMode.player === 2)
 			{
 				await this.prisma.game.update({
@@ -167,19 +159,8 @@ export class GameGateway {
 					data: { state: "ONLINE", losses: { increment: 1 } }})
 			}
 		}
-		else if (endMode.mode === "disconnected") {
-			await this.prisma.user.update({
-				where: { id: game.user2Id },
-				data: { state: "ONLINE"}})
-			await this.prisma.user.update({
-				where: { id: game.user1Id },
-				data: { state: "ONLINE"}})
-
-		}
-			
 		
-		// this.GamePlaying.splice(this.GamePlaying.indexOf(room), 1);
-		this.GamePlaying.splice(this.GamePlaying.findIndex((game) => game.room === room), 1);
+		this.GamePlaying.splice(this.GamePlaying.indexOf(room), 1);
 		//disconnect all socket to the room associated and navigate to the end page
 		this.server.to("game-" + room).emit("endGame", {player1_score: gameRoom.player1.score, player2_score: gameRoom.player2.score});
 		//jE PENSE QU'IL FAUDRAIT AUSSI DELETE ROOM
@@ -195,19 +176,22 @@ export class GameGateway {
 		await this.gameEnd(gameRoom, room, end);
 	}
 
-	private async checkUserConnection(client: Socket, data: any) {
+	private async checkUserConnection(client: Socket) {
 	
 		const cookies = client.handshake.headers.cookie;
 		const token = cookies.split("jwt=")[1].split(";")[0];
 		const userCookie = JSON.parse(atob(token.split(".")[1]));
 	//	jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => { if (err) return (null); });
 
+		if (!client.handshake.query || !client.handshake.query.room)
+			return (null);
+		
 		const user = await this.prisma.user.findUnique({where: {login: userCookie.login}});
 		if (!user)
 			return (null);
-		if (!data || !data.room)
+		const room = parseInt(client.handshake.query.room.toString());
+		if (!room)
 			return (null);
-		const room = data.room;
 		
 		const game = await this.prisma.game.findUnique({where: {id: room}});	
 		if (!game || game.state == "ENDED")
@@ -215,51 +199,28 @@ export class GameGateway {
 		return ({login: userCookie.login, user, game, room})
 	}
 
-	private addSpecToRoom(room: number, login: string) {
-		const game = this.GamePlaying.find(x => x.room === room);
-		if (game && game.specList.find(x => x === login) === undefined)
-		{
-			game.specList.push(login);
-			this.server.to("game-" + room).emit("updateSpectator", {spectator: game.specList.length});
-		}
-	}
-
-	private removeSpecToRoom(room: number, login: string) {
-		const game = this.GamePlaying.find(x => x.room === room);
-		if (game && game.specList.find(x => x === login) !== undefined)
-		{
-			game.specList.splice(game.specList.findIndex((spec) => spec === login), 1);
-			this.server.to("game-" + room).emit("updateSpectator", {spectator: game.specList.length});
-		}
-	}
-
 	private setupUserSocket(client: Socket, user: User, game: Game, userLogin: string, room: number) {
 		let state : string;
 
 		if (game.user1Id == user.id)
-			state = "player1";
+		state = "player1";
 		else if (game.user2Id == user.id)
 			state = "player2";	
 		else
-		{
 			state = "spectator";
-			this.addSpecToRoom(room, user.login);
-		}
 
 		const sockUser : SocketUser = this.ConnectedSockets.find(x => x.login === user.login);
 
 		if (sockUser != null)
 		{
-			if (sockUser.state === "spectator")
-				this.removeSpecToRoom(parseInt(sockUser.roomName.split("game-")[0]), sockUser.login);
 			if (sockUser.roomName !== "game-" + room)
 			{
+				this.server.to(sockUser.socketId).emit("close");
 				sockUser.roomName = "game-" + room;
 				sockUser.state = state;
 				sockUser.up = 0;
 				sockUser.down = 0;
 				sockUser.socketId = client.id;
-
 				client.join("game-" + room);
 			}
 		}
@@ -279,13 +240,14 @@ export class GameGateway {
 		}
 	}
 
-	private async checkAndSave(client: Socket, data: any) {
 
-		let userCheck = await this.checkUserConnection(client, data);
+	private async checkAndSave(client: Socket) {
+
+		let userCheck = await this.checkUserConnection(client);
 		
 		if (userCheck === null)
 		{
-			client.emit("error"); 
+			client.emit("BadConnection"); 
 			return (false);
 		}
 		
@@ -295,30 +257,28 @@ export class GameGateway {
 			client.emit("gameState", {
 				ball_x: 0.5,
 				ball_y: 0.5,
-				ball_size: 0.03,
+				ball_size: 0.05,
 				
 				player1_x: 0.006,
 				player1_y: 0.5,
-				player1_size: 0.2,
+				player1_size: 0.3,
 				player1_score: 0,
 	
 				player2_x: 0.994,
 				player2_y: 0.5,
-				player2_size: 0.2,
+				player2_size: 0.3,
 				player2_score: 0,
 			});
-		if (this.GamePlaying.findIndex(x => x.room === userCheck.room) === -1)
+		if (this.GamePlaying.findIndex(x => x === userCheck.room) === -1)
 		{
-			this.GamePlaying.push({room: userCheck.room, specList: []});
+			this.GamePlaying.push(userCheck.room);
 			this.gameLoop(userCheck.room);
 		}
 		return (true);
 	}
  
-	async handleConnection(client: Socket) {
-		console.log("Game Server Connection", client.id);
-
-		return ;
+	async handleConnection(client: Socket) { 
+		return await this.checkAndSave(client)
 	}
 
 	handleDisconnect(client: Socket) {
@@ -326,48 +286,10 @@ export class GameGateway {
 		if (sockUser != null)
 		{
 			client.leave(sockUser.roomName);
+			this.server.to(sockUser.socketId).emit("close");
 			this.ConnectedSockets.splice(this.ConnectedSockets.findIndex(x => x.socketId === client.id), 1);
 		}
 		return ;
-	}
-
-	@SubscribeMessage("gameConnection")
-	async handleGameConnection(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
-		return await this.checkAndSave(client, data);
-	}
-
-	@SubscribeMessage("gameDisconnection")
-	async handleGameDisconnection(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
-		const sockUser : SocketUser = this.ConnectedSockets.find(x => x.socketId === client.id);
-		if (sockUser != null)
-		{
-			client.leave(sockUser.roomName);
-			//this.server.to(client.id).socketsLeave(sockUser.roomName);
-			if (sockUser.state === "spectator")
-				this.removeSpecToRoom(parseInt(sockUser.roomName.split("game-")[0]), sockUser.login);
-			this.ConnectedSockets.splice(this.ConnectedSockets.findIndex(x => x.socketId === client.id), 1);
-		}
-	}
-
-	@SubscribeMessage("endGameStatus")
-	async handleEndGameStatus(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
-		const sockUser : SocketUser = this.ConnectedSockets.find(x => x.socketId === client.id);
-		if (sockUser != null)
-		{
-			const game = await this.prisma.game.findFirst({where: {id: data.room}});
-			if (game)
-			{
-				const player1 = await this.prisma.user.findFirst({where: {id: game.user1Id}});
-				const player2 = await this.prisma.user.findFirst({where: {id: game.user2Id}});
-				if (player1 && player2)
-				{
-					if (game.score1 > game.score2)
-						client.emit("getEndStatus", {score1: game.score1, score2: game.score2, avatar1: player1.avatar, avatar2: player2.avatar} )
-					else
-						client.emit("getEndStatus", {score1: game.score2, score2: game.score1, avatar1: player2.avatar, avatar2: player1.avatar} )
-				}
-			}
-		}
 	}
 
 	@SubscribeMessage("keyPress")
@@ -415,32 +337,5 @@ export class GameGateway {
 			players.player1.surrender = true;
 		if (players.player2 != null && players.player2.login === data.login)
 			players.player2.surrender = true;
-	}
-
-	@SubscribeMessage("quickChatMessage")
-	async HandleQuickChatMessage(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
-		const sockUser : SocketUser = this.ConnectedSockets.find(x => x.socketId === client.id);
-		if (sockUser === null)
-			return ;
-		
-		const game = await this.prisma.game.findUnique({where: {id: data.room}});
-
-		if (game === null || (game.user1Id !== sockUser.prismaId && game.user2Id !== sockUser.prismaId))
-			return ;
-
-		this.server.to("game-" + data.room).emit("quickChatMessageResponse", {login: sockUser.login, message: parseInt(data.key)});
-	}
-
-	@SubscribeMessage("getSpectator")
-	HanldeGetSpectator(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
-		const sockUser : SocketUser = this.ConnectedSockets.find(x => x.socketId === client.id);
-		if (sockUser === null)
-			return ;
-		
-		const game = this.GamePlaying.find(x => x.room === data.room);
-		if (game === undefined)
-			return ;
-		
-		client.emit("updateSpectator", {spectator: game.specList.length});
 	}
 }

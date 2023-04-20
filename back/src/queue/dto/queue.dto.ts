@@ -18,13 +18,7 @@ export class QueueDto {
 	@IsNotEmpty()
 	@IsString()
 	bonus2: string;
-}
 
-export enum QueueState {
-	Searching = "Searching",
-	Waiting = "WaitingRep",
-	Accepted = "Accepted",
-	Declined = "Declined",
 }
 
 export class QueueObject {
@@ -33,16 +27,8 @@ export class QueueObject {
 	login: string;
 	socketId: string;
 	mode: string;
-	avatar: string;
 	bonus1: boolean;
 	bonus2: boolean;
 	elo: number;
-	timeData: number;
-	state: QueueState;
-}
-
-export class GameMatched {
-	player1: QueueObject;
-	player2: QueueObject;
-	time: number;
+	timeData: number
 }

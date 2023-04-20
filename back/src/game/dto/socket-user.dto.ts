@@ -7,4 +7,5 @@ export class SocketUser {
 	state: string; // 'player1' | 'player2' | 'spectator'
 	up: number;
 	down: number;
+	surrender: boolean;
 }
