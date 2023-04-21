@@ -75,7 +75,7 @@ function App(this: any) {
 						}
 					/>
 					<Route
-						path="/notification"
+						path="/Notification"
 						element={
 							<AppLayout>
 								{' '}

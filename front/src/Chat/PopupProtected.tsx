@@ -1,5 +1,5 @@
-import axios from "axios";
-import { useEffect, useRef, useState } from "react";
+import axios from 'axios';
+import { useEffect, useRef, useState } from 'react';
 
 interface PopupProtectedProps {
 	channel: string;
@@ -9,7 +9,7 @@ interface PopupProtectedProps {
 	setMessages: (messages: any[]) => void;
 	SaveChannel: string[];
 	setSaveChannel: (channels: string[]) => void;
-	setAlert: (Alert: { message: string; type: "success" | "error" }) => void;
+	setAlert: (Alert: { message: string; type: 'success' | 'error' }) => void;
 }
 
 function PopupProtected({
@@ -22,7 +22,7 @@ function PopupProtected({
 	setSaveChannel,
 	setAlert,
 }: PopupProtectedProps) {
-	const [Password, setPassword] = useState(""); // <--- Password for protected channel
+	const [Password, setPassword] = useState(''); // <--- Password for protected channel
 	const [ChannelName, setChannelName] = useState(channel); // <--- Name of protected channel
 	const PopupRef = useRef<HTMLDivElement>(null); // <--- Ref for protected channel
 
@@ -32,57 +32,59 @@ function PopupProtected({
 				PopupRef.current &&
 				!PopupRef.current.contains(event.target as Node)
 			) {
-				setChannelName("");
+				setChannelName('');
 			}
 		};
 
-		document.addEventListener("mousedown", handleClickOutside);
+		document.addEventListener('mousedown', handleClickOutside);
 		return () => {
-			document.removeEventListener("mousedown", handleClickOutside);
+			document.removeEventListener('mousedown', handleClickOutside);
 		};
 	}, [PopupRef]);
 
 	const ClosePopupPassword = () => {
-		setChannelName("");
+		setChannelName('');
 	};
 
 	const JoinProtectedChannel = async () => {
 		try {
 			await axios.post(
-				"http://localhost:3333/chat/join/" + ChannelName,
-				{ state: "PROTECTED", password: Password },
+				'http://localhost:3333/chat/join/' + ChannelName,
+				{ state: 'PROTECTED', password: Password },
 				{ withCredentials: true }
 			);
 			setSelectedChannel(ChannelName);
 			setMessages([]);
-			socket?.emit("join", {
+			socket?.emit('join', {
 				channel: ChannelName,
 				username: userInfo?.username,
 			});
-			setChannelName("");
+			setChannelName('');
 			setSaveChannel([...SaveChannel, ChannelName]);
 			setAlert({
-				message: "You joinned " + ChannelName,
-				type: "success",
+				message: 'You joinned ' + ChannelName,
+				type: 'success',
 			});
 		} catch (error) {
 			setAlert({
-				message: "Wrong password",
-				type: "error",
+				message: 'Wrong password',
+				type: 'error',
 			});
 		}
 	};
 
 	return (
 		<>
-			{ChannelName !== "" && (
-				<div ref={PopupRef} className="overlay">
-					<div className="popup">
-						<label className="close" onClick={ClosePopupPassword}>
+			{ChannelName !== '' && (
+				<div ref={PopupRef} className="chat-overlay">
+					<div className="chat-popup">
+						<label
+							className="chat-close"
+							onClick={ClosePopupPassword}>
 							&times;
 						</label>
 						<h2>Protected Channel</h2>
-						<div className="content">
+						<div className="chat-content">
 							<p>Enter the password of the channel</p>
 							<input
 								onChange={(e) => setPassword(e.target.value)}

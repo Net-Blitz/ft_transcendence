@@ -3,7 +3,6 @@ import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { Response } from "express";
 import { PrismaService } from "src/prisma/prisma.service";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import axios from "axios";
 import { UserDto } from "./dto";
 import { authenticator } from "otplib";
@@ -110,16 +109,6 @@ export class AuthService {
 					"/login/config"
 			);
 		} catch (error) {
-			if (error instanceof PrismaClientKnownRequestError) {
-				if (error.code === "P2002") {
-					const existingUser = await this.prisma.user.findUnique({
-						where: {
-							login: user.login,
-						},
-					});
-					return this.signToken(res, existingUser);
-				}
-			}
 			throw new ForbiddenException("prisma error");
 		}
 	}

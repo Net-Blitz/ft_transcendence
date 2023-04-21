@@ -1,5 +1,5 @@
-import axios from "axios";
-import { useEffect, useRef, useState } from "react";
+import axios from 'axios';
+import { useEffect, useRef, useState } from 'react';
 
 interface DropdownMenuProps {
 	channel: string;
@@ -21,7 +21,7 @@ function DropdownMenu({
 	setAlert,
 }: DropdownMenuProps) {
 	const dropdownRef = useRef<HTMLDivElement>(null);
-	const [openUsername, setOpenUsername] = useState<string>("");
+	const [openUsername, setOpenUsername] = useState<string>('');
 	const [isBlocked, setIsBlocked] = useState<boolean>(false);
 
 	useEffect(() => {
@@ -30,18 +30,18 @@ function DropdownMenu({
 				dropdownRef.current &&
 				!dropdownRef.current.contains(event.target as Node)
 			) {
-				setOpenUsername("");
+				setOpenUsername('');
 			}
 		};
 
-		document.addEventListener("mousedown", handleClickOutside);
+		document.addEventListener('mousedown', handleClickOutside);
 		return () =>
-			document.removeEventListener("mousedown", handleClickOutside);
+			document.removeEventListener('mousedown', handleClickOutside);
 	}, [dropdownRef]);
 
 	const handleToggleDropdown = (username: string) => {
 		if (openUsername === username) {
-			setOpenUsername("");
+			setOpenUsername('');
 		} else {
 			setOpenUsername(username);
 		}
@@ -50,21 +50,21 @@ function DropdownMenu({
 	const handlePromote = async (username: string) => {
 		try {
 			await axios.post(
-				"http://localhost:3333/chat/admin/promote/" + channel,
+				'http://localhost:3333/chat/admin/promote/' + channel,
 				{
 					username: username,
 				},
 				{ withCredentials: true }
 			);
 			setAlert({
-				message: username + " has been promoted",
-				type: "success",
+				message: username + ' has been promoted',
+				type: 'success',
 			});
 		} catch (error) {
 			console.error(error);
 			setAlert({
-				message: "An error occured",
-				type: "error",
+				message: 'An error occured',
+				type: 'error',
 			});
 		}
 	};
@@ -72,89 +72,89 @@ function DropdownMenu({
 	const handleDemote = async (username: string) => {
 		try {
 			await axios.post(
-				"http://localhost:3333/chat/admin/demote/" + channel,
+				'http://localhost:3333/chat/admin/demote/' + channel,
 				{
 					username: username,
 				},
 				{ withCredentials: true }
 			);
 			setAlert({
-				message: username + " has been demoted",
-				type: "success",
+				message: username + ' has been demoted',
+				type: 'success',
 			});
 		} catch (error) {
 			console.error(error);
 			setAlert({
-				message: "An error occured",
-				type: "error",
+				message: 'An error occured',
+				type: 'error',
 			});
 		}
 	};
 
 	const handleKick = async (username: string) => {
-		socket?.emit("ToKick", {
+		socket?.emit('ToKick', {
 			username: userInfo.username,
 			channel: channel,
 			login: username,
 		});
 		setAlert({
-			message: username + " has been kicked",
-			type: "success",
+			message: username + ' has been kicked',
+			type: 'success',
 		});
 	};
 
 	const handleBan = async (username: string) => {
-		socket?.emit("ToBan", {
+		socket?.emit('ToBan', {
 			username: userInfo.username,
 			channel: channel,
 			login: username,
 		});
 		setAlert({
-			message: username + " has been banned",
-			type: "success",
+			message: username + ' has been banned',
+			type: 'success',
 		});
 	};
 
 	const handleMute = async (username: string) => {
-		socket?.emit("ToMute", {
+		socket?.emit('ToMute', {
 			username: userInfo.username,
 			channel: channel,
 			login: username,
 		});
 		setAlert({
-			message: username + " has been muted",
-			type: "success",
+			message: username + ' has been muted',
+			type: 'success',
 		});
 	};
 
 	const handleUnmute = async (username: string) => {
-		socket?.emit("ToUnmute", {
+		socket?.emit('ToUnmute', {
 			username: userInfo.username,
 			channel: channel,
 			login: username,
 		});
 		setAlert({
-			message: username + " has been unmuted",
-			type: "success",
+			message: username + ' has been unmuted',
+			type: 'success',
 		});
 	};
 
 	const handleBlock = async (username: string) => {
 		try {
 			await axios.post(
-				"http://localhost:3333/friend/block/" + username,
+				'http://localhost:3333/friend/block/' + username,
 				{},
 				{ withCredentials: true }
 			);
 			setAlert({
-				message: username + " has been blocked",
-				type: "success",
+				message: username + ' has been blocked',
+				type: 'success',
 			});
 		} catch (error) {
 			console.error(error);
 			setAlert({
-				message: "An error occured",
-				type: "error",
+				message: 'An error occured',
+				type: 'error',
 			});
 		}
 	};
@@ -162,19 +162,19 @@ function DropdownMenu({
 	const handleUnblock = async (username: string) => {
 		try {
 			await axios.post(
-				"http://localhost:3333/friend/unblock/" + username,
+				'http://localhost:3333/friend/unblock/' + username,
 				{},
 				{ withCredentials: true }
 			);
 			setAlert({
-				message: username + " has been unblocked",
-				type: "success",
+				message: username + ' has been unblocked',
+				type: 'success',
 			});
 		} catch (error) {
 			console.error(error);
 			setAlert({
-				message: "An error occured",
-				type: "error",
+				message: 'An error occured',
+				type: 'error',
 			});
 		}
 	};
@@ -183,7 +183,7 @@ function DropdownMenu({
 		const getIsBlocked = async () => {
 			try {
 				const response = await axios.get(
-					"http://localhost:3333/friend/blockbyme/" + user.username,
+					'http://localhost:3333/friend/blockbyme/' + user.username,
 					{ withCredentials: true }
 				);
 				setIsBlocked(response.data.isBlocked);
@@ -197,24 +197,24 @@ function DropdownMenu({
 	return (
 		<>
 			{user.username !== userInfo.username && (
-				<div className="dropdown-menu-container" ref={dropdownRef}>
+				<div className="chat-dropdown-menu-container" ref={dropdownRef}>
 					<div
-						className="dropdown-menu-header"
-						onClick={() => handleToggleDropdown(user.username)}
-					>
+						className="chat-dropdown-menu-header"
+						onClick={() => handleToggleDropdown(user.username)}>
 						<span>Options</span>
 						<i
-							className={`arrow ${
-								openUsername === user.username ? "up" : "down"
+							className={`chat-arrow ${
+								openUsername === user.username ? 'up' : 'down'
 							}`}
 						/>
 					</div>
 					{openUsername === user.username && (
-						<ul className="dropdown-menu-options">
+						<ul className="chat-dropdown-menu-options">
 							{isBlocked ? (
 								<li
-									onClick={() => handleUnblock(user.username)}
-								>
+									onClick={() =>
+										handleUnblock(user.username)
+									}>
 									Unblock
 								</li>
 							) : (
@@ -222,51 +222,47 @@ function DropdownMenu({
 									Block
 								</li>
 							)}
-							{((isAdmin && user.role === "user") ||
+							{((isAdmin && user.role === 'user') ||
 								(userInfo?.id === channelInfo?.ownerId &&
-									user.role !== "owner")) && (
+									user.role !== 'owner')) && (
 								<>
 									<li
-										onClick={() => handleBan(user.username)}
-									>
+										onClick={() =>
+											handleBan(user.username)
+										}>
 										Ban
 									</li>
-									{user.role === "user" ? (
+									{user.role === 'user' ? (
 										<li
 											onClick={() =>
 												handlePromote(user.username)
-											}
-										>
+											}>
 											Make Admin
 										</li>
 									) : (
 										<li
 											onClick={() =>
 												handleDemote(user.username)
-											}
-										>
+											}>
 											Remove Admin
 										</li>
 									)}
 									<li
 										onClick={() =>
 											handleKick(user.username)
-										}
-									>
+										}>
 										Kick
 									</li>
 									<li
 										onClick={() =>
 											handleMute(user.username)
-										}
-									>
+										}>
 										Mute
 									</li>
 									<li
 										onClick={() =>
 											handleUnmute(user.username)
-										}
-									>
+										}>
 										Unmute
 									</li>
 								</>

@@ -1,8 +1,8 @@
-import MessageInput from "./MessageInput";
-import Alert from "../Alert/Alert";
-import { useEffect, useState } from "react";
-import PopupDM from "./PopupDM";
-import axios from "axios";
+import MessageInput from './MessageInput';
+import Alert from './Alert';
+import { useEffect, useState } from 'react';
+import PopupDM from './PopupDM';
+import axios from 'axios';
 
 export interface DirectMessageDto {
 	id: number;
@@ -23,7 +23,7 @@ function DirectMessage({
 }: any) {
 	const [selectedDM, setSelectedDM] = useState<number>(0);
 	const [messages, setMessages] = useState<any[]>([]);
-	const [Alert, setAlert] = useState({ message: "", type: "" });
+	const [alert, setAlert] = useState({ message: '', type: '' });
 	const [PopupNewDm, setPopupNewDm] = useState(false);
 
 	const handleDMClick = async (DM: DirectMessageDto) => {
@@ -36,14 +36,14 @@ function DirectMessage({
 		const getMessages = async () => {
 			try {
 				const reponse = await axios.get(
-					"http://localhost:3333/chat/dm/messages/" + selectedDM,
+					'http://localhost:3333/chat/dm/messages/' + selectedDM,
 					{ withCredentials: true }
 				);
 				reponse.data.map((message: any) => {
 					return (
 						message.userId === userInfo.id
 							? (message.username = userInfo.username)
-							: (message.username = ""),
+							: (message.username = ''),
 						(message.content = message.message)
 					);
 				});
@@ -53,16 +53,16 @@ function DirectMessage({
 			}
 		};
 
-		socket?.on("DM", (message: any) => {
+		socket?.on('DM', (message: any) => {
 			if (message.DMid === selectedDM)
 				setMessages((messages) => [...messages, message]);
 		});
-		socket?.emit("ConnectedDM", { id: userInfo?.id });
+		socket?.emit('ConnectedDM', { id: userInfo?.id });
 
 		getMessages();
 
 		return () => {
-			socket?.off("DM");
+			socket?.off('DM');
 		};
 	}, [selectedDM, socket, userInfo?.id, userInfo?.username]);
 
@@ -71,7 +71,7 @@ function DirectMessage({
 		const DM = DMList.find((DM: DirectMessageDto) => DM.id === selectedDM);
 		const receiver =
 			DM?.senderId === userInfo.id ? DM?.receiverId : DM?.senderId;
-		socket?.emit("DM", {
+		socket?.emit('DM', {
 			...message,
 			DMid: selectedDM,
 			sender: userInfo.id,
@@ -86,7 +86,7 @@ function DirectMessage({
 
 	return (
 		<>
-			<Alert message={Alert.message} type={Alert.type} />
+			<Alert message={alert.message} type={alert.type} />
 			{PopupNewDm && (
 				<PopupDM
 					ClosePopup={handleTogglePopupNewDm}
@@ -94,15 +94,14 @@ function DirectMessage({
 					userInfo={userInfo}
 				/>
 			)}
-			<div className="wrapper">
-				<div className="container">
-					<div className="left">
-						<div className="top">
+			<div className="chat-wrapper">
+				<div className="chat-container">
+					<div className="chat-left">
+						<div className="chat-top">
 							<select
 								id="channelOrDM"
 								value={channelOrDM}
-								onChange={handleOptionChange}
-							>
+								onChange={handleOptionChange}>
 								<option value="channel">Channels</option>
 								<option value="dm">Direct Message</option>
 							</select>
@@ -110,17 +109,16 @@ function DirectMessage({
 								New DM
 							</button>
 						</div>
-						<ul className="channel">
+						<ul className="chat-channel">
 							{DMList.map((DM: DirectMessageDto) => (
 								<li
 									key={DM.id}
-									className={`person ${
-										selectedDM === DM.id ? "active" : ""
+									className={`chat-person ${
+										selectedDM === DM.id ? 'active' : ''
 									}`}
-									onClick={() => handleDMClick(DM)}
-								>
+									onClick={() => handleDMClick(DM)}>
 									<img
-										className="friend-img"
+										className="chat-friend-img"
 										src={
 											userInfo.id === DM.senderId
 												? DM.receiver.avatar
@@ -128,7 +126,7 @@ function DirectMessage({
 										}
 										alt="avatar"
 									/>
-									<span className="name">
+									<span className="chat-name">
 										{userInfo.id === DM.senderId
 											? DM.receiver.username
 											: DM.sender.username}
@@ -137,13 +135,13 @@ function DirectMessage({
 							))}
 						</ul>
 					</div>
-					<div className="right">
-						<div className="top">
+					<div className="chat-right">
+						<div className="chat-top">
 							<span>
-								To:{" "}
-								<span className="name">
+								To:{' '}
+								<span className="chat-name">
 									{selectedDM === 0
-										? "No Chat selected"
+										? 'No Chat selected'
 										: DMList.find(
 												(DM: DirectMessageDto) =>
 													DM.id === selectedDM
@@ -160,25 +158,24 @@ function DirectMessage({
 							</span>
 						</div>
 						{selectedDM === 0 && (
-							<div className="chat center">
+							<div className="chat-chat center">
 								<p>No Chat selected</p>
 							</div>
 						)}
-						<div className="chat">
+						<div className="chat-chat">
 							{messages.map((message, index) => (
 								<div
 									key={index}
-									className={`bubble ${
+									className={`chat-bubble ${
 										userInfo.username === message.username
-											? "me"
-											: "you"
-									}`}
-								>
+											? 'chat-me'
+											: 'chat-you'
+									}`}>
 									{message.content}
 								</div>
 							))}
 						</div>
-						<div className="write">
+						<div className="chat-write">
 							<MessageInput
 								sendMessage={sendMessage}
 								userInfo={userInfo}
