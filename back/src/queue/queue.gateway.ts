@@ -134,7 +134,7 @@ export class QueueGateway {
 	async runQueue() {
 		while (1)
 		{
-			// console.log("This is the queue: ", this.queue1v1);
+			// console.log("This is the queue: ", this.queue1v1);  
 			this.checkQueue();
 			
 			await this.checkMatch();
