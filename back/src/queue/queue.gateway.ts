@@ -78,7 +78,8 @@ export class QueueGateway {
 			id: prismaUser.id,
 			login: userParam.login,
 			socketId: client.id,
-			mode: userParam.mode, elo: prismaUser.elo,
+			mode: userParam.mode,
+			elo: prismaUser.elo, 
 			bonus1: (userParam.bonus1 == undefined) ? false : true,
 			bonus2: (userParam.bonus2 == undefined) ? false : true,
 			timeData: Date.now()
@@ -94,6 +95,7 @@ export class QueueGateway {
 
 		this.addUserToQueue(userParam, client);
 
+		console.log("connected: ", client.id);
 		return ;
 	} 
 

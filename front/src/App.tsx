@@ -17,6 +17,9 @@ import { useSelector } from 'react-redux';
 import { useGetUser } from './utils/hooks';
 /*	SELECTORS	*/
 import { selectUser } from './utils/redux/selectors';
+/* SOCKET */
+import { io, Socket } from 'socket.io-client';
+import { Manager } from "socket.io-client";
 
 const NotFound = () => {
 	return (
@@ -30,6 +33,11 @@ function App(this: any) {
 	useGetUser();
 	const status = useSelector(selectUser).status;
 	const currentPath = window.location.pathname;
+
+	// const manager = new Manager("http://localhost:3333", {transports: ['websocket'], path, withCredentials: true});
+	// const socketQueue: Socket = manager.socket("/queue");
+	const socketQueue: Socket = io("http://localhost:3333/queue", {transports: ['websocket'], withCredentials: true});
+	// const socketGame: Socket = io("http://localhost:3333/game", {transports: ['websocket'], withCredentials: true});
 
 	if (status !== 'resolved' && status !== 'notAuth') return <div></div>;
 	return (
@@ -70,7 +78,7 @@ function App(this: any) {
 						element={
 							<AppLayout>
 								{' '}
-								<Game />
+								<Game socketQueue={socketQueue}/>
 							</AppLayout>
 						}
 					/>

@@ -25,79 +25,13 @@ function App(this: any) {
 			<GamePopUp socketQueue={socketQueue} />
 			<Routes>
 				<Route path="/login" element={<Login />} />
-				<Route path="/login/2fa" element={<Login2fa />} />
-				<Route
-					path="/dashboard"
-					element={
-						<PrivateRoute>
-							<Dashboard />
-						</PrivateRoute>
-					}
-				/>
-				<Route
-					path="/profile/:username"
-					element={
-						<PrivateRoute>
-							<Profile />
-						</PrivateRoute>
-					}
-				/>
-				<Route
-					path="/"
-					element={
-						<PrivateRoute>
-							<Hello />
-						</PrivateRoute>
-					}
-				/>
-				<Route
-					path="/search"
-					element={
-						<PrivateRoute>
-							<SearchUser />
-						</PrivateRoute>
-					}
-				/>
-				<Route
-					path="/2fa"
-					element={
-						<PrivateRoute>
-							<DoubleAuth />
-						</PrivateRoute>
-					}
-				/>
-				<Route
-					path="/lobby"
-					element={
-						<PrivateRoute>
-							<Lobby />
-						</PrivateRoute>
-					}
-				/>
-				<Route
-					path="/game"
-					element={
-						<PrivateRoute>
-							<Game />
-						</PrivateRoute>
-					}
-				/>
-				<Route
-					path="/friend"
-					element={
-						<PrivateRoute>
-							<Friend />
-						</PrivateRoute>
-					}
-				/>
-				<Route
-					path="/chat"
-					element={
-						<PrivateRoute>
-							<Channel />
-						</PrivateRoute>
-					}
-				/>
+				<Route path="/login/2fa" element={<Login2fa />} /> 
+				<Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+				<Route path="/" element={<PrivateRoute><Hello /></PrivateRoute>} />
+				<Route path="/search" element={<PrivateRoute><SearchUser /></PrivateRoute>} />
+				<Route path="/2fa" element={<PrivateRoute><DoubleAuth /></PrivateRoute>} />
+				<Route path="/lobby" element={<PrivateRoute><Lobby socketQueue={socketQueue} /></PrivateRoute>} />
+				<Route path="/game" element={<PrivateRoute><Game socketGame={socketGame}/></PrivateRoute>} />
 				{/* <Route path="/game/:id" exact component={Game} /> */}
 			</Routes>
 			</div>
