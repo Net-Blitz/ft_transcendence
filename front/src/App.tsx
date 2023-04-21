@@ -8,7 +8,7 @@ import Contact from './Contact/Contact';
 import { Login, Login2fa, Config, Config2fa } from './Login/Login';
 import Chat from './Chat/Chat';
 import AppLayout from './AppLayout';
-import Game from './Game/Game';
+import GameRoute from './Game/GameRoute';
 import Notification from './Notification/Notification';
 import { Profile } from './Profile/Profile';
 import { AuthRoutes } from './utils/PrivateRoutes';
@@ -34,10 +34,8 @@ function App(this: any) {
 	const status = useSelector(selectUser).status;
 	const currentPath = window.location.pathname;
 
-	// const manager = new Manager("http://localhost:3333", {transports: ['websocket'], path, withCredentials: true});
-	// const socketQueue: Socket = manager.socket("/queue");
 	const socketQueue: Socket = io("http://localhost:3333/queue", {transports: ['websocket'], withCredentials: true});
-	// const socketGame: Socket = io("http://localhost:3333/game", {transports: ['websocket'], withCredentials: true});
+	const socketGame: Socket = io("http://localhost:3333/game", {transports: ['websocket'], withCredentials: true});
 
 	if (status !== 'resolved' && status !== 'notAuth') return <div></div>;
 	return (
@@ -75,12 +73,7 @@ function App(this: any) {
 					/>
 					<Route
 						path="/game"
-						element={
-							<AppLayout>
-								{' '}
-								<Game socketQueue={socketQueue}/>
-							</AppLayout>
-						}
+						element={<GameRoute socketQueue={socketQueue} socketGame={socketGame}/>}
 					/>
 					<Route
 						path="/notification"

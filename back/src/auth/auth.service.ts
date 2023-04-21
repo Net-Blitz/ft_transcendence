@@ -111,7 +111,7 @@ export class AuthService {
 			);
 		} catch (error) {
 			if (error instanceof PrismaClientKnownRequestError) {
-				if (error.code === "P2002") {
+					if (error.code === "P2002") { 
 					const existingUser = await this.prisma.user.findUnique({
 						where: {
 							login: user.login,

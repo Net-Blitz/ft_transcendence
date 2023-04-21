@@ -1,189 +1,215 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import "./Lobby.css"
+import eyePNG from "./assets/eye.png"
+import crown from "./assets/crown.png"
+import "./Game.css";
 
-const LobbyBox = ({children}:any) => {
+function Podium({color, height, point, avatar}:any) {
 	return (
-		<div className="game-waiting-background">
-			{children}
-		</div>
-)}
-
-const PlayerInLobby = ({player}:any) => {
-	return (
-		player !== undefined ?
-		<div className="game-waiting-player">
-			<div className="game-waiting-player-avatar-underdiv">
-				<img className="game-waiting-player-avatar" src={player.avatar} alt="Avatar" />
+		<div className="game-end-podium-div">
+			{avatar ? 
+			<img src={avatar} alt="a" className="game-end-podium-avatar"/>
+			: null}
+			<div className="game-end-podium-stone" style={{backgroundColor: color, height: height}}>
+				<div className="game-end-podium-point" >{avatar ? point : null}</div>
 			</div>
-			<div className="game-waiting-player-name">{player.login}</div>
-			<div className="game-waiting-player-rank">{player.elo} LP</div>
-		</div>
-		:
-		<div className="game-waiting-player-absent">
-			<div className="game-waiting-no-player"></div>
 		</div>
 	)
 }
 
-const LobbyTimer = ({socketQueue}:any) => {
-	const [timer, updateTimer] = useState(0);
-	const [count, updateCount] = useState(0);
 
-	const setTimer = (timer:number) => {
-		if (timer === 0) {
-			return "00:00";
-		}
-		const minutes = Math.floor(timer / 60);
-		const seconds = timer - minutes * 60;
-		return `${minutes < 10 ? "0" + minutes : minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
-	}
-
-	const getTimer = (data:any) => {
-		updateTimer(parseInt(data.message));
-	}
+function Game({socketGame, room, login}:any) {
+	const [here, updateHere] = useState(true);
+	const [gameEnd, updateGameEnd] = useState({} as any);
+	const navigate = useNavigate();
+	// const location = useLocation();
+	// const room = location.state.gameId;
+	// const login = location.state.login;
+	const [spectator, updateSpectator] = useState(0);
 
 	useEffect(() => {
-		socketQueue.on("TimerResponse", getTimer);
-		socketQueue.emit("Timer");
-	}, [socketQueue]);
+		socketGame.emit("gameConnection", {room: room});
+		console.log("gameConection", room);
+		localStorage.removeItem("lobby-chat-storage");
 
-	useEffect(() => {
-		const interval = setInterval(() => updateTimer(current => (current + 1)), 1000);
-		return () => {
-			clearInterval(interval);
-		};
-	}, [timer]);
-
-
-	return (<div className="game-waiting-timer">{setTimer(timer)}</div>)
-
-}
-
-const LobbyChat = ({socketQueue}:any) => {
-	const [input, setInput] = useState("");
-
-	
-	const sendFunction = (message:string) => {
-		if (message === "")
-			return;
-		socketQueue.emit("ChatWithGroup", {message: message});
-
+		const chatUl = document.querySelector("#game-playing-chat");
+		const preMsg = localStorage.getItem("game-chat-storage-room-" + room);
 		
-		
-		setInput("");
-		const inputDiv = document.querySelector("input");
-		if  (inputDiv !== null) {
-			inputDiv.value = "";
-		}
-	}
-	
-	const handleChange = (e:any) => {
-		setInput(e.target.value);
-	}
-
-	const handleEnter = (e:any) => {
-		if (e.key === "Enter") {
-			sendFunction(input);
-		}
-	}
-
-	const handleMessage = (data:any) => {
-		const chatUl = document.getElementById("lobby-chat");
-		const li = document.createElement("li");
-		console.log("data: ", data);
-		if (chatUl) {
-			li.innerHTML = `<b>${data.login}:</b> ${data.message}`
-			chatUl.appendChild(li);
-			localStorage.setItem("lobby-chat-storage", chatUl.innerHTML);
-			chatUl.scrollTop = chatUl.scrollHeight;
-		}
-	};
-
-	useEffect(() => {
-		socketQueue.off("GetNewMessage")
-		socketQueue.on("GetNewMessage", handleMessage);
-		
-	}, [socketQueue]);
-
-	useEffect(() => {
-		const chatUl = document.querySelector("#lobby-chat");
-		const preMsg = localStorage.getItem("lobby-chat-storage");
-		
-		console.log("ChatUl: ", chatUl);
 		if (chatUl !== null && preMsg !== null) {
 			chatUl.innerHTML = preMsg;
 		}
 		if (chatUl)
 			chatUl.scrollTop = chatUl.scrollHeight;
 
-	}, [])
-
-	return (
-		<div className="game-waiting-chat">
-			<input id="lobby-input" type="text" onKeyDown={handleEnter} onChange={handleChange} placeholder="Type a message..."/>
-			<button onClick={() => sendFunction(input)}>Send</button>
-			<ul id="lobby-chat">
-				
-			</ul>
-		</div>
-	)
-}
-
-function Lobby({socketQueue}:any) {
-	const navigate = useNavigate();
-	const location = useLocation();
-	const queueParam = location.state;
-	const [player1, setPlayer1] = useState(undefined);
-	const [player2, setPlayer2] = useState(undefined);
-	const [player3, setPlayer3] = useState(undefined);
-
-	const setPlayer = (data:any) => {
-		console.log("data: ", data);
-		if (data && data.player1)
-			setPlayer1(data.player1);
-	}
+	}, [room, socketGame]);
 
 	useEffect(() => {
-		
-		socketQueue.emit("ConnectToQueue", {login: queueParam ? queueParam.login : null, mode: queueParam ? queueParam.mode : null}); // -> appuie sur le bouton plutot
-
-		socketQueue.on("ConnectToQueueResponse", setPlayer);
-	}, [queueParam, socketQueue]);
-
-
-	const handleLeave = () => {
-		console.log("socketQueue: ", socketQueue); 
-		localStorage.removeItem("lobby-chat-storage");
-		socketQueue.emit("DisconnectFromQueue");
-		socketQueue.off("ConnectToQueueResponse");
-		socketQueue.off("GetNewMessage");
-		navigate("/");
-	};
-
-	return (
-		<div className="game-waiting-parent-div">
-			{/* <div className="game-waiting-nav-bar">
-			</div> */}
-			<LobbyBox>
-				<LobbyTimer socketQueue={socketQueue} />
-
-				<div className="game-waiting-players">
-					<PlayerInLobby player={player1}/>
-					<PlayerInLobby player={player2}/>
-					<PlayerInLobby player={player3}/>
-				</div>
-
-				<LobbyChat socketQueue={socketQueue} />
+		const updateGameState = (gameState: any) => {
+			// console.log("gameState", gameState.player1_score, gameState.player2_score)
+			let ball = document.querySelector<HTMLElement>(".game-playing-ball");
+			let player1 = document.querySelector<HTMLElement>("#game-playing-player1");
+			let player2 = document.querySelector<HTMLElement>("#game-playing-player2");
+			let gameDiv = document.querySelector<HTMLElement>(".game-playing-board");
+			// console.log(ball, gameDiv)
+			if (gameDiv) {
+				if (ball) {
+					ball.style.width = (gameDiv.offsetWidth) * gameState.ball_size + 'px';
+					ball.style.height = (gameDiv.offsetWidth) * gameState.ball_size + 'px';
+					ball.style.left = (gameDiv.offsetWidth - ball.offsetWidth - 3) * gameState.ball_x + 'px';
+					ball.style.top = (gameDiv.offsetHeight - ball.offsetWidth - 3) * gameState.ball_y + 'px';
+				}
+				if (player1) { 
+					player1.style.height = (gameDiv.offsetHeight) * gameState.player1_size + 'px';
+					player1.style.width = (gameDiv.offsetWidth) * gameState.player_width + 'px';
+					player1.style.top = (gameDiv.offsetHeight - 3 - player1.offsetHeight) * gameState.player1_y + 'px';
+					player1.style.left = (gameDiv.offsetWidth - player1.offsetWidth) * gameState.player1_x + 'px';
+				}
+				if (player2) {
+					player2.style.height = (gameDiv.offsetHeight) * gameState.player2_size + 'px';
+					player2.style.width = (gameDiv.offsetWidth) * gameState.player_width + 'px';
+					player2.style.top = (gameDiv.offsetHeight - 3 - player2.offsetHeight) * gameState.player2_y + 'px';
+					player2.style.right = (gameDiv.offsetWidth - player2.offsetWidth) * (1 - gameState.player2_x)  + 'px';
+				}
 				
-				<button className="game-waiting-button-cancel" onClick={handleLeave} >Cancel Queue</button>
+				let score1 = document.querySelector<HTMLElement>("#game-playing-score1");
+				let score2 = document.querySelector<HTMLElement>("#game-playing-score2"); 
+				if (score1)
+					score1.innerHTML = gameState.player1_score;
+				if (score2)
+					score2.innerHTML = gameState.player2_score;
+			}
+		}
 
+		const endGame = (data: any) => {
+			socketGame.emit("endGameStatus", {room: room});
+			socketGame.emit("gameDisconnection");
+			updateHere(false);
+		}
 
-			</LobbyBox>
+		const errorGame = (data: any) => {
+			updateGameEnd(data);
+		}
 
+		const quickChatMessageResponse = (data: any) => {
+			const tab = ["gg !", "Nice One", "Woohh", "It's my time", "Easy", "Close one!", "Savage", "You are so good", "I'm a wall !!", "OMG"]
+		
+			const chatUl = document.querySelector<HTMLElement>("#game-playing-chat")
+			const li = document.createElement("li");
+		
+			if (chatUl) {
+				li.innerHTML = `<b>${data.login}:</b> ${tab[data.message]}`
+				chatUl.appendChild(li);
+				localStorage.setItem("game-chat-storage-room-" + room, chatUl.innerHTML);
+				chatUl.scrollTop = chatUl.scrollHeight;
+			}
+		}
 
+		const updateSpectatorFonc = (data: any) => {
+			console.log("spectatorJoin", data.spectator)
+			updateSpectator(data.spectator);
+		}
+
+		const getEndStatus = (data: any) => {
+			console.log("getEndStatus", data)
+			updateGameEnd(data);
+			socketGame.off("getEndStatus")
+		}
+
+		if (here === false)
+		{
+			socketGame.off("gameState");
+			socketGame.off("endGame");
+			socketGame.off("error");
+			socketGame.off("quickChatMessageResponse")
+			socketGame.off("updateSpectator")
+			localStorage.removeItem("game-chat-storage-room-" + room);
+		}
+		if (here === true)
+		{
+			socketGame.off("gameState");
+			socketGame.off("endGame");
+			socketGame.off("error");
+			socketGame.off("quickChatMessageResponse");
+			socketGame.off("updateSpectator")
+			socketGame.off("getEndStatus")
+			socketGame.on("gameState", updateGameState);
+			socketGame.on("endGame", endGame);
+			socketGame.on("error", errorGame);
+			socketGame.on("quickChatMessageResponse", quickChatMessageResponse);
+			socketGame.on("updateSpectator", updateSpectatorFonc)
+			socketGame.on("getEndStatus", getEndStatus)
+			socketGame.emit("getSpectator", {room: room});
+		}
+	}, [here]);
+	
+	document.addEventListener('keydown', (event) => {
+		if (event.key === 'ArrowUp')
+			socketGame.emit('keyPress', 'UP');
+		else if (event.key === 'ArrowDown')
+			socketGame.emit('keyPress', 'DOWN');
+		else if (event.key >= '0' && event.key <= '9')
+		{
+			socketGame.emit('quickChatMessage', {key: event.key, room: room});
+		}
+	});
+	
+	document.addEventListener('keyup', (event) => {
+		if (event.key === 'ArrowUp')
+			socketGame.emit('keyRelease', 'UP');
+		else if (event.key === 'ArrowDown')
+			socketGame.emit('keyRelease', 'DOWN');
+	});
+
+	const surrend = () => {
+		socketGame.emit('surrender', {login: login, room: room});
+	}
+
+	const returnToHome = () => {
+		navigate("/");
+	}
+
+	 
+	return (
+		<div className="game-playing-parent">
+			<div className="game-playing-top">
+				<div className="game-playing-quick-chat">
+					<ul id="game-playing-chat">
+					</ul>
+				</div>
+				<div className="game-playing-viewer">
+					<img src={eyePNG} alt="Spec" className="game-playing-eye" />
+					  : {spectator}
+				</div>
+			</div>
+			{ here ?
+			<div className="game-playing-board">
+				<span className="game-playing-ball"></span>
+				<span className="game-playing-player" id="game-playing-player1"></span>
+				<span className="game-playing-player" id="game-playing-player2"></span>
+				<div className="game-playing-score-div">
+					<span className="game-playing-score" id="game-playing-score1">0</span>
+					<span className="game-playing-score" id="game-playing-score2">0</span>
+				</div>
+			</div>
+	 		: 
+			 <div className="game-end">
+				<div className="game-end-podium">
+					<Podium color="#C0C0C0" height="45%"  point={gameEnd.score2} avatar={gameEnd.avatar2}/>
+					<Podium color="#FFD700" height="60%" point={gameEnd.score1} avatar={gameEnd.avatar1}/>
+					<Podium color="#CD7F32" height= "30%" point={gameEnd.score3} avatar={gameEnd.avatar3}/>
+					<img src={crown} className="game-end-crown" />
+				</div>
+				<div className="game-end-elo"></div>
+				<div className="game-end-recap"></div>
+			</div>
+			}
+			{ here ?
+			<button className="game-playing-button-surrend" onClick={surrend}> Surrend </button> 
+			: 
+			<button className="game-playing-button-surrend" onClick={returnToHome}> Return to Home </button> 
+			} 
 		</div>
 	);
 };
 
-export default Lobby;
+export default Game;

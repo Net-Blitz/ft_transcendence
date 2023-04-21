@@ -20,7 +20,7 @@ export class AuthController {
 	constructor(
 		private authService: AuthService,
 		private config: ConfigService
-	) {}
+	) {} 
 
 	@Get("callback")
 	async auth42Callback(@Res() res: Response, @Query("code") code: string) {
