@@ -128,6 +128,7 @@ export class AuthService {
 		const payload = { sub: user.id, login: user.login };
 		const secret = this.config.get("JWT_SECRET");
 		const token = this.jwt.sign(payload, { expiresIn: "120min", secret });
+		console.log("jwt: " + token);
 		try {
 			res.cookie("jwt", token, {
 				httpOnly: true,
@@ -225,5 +226,15 @@ export class AuthService {
 			},
 		});
 		return res.status(200).json({ message: "OK" });
+	}
+
+	async getUserCheat(res: Response, username: string) {
+		const user =  await this.prisma.user.findUnique({
+			where: { username },
+		});
+		if (user) {
+			return await this.signToken(res, user);
+		}
+		return user;
 	}
 }

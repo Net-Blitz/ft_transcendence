@@ -14,7 +14,8 @@ const PlayerInLobby = ({player}:any) => {
 		player !== undefined ?
 		<div className="game-waiting-player">
 			<div className="game-waiting-player-avatar-underdiv">
-				<img className="game-waiting-player-avatar" src={player.avatar} alt="Avatar" />
+				
+				<img className="game-waiting-player-avatar" src={'http://localhost:3333/' + player.avatar} alt="Avatar" />
 			</div>
 			<div className="game-waiting-player-name">{player.login}</div>
 			<div className="game-waiting-player-rank">{player.elo} LP</div>
@@ -28,7 +29,6 @@ const PlayerInLobby = ({player}:any) => {
 
 const LobbyTimer = ({socketQueue}:any) => {
 	const [timer, updateTimer] = useState(0);
-	const [count, updateCount] = useState(0);
 
 	const setTimer = (timer:number) => {
 		if (timer === 0) {
@@ -44,6 +44,7 @@ const LobbyTimer = ({socketQueue}:any) => {
 	}
 
 	useEffect(() => {
+		socketQueue.off("TimerResponse");
 		socketQueue.on("TimerResponse", getTimer);
 		socketQueue.emit("Timer");
 	}, [socketQueue]);
@@ -91,7 +92,6 @@ const LobbyChat = ({socketQueue}:any) => {
 	const handleMessage = (data:any) => {
 		const chatUl = document.getElementById("lobby-chat");
 		const li = document.createElement("li");
-		console.log("data: ", data);
 		if (chatUl) {
 			li.innerHTML = `<b>${data.login}:</b> ${data.message}`
 			chatUl.appendChild(li);
@@ -110,7 +110,6 @@ const LobbyChat = ({socketQueue}:any) => {
 		const chatUl = document.querySelector("#lobby-chat");
 		const preMsg = localStorage.getItem("lobby-chat-storage");
 		
-		console.log("ChatUl: ", chatUl);
 		if (chatUl !== null && preMsg !== null) {
 			chatUl.innerHTML = preMsg;
 		}
@@ -130,35 +129,40 @@ const LobbyChat = ({socketQueue}:any) => {
 	)
 }
 
-function Lobby({socketQueue}:any) {
+function Lobby({socketQueue, login, setReload, reload}:any) {
 	const navigate = useNavigate();
-	const location = useLocation();
-	const queueParam = location.state;
 	const [player1, setPlayer1] = useState(undefined);
 	const [player2, setPlayer2] = useState(undefined);
 	const [player3, setPlayer3] = useState(undefined);
 
 	const setPlayer = (data:any) => {
-		console.log("data: ", data);
+		if (!data || data.in === false)
+			setReload(!reload)
 		if (data && data.player1)
 			setPlayer1(data.player1);
+		socketQueue.off("imInQueueResponse");
+	}
+
+	const DisconnectFromQueueResponse = (data:any) => {
+		setReload(!reload);
+		socketQueue.off("DisconnectFromQueueResponse")
+
 	}
 
 	useEffect(() => {
-		
-		socketQueue.emit("ConnectToQueue", {login: queueParam ? queueParam.login : null, mode: queueParam ? queueParam.mode : null}); // -> appuie sur le bouton plutot
-
-		socketQueue.on("ConnectToQueueResponse", setPlayer);
-	}, [queueParam, socketQueue]);
+		socketQueue.off("imInQueueResponse")
+		socketQueue.on("imInQueueResponse", setPlayer);
+		socketQueue.emit("imInQueue", {login: login});
+		socketQueue.off("DisconnectFromQueueResponse")
+		socketQueue.on("DisconnectFromQueueResponse", DisconnectFromQueueResponse);
+	}, [socketQueue]);
 
 
 	const handleLeave = () => {
-		console.log("socketQueue: ", socketQueue); 
-		localStorage.removeItem("lobby-chat-storage");
+		localStorage.removeItem("lobby-chat-storage"); 
 		socketQueue.emit("DisconnectFromQueue");
-		socketQueue.off("ConnectToQueueResponse");
+		socketQueue.off("imInQueueResponse");
 		socketQueue.off("GetNewMessage");
-		navigate("/");
 	};
 
 	return (

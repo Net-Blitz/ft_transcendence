@@ -8,10 +8,10 @@ function Podium({color, height, point, avatar}:any) {
 	return (
 		<div className="game-end-podium-div">
 			{avatar ? 
-			<img src={avatar} alt="a" className="game-end-podium-avatar"/>
+			<img src={'http://localhost:3333/' + avatar} alt="a" className="game-end-podium-avatar"/>
 			: null}
 			<div className="game-end-podium-stone" style={{backgroundColor: color, height: height}}>
-				<div className="game-end-podium-point" >{avatar ? point : null}</div>
+				<div className="game-end-podium-point" >{point}</div>
 			</div>
 		</div>
 	)
