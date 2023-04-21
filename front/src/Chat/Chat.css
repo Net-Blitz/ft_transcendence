@@ -11,10 +11,9 @@
 	flex-direction: row;
 	width: 90%;
 	height: 90%;
-	background-color: #fff;
 	box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
 	border-radius: 5px;
-	background-color: aliceblue;
+	background-color: #fffde4;
 }
 
 .chat-left {
@@ -54,20 +53,23 @@
 }
 
 .chat-person {
+	display: flex;
+	align-items: center;
 	padding: 15px;
 	cursor: pointer;
 }
 
-.chat-person.active {
-	background-color: #f2f2f2;
+.chat-person.chat-active {
+	background-color: #f9da49;
 }
 
 .chat-person:hover {
-	background-color: #f9f9f9;
+	background-color: #f3e2a1;
 }
 
 .chat-name {
 	font-weight: bold;
+	color: #0a3d62;
 	margin: 1rem;
 }
 
@@ -93,6 +95,24 @@
 	padding: 15px;
 }
 
+.chat-write-link {
+	all: unset;
+	box-shadow: 0px 10px 15px -3px rgba(10, 61, 98, 0.1);
+	color: #0a3d62;
+	border: 0.14rem solid #0a3d62;
+	border-radius: 1recm;
+	cursor: pointer;
+	text-align: center;
+	border-radius: 10px;
+	transition-duration: 0.4s;
+	background-color: #f9da49;
+	font-family: 'Poppins', sans-serif;
+	font-weight: 300;
+	font-size: 20px;
+	width: 10%;
+	height: 100%;
+}
+
 .chat-bubble {
 	display: inline-block;
 	max-width: 80%;
@@ -102,12 +122,12 @@
 }
 
 .chat-you {
-	background-color: #dcf8c6;
+	background-color: #1e8ddc;
 	align-self: flex-start;
 }
 
 .chat-me {
-	background-color: #fff;
+	background-color: #c5c5c5;
 	align-self: flex-end;
 }
 
@@ -209,39 +229,32 @@
 }
 
 .chat-overlay {
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	background-color: rgba(0, 0, 0, 0.5);
-	transition: opacity 200ms;
-}
-
-.chat-popup {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 6;
+	width: 349px;
+	height: 349px;
+	background-color: #0a3d62;
+	border-radius: 15px;
 	display: flex;
 	flex-direction: column;
-	margin: 75px auto;
-	padding: 20px;
-	background: #fff;
-	border: 1px solid #666;
-	width: 300px;
-	box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
-	position: relative;
+	align-items: center;
+}
+
+.chat-overlay h2 {
+	margin: 0;
+	font-family: 'YesevaOne', sans-serif;
+	font-style: normal;
+	font-weight: 400;
+	font-size: 30px;
+	color: #fdfad0;
 }
 
 .chat-close {
-	position: absolute;
-	width: 20px;
-	height: 20px;
-	top: 20px;
-	right: 20px;
-	opacity: 0.8;
-	transition: all 200ms;
-	font-size: 24px;
-	font-weight: bold;
-	text-decoration: none;
-	color: #666;
+	align-self: flex-end;
+	padding: 10px 10px 0 0;
 	cursor: pointer;
 }
 
@@ -259,6 +272,108 @@
 	display: flex;
 	flex-direction: column;
 	width: -webkit-fill-available;
+}
+.chat-content form {
+	height: 98px;
+	width: 74%;
+	align-content: center;
+
+	display: flex;
+	flex-direction: column;
+}
+
+.chat-content form label {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	height: 53px;
+	width: 297px;
+	background-color: #fdfad0;
+	border: 1px solid #0a3d62;
+	border-radius: 10px;
+	padding: 2px;
+	margin-top: 25px;
+}
+
+.chat-content form label p {
+	margin: 0px 0px 2px 2px;
+	font-size: 11px;
+	color: #b6b6b6;
+	font-family: 'Poppins', sans-serif;
+}
+
+.chat-content form label input {
+	background-color: #fdfad0;
+	border: none;
+	color: #0a3d62;
+	font-weight: 300;
+	width: 90%;
+	font-size: 15px;
+	font-family: 'Poppins', sans-serif;
+}
+
+.chat-content form label select {
+	background-color: #fdfad0;
+	border: none;
+	color: #0a3d62;
+	font-weight: 300;
+	width: 90%;
+	font-size: 15px;
+	font-family: 'Poppins', sans-serif;
+}
+
+.chat-content form button {
+	all: unset;
+	box-shadow: 0px 10px 15px -3px rgba(10, 61, 98, 0.1);
+	color: #0a3d62;
+	border: 0.14rem solid #0a3d62;
+	cursor: pointer;
+	text-align: center;
+	border-radius: 10px;
+	transition-duration: 0.4s;
+	background-color: #f9da49;
+	font-family: 'Poppins', sans-serif;
+	font-weight: 300;
+	font-size: 20px;
+	width: 83%;
+	height: fit-content;
+	position: absolute;
+	top: 95%;
+}
+
+.chat-content form ul {
+	display: flex;
+	flex-direction: column;
+}
+
+.chat-content form ul li {
+	display: flex;
+	align-items: center;
+	background-color: #fdfad0;
+	border: 1px solid #0a3d62;
+	border-radius: 10px;
+	padding: 2px;
+	font-size: 15px;
+	font-family: 'Poppins', sans-serif;
+	font-weight: 300;
+	color: #0a3d62;
+}
+
+.chat-content form ul li button {
+	all: unset;
+	box-shadow: 0px 10px 15px -3px rgba(10, 61, 98, 0.1);
+	color: #0a3d62;
+	border: 0.14rem solid #0a3d62;
+	cursor: pointer;
+	text-align: center;
+	border-radius: 10px;
+	transition-duration: 0.4s;
+	background-color: #f9da49;
+	font-family: 'Poppins', sans-serif;
+	font-weight: 300;
+	font-size: 20px;
+	width: 43%;
+	height: fit-content;
 }
 
 .chat-popup p {

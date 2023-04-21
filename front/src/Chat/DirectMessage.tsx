@@ -114,15 +114,19 @@ function DirectMessage({
 								<li
 									key={DM.id}
 									className={`chat-person ${
-										selectedDM === DM.id ? 'active' : ''
+										selectedDM === DM.id
+											? 'chat-active'
+											: ''
 									}`}
 									onClick={() => handleDMClick(DM)}>
 									<img
 										className="chat-friend-img"
 										src={
 											userInfo.id === DM.senderId
-												? DM.receiver.avatar
-												: DM.sender.avatar
+												? 'http://localhost:3333/' +
+												  DM.receiver.avatar
+												: 'http://localhost:3333/' +
+												  DM.sender.avatar
 										}
 										alt="avatar"
 									/>
