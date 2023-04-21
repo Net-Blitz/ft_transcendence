@@ -1,5 +1,5 @@
-import axios from "axios";
-import React, { useRef, useState } from "react";
+import axios from 'axios';
+import React, { useRef, useState } from 'react';
 
 function CreateChannel({
 	ClosePopup,
@@ -8,55 +8,55 @@ function CreateChannel({
 	ClosePopup: () => void;
 	setAlert: (Alert: { message: string; type: string }) => void;
 }) {
-	const [name, setName] = useState("");
-	const [password, setPassword] = useState("");
-	const [privacy, setPrivacy] = useState("PUBLIC");
+	const [name, setName] = useState('');
+	const [password, setPassword] = useState('');
+	const [privacy, setPrivacy] = useState('PUBLIC');
 	const PopupRef = useRef<HTMLDivElement>(null);
 
 	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		try {
-			let state = "PUBLIC";
+			let state = 'PUBLIC';
 			switch (privacy) {
-				case "PUBLIC":
-					state = "PUBLIC";
+				case 'PUBLIC':
+					state = 'PUBLIC';
 					break;
-				case "PROTECTED":
-					state = "PROTECTED";
+				case 'PROTECTED':
+					state = 'PROTECTED';
 					break;
-				case "PRIVATE":
-					state = "PRIVATE";
+				case 'PRIVATE':
+					state = 'PRIVATE';
 					break;
 			}
 			await axios.post(
-				"http://localhost:3333/chat/create/" + name,
+				'http://localhost:3333/chat/create/' + name,
 				{ state, password },
 				{ withCredentials: true }
 			);
-			setName("");
-			setPassword("");
-			setPrivacy("PUBLIC");
+			setName('');
+			setPassword('');
+			setPrivacy('PUBLIC');
 			ClosePopup();
 			setAlert({
-				message: "Channel " + name + " created",
-				type: "success",
+				message: 'Channel ' + name + ' created',
+				type: 'success',
 			});
 		} catch (error) {
 			setAlert({
-				message: "Channel " + name + " already exist",
-				type: "error",
+				message: 'Channel ' + name + ' already exist',
+				type: 'error',
 			});
 		}
 	};
 
 	return (
-		<div ref={PopupRef} className="overlay">
-			<div className="popup center">
-				<label className="close" onClick={ClosePopup}>
+		<div ref={PopupRef} className="chat-overlay">
+			<div className="chat-popup chat-center">
+				<label className="chat-close" onClick={ClosePopup}>
 					&times;
 				</label>
 				<h2>Create a Channel</h2>
-				<div className="content">
+				<div className="chat-content">
 					<form onSubmit={handleSubmit}>
 						<label>
 							Create a channel:
@@ -71,15 +71,14 @@ function CreateChannel({
 							Privacy:
 							<select
 								value={privacy}
-								onChange={(e) => setPrivacy(e.target.value)}
-							>
+								onChange={(e) => setPrivacy(e.target.value)}>
 								<option value="PUBLIC">Public</option>
 								<option value="PROTECTED">Protected</option>
 								<option value="PRIVATE">Private</option>
 							</select>
 						</label>
 
-						{privacy === "PROTECTED" && (
+						{privacy === 'PROTECTED' && (
 							<input
 								onChange={(e) => setPassword(e.target.value)}
 								placeholder="Enter password"

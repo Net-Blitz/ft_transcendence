@@ -1,18 +1,18 @@
-import axios from "axios";
-import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import axios from 'axios';
+import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 function PopupDM({ ClosePopup, setAlert, userInfo }: any) {
 	const [users, setUsers] = useState<any[]>([]);
 	const PopupRef = useRef<HTMLDivElement>(null);
-	const [searchTerm, setSearchTerm] = useState("");
+	const [searchTerm, setSearchTerm] = useState('');
 	const [searchResults, setSearchResults] = useState<any[]>([]);
 	const [blocked, setBlocked] = useState<any[]>([]);
 
 	useEffect(() => {
 		const fetchUsers = async () => {
 			const response = await axios.get(
-				"http://localhost:3333/users/login",
+				'http://localhost:3333/users/login',
 				{
 					withCredentials: true,
 				}
@@ -28,7 +28,7 @@ function PopupDM({ ClosePopup, setAlert, userInfo }: any) {
 		const fetchBlocked = async () => {
 			try {
 				const response = await axios.get(
-					"http://localhost:3333/friend/blocked",
+					'http://localhost:3333/friend/blocked',
 					{
 						withCredentials: true,
 					}
@@ -42,26 +42,26 @@ function PopupDM({ ClosePopup, setAlert, userInfo }: any) {
 	const handleDM = async (username: string) => {
 		if (blocked?.find((blocked: any) => blocked.username === username)) {
 			setAlert({
-				message: "You are blocked from this user",
-				type: "error",
+				message: 'You are blocked from this user',
+				type: 'error',
 			});
 			return;
 		}
 		try {
 			await axios.post(
-				"http://localhost:3333/chat/dm/create",
+				'http://localhost:3333/chat/dm/create',
 				{ username: username },
 				{ withCredentials: true }
 			);
 			setAlert({
-				message: "DM created",
-				type: "success",
+				message: 'DM created',
+				type: 'success',
 			});
 			ClosePopup();
 		} catch (error) {
 			setAlert({
-				message: "DM already exist",
-				type: "error",
+				message: 'DM already exist',
+				type: 'error',
 			});
 		}
 	};
@@ -78,13 +78,13 @@ function PopupDM({ ClosePopup, setAlert, userInfo }: any) {
 	}, [searchTerm, users]);
 
 	return (
-		<div ref={PopupRef} className="overlay">
-			<div className="popup center">
-				<label className="close" onClick={ClosePopup}>
+		<div ref={PopupRef} className="chat-overlay">
+			<div className="chat-popup center">
+				<label className="chat-close" onClick={ClosePopup}>
 					&times;
 				</label>
 				<h2>New Direct Message</h2>
-				<div className="content-dm">
+				<div className="chat-content-dm">
 					<input
 						type="text"
 						placeholder="Search a user"
@@ -93,17 +93,17 @@ function PopupDM({ ClosePopup, setAlert, userInfo }: any) {
 							setSearchTerm(e.target.value);
 						}}
 					/>
-					<ul className="users">
+					<ul className="chat-users">
 						{searchResults.map((user) => (
-							<li className="person" key={user.id}>
-								<Link to={"/profile/" + user.username}>
-									<div className="users-list">
+							<li className="chat-person" key={user.id}>
+								<Link to={'/profile/' + user.username}>
+									<div className="chat-users-list">
 										<img
-											className="friend-img"
+											className="chat-friend-img"
 											src={user.avatar}
 											alt="avatar"
 										/>
-										<span className="name">
+										<span className="chat-name">
 											{user.username}
 										</span>
 									</div>
@@ -113,8 +113,7 @@ function PopupDM({ ClosePopup, setAlert, userInfo }: any) {
 										handleDM(user.username);
 									}}
 									value={user.username}
-									className="btn btn-primary"
-								>
+									className="chat-btn btn-primary">
 									DM
 								</button>
 							</li>

@@ -30,6 +30,7 @@ async function bootstrap() {
 			whitelist: true,
 		})
 	);
+	app.enableShutdownHooks();
 	await app.listen(parseInt(config.get("PORT_BACK")));
 }
 bootstrap();

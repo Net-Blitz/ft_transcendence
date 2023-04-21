@@ -83,7 +83,7 @@ function App(this: any) {
 						element={<GameRoute socketQueue={socketQueue} socketGame={socketGame} reload={reload} setReload={setReload}/>}
 					/>
 					<Route
-						path="/notification"
+						path="/Notification"
 						element={
 							<AppLayout>
 								{' '}
