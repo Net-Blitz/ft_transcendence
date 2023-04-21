@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 function Hello() {
 	const navigate = useNavigate();
+
 	const handleClick = () => {
 		navigate("/dashboard");
 	};
@@ -23,7 +24,6 @@ function Hello() {
 	const handleGame = () => {
 		axios.get("http://localhost:3333/queues/joinable", { withCredentials: true })
 		.then((res) => {
-			console.log("res: ", res.data.canJoin);
 			if (res.data.canJoin)
 				navigate("/lobby", { state: { mode: "1v1", login: res.data.login } } );
 			if (res.data.reason === "playing")
@@ -33,6 +33,11 @@ function Hello() {
 			console.log(err);
 		});
 	};
+
+	const handleGaming = () => {
+		navigate("/game", {state: {gameId: 25, login: "martin"}})
+	};
+
 	return (
 		<div>
 			<h1>Hello</h1>
@@ -43,6 +48,7 @@ function Hello() {
 			<button onClick={() => navigate("/chat")}>Chat</button>
 			<button onClick={() => navigate("/2fa")}>2FA</button>
 			<button onClick={handleGame}>JoinGame</button>
+			<button onClick={handleGaming}>Gaming</button>
 		</div>
 	);
 }

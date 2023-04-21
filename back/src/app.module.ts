@@ -7,6 +7,8 @@ import { JwtModule } from "@nestjs/jwt";
 import { ChatGateway } from "./chat/chat.gateway";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
+import { GameModule } from "./game/game.module";
+import { QueueModule } from "./queue/queue.module";
 import { FriendModule } from "./friend/friend.module";
 import { ChatModule } from "./chat/chat.module";
 
@@ -16,6 +18,8 @@ import { ChatModule } from "./chat/chat.module";
 		AuthModule,
 		PrismaModule,
 		UserModule,
+		GameModule,
+		QueueModule,
 		JwtModule.register({
 			secret: process.env.JWT_SECRET,
 			signOptions: { expiresIn: "120min" },
