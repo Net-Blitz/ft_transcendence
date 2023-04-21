@@ -52,4 +52,7 @@
 	.middleinfo-wrapper {
 		flex-wrap: wrap;
 	}
+	.basic-frame{
+		height: 200px !important;
+	}
 }
