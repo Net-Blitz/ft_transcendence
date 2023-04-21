@@ -1,13 +1,14 @@
-import { Body, Inject, Injectable, Param, Req, Res } from "@nestjs/common";
+import { Body, Inject, Injectable, Param, Res } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
-import { Request, Response } from "express";
+import { Response } from "express";
 import { UpdateUserDto } from "./dto";
-import { AuthService } from "src/auth/auth.service";
+import { GetUser } from "src/auth/decorator";
 import { FileService } from "src/file/file.service";
 import * as fs from "fs";
 import * as path from "path";
 import { ConfigService } from "@nestjs/config";
 import { v4 as uuidv4 } from "uuid";
+import { AuthService } from "src/auth/auth.service";
 
 @Injectable()
 export class UserService {
@@ -17,16 +18,6 @@ export class UserService {
 		private fileservice: FileService,
 		private config: ConfigService
 	) {}
-
-	async getUser(@Req() req: Request) {
-		const jwt = req.cookies.jwt;
-		const login = JSON.parse(atob(jwt.split(".")[1])).login;
-		return await this.prisma.user.findUnique({
-			where: {
-				login: login,
-			},
-		});
-	}
 
 	async GetUserByLogin(@Param("login") login: string, @Res() res: Response) {
 		const user = await this.prisma.user.findUnique({
@@ -55,13 +46,16 @@ export class UserService {
 		return res.status(200).json(user);
 	}
 
+	async GetAllUser(@Res() res: Response) {
+		const users = await this.prisma.user.findMany();
+		return res.status(200).json(users);
+	}
+
 	async UpdateUser(
-		@Req() req: Request,
 		@Res() res: Response,
-		@Body() updateUserDto: UpdateUserDto
+		@GetUser() user: any,
+		@Body("updateUser") updateUserDto: UpdateUserDto
 	) {
-		console.log(updateUserDto);
-		const user = await this.getUser(req);
 		if (!user) {
 			return res.status(404).json({ message: `User not found` });
 		}
@@ -75,10 +69,11 @@ export class UserService {
 			},
 			data: user,
 		});
+
 		return res.status(200).json(updatedUser);
 	}
 
-	Logout(@Req() req: Request, @Res() res: Response) {
+	Logout(@Res() res: Response) {
 		res.clearCookie("jwt", { httpOnly: true });
 		return res.status(200).json({ message: "Logged out" });
 	}
@@ -93,13 +88,11 @@ export class UserService {
 	}
 
 	async ConfigUser(
-		@Req() req: Request,
+		@GetUser() user: any,
 		@Res() res: Response,
 		file: any,
 		text: string
 	) {
-		const user = await this.getUser(req);
-
 		if ((await this.fileservice.checkFile(file)) === false)
 			return res.status(400).json({ message: "Bad file" });
 		const extension = path.extname(file.originalname);
@@ -111,6 +104,7 @@ export class UserService {
 		try {
 			await fs.promises.writeFile(filepath, file.buffer);
 		} catch (error) {
+			console.log(error);
 			return res.status(400).json({ message: "Write File error" });
 		}
 		if (!user) {
@@ -125,16 +119,16 @@ export class UserService {
 			},
 			data: user,
 		});
+		console.log(user);
 		return res.status(200).json(updatedUser);
 	}
 
 	async UpdateUserConfig(
-		@Req() req: Request,
+		@GetUser() user: any,
 		@Res() res: Response,
 		file: any,
 		text: string
 	) {
-		const user = await this.getUser(req);
 		if ((await this.fileservice.checkFile(file)) === false)
 			return res.status(400).json({ message: "Bad file" });
 		try {

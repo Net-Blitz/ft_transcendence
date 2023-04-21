@@ -3,7 +3,6 @@ import {
 	Controller,
 	Delete,
 	Get,
-	Param,
 	Post,
 	Query,
 	Req,
@@ -24,12 +23,8 @@ export class AuthController {
 	) {}
 
 	@Get("callback")
-	async auth42Callback(
-		@Req() req: Request,
-		@Res() res: Response,
-		@Query("code") code: string
-	) {
-		await this.authService.Auth42Callback(req, res, code);
+	async auth42Callback(@Res() res: Response, @Query("code") code: string) {
+		await this.authService.Auth42Callback(res, code);
 		return;
 	}
 
@@ -76,13 +71,5 @@ export class AuthController {
 	@Delete("2fa/disable")
 	async remove2fa(@Res() res: Response, @GetCookie() cookie: CookieDto) {
 		return await this.authService.remove2fa(res, cookie);
-	}
-
-	@Get(":username") /*Temp*/ async getUserCheat(
-		@Req() req: Request,
-		@Res() res: Response,
-		@Param("username") username: string
-	) {
-		return await this.authService.getUserCheat(req, res, username);
 	}
 }
