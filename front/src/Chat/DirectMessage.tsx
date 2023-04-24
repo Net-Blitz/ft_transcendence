@@ -3,6 +3,7 @@ import Alert from './Alert';
 import { useEffect, useState } from 'react';
 import PopupDM from './PopupDM';
 import axios from 'axios';
+import { Socket } from 'socket.io-client';
 
 export interface DirectMessageDto {
 	id: number;
@@ -14,13 +15,21 @@ export interface DirectMessageDto {
 	receiver: any;
 }
 
+interface Props {
+	DMList: DirectMessageDto[];
+	userInfo: any;
+	socket: Socket;
+	channelOrDM: string;
+	handleOptionChange: (e: any) => void;
+}
+
 function DirectMessage({
 	DMList,
 	userInfo,
 	socket,
 	channelOrDM,
 	handleOptionChange,
-}: any) {
+}: Props) {
 	const [selectedDM, setSelectedDM] = useState<number>(0);
 	const [messages, setMessages] = useState<any[]>([]);
 	const [alert, setAlert] = useState({ message: '', type: '' });
@@ -98,13 +107,10 @@ function DirectMessage({
 				<div className="chat-container">
 					<div className="chat-left">
 						<div className="chat-top">
-							<select
-								id="channelOrDM"
-								value={channelOrDM}
-								onChange={handleOptionChange}>
-								<option value="channel">Channels</option>
-								<option value="dm">Direct Message</option>
-							</select>
+							<button
+								onClick={() => handleOptionChange('channel')}>
+								Channels
+							</button>
 							<button onClick={handleTogglePopupNewDm}>
 								New DM
 							</button>

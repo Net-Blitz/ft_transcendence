@@ -113,7 +113,9 @@ function PopupDM({ ClosePopup, setAlert, userInfo }: any) {
 											}
 											alt="avatar"
 										/>
-										<span className="chat-name">
+										<span
+											className="chat-name"
+											style={{ color: '#0a3d62' }}>
 											{user.username}
 										</span>
 									</div>

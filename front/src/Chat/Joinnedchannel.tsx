@@ -182,13 +182,9 @@ function JoinnedChannels({
 				<div className="chat-container">
 					<div className="chat-left">
 						<div className="chat-top">
-							<select
-								id="channelOrDM"
-								value={channelOrDM}
-								onChange={handleOptionChange}>
-								<option value="channel">Channels</option>
-								<option value="dm">Direct Message</option>
-							</select>
+							<button onClick={() => handleOptionChange('dm')}>
+								DM
+							</button>
 							<button onClick={handleToggleCreateChannel}>
 								Create
 							</button>
