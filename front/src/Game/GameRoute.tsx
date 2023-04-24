@@ -8,18 +8,18 @@ import axios from "axios";
 
 
 const GameRoute = ({socketQueue, socketGame, reload, setReload}:any) => {
-	const [state, updateState] = useState({} as {code: number, login: string, mode: string, room: number});
+	const [state, updateState] = useState({} as {code: number, login: string, room: number});
 	const location = useLocation();
 	const update = location.state;
 	useEffect (() =>{
 		axios.get("http://localhost:3333/queues/joinable", { withCredentials: true })
 		.then((res) => {
 			if (res.data.canJoin)
-				updateState({code: 0, login: res.data.login, mode: "1v1", room: 0});
+				updateState({code: 0, login: res.data.login, room: 0});
 			if (res.data.reason === "searching")
-				updateState({code: 1, login: res.data.login, mode: "", room: 0});
+				updateState({code: 1, login: res.data.login, room: 0});
 			if (res.data.reason === "playing")
-				updateState({code: 2, login: res.data.login, mode: "", room: res.data.gameId});
+				updateState({code: 2, login: res.data.login, room: res.data.gameId});
 		})
 		.catch((err) => {
 			console.log(err);
@@ -34,7 +34,7 @@ const GameRoute = ({socketQueue, socketGame, reload, setReload}:any) => {
 		return (
 			<AppLayout>
 			{' '}
-			<LobbyCreation socketQueue={socketQueue} login={state.login} mode={state.mode} reload={reload} setReload={setReload}/>
+			<LobbyCreation socketQueue={socketQueue} login={state.login} reload={reload} setReload={setReload}/>
 		</AppLayout>
 		)
 	}

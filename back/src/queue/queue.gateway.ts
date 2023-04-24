@@ -36,7 +36,7 @@ export class QueueGateway {
 		{
 			const group1 = this.queue1v1.shift();
 			const group2 = this.queue1v1.shift();
-			this.gameMatched.push({group1, group2, group3: null, group4: null, time: Date.now()});
+			this.gameMatched.push({group1, group2, group3: null, group4: null, time: Date.now(), mode: "ONEVONE"});
 			this.server.to(group1.player1.socketId).emit("GamePopUpSetup", {message: "show"});
 			this.server.to(group2.player1.socketId).emit("GamePopUpSetup", {message: "show"});
 		}
@@ -129,7 +129,7 @@ export class QueueGateway {
 				data: {state: "PLAYING"}});
 			
 			await this.prisma.game.create({ 
-				data: {user1Id: players[0].id, user2Id: players[1].id,}
+				data: {user1Id: players[0].id, user2Id: players[1].id, user3Id: players[2] ? players[2].id : 0, user4Id: players[3] ? players[3].id : 0, mode: match.mode}
 			});
 
 			const game = await this.prisma.game.findFirst({ 
@@ -140,8 +140,16 @@ export class QueueGateway {
 
 			this.server.to(players[0].socketId).emit("GamePopUpResponse", {message: "OK", login: players[0].login, opponent: players[0].login, gameId: game.id});
 			this.server.to(players[1].socketId).emit("GamePopUpResponse", {message: "OK", login: players[1].login, opponent: players[0].login, gameId: game.id});
+			if (players[2])
+				this.server.to(players[2].socketId).emit("GamePopUpResponse", {message: "OK", login: players[2].login, opponent: players[0].login, gameId: game.id});
+			if (players[3])
+				this.server.to(players[3].socketId).emit("GamePopUpResponse", {message: "OK", login: players[3].login, opponent: players[0].login, gameId: game.id});
 			players[0].state = QueueState.Searching;
 			players[1].state = QueueState.Searching;
+			if (players[2])
+				players[2].state = QueueState.Searching;
+			if (players[3])
+				players[3].state = QueueState.Searching;
 			if (match.group1)
 				this.groups.push(match.group1);
 			if (match.group2)
@@ -309,7 +317,7 @@ export class QueueGateway {
 		}
 		else if (this.groupCount(group) === 2)
 		{
-			this.gameMatched.push({group1: group, group2: null, group3: null, group4: null, time: Date.now()});
+			this.gameMatched.push({group1: group, group2: null, group3: null, group4: null, time: Date.now(), mode: groupParam.mode});
 			this.server.to(group.player1.socketId).emit("GamePopUpSetup", {message: "show"});
 			this.server.to(group.player2.socketId).emit("GamePopUpSetup", {message: "show"});
 			this.groups = this.groups.filter((groupe) => groupe.player1.socketId !== group.player1.socketId);
@@ -320,6 +328,7 @@ export class QueueGateway {
 	}
 
 	add2v2GroupToQueue(group: QueueGroup, groupParam: any) {
+		console.log("groupCount: ", this.groupCount(group));
 		if (this.groupCount(group) === 1 || this.groupCount(group) === 2)
 		{
 			group.timeData = Date.now();
@@ -329,6 +338,7 @@ export class QueueGateway {
 		}
 		else if (this.groupCount(group) === 4)
 		{
+			this.gameMatched.push({group1: group, group2: null, group3: null, group4: null, time: Date.now(), mode: groupParam.mode});
 			this.server.to(group.player1.socketId).emit("GamePopUpSetup", {message: "show"});
 			this.server.to(group.player2.socketId).emit("GamePopUpSetup", {message: "show"});
 			this.server.to(group.player3.socketId).emit("GamePopUpSetup", {message: "show"});
@@ -338,6 +348,7 @@ export class QueueGateway {
 		}
 		else 
 			return (false);
+		return (true);
 	}
 
 	addFFAGroupToQueue(group: QueueGroup, groupParam: any) {
@@ -350,7 +361,7 @@ export class QueueGateway {
 		}
 		else if (this.groupCount(group) === 4)
 		{
-			this.gameMatched.push({group1: group, group2: null, group3: null, group4: null, time: Date.now()});
+			this.gameMatched.push({group1: group, group2: null, group3: null, group4: null, time: Date.now(), mode: groupParam.mode});
 			this.server.to(group.player1.socketId).emit("GamePopUpSetup", {message: "show"});
 			this.server.to(group.player2.socketId).emit("GamePopUpSetup", {message: "show"});
 			this.server.to(group.player3.socketId).emit("GamePopUpSetup", {message: "show"});
@@ -359,14 +370,16 @@ export class QueueGateway {
 		}
 		else
 			return (false);
+		return (true);
 	}
 
 	addGroupToQueue(group: QueueGroup, groupParam: any) {
-		if (groupParam.mode === "1v1")
+		console.log("groupParam: ", groupParam.mode)
+		if (groupParam.mode === "ONEVONE")
 			return (this.add1v1GroupToQueue(group, groupParam));
-		if (groupParam.mode === "2v2")
+		if (groupParam.mode === "TWOVTWO")
 			return (this.add2v2GroupToQueue(group, groupParam));
-		if (groupParam.mode === "FFA")
+		if (groupParam.mode === "FREEFORALL")
 			return (this.addFFAGroupToQueue(group, groupParam));
 		return (false);
 			
@@ -537,6 +550,7 @@ export class QueueGateway {
 		//const user = this.queue1v1.find((queuer) => queuer.socketId === client.id);
 		//if (!user)
 		//	return ;
+		console.log("groupUser: ", groupUser);
 		this.server.to(groupUser.player1.socketId).emit("ConnectToQueueResponse", {message: "OK", user: groupUser});
 		if (groupUser.player2)
 			this.server.to(groupUser.player2.socketId).emit("ConnectToQueueResponse", {message: "OK", user: groupUser});

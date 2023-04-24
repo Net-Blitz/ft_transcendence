@@ -25,6 +25,8 @@ model User {
     friendwith           FriendsRelation[] @relation("friendwith")
     GameAsPlayer1        Game[]            @relation("player1")
     GameAsPlayer2        Game[]            @relation("player2")
+    GameAsPlayer3        Game[]            @relation("player3")
+    GameAsPlayer4        Game[]            @relation("player4")
     Admin                Admin[]
     Ban                  Ban[]
     ChatUsers            ChatUsers[]
@@ -104,14 +106,19 @@ model Game {
     id Int @id @default(autoincrement())
 
     difficulty Int       @default(0)
+    mode       GameMode
     state      GameState @default(CREATING)
     score1     Int       @default(0)
     score2     Int       @default(0)
     winner    Int       @default(0)     
     user1Id Int
     user2Id Int
+    user3Id Int
+    user4Id Int
     user1   User @relation("player1", fields: [user1Id], references: [id])
     user2   User @relation("player2", fields: [user2Id], references: [id])
+    user3   User @relation("player3", fields: [user3Id], references: [id])
+    user4   User @relation("player4", fields: [user4Id], references: [id])
 }
 
 model Queue {
@@ -195,4 +202,10 @@ enum GameState {
     CREATING
     PLAYING
     ENDED
+}
+
+enum GameMode {
+    ONEVONE
+    TWOVTWO
+    FREEFORALL
 }

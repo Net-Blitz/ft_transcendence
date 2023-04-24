@@ -1,4 +1,5 @@
 import { IsString, IsNotEmpty, IsIn, IsOptional } from "class-validator";
+import { GameMode } from "src/game/dto";
 
 export class QueueDto {
 
@@ -53,4 +54,5 @@ export class GameMatched {
 	group3: QueueGroup;
 	group4: QueueGroup;
 	time: number;
+	mode: GameMode;
 }
