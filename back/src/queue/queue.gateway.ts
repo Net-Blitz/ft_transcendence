@@ -43,7 +43,7 @@ export class QueueGateway {
 		{
 			if (match.player1.state === QueueState.Searching || match.player1.state === QueueState.Accepted)
 			{
-				match.player1.state = QueueState.Waiting;
+				match.player1.state = QueueState.Searching;
 				this.queue1v1.push(match.player1);
 				this.server.to(match.player1.socketId).emit("GamePopUpResponse", {message: "KO", reason: "OtherDeclined"});
 			}
@@ -51,7 +51,7 @@ export class QueueGateway {
 				this.server.to(match.player1.socketId).emit("GamePopUpResponse", {message: "KO"});
 			if (match.player2.state === QueueState.Searching || match.player2.state === QueueState.Accepted)
 			{
-				match.player1.state = QueueState.Waiting;
+				match.player1.state = QueueState.Searching;
 				this.queue1v1.push(match.player2);
 				this.server.to(match.player2.socketId).emit("GamePopUpResponse", {message: "KO", reason: "OtherDeclined"});
 			}
@@ -86,7 +86,7 @@ export class QueueGateway {
 		return (false);
 	}
 
-	checkTimeOut(match : GameMatched) {
+	async checkTimeOut(match : GameMatched) {
 		if (Date.now() - match.time > 20500)
 		{
 			if (match.player1.state === QueueState.Accepted)
@@ -96,7 +96,10 @@ export class QueueGateway {
 				this.server.to(match.player1.socketId).emit("GamePopUpResponse", {message: "KO", reason: "OtherDeclined"});
 			}
 			else
+			{
+				await this.prisma.user.update({where: {login: match.player1.login}, data: {state: "ONLINE"}});
 				this.server.to(match.player1.socketId).emit("GamePopUpResponse", {message: "KO"});
+			}
 			if (match.player2.state === QueueState.Accepted)
 			{
 				match.player2.state = QueueState.Searching;
@@ -104,7 +107,10 @@ export class QueueGateway {
 				this.server.to(match.player2.socketId).emit("GamePopUpResponse", {message: "KO", reason: "OtherDeclined"});
 			}
 			else
+			{
+				await this.prisma.user.update({where: {login: match.player2.login}, data: {state: "ONLINE"}});
 				this.server.to(match.player2.socketId).emit("GamePopUpResponse", {message: "KO"});
+			}
 
 			return (true);
 		}
@@ -117,7 +123,7 @@ export class QueueGateway {
 		for (let i = 0; i < this.gameMatched.length; i++)
 		{
 			match = this.gameMatched[i];
-			if (this.checkOneDeclined(match) || await this.checkTwoAccepted(match) || this.checkTimeOut(match))
+			if (this.checkOneDeclined(match) || await this.checkTwoAccepted(match) || await this.checkTimeOut(match))
 			{
 				this.gameMatched.splice(i, 1);
 				break ;
@@ -128,7 +134,7 @@ export class QueueGateway {
 	async runQueue() {
 		while (1)
 		{
-			// console.log("This is the queue: ", this.queue1v1);
+			// console.log("This is the queue: ", this.queue1v1);  
 			this.checkQueue();
 			
 			await this.checkMatch();
@@ -147,7 +153,6 @@ export class QueueGateway {
 		{
 			if (user.socketId !== client.id)
 			{
-				console.log("adduser");
 				user.socketId = client.id;
 				user.mode = userParam.mode;
 				user.bonus1 = (userParam.bonus1 === undefined) ? false : true;
@@ -179,13 +184,14 @@ export class QueueGateway {
 		return ;
 	} 
 
-	handleDisconnect(client: Socket) {
+	async handleDisconnect(client: Socket) {
 
 		const user = this.queue1v1.find((queuer) => queuer.socketId === client.id);
 		if (!user)
 			return ;
 		this.queue1v1 = this.queue1v1.filter((queuer) => queuer.socketId !== client.id);
-
+		const prismaUser = await this.prisma.user.update({where: {login: user.login},
+			data: {state: "ONLINE"}});
 		return ;
 	}
 
@@ -204,9 +210,7 @@ export class QueueGateway {
 		const user = this.queue1v1.find((queuer) => queuer.socketId === client.id);
 		if (!user)
 			return ;
-		
-		
-		client.emit("ConnectToQueueResponse", {player1: {elo: user.elo, login: user.login, avatar: user.avatar}});
+		client.emit("ConnectToQueueResponse", {message: "OK", user: user});
 	}
 
 	@SubscribeMessage("DisconnectFromQueue")
@@ -221,6 +225,7 @@ export class QueueGateway {
 			data: {state: "ONLINE"}
 		});
 		console.log("DisconnectFromQueue: ", client.id)
+		client.emit("DisconnectFromQueueResponse", {message: "OK"});
 	}
 
 	@SubscribeMessage("AcceptGame")
@@ -265,7 +270,6 @@ export class QueueGateway {
 
 	@SubscribeMessage("Timer")
 	timer(@ConnectedSocket() client: Socket) {
-		console.log("Timer: ", client.id)
 		const user = this.queue1v1.find((queuer) => queuer.socketId === client.id);
 		if (!user)
 			return ;
@@ -274,15 +278,28 @@ export class QueueGateway {
 
 	@SubscribeMessage("ChatWithGroup")
 	chatWithGroup(@ConnectedSocket() client: Socket, @MessageBody() message: any) {
-		console.log("ChatWithGroup: ", client.id)
 		const user = this.queue1v1.find((queuer) => queuer.socketId === client.id);
 		if (!user)
 			return ;
-		console.log("ChatWithGroup: ", message.message)
 		for (const queuer of this.queue1v1) //envoi a tout le groupes plutot que tout la queue
 		{
-			console.log("Queuer: ", queuer.socketId)
 			queuer.socketId && this.server.to(queuer.socketId).emit("GetNewMessage", {message: message.message, login: user.login});
 		}
+	} 
+
+	@SubscribeMessage("imInQueue")
+	async imInQueue(@ConnectedSocket() client: Socket, @MessageBody() userParam: any) {
+		const user = this.queue1v1.find((queuer) => queuer.socketId === client.id);
+		if (!user)
+		{
+			await this.prisma.user.update({
+				where: {login: userParam.login},
+				data: {state: "ONLINE"}
+			});
+			client.emit("imInQueueResponse", {in: false});
+			return ;
+		}
+		
+		client.emit("imInQueueResponse", {player1: {elo: user.elo, login: user.login, avatar: user.avatar}, in: true});
 	}
 }

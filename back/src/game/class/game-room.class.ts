@@ -201,7 +201,7 @@ export class GameRoom {
 	}
 
 	checkEndGame() {
-		if ((this.player1.score >= 2 || this.player2.score >= 2) && Math.abs(this.player1.score - this.player2.score) >= 0)
+		if ((this.player1.score >= 10 || this.player2.score >= 10) && Math.abs(this.player1.score - this.player2.score) >= 2)
 			return {state: true, mode: "normal"} /* TEMP */ //return true;
 		return {state: false, mode: "none"}
 	} 

@@ -1,3 +1,7 @@
+import React from "react";
+import Friend from "./components/Friend";
+import Profile from "./components/Profile";
+import Channel from "./components/Chat/Channel";
 import { Routes, Route } from 'react-router-dom';
 import Hello from './components/Hello';
 import PrivateRoute from './components/PrivateRoute';

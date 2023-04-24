@@ -8,13 +8,16 @@ function Hello() {
 		navigate("/dashboard");
 	};
 	const handleLogout = () => {
-		axios.get("http://localhost:3333/users/logout", { withCredentials: true })
-		.then((res) => {
-			console.log(res);
-		})
-		.catch((err) => {
-			console.log(err);
-		});
+		axios
+			.get("http://localhost:3333/users/logout", {
+				withCredentials: true,
+			})
+			.then((res) => {
+				console.log(res);
+			})
+			.catch((err) => {
+				console.log(err);
+			});
 		navigate("/login");
 	};
 
@@ -41,12 +44,13 @@ function Hello() {
 			<p>Login success</p>
 			<button onClick={handleClick}>Dashboard</button>
 			<button onClick={handleLogout}>Logout</button>
-			<button onClick={() => navigate("/search")}>SearchUser</button>
+			<button onClick={() => navigate("/friend")}>Friend</button>
+			<button onClick={() => navigate("/chat")}>Chat</button>
 			<button onClick={() => navigate("/2fa")}>2FA</button>
 			<button onClick={handleGame}>JoinGame</button>
 			<button onClick={handleGaming}>Gaming</button>
 		</div>
 	);
-};
+}
 
 export default Hello;

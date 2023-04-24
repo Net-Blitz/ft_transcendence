@@ -1,37 +1,85 @@
-import { Body, Controller, Get, Param, Put, Req, Res } from "@nestjs/common";
+import {
+	Body,
+	Controller,
+	Get,
+	Param,
+	Post,
+	Put,
+	Res,
+	UseInterceptors,
+	UploadedFile,
+} from "@nestjs/common";
 import { UserService } from "./user.service";
-import { Request, Response } from "express";
+import { Response } from "express";
 import { UpdateUserDto } from "./dto";
+import { GetUser } from "src/auth/decorator";
+import { FileInterceptor } from "@nestjs/platform-express";
 
 @Controller("users")
 export class UserController {
 	constructor(private userService: UserService) {}
 
 	@Get("me")
-	GetUser(@Req() req: Request) {
-		return this.userService.getUser(req);
+	async GetUser(@Res() res: Response, @GetUser() user: any) {
+		return res.status(200).json(user);
 	}
 
-	@Get("login/:username")
-	async GetUserByLogin(
+	@Get("login/:login")
+	async GetUserByLogin(@Param("login") login: string, @Res() res: Response) {
+		return await this.userService.GetUserByLogin(login, res);
+	}
+
+	@Get("username/:username")
+	async GetUserByUsername(
 		@Param("username") username: string,
-		@Req() req: Request,
 		@Res() res: Response
 	) {
-		return this.userService.GetUserByLogin(username, req, res);
+		return await this.userService.GetUserByUsername(username, res);
+	}
+
+	@Get("login")
+	async GetAllUser(@Res() res: Response) {
+		return await this.userService.GetAllUser(res);
 	}
 
 	@Put("update")
 	async UpdateUser(
-		@Req() req: Request,
 		@Res() res: Response,
-		@Body() updateUserDto: UpdateUserDto
+		@GetUser() user: any,
+		@Body("updateUser") updateUserDto: UpdateUserDto
 	) {
-		return this.userService.UpdateUser(req, res, updateUserDto);
+		return await this.userService.UpdateUser(res, user, updateUserDto);
 	}
 
 	@Get("logout")
-	Logout(@Req() req: Request, @Res() res: Response) {
-		return this.userService.Logout(req, res);
+	Logout(@Res() res: Response) {
+		return this.userService.Logout(res);
+	}
+
+	@Get("/all/pseudo")
+	async GetAllPseudo() {
+		return this.userService.GetAllPseudo();
+	}
+
+	@Post("config")
+	@UseInterceptors(FileInterceptor("file"))
+	async ConfigUser(
+		@GetUser() user: any,
+		@Res() res: Response,
+		@UploadedFile() file,
+		@Body("username") text: string
+	) {
+		this.userService.ConfigUser(user, res, file, text);
+	}
+
+	@Post("updateconfig")
+	@UseInterceptors(FileInterceptor("file"))
+	async UpdateUserConfig(
+		@GetUser() user: any,
+		@Res() res: Response,
+		@UploadedFile() file,
+		@Body("username") text: string
+	) {
+		this.userService.UpdateUserConfig(user, res, file, text);
 	}
 }

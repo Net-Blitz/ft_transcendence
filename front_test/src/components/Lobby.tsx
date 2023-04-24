@@ -112,7 +112,6 @@ const LobbyChat = ({socketQueue}:any) => {
 		const chatUl = document.querySelector("#lobby-chat");
 		const preMsg = localStorage.getItem("lobby-chat-storage");
 		
-		console.log("ChatUl: ", chatUl);
 		if (chatUl !== null && preMsg !== null) {
 			chatUl.innerHTML = preMsg;
 		}

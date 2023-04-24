@@ -1,6 +1,7 @@
 # compiled output
 /dist
 /node_modules
+/node_modules/*
 
 prisma/migrations
 prisma/migrations/*
@@ -36,3 +37,7 @@ lerna-debug.log*
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+public/uploads/*
+!public/.gitkeep
+!public/uploads/.gitkeep

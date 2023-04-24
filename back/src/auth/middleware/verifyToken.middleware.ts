@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import * as jwt from "jsonwebtoken";
 
 export function verifyToken(req: Request, res: Response, next: NextFunction) {
-	if (req.path === "/auth/callback" || req.path === "/auth/2fa/verify") {
+	if (req.path === "/auth/callback" || req.path === "/auth/2fa/verifylogin") {
 		next();
 		return;
 	}

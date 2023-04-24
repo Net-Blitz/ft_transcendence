@@ -57,7 +57,6 @@ export class GameGateway {
 	private async waitingPlayerConnection(room: number) {
 		while (this.ConnectedSockets.findIndex((socket) => socket.roomName === "game-" + room && socket.state === "player1") === -1 ||
 				this.ConnectedSockets.findIndex((socket) => socket.roomName === "game-" + room && socket.state === "player2") === -1) {
-				console.log("waiting for player connection");
 				await this.sleep(1000); // can add a timeout here --> if timeout, delete the game or make cancel state
 		}
 		await this.prisma.game.update({
@@ -359,9 +358,9 @@ export class GameGateway {
 			{
 				const player1 = await this.prisma.user.findFirst({where: {id: game.user1Id}});
 				const player2 = await this.prisma.user.findFirst({where: {id: game.user2Id}});
-				if (player1 && player2)
+				if (player1 && player2) 
 				{
-					if (game.score1 > game.score2)
+					if (game.winner === game.user1Id)
 						client.emit("getEndStatus", {score1: game.score1, score2: game.score2, avatar1: player1.avatar, avatar2: player2.avatar} )
 					else
 						client.emit("getEndStatus", {score1: game.score2, score2: game.score1, avatar1: player2.avatar, avatar2: player1.avatar} )
@@ -408,7 +407,6 @@ export class GameGateway {
 
 	@SubscribeMessage("surrender")
 	HandleSurrender(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
-		console.log("surrender: ", data)
 		const players = this.getPlayerSocket(data.room);
 		
 		if (players.player1 != null && players.player1.login === data.login)
@@ -425,7 +423,7 @@ export class GameGateway {
 		
 		const game = await this.prisma.game.findUnique({where: {id: data.room}});
 
-		if (game === null || (game.user1Id !== sockUser.prismaId && game.user2Id !== sockUser.prismaId))
+		if (game === null || game.state === "ENDED" || (game.user1Id !== sockUser.prismaId && game.user2Id !== sockUser.prismaId))
 			return ;
 
 		this.server.to("game-" + data.room).emit("quickChatMessageResponse", {login: sockUser.login, message: parseInt(data.key)});

@@ -30,9 +30,10 @@ export class QueueService {
 				return ({canJoin: false, reason: "playing", gameId: game.id, login: userLogin});
 
 		}
+		if (user.state === "SEARCHING")
+			return ({canJoin: false, reason: "searching", login: userLogin});
 		return ({canJoin: true, login: userLogin});
 	}
-
 
 	//async addToQueue(userLogin: string, dto: AddQueueDto) {
 	//	const user = await this.prisma.user.findUnique({
