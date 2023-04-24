@@ -13,7 +13,7 @@ model User {
     avatar               String?
     twoFactor            Boolean           @default(false)
     config               Boolean           @default(false)
-    status               UserStatus        @default(ONLINE)
+    state                UserStatus        @default(ONLINE)
     wins                 Int               @default(0)
     losses               Int               @default(0)
     elo                  Int               @default(300)
@@ -101,15 +101,17 @@ model Message {
 }
 
 model Game {
-    id         Int       @id @default(autoincrement())
+    id Int @id @default(autoincrement())
+
     difficulty Int       @default(0)
     state      GameState @default(CREATING)
     score1     Int       @default(0)
     score2     Int       @default(0)
-    user1Id    Int
-    user2Id    Int
-    user1      User      @relation("player1", fields: [user1Id], references: [id])
-    user2      User      @relation("player2", fields: [user2Id], references: [id])
+    winner    Int       @default(0)     
+    user1Id Int
+    user2Id Int
+    user1   User @relation("player1", fields: [user1Id], references: [id])
+    user2   User @relation("player2", fields: [user2Id], references: [id])
 }
 
 model Queue {

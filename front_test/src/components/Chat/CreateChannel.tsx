@@ -3,10 +3,10 @@ import React, { useRef, useState } from "react";
 
 function CreateChannel({
 	ClosePopup,
-	setNotification,
+	setAlert,
 }: {
 	ClosePopup: () => void;
-	setNotification: (notification: { message: string; type: string }) => void;
+	setAlert: (Alert: { message: string; type: string }) => void;
 }) {
 	const [name, setName] = useState("");
 	const [password, setPassword] = useState("");
@@ -37,12 +37,12 @@ function CreateChannel({
 			setPassword("");
 			setPrivacy("PUBLIC");
 			ClosePopup();
-			setNotification({
+			setAlert({
 				message: "Channel " + name + " created",
 				type: "success",
 			});
 		} catch (error) {
-			setNotification({
+			setAlert({
 				message: "Channel " + name + " already exist",
 				type: "error",
 			});

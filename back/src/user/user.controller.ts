@@ -48,7 +48,6 @@ export class UserController {
 		@GetUser() user: any,
 		@Body("updateUser") updateUserDto: UpdateUserDto
 	) {
-		console.log("UpdateUser: " + updateUserDto.username);
 		return await this.userService.UpdateUser(res, user, updateUserDto);
 	}
 

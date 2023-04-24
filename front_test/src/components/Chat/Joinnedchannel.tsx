@@ -6,7 +6,7 @@ import { ChannelDto } from "./Channel";
 import axios from "axios";
 import Messages from "./Messages";
 import UsersList from "./UsersList";
-import Notification from "../Notification/Notification";
+import Alert from "../Alert/Alert";
 import PopupProtected from "./PopupProtected";
 import HandleInvite from "./HandleInvite";
 import CreateChannel from "./CreateChannel";
@@ -21,7 +21,7 @@ function JoinnedChannels({
 	const [selectedChannel, setSelectedChannel] = useState<string>("");
 	const [messages, setMessages] = useState<MessageDto[]>([]);
 	const [showUsers, setShowUsers] = useState(false);
-	const [notification, setNotification] = useState({ message: "", type: "" });
+	const [Alert, setAlert] = useState({ message: "", type: "" });
 	const [PopupPassword, setPopupPassword] = useState<string>(""); // <-- name of protected channel
 	const [SaveChannel, setSaveChannel] = useState<string[]>([]); // <--- Save all joinned protected || private channel
 	const [PopupCreateChannel, setPopupCreateChannel] = useState(false);
@@ -67,7 +67,7 @@ function JoinnedChannels({
 		);
 		setBan(response.data);
 		if (ban?.find((ban: any) => ban.name === channel.name)) {
-			setNotification({
+			setAlert({
 				message: "You are banned from this channel",
 				type: "error",
 			});
@@ -110,7 +110,7 @@ function JoinnedChannels({
 					username: userInfo?.username,
 				});
 			} else {
-				setNotification({
+				setAlert({
 					message: "This channel is private, you have to be invited",
 					type: "error",
 				});
@@ -129,7 +129,7 @@ function JoinnedChannels({
 			if (data?.username === userInfo?.username) {
 				setSelectedChannel("");
 				setMessages([]);
-				setNotification({
+				setAlert({
 					message: `You have been kicked from ${data?.channel}`,
 					type: "error",
 				});
@@ -139,7 +139,7 @@ function JoinnedChannels({
 			if (data?.username === userInfo?.username) {
 				setSelectedChannel("");
 				setMessages([]);
-				setNotification({
+				setAlert({
 					message: `You have been banned from ${data?.channel}`,
 					type: "error",
 				});
@@ -171,14 +171,11 @@ function JoinnedChannels({
 
 	return (
 		<>
-			<Notification
-				message={notification.message}
-				type={notification.type}
-			/>
+			<Alert message={Alert.message} type={Alert.type} />
 			{PopupCreateChannel && (
 				<CreateChannel
 					ClosePopup={handleToggleCreateChannel}
-					setNotification={setNotification}
+					setAlert={setAlert}
 				/>
 			)}
 			<div className="wrapper">
@@ -220,7 +217,7 @@ function JoinnedChannels({
 											setMessages={setMessages}
 											SaveChannel={SaveChannel}
 											setSaveChannel={setSaveChannel}
-											setNotification={setNotification}
+											setAlert={setAlert}
 										/>
 									)}
 									<span className="name">{channel.name}</span>
@@ -236,7 +233,7 @@ function JoinnedChannels({
 								setMessages={setMessages}
 								SaveChannel={SaveChannel}
 								setSaveChannel={setSaveChannel}
-								setNotification={setNotification}
+								setAlert={setAlert}
 							/>
 						</ul>
 					</div>

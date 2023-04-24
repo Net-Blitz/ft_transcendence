@@ -8,7 +8,7 @@ interface DropdownMenuProps {
 	userInfo: any;
 	isAdmin: boolean;
 	channelInfo: any;
-	setNotification: (notification: { message: string; type: string }) => void;
+	setAlert: (Alert: { message: string; type: string }) => void;
 }
 
 function DropdownMenu({
@@ -18,7 +18,7 @@ function DropdownMenu({
 	userInfo,
 	isAdmin,
 	channelInfo,
-	setNotification,
+	setAlert,
 }: DropdownMenuProps) {
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	const [openUsername, setOpenUsername] = useState<string>("");
@@ -56,13 +56,13 @@ function DropdownMenu({
 				},
 				{ withCredentials: true }
 			);
-			setNotification({
+			setAlert({
 				message: username + " has been promoted",
 				type: "success",
 			});
 		} catch (error) {
 			console.error(error);
-			setNotification({
+			setAlert({
 				message: "An error occured",
 				type: "error",
 			});
@@ -78,13 +78,13 @@ function DropdownMenu({
 				},
 				{ withCredentials: true }
 			);
-			setNotification({
+			setAlert({
 				message: username + " has been demoted",
 				type: "success",
 			});
 		} catch (error) {
 			console.error(error);
-			setNotification({
+			setAlert({
 				message: "An error occured",
 				type: "error",
 			});
@@ -97,7 +97,7 @@ function DropdownMenu({
 			channel: channel,
 			login: username,
 		});
-		setNotification({
+		setAlert({
 			message: username + " has been kicked",
 			type: "success",
 		});
@@ -109,7 +109,7 @@ function DropdownMenu({
 			channel: channel,
 			login: username,
 		});
-		setNotification({
+		setAlert({
 			message: username + " has been banned",
 			type: "success",
 		});
@@ -121,7 +121,7 @@ function DropdownMenu({
 			channel: channel,
 			login: username,
 		});
-		setNotification({
+		setAlert({
 			message: username + " has been muted",
 			type: "success",
 		});
@@ -133,7 +133,7 @@ function DropdownMenu({
 			channel: channel,
 			login: username,
 		});
-		setNotification({
+		setAlert({
 			message: username + " has been unmuted",
 			type: "success",
 		});
@@ -146,13 +146,13 @@ function DropdownMenu({
 				{},
 				{ withCredentials: true }
 			);
-			setNotification({
+			setAlert({
 				message: username + " has been blocked",
 				type: "success",
 			});
 		} catch (error) {
 			console.error(error);
-			setNotification({
+			setAlert({
 				message: "An error occured",
 				type: "error",
 			});
@@ -166,13 +166,13 @@ function DropdownMenu({
 				{},
 				{ withCredentials: true }
 			);
-			setNotification({
+			setAlert({
 				message: username + " has been unblocked",
 				type: "success",
 			});
 		} catch (error) {
 			console.error(error);
-			setNotification({
+			setAlert({
 				message: "An error occured",
 				type: "error",
 			});
@@ -192,7 +192,7 @@ function DropdownMenu({
 			}
 		};
 		getIsBlocked();
-	}, [setNotification, user?.username]);
+	}, [setAlert, user?.username]);
 
 	return (
 		<>

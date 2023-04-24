@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import "./Notification.css";
+import "./Alert.css";
 
-function Notification({ message, type }: { message: string; type: string }) {
+function Alert({ message, type }: { message: string; type: string }) {
 	const [show, setShow] = useState(false);
 
 	useEffect(() => {
@@ -16,11 +16,11 @@ function Notification({ message, type }: { message: string; type: string }) {
 
 	return (
 		<>
-			<div className={`notification ${type} ${show ? "show" : ""}`}>
+			<div className={`Alert ${type} ${show ? "show" : ""}`}>
 				<p>{message}</p>
 			</div>
 		</>
 	);
 }
 
-export default Notification;
+export default Alert;

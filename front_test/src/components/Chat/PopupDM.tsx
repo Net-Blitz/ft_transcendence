@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
-function PopupDM({ ClosePopup, setNotification, userInfo }: any) {
+function PopupDM({ ClosePopup, setAlert, userInfo }: any) {
 	const [users, setUsers] = useState<any[]>([]);
 	const PopupRef = useRef<HTMLDivElement>(null);
 	const [searchTerm, setSearchTerm] = useState("");
@@ -41,7 +41,7 @@ function PopupDM({ ClosePopup, setNotification, userInfo }: any) {
 
 	const handleDM = async (username: string) => {
 		if (blocked?.find((blocked: any) => blocked.username === username)) {
-			setNotification({
+			setAlert({
 				message: "You are blocked from this user",
 				type: "error",
 			});
@@ -53,13 +53,13 @@ function PopupDM({ ClosePopup, setNotification, userInfo }: any) {
 				{ username: username },
 				{ withCredentials: true }
 			);
-			setNotification({
+			setAlert({
 				message: "DM created",
 				type: "success",
 			});
 			ClosePopup();
 		} catch (error) {
-			setNotification({
+			setAlert({
 				message: "DM already exist",
 				type: "error",
 			});
