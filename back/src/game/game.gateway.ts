@@ -88,7 +88,7 @@ export class GameGateway {
 			this.server.to("game-" + room).emit("gameState", gameRoom.getGameRoomInfo());
 			end = gameRoom.checkEndGame();
 			if (end.state)
-				return (end.mode);
+				return (end);
 			end = this.checkConnected(room);
 			if (end.state && end.mode === "disconnected")
 			{
@@ -113,7 +113,7 @@ export class GameGateway {
 		const game = await this.prisma.game.findUnique({where: {id: room}});	
 		if (!game)
 			return (false);
-
+		
 		if (endMode.mode === "normal") {
 			if (gameRoom.player1.score > gameRoom.player2.score)
 			{

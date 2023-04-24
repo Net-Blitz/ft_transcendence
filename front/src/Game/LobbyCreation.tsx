@@ -12,9 +12,20 @@ const LobbyCreation = ({socketQueue, reload, setReload, login, mode}:any) => {
 		console.log("join queue")
 	}
 
+	const joinGroup = () => {
+		socketQueue.emit("JoinGroup", {groupLogin: "lgiband"}); // -> appuie sur le bouton plutot
+	}
+
+
+	const leaveGroup = () => {
+		socketQueue.emit("LeaveGroup"); // -> appuie sur le bouton plutot
+	}
+
 	return (
 		<div>
-			<button onClick={joinQueue}>click bb</button>
+			<button onClick={joinQueue}>joinQueue</button>
+			<button onClick={joinGroup}>joinGroup</button>
+			<button onClick={leaveGroup}>leaveGroup</button>
 		</div>
 	)
 }
