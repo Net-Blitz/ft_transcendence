@@ -17,9 +17,9 @@
 
 .game-waiting-background {
 	position: absolute;
-	top: 30px;
+	top: 14px;
 	left: calc(81px + 14px + 14px);
-	height: calc(100% - 60px);
+	height: calc(100% - 40px);
 	width: calc(100% - 81px - 14px - 14px - 14px);
 	
 	background: #FFFDE4;

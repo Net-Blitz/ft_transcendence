@@ -90,7 +90,7 @@ export class GameGateway {
 			if (end.state)
 				return (end);
 			end = this.checkConnected(room);
-			if (end.state && end.mode === "disconnected")
+			if (end.state && end.mode === "disconnected") 
 			{
 				if (wait > 2500)
 					return (end);

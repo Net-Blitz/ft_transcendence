@@ -143,10 +143,17 @@ function Game({socketGame, room, login, env}:any) {
 	}, [here]);
 	
 	document.addEventListener('keydown', (event) => {
+		//event.preventDefault();
 		if (event.key === 'ArrowUp')
+		{
+			event.preventDefault();
 			socketGame.emit('keyPress', 'UP');
+		}
 		else if (event.key === 'ArrowDown')
+		{
+			event.preventDefault();
 			socketGame.emit('keyPress', 'DOWN');
+		}
 		else if (event.key >= '0' && event.key <= '9')
 		{
 			socketGame.emit('quickChatMessage', {key: event.key, room: room});
@@ -155,9 +162,15 @@ function Game({socketGame, room, login, env}:any) {
 	
 	document.addEventListener('keyup', (event) => {
 		if (event.key === 'ArrowUp')
+		{
+			event.preventDefault();
 			socketGame.emit('keyRelease', 'UP');
+		}
 		else if (event.key === 'ArrowDown')
+		{
+			event.preventDefault();
 			socketGame.emit('keyRelease', 'DOWN');
+		}
 	});
 
 	const surrend = () => {
