@@ -5,15 +5,16 @@ import { QueueObject, QueueState, GameMatched, QueueGroup } from "./dto";
 import * as jwt from "jsonwebtoken";
 
 import { QueueService } from "./queue.service";
+import { GameMode } from "@prisma/client";
 
 @WebSocketGateway({namespace:"queue", cors: {origin: "*"}})
-export class QueueGateway {
+export class QueueGateway { 
 
 	@WebSocketServer()
 	server: Server;
 
 	groups: QueueGroup[];
-	queue1v1: QueueGroup[]
+	queue1v1: QueueGroup[] 
 	queue2v2: QueueGroup[]
 	queueFFA: QueueGroup[]
 	gameMatched: GameMatched[]
@@ -31,6 +32,38 @@ export class QueueGateway {
 		return new Promise(resolve => setTimeout(resolve, ms));
 	}
 
+	match4(mode: GameMode, queue: QueueGroup[]) {
+		let allGroup = []
+		let count:number;
+		for (const group1 of queue)
+		{
+			count = this.groupCount(group1);
+			allGroup = [group1];
+			for (const group2 of queue)
+			{
+				if (group1 !== group2 && this.groupCount(group2) + count <= 4)
+				{
+					allGroup.push(group2);
+					count += this.groupCount(group2);
+				}
+				if (count === 4)
+				{
+					this.gameMatched.push({group1: allGroup[0], group2: allGroup[1], group3: allGroup.length >= 3 ? allGroup[2] : null, group4: allGroup.length >= 4 ? allGroup[3] : null, time: Date.now(), mode: mode});
+					queue = queue.filter(group => !allGroup.includes(group));
+					for (const group of allGroup)
+					{
+						for (const player of [group.player1, group.player2, group.player3, group.player4])
+						{
+							if (player)
+								this.server.to(player.socketId).emit("GamePopUpSetup", {message: "show"});
+						}
+					}
+					return ;
+				}
+			}
+		}
+	}
+
 	checkQueue() {
 		if (this.queue1v1.length >= 2)
 		{
@@ -39,6 +72,14 @@ export class QueueGateway {
 			this.gameMatched.push({group1, group2, group3: null, group4: null, time: Date.now(), mode: "ONEVONE"});
 			this.server.to(group1.player1.socketId).emit("GamePopUpSetup", {message: "show"});
 			this.server.to(group2.player1.socketId).emit("GamePopUpSetup", {message: "show"});
+		}
+		if (this.queue2v2.length >= 2)
+		{
+			this.match4("TWOVTWO", this.queue2v2);
+		}
+		if (this.queueFFA.length >= 2)
+		{
+			this.match4("FREEFORALL", this.queueFFA);
 		}
 	}
 
@@ -78,12 +119,15 @@ export class QueueGateway {
 				{
 					if (!this.oneGroupDeclined(group))
 					{
-						console.log("group accepted")
-						this.queue1v1.push(group);
+						if (group.mode === "ONEVONE")
+							this.queue1v1.push(group);
+						else if (group.mode === "TWOVTWO")
+							this.queue2v2.push(group);
+						else if (group.mode === "FFA")
+							this.queueFFA.push(group);
 					}
 					else
 					{
-						console.log("group declined")
 						this.groups.push(group);
 					}
 					for (const player of [group.player1, group.player2, group.player3, group.player4])
@@ -129,21 +173,25 @@ export class QueueGateway {
 				data: {state: "PLAYING"}});
 			
 			await this.prisma.game.create({ 
-				data: {user1Id: players[0].id, user2Id: players[1].id, user3Id: players[2] ? players[2].id : 0, user4Id: players[3] ? players[3].id : 0, mode: match.mode}
+				data: {user1Id: players[0].id, user2Id: players[1].id, user3Id: players[2] ? players[2].id : players[0].id, user4Id: players[3] ? players[3].id : players[1].id, mode: match.mode}
 			});
 
 			const game = await this.prisma.game.findFirst({ 
 				where: {
 					state: "CREATING",
-					AND: [{ user1Id: players[0].id }, { user2Id: players[1].id }]}
+					AND: [
+						{ user1Id: players[0].id },
+						{ user2Id: players[1].id },
+						{user3Id: players[2] ? players[2].id : players[0].id},
+						{user4Id: players[3] ? players[3].id : players[1].id}]}
 				});
 
-			this.server.to(players[0].socketId).emit("GamePopUpResponse", {message: "OK", login: players[0].login, opponent: players[0].login, gameId: game.id});
-			this.server.to(players[1].socketId).emit("GamePopUpResponse", {message: "OK", login: players[1].login, opponent: players[0].login, gameId: game.id});
+			this.server.to(players[0].socketId).emit("GamePopUpResponse", {message: "OK"});
+			this.server.to(players[1].socketId).emit("GamePopUpResponse", {message: "OK"});
 			if (players[2])
-				this.server.to(players[2].socketId).emit("GamePopUpResponse", {message: "OK", login: players[2].login, opponent: players[0].login, gameId: game.id});
+				this.server.to(players[2].socketId).emit("GamePopUpResponse", {message: "OK"});
 			if (players[3])
-				this.server.to(players[3].socketId).emit("GamePopUpResponse", {message: "OK", login: players[3].login, opponent: players[0].login, gameId: game.id});
+				this.server.to(players[3].socketId).emit("GamePopUpResponse", {message: "OK"});
 			players[0].state = QueueState.Searching;
 			players[1].state = QueueState.Searching;
 			if (players[2])
@@ -202,7 +250,12 @@ export class QueueGateway {
 							this.server.to(player.socketId).emit("GamePopUpResponse", {message: "KO", reason: "OtherDeclined"});
 						}
 					}
-					this.queue1v1.push(group);
+					if (group.mode === "ONEVONE")
+						this.queue1v1.push(group);
+					else if (group.mode === "TWOVTWO")
+						this.queue2v2.push(group);
+					else if (group.mode === "FFA")
+						this.queueFFA.push(group);
 				}
 			}
 			return (true);
@@ -228,10 +281,23 @@ export class QueueGateway {
 		while (1)
 		{
 			// console.log("This is the queue: ", this.queue1v1);
-			console.log("===Groups====")
-			for (const group of this.groups)
-				console.log (group.player1.login, (!group.player2 || group.player2.login), (!group.player3 || group.player3.login), (!group.player4 || group.player4.login)) 
-			console.log("=============");
+			//console.log("===Group====")
+			//for (const group of this.groups)
+			//	console.log (group.player1.login, (!group.player2 || group.player2.login), (!group.player3 || group.player3.login), (!group.player4 || group.player4.login)) 
+			//console.log("=============");
+			//console.log("===Queue1v1====")
+			//for (const group of this.queue1v1)
+			//	console.log (group.player1.login, (!group.player2 || group.player2.login), (!group.player3 || group.player3.login), (!group.player4 || group.player4.login)) 
+			//console.log("=============");
+			//console.log("===Queue2v2====")
+			//for (const group of this.queue2v2)
+			//	console.log (group.player1.login, (!group.player2 || group.player2.login), (!group.player3 || group.player3.login), (!group.player4 || group.player4.login)) 
+			//console.log("=============");
+			//console.log("===QueueFFA====")
+			//for (const group of this.queueFFA)
+			//	console.log (group.player1.login, (!group.player2 || group.player2.login), (!group.player3 || group.player3.login), (!group.player4 || group.player4.login)) 
+			//console.log("=============");
+			
 			this.checkQueue();
 			
 			await this.checkMatch();
@@ -281,11 +347,43 @@ export class QueueGateway {
 			if (queuer.player1.socketId === socketId)
 				return (queuer.player1);
 		}
+		for (const queuer of this.queue2v2)
+		{
+			if (queuer.player1.socketId === socketId)
+				return (queuer.player1);
+			if (queuer.player2 && queuer.player2.socketId === socketId)
+				return (queuer.player2);
+			if (queuer.player3 && queuer.player3.socketId === socketId)
+				return (queuer.player3);
+			if (queuer.player4 && queuer.player4.socketId === socketId)
+				return (queuer.player4);
+		}
+		for (const queuer of this.queueFFA)
+		{
+			if (queuer.player1.socketId === socketId)
+				return (queuer.player1);
+			if (queuer.player2 && queuer.player2.socketId === socketId)
+				return (queuer.player2);
+			if (queuer.player3 && queuer.player3.socketId === socketId)
+				return (queuer.player3);
+			if (queuer.player4 && queuer.player4.socketId === socketId)
+				return (queuer.player4);
+		}
 		return (null);
 	}
 
 	findMyGroup(socketId: string) {
 		for (const queuer of this.queue1v1)
+		{
+			if (queuer.player1.socketId === socketId || (queuer.player2 && queuer.player2.socketId === socketId) || (queuer.player3 && queuer.player3.socketId === socketId) || (queuer.player4 && queuer.player4.socketId === socketId))
+				return (queuer);
+		}
+		for (const queuer of this.queue2v2)
+		{
+			if (queuer.player1.socketId === socketId || (queuer.player2 && queuer.player2.socketId === socketId) || (queuer.player3 && queuer.player3.socketId === socketId) || (queuer.player4 && queuer.player4.socketId === socketId))
+				return (queuer);
+		}
+		for (const queuer of this.queueFFA)
 		{
 			if (queuer.player1.socketId === socketId || (queuer.player2 && queuer.player2.socketId === socketId) || (queuer.player3 && queuer.player3.socketId === socketId) || (queuer.player4 && queuer.player4.socketId === socketId))
 				return (queuer);
@@ -328,7 +426,6 @@ export class QueueGateway {
 	}
 
 	add2v2GroupToQueue(group: QueueGroup, groupParam: any) {
-		console.log("groupCount: ", this.groupCount(group));
 		if (this.groupCount(group) === 1 || this.groupCount(group) === 2)
 		{
 			group.timeData = Date.now();
@@ -374,7 +471,6 @@ export class QueueGateway {
 	}
 
 	addGroupToQueue(group: QueueGroup, groupParam: any) {
-		console.log("groupParam: ", groupParam.mode)
 		if (groupParam.mode === "ONEVONE")
 			return (this.add1v1GroupToQueue(group, groupParam));
 		if (groupParam.mode === "TWOVTWO")
@@ -488,8 +584,6 @@ export class QueueGateway {
 			id: prismaUser.id,
 			login: login,
 			socketId: client.id,
-			avatar: prismaUser.avatar,
-			elo: prismaUser.elo,
 			state : QueueState.Searching,
 			}, player2: null, player3: null, player4: null, mode: null, map: null, timeData: null});
 	}
@@ -508,12 +602,48 @@ export class QueueGateway {
 	async handleDisconnect(client: Socket) { 
 		console.log("Queue Server Disconnection", client.id);
 		this.leaveGroup(client, undefined);
-		const user = this.findInQueue(client.id);
-		if (!user)
+		const group = this.findMyGroup(client.id);
+		if (!group)
 			return ;
-		this.queue1v1 = this.queue1v1.filter((queuer) => queuer.player1.socketId !== client.id);
-		await this.prisma.user.update({where: {login: user.login},
-			data: {state: "ONLINE"}});
+		this.queue1v1 = this.queue1v1.filter((queuer) => queuer.player1.socketId !== group.player1.socketId);
+		this.queue2v2 = this.queue2v2.filter((queuer) => queuer.player1.socketId !== group.player1.socketId);
+		this.queueFFA = this.queueFFA.filter((queuer) => queuer.player1.socketId !== group.player1.socketId);
+		
+		if (this.groupCount(group) > 1)
+		{
+			if (group.player1 && group.player1.socketId !== client.id)
+			{
+				await this.prisma.user.update({where: {login: group.player1.login},
+					data: {state: "ONLINE"}});
+				this.recreateGroup(group.player1);
+			}
+			if (group.player2 && group.player2.socketId !== client.id)
+			{
+				await this.prisma.user.update({where: {login: group.player2.login},
+					data: {state: "ONLINE"}});
+				this.recreateGroup(group.player2);
+			}
+			if (group.player3 && group.player3.socketId !== client.id)
+			{
+				await this.prisma.user.update({where: {login: group.player3.login},
+					data: {state: "ONLINE"}});
+				this.recreateGroup(group.player3);
+			}	
+			if (group.player4 && group.player4.socketId !== client.id)
+			{
+				await this.prisma.user.update({where: {login: group.player4.login},
+					data: {state: "ONLINE"}});
+				this.recreateGroup(group.player4);
+			}
+		}
+		this.server.to(group.player1.socketId).emit("DisconnectFromQueueResponse", {message: "OK"});
+		if (group.player2)
+			this.server.to(group.player2.socketId).emit("DisconnectFromQueueResponse", {message: "OK"});
+		if (group.player3)
+			this.server.to(group.player3.socketId).emit("DisconnectFromQueueResponse", {message: "OK"});
+		if (group.player4)
+			this.server.to(group.player4.socketId).emit("DisconnectFromQueueResponse", {message: "OK"});
+
 		return ;
 	}
 
@@ -523,6 +653,7 @@ export class QueueGateway {
 		if (!groupUser)
 			return ;
 		
+		console.log("ConnectToQueue", groupParam);
 		let ret = this.addGroupToQueue(groupUser, groupParam);
 		if (!ret)
 			return client.emit("notPossible");
@@ -567,7 +698,8 @@ export class QueueGateway {
 			return ;
 
 		this.queue1v1 = this.queue1v1.filter((queuer) => queuer.player1.socketId !== group.player1.socketId);
-		
+		this.queue2v2 = this.queue2v2.filter((queuer) => queuer.player1.socketId !== group.player1.socketId);
+		this.queueFFA = this.queueFFA.filter((queuer) => queuer.player1.socketId !== group.player1.socketId);
 		this.groups.push(group);
 
 		await this.prisma.user.update({
@@ -590,7 +722,13 @@ export class QueueGateway {
 				data: {state: "ONLINE"}
 			});
 		
-		client.emit("DisconnectFromQueueResponse", {message: "OK"});
+		this.server.to(group.player1.socketId).emit("DisconnectFromQueueResponse", {message: "OK"});
+		if (group.player2)
+			this.server.to(group.player2.socketId).emit("DisconnectFromQueueResponse", {message: "OK"});
+		if (group.player3)
+			this.server.to(group.player3.socketId).emit("DisconnectFromQueueResponse", {message: "OK"});
+		if (group.player4)
+			this.server.to(group.player4.socketId).emit("DisconnectFromQueueResponse", {message: "OK"});
 	}
 
 	@SubscribeMessage("LeaveGroup")
@@ -656,6 +794,7 @@ export class QueueGateway {
 						where: {login: group.player1.login},
 						data: {state: "ONLINE"}
 					});
+					this.server.to(group.player1.socketId).emit("DeclineGameResponse", {message: "Declined"});
 				}
 				if (group.player2 && group.player2.socketId === client.id && group.player2.state === QueueState.Searching)
 				{
@@ -664,6 +803,7 @@ export class QueueGateway {
 						where: {login: group.player2.login},
 						data: {state: "ONLINE"}
 					});
+					this.server.to(group.player2.socketId).emit("DeclineGameResponse", {message: "Declined"});
 				}	
 				if (group.player3 && group.player3.socketId === client.id && group.player3.state === QueueState.Searching)
 				{
@@ -672,6 +812,7 @@ export class QueueGateway {
 						where: {login: group.player3.login},
 						data: {state: "ONLINE"}
 					});
+					this.server.to(group.player3.socketId).emit("DeclineGameResponse", {message: "Declined"});
 				}	
 				if (group.player4 && group.player4.socketId === client.id && group.player4.state === QueueState.Searching)
 				{
@@ -680,6 +821,7 @@ export class QueueGateway {
 						where: {login: group.player4.login},
 						data: {state: "ONLINE"}
 					});
+					this.server.to(group.player4.socketId).emit("DeclineGameResponse", {message: "Declined"});
 				}	
 			}
 		}
@@ -699,10 +841,19 @@ export class QueueGateway {
 		const group = this.findMyGroup(client.id);
 		if (!group)
 			return ;
-		group.player1 && this.server.to(group.player1.socketId).emit("GetNewMessage", {message: message.message, login: message.login});
-		group.player2 && this.server.to(group.player2.socketId).emit("GetNewMessage", {message: message.message, login: message.login});
-		group.player3 && this.server.to(group.player3.socketId).emit("GetNewMessage", {message: message.message, login: message.login});
-		group.player4 && this.server.to(group.player4.socketId).emit("GetNewMessage", {message: message.message, login: message.login});
+		let me: QueueObject;
+		if (group.player1 && group.player1.socketId === client.id)
+			me = group.player1;
+		else if (group.player2 && group.player2.socketId === client.id)
+			me = group.player2;
+		else if (group.player3 && group.player3.socketId === client.id)
+			me = group.player3;
+		else if (group.player4 && group.player4.socketId === client.id)
+			me = group.player4;
+		group.player1 && this.server.to(group.player1.socketId).emit("GetNewMessage", {message: message.message, login: me.login});
+		group.player2 && this.server.to(group.player2.socketId).emit("GetNewMessage", {message: message.message, login: me.login});
+		group.player3 && this.server.to(group.player3.socketId).emit("GetNewMessage", {message: message.message, login: me.login});
+		group.player4 && this.server.to(group.player4.socketId).emit("GetNewMessage", {message: message.message, login: me.login});
 	} 
 
 	@SubscribeMessage("imInQueue")
@@ -722,7 +873,11 @@ export class QueueGateway {
 			client.emit("imInQueueResponse", {in: false});
 			return ;
 		}
-		
-		client.emit("imInQueueResponse", {player1: {elo: user.elo, login: user.login, avatar: user.avatar}, in: true});
+		const prismaUser = await this.prisma.user.findUnique({
+			where: {login: user.login}
+		});
+		if (!prismaUser)
+			return ;
+		client.emit("imInQueueResponse", {player1: {elo: prismaUser.elo, login: prismaUser.login, avatar: prismaUser.avatar}, in: true});
 	}
 }

@@ -7,14 +7,14 @@ import { Navigate, useLocation } from 'react-router-dom';
 import axios from "axios";
 
 
-const GameRoute = ({socketQueue, socketGame, reload, setReload}:any) => {
+const GameRoute = ({socketQueue, socketGame, reload, setReload, env}:any) => {
 	const [state, updateState] = useState({} as {code: number, login: string, room: number});
 	const location = useLocation();
 	const update = location.state;
 	useEffect (() =>{
-		axios.get("http://localhost:3333/queues/joinable", { withCredentials: true })
+		axios.get("http://" + env.host + ":" + env.port + "/queues/joinable", { withCredentials: true })
 		.then((res) => {
-			if (res.data.canJoin)
+			if (res.data.canJoin || reload === 2)
 				updateState({code: 0, login: res.data.login, room: 0});
 			if (res.data.reason === "searching")
 				updateState({code: 1, login: res.data.login, room: 0});
@@ -43,14 +43,14 @@ const GameRoute = ({socketQueue, socketGame, reload, setReload}:any) => {
 		return (
 			<AppLayout>
 			{' '}
-			<Lobby socketQueue={socketQueue} login={state.login} reload={reload} setReload={setReload}/>
+			<Lobby socketQueue={socketQueue} login={state.login} reload={reload} setReload={setReload} env={env}/>
 		</AppLayout>
 		)
 	}
 	if (state.code === 2)
 	{
 		return (
-			<Game socketGame={socketGame} room={state.room} login={state.login}/>
+			<Game socketGame={socketGame} room={state.room} login={state.login} env={env}/>
 		)
 	}
 	return <Navigate to="/" replace />;

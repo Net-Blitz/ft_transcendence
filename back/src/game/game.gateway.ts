@@ -110,7 +110,7 @@ export class GameGateway {
 			where: { id: room },
 			data: { state: "ENDED"}
 		})
-		const game = await this.prisma.game.findUnique({where: {id: room}});	
+		const game = await this.prisma.game.findUnique({where: {id: room}});
 		if (!game)
 			return (false);
 		
@@ -122,10 +122,10 @@ export class GameGateway {
 					data: { winner: game.user1Id }})
 				await this.prisma.user.update({
 					where: { id: game.user1Id },
-					data: { state: "ONLINE", wins: { increment: 1 } }})
+					data: { state: "ONLINE", wins: { increment: 1 }, elo: { increment: 10 }, experience: { increment: 170 + gameRoom.player1.score * 20 } }})
 				await this.prisma.user.update({
 					where: { id: game.user2Id },
-					data: { state: "ONLINE", losses: { increment: 1 } }})
+					data: { state: "ONLINE", losses: { increment: 1 }, elo: { decrement: 10 }, experience: { increment: 100 + gameRoom.player2.score * 20 } }})
 			}
 			else
 			{
@@ -134,10 +134,10 @@ export class GameGateway {
 					data: { winner: game.user2Id }})
 				await this.prisma.user.update({
 					where: { id: game.user2Id },
-					data: { state: "ONLINE",wins: { increment: 1 } }})
+					data: { state: "ONLINE",wins: { increment: 1 }, elo: { increment: 10 }, experience: { increment: 170 + gameRoom.player2.score * 20 } }})
 				await this.prisma.user.update({
 					where: { id: game.user1Id },
-					data: { state: "ONLINE", losses: { increment: 1 } }})
+					data: { state: "ONLINE", losses: { increment: 1 }, elo: { decrement: 10 }, experience: { increment: 100 + gameRoom.player1.score * 20 } }})
 			}
 		}
 		else if (endMode.mode === "surrender") {
@@ -148,10 +148,10 @@ export class GameGateway {
 					data: { winner: game.user1Id }})
 				await this.prisma.user.update({
 					where: { id: game.user1Id },
-					data: { state: "ONLINE", wins: { increment: 1 } }})
+					data: { state: "ONLINE", wins: { increment: 1 }, elo: { increment: 10 }, experience: { increment: 170 + gameRoom.player1.score * 20 } }})
 				await this.prisma.user.update({
 					where: { id: game.user2Id },
-					data: { state: "ONLINE", losses: { increment: 1 } }})
+					data: { state: "ONLINE", losses: { increment: 1 }, elo: { decrement: 10 }, experience: { increment: 100 + gameRoom.player2.score * 20 } }})
 			}
 			else
 			{
@@ -160,10 +160,10 @@ export class GameGateway {
 					data: { winner: game.user2Id }})
 				await this.prisma.user.update({
 					where: { id: game.user2Id },
-					data: { state: "ONLINE",wins: { increment: 1 } }})
+					data: { state: "ONLINE",wins: { increment: 1 }, elo: { increment: 10 }, experience: { increment: 170 + gameRoom.player2.score * 20 } }})
 				await this.prisma.user.update({
 					where: { id: game.user1Id },
-					data: { state: "ONLINE", losses: { increment: 1 } }})
+					data: { state: "ONLINE", losses: { increment: 1 }, elo: { decrement: 10 }, experience: { increment: 100 + gameRoom.player1.score * 20 } }})
 			}
 		}
 		else if (endMode.mode === "disconnected") {

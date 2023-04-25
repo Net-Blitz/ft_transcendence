@@ -5,6 +5,7 @@ const LobbyCreation = ({socketQueue, reload, setReload, login}:any) => {
 	useEffect (() =>{
 		socketQueue.on("ConnectToQueueResponse", (data:any) => {
 			setReload(!reload)
+			console.log("ConnectToQueueResponse", data)
 		})
 	}, [reload]);
 

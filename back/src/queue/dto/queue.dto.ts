@@ -33,8 +33,6 @@ export class QueueObject {
 	id: number;
 	login: string;
 	socketId: string;
-	avatar: string;
-	elo: number;
 	state: QueueState;
 }
 
