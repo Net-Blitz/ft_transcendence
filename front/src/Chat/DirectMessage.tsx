@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import PopupDM from './PopupDM';
 import axios from 'axios';
 import { Socket } from 'socket.io-client';
+import { BasicFrame } from '../Profile/Components/MiddleInfo/MiddleInfo';
 
 export interface DirectMessageDto {
 	id: number;
@@ -145,54 +146,89 @@ function DirectMessage({
 							))}
 						</ul>
 					</div>
-					<div className="chat-right">
-						<div className="chat-top">
-							<span>
-								To:{' '}
-								<span className="chat-name">
-									{selectedDM === 0
-										? 'No Chat selected'
-										: DMList.find(
-												(DM: DirectMessageDto) =>
-													DM.id === selectedDM
-										  )?.senderId === userInfo.id
-										? DMList.find(
-												(DM: DirectMessageDto) =>
-													DM.id === selectedDM
-										  )?.receiver.username
-										: DMList.find(
-												(DM: DirectMessageDto) =>
-													DM.id === selectedDM
-										  )?.sender.username}
-								</span>
-							</span>
-						</div>
-						{selectedDM === 0 && (
-							<div className="chat-chat center">
-								<p>No Chat selected</p>
-							</div>
-						)}
-						<div className="chat-chat">
-							{messages.map((message, index) => (
-								<div
-									key={index}
-									className={`chat-bubble ${
-										userInfo.username === message.username
-											? 'chat-me'
-											: 'chat-you'
-									}`}>
-									{message.content}
-								</div>
-							))}
-						</div>
-						<div className="chat-write">
-							<MessageInput
-								sendMessage={sendMessage}
-								userInfo={userInfo}
-							/>
-						</div>
-					</div>
 				</div>
+			</div>
+			<div className="chat-frame">
+				<BasicFrame
+					height="550px"
+					title={
+						selectedDM === 0
+							? 'No Chat selected'
+							: DMList.find(
+									(DM: DirectMessageDto) =>
+										DM.id === selectedDM
+							  )?.senderId === userInfo.id
+							? DMList.find(
+									(DM: DirectMessageDto) =>
+										DM.id === selectedDM
+							  )?.receiver.username
+							: DMList.find(
+									(DM: DirectMessageDto) =>
+										DM.id === selectedDM
+							  )?.sender.username
+					}>
+					<div className="chat-bubble-container">
+						{messages.reverse().map((message, index) => (
+							<div
+								key={index}
+								className={`chat-bubble ${
+									userInfo.username === message.username
+										? 'chat-me'
+										: 'chat-you'
+								}`}>
+								{(userInfo.username === message.username && (
+									<>
+										<p>{message.content}</p>
+										<img
+											className="chat-avatar"
+											src={
+												'http://localhost:3333/' +
+												message?.avatar
+											}
+											alt="avatar"
+										/>
+										<p>
+											{new Date(
+												message.createdAt
+											).getHours() +
+												':' +
+												new Date(
+													message.createdAt
+												).getMinutes()}
+										</p>
+									</>
+								)) || (
+									<>
+										<p>
+											{new Date(
+												message.createdAt
+											).getHours() +
+												':' +
+												new Date(
+													message.createdAt
+												).getMinutes()}
+										</p>
+										<img
+											className="chat-avatar"
+											src={
+												'http://localhost:3333/' +
+												message.avatar
+											}
+											alt="avatar"
+										/>
+										<p>{message.content}</p>
+									</>
+								)}
+							</div>
+						))}
+					</div>
+					<div className="chat-write">
+						<MessageInput
+							sendMessage={sendMessage}
+							userInfo={userInfo}
+						/>
+					</div>
+				</BasicFrame>
 			</div>
 		</>
 	);

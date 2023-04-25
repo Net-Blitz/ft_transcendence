@@ -13,7 +13,7 @@ export interface ChannelDto {
 }
 
 const Chat = () => {
-	const [channelOrDM, setChannelOrDM] = useState<'channel' | 'dm'>('channel');
+	const [channelOrDM, setChannelOrDM] = useState<'channel' | 'dm'>('dm');
 	const [channels, setChannels] = useState<ChannelDto[]>([]);
 	const [userInfo, setUserInfo] = useState<any>();
 	const [DMList, setDMList] = useState<DirectMessageDto[]>([]);

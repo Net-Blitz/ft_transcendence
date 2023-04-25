@@ -94,6 +94,15 @@ function App(this: any) {
 						}
 					/>
 					<Route
+						path="/chat_test"
+						element={
+							<AppLayout>
+								{' '}
+								<Chat />
+							</AppLayout>
+						}
+					/>
+					<Route
 						path="/game"
 						element={
 							<GameRoute
