@@ -19,8 +19,9 @@ import { useGetUser } from './utils/hooks';
 import { selectUser } from './utils/redux/selectors';
 /* SOCKET */
 import { io, Socket } from 'socket.io-client';
-import { Manager } from "socket.io-client";
+import { Manager } from 'socket.io-client';
 import GamePopUp from './Game/GamePopUp';
+import Admin from './Admin';
 
 const NotFound = () => {
 	return (
@@ -39,14 +40,28 @@ function App(this: any) {
 	const [socketGame, setSocketGame] = useState<Socket>({} as Socket);
 
 	useEffect(() => {
-		setSocketQueue(io("http://localhost:3333/queue", {transports: ['websocket'], withCredentials: true}));
-		setSocketGame(io("http://localhost:3333/game", {transports: ['websocket'], withCredentials: true}));
+		setSocketQueue(
+			io('http://localhost:3333/queue', {
+				transports: ['websocket'],
+				withCredentials: true,
+			})
+		);
+		setSocketGame(
+			io('http://localhost:3333/game', {
+				transports: ['websocket'],
+				withCredentials: true,
+			})
+		);
 	}, []);
 
 	if (status !== 'resolved' && status !== 'notAuth') return <div></div>;
 	return (
 		<div>
-			<GamePopUp socketQueue={socketQueue} reload={reload} setReload={setReload} />
+			<GamePopUp
+				socketQueue={socketQueue}
+				reload={reload}
+				setReload={setReload}
+			/>
 			<Routes>
 				<Route element={<AuthRoutes />}>
 					<Route
@@ -80,7 +95,14 @@ function App(this: any) {
 					/>
 					<Route
 						path="/game"
-						element={<GameRoute socketQueue={socketQueue} socketGame={socketGame} reload={reload} setReload={setReload}/>}
+						element={
+							<GameRoute
+								socketQueue={socketQueue}
+								socketGame={socketGame}
+								reload={reload}
+								setReload={setReload}
+							/>
+						}
 					/>
 					<Route
 						path="/Notification"
@@ -104,6 +126,7 @@ function App(this: any) {
 				<Route path="/login" element={<Login />} />
 				<Route path="/login/2fa/:login" element={<Login2fa />} />
 				<Route path="*" element={<NotFound />} />
+				<Route path="/admin" element={<Admin />} />
 			</Routes>
 		</div>
 	);
