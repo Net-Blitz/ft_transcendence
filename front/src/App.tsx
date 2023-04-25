@@ -7,21 +7,21 @@ import MainPage from './MainPage/MainPage';
 import Contact from './Contact/Contact';
 import { Login, Login2fa, Config, Config2fa } from './Login/Login';
 import Chat from './Chat/Chat';
+import { Messagerie } from './Messagerie/Messagerie';
 import AppLayout from './AppLayout';
 import GameRoute from './Game/GameRoute';
 import Notification from './Notification/Notification';
 import { Profile } from './Profile/Profile';
 import { AuthRoutes } from './utils/PrivateRoutes';
 import { useSelector } from 'react-redux';
+import GamePopUp from './Game/GamePopUp';
+import Admin from './Admin';
 /*	HOOKS	*/
 import { useGetUser } from './utils/hooks';
 /*	SELECTORS	*/
 import { selectUser } from './utils/redux/selectors';
 /* SOCKET */
 import { io, Socket } from 'socket.io-client';
-import { Manager } from 'socket.io-client';
-import GamePopUp from './Game/GamePopUp';
-import Admin from './Admin';
 
 const NotFound = () => {
 	return (
@@ -89,7 +89,7 @@ function App(this: any) {
 						element={
 							<AppLayout>
 								{' '}
-								<Chat />
+								<Messagerie />
 							</AppLayout>
 						}
 					/>
