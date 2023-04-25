@@ -96,6 +96,7 @@
 	border-radius: min(0.5vw, 0.5vh);
 	box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25), 0px 4px 4px rgba(0, 0, 0, 0.25);
 	background: #EFEDD4;
+	/*background-image: url("assets/seashells-1337565__340.jpg");*/
 	border: 2px solid #0A3D62;
 	position: relative;
 }

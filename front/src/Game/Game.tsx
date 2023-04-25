@@ -4,11 +4,11 @@ import eyePNG from "./assets/eye.png"
 import crown from "./assets/crown.png"
 import "./Game.css";
 
-function Podium({color, height, point, avatar}:any) {
+function Podium({color, height, point, avatar, env}:any) {
 	return (
 		<div className="game-end-podium-div">
 			{avatar ? 
-			<img src={'http://localhost:3333/' + avatar} alt="a" className="game-end-podium-avatar"/>
+			<img src={'http://' + env.host + ':' + env.port + '/' + avatar} alt="a" className="game-end-podium-avatar"/>
 			: null}
 			<div className="game-end-podium-stone" style={{backgroundColor: color, height: height}}>
 				<div className="game-end-podium-point" >{point}</div>
@@ -18,7 +18,7 @@ function Podium({color, height, point, avatar}:any) {
 }
 
 
-function Game({socketGame, room, login}:any) {
+function Game({socketGame, room, login, env}:any) {
 	const [here, updateHere] = useState(true);
 	const [gameEnd, updateGameEnd] = useState({} as any);
 	const navigate = useNavigate();
@@ -143,10 +143,17 @@ function Game({socketGame, room, login}:any) {
 	}, [here]);
 	
 	document.addEventListener('keydown', (event) => {
+		//event.preventDefault();
 		if (event.key === 'ArrowUp')
+		{
+			event.preventDefault();
 			socketGame.emit('keyPress', 'UP');
+		}
 		else if (event.key === 'ArrowDown')
+		{
+			event.preventDefault();
 			socketGame.emit('keyPress', 'DOWN');
+		}
 		else if (event.key >= '0' && event.key <= '9')
 		{
 			socketGame.emit('quickChatMessage', {key: event.key, room: room});
@@ -155,9 +162,15 @@ function Game({socketGame, room, login}:any) {
 	
 	document.addEventListener('keyup', (event) => {
 		if (event.key === 'ArrowUp')
+		{
+			event.preventDefault();
 			socketGame.emit('keyRelease', 'UP');
+		}
 		else if (event.key === 'ArrowDown')
+		{
+			event.preventDefault();
 			socketGame.emit('keyRelease', 'DOWN');
+		}
 	});
 
 	const surrend = () => {
@@ -194,9 +207,9 @@ function Game({socketGame, room, login}:any) {
 	 		: 
 			 <div className="game-end">
 				<div className="game-end-podium">
-					<Podium color="#C0C0C0" height="45%"  point={gameEnd.score2} avatar={gameEnd.avatar2}/>
-					<Podium color="#FFD700" height="60%" point={gameEnd.score1} avatar={gameEnd.avatar1}/>
-					<Podium color="#CD7F32" height= "30%" point={gameEnd.score3} avatar={gameEnd.avatar3}/>
+					<Podium color="#C0C0C0" height="45%"  point={gameEnd.score2} avatar={gameEnd.avatar2} env={env}/>
+					<Podium color="#FFD700" height="60%" point={gameEnd.score1} avatar={gameEnd.avatar1} env={env}/>
+					<Podium color="#CD7F32" height= "30%" point={gameEnd.score3} avatar={gameEnd.avatar3} env={env}/>
 					<img src={crown} className="game-end-crown" />
 				</div>
 				<div className="game-end-elo"></div>
