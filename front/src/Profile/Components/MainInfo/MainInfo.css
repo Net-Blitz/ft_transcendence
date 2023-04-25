@@ -130,6 +130,9 @@
 	.maininfo-wrapper .info-element {
 		padding: 0 20px 0 20px;
 	}
+	.maininfo-wrapper{
+		margin-top: 80px
+	}
 }
 
 /* Mobile */
