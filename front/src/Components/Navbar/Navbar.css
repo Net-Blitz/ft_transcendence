@@ -6,9 +6,9 @@
 	height: 100vh;
 }
 
-.background_navbar{
+.background_navbar {
 	z-index: 1;
-	background-color: #FFFDE4;
+	background-color: #fffde4;
 	display: flex;
 	flex-direction: column;
 	width: 80px;
@@ -21,17 +21,17 @@
 	box-shadow: 0px 4px 29px 7px rgba(217, 217, 217, 0.5);
 }
 
-.Home{
+.Home {
 	margin-top: 15px;
 }
 
-.Home img{
+.Home img {
 	width: 50px;
 	height: 50px;
 }
 
-.Profile{
-	position:absolute;
+.Profile {
+	position: absolute;
 	bottom: 0;
 	margin-bottom: 15px;
 	display: flex;
@@ -39,40 +39,42 @@
 	text-decoration: none;
 }
 
-.Profile p{
-	color:#0A3D62;
+.Profile p {
+	color: #0a3d62;
 	font-family: 'Poppins';
 	font-weight: 300;
 }
 
 .profile-img {
-	background-color: #F9DA49;
-	display:flex;
+	background-color: #f9da49;
+	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	width:50px;
+	width: 50px;
 	height: 50px;
 	border-radius: 7px;
 	margin: auto;
 }
 
-.Contact{
+.Contact {
 	margin-top: 60px;
 }
 
-.Game, .Chat, .Notification{
+.Game,
+.Chat,
+.Alert {
 	margin-top: 40px;
 }
 
-.inactive{
+.inactive {
 	height: 44px;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 }
-.active{
-	background-color: #F9DA49;
+.active {
+	background-color: #f9da49;
 	width: 80px;
 	height: 44px;
 	display: flex;
@@ -83,11 +85,11 @@
 /* Ipad */
 @media screen and (min-width: 768px) and (max-width: 1020px) {
 	.inactive,
-	.active{
+	.active {
 		width: 50px;
 		height: 50px;
 	}
-	.active{
+	.active {
 		border-radius: 7px;
 	}
 	.background_navbar {
@@ -103,30 +105,30 @@
 		height: 70px;
 		align-items: center;
 		border-radius: 15px 15px 0 0;
-	  }
+	}
 
-	.Profile{
+	.Profile {
 		margin: 0;
-		position:initial;
+		position: initial;
 		right: 0;
 	}
-  
+
 	.Home,
 	.Profile,
 	.Contact,
 	.Game,
 	.Chat,
-	.Notification {
+	.Alert {
 		margin-top: 0;
 	}
-  
-	.Profile p{
+
+	.Profile p {
 		display: none;
 	}
-	.profile-img{
+	.profile-img {
 		margin: 0;
 	}
-  }
+}
 
 /* Mobile */
 @media screen and (min-width: 320px) and (max-width: 767px) {
@@ -144,44 +146,45 @@
 		align-items: center;
 		border-radius: 15px 15px 0 0;
 	}
-	.Profile{
+	.Profile {
 		margin: 0;
-		position:initial;
+		position: initial;
 		right: 0;
 	}
-	.Home img, .profile-img{
-		width:40px;
+	.Home img,
+	.profile-img {
+		width: 40px;
 		height: 40px;
 	}
-	
+
 	.Home,
 	.Profile,
 	.Contact,
 	.Game,
 	.Chat,
-	.Notification {
+	.Alert {
 		margin-top: 0;
 	}
-	
-	.Profile p{
+
+	.Profile p {
 		display: none;
 	}
-	.profile-img{
+	.profile-img {
 		margin: 0;
 	}
-	
+
 	.Profile img,
 	.Contact img,
 	.Game img,
-	.Chat img{
+	.Chat img {
 		height: 30px;
 		width: 30px;
 	}
-	.Notification img{
+	.Alert img {
 		height: 25px;
 		width: 25px;
 	}
-	.active{
+	.active {
 		width: 40px;
 		height: 40px;
 		border-radius: 7px;

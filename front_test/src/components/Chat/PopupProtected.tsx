@@ -9,10 +9,7 @@ interface PopupProtectedProps {
 	setMessages: (messages: any[]) => void;
 	SaveChannel: string[];
 	setSaveChannel: (channels: string[]) => void;
-	setNotification: (notification: {
-		message: string;
-		type: "success" | "error";
-	}) => void;
+	setAlert: (Alert: { message: string; type: "success" | "error" }) => void;
 }
 
 function PopupProtected({
@@ -23,7 +20,7 @@ function PopupProtected({
 	setMessages,
 	SaveChannel,
 	setSaveChannel,
-	setNotification,
+	setAlert,
 }: PopupProtectedProps) {
 	const [Password, setPassword] = useState(""); // <--- Password for protected channel
 	const [ChannelName, setChannelName] = useState(channel); // <--- Name of protected channel
@@ -64,12 +61,12 @@ function PopupProtected({
 			});
 			setChannelName("");
 			setSaveChannel([...SaveChannel, ChannelName]);
-			setNotification({
+			setAlert({
 				message: "You joinned " + ChannelName,
 				type: "success",
 			});
 		} catch (error) {
-			setNotification({
+			setAlert({
 				message: "Wrong password",
 				type: "error",
 			});

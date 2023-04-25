@@ -8,10 +8,7 @@ interface HandleInviteProps {
 	setMessages: (messages: any[]) => void;
 	SaveChannel: string[];
 	setSaveChannel: (channels: string[]) => void;
-	setNotification: (notification: {
-		message: string;
-		type: "success" | "error";
-	}) => void;
+	setAlert: (Alert: { message: string; type: "success" | "error" }) => void;
 }
 
 function HandleInvite({
@@ -21,7 +18,7 @@ function HandleInvite({
 	setMessages,
 	SaveChannel,
 	setSaveChannel,
-	setNotification,
+	setAlert,
 }: HandleInviteProps) {
 	const [Invites, setInvites] = useState<any[]>([]);
 
@@ -56,12 +53,12 @@ function HandleInvite({
 				username: userInfo?.username,
 			});
 			setSaveChannel([...SaveChannel, channelName]);
-			setNotification({
+			setAlert({
 				message: "You joinned " + channelName,
 				type: "success",
 			});
 		} catch (error) {
-			setNotification({
+			setAlert({
 				message: "You have already joinned this channel",
 				type: "error",
 			});

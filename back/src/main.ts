@@ -24,12 +24,13 @@ async function bootstrap() {
 		}
 	});
 	app.use(cookieParser());
-	app.use(verifyToken);
+	// app.use(verifyToken);
 	app.useGlobalPipes(
 		new ValidationPipe({
 			whitelist: true,
 		})
 	);
+	app.enableShutdownHooks();
 	await app.listen(parseInt(config.get("PORT_BACK")));
 }
 bootstrap();

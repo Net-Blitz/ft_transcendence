@@ -1,5 +1,5 @@
 import MessageInput from "./MessageInput";
-import Notification from "../Notification/Notification";
+import Alert from "../Alert/Alert";
 import { useEffect, useState } from "react";
 import PopupDM from "./PopupDM";
 import axios from "axios";
@@ -23,7 +23,7 @@ function DirectMessage({
 }: any) {
 	const [selectedDM, setSelectedDM] = useState<number>(0);
 	const [messages, setMessages] = useState<any[]>([]);
-	const [notification, setNotification] = useState({ message: "", type: "" });
+	const [Alert, setAlert] = useState({ message: "", type: "" });
 	const [PopupNewDm, setPopupNewDm] = useState(false);
 
 	const handleDMClick = async (DM: DirectMessageDto) => {
@@ -86,14 +86,11 @@ function DirectMessage({
 
 	return (
 		<>
-			<Notification
-				message={notification.message}
-				type={notification.type}
-			/>
+			<Alert message={Alert.message} type={Alert.type} />
 			{PopupNewDm && (
 				<PopupDM
 					ClosePopup={handleTogglePopupNewDm}
-					setNotification={setNotification}
+					setAlert={setAlert}
 					userInfo={userInfo}
 				/>
 			)}

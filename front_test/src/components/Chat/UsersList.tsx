@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { ChannelDto } from "./Channel";
-import Notification from "../Notification/Notification";
+import Alert from "../Alert/Alert";
 import InviteUser from "./InviteUser";
 import DropdownMenu from "./DropdownMenu";
 
@@ -11,7 +11,7 @@ function UsersList({ channel, socket }: { channel: string; socket: any }) {
 	const [channelInfo, setChannelInfo] = useState<ChannelDto>();
 	const [users, setUsers] = useState<any>([]);
 	const [isAdmin, setIsAdmin] = useState(false);
-	const [notification, setNotification] = useState({ message: "", type: "" });
+	const [Alert, setAlert] = useState({ message: "", type: "" });
 	const [BanUsers, setBanUsers] = useState<any>([]);
 
 	useEffect(() => {
@@ -59,7 +59,7 @@ function UsersList({ channel, socket }: { channel: string; socket: any }) {
 			channel: channel,
 			login: login,
 		});
-		setNotification({
+		setAlert({
 			message: login + " has been unbanned",
 			type: "success",
 		});
@@ -67,10 +67,7 @@ function UsersList({ channel, socket }: { channel: string; socket: any }) {
 
 	return (
 		<>
-			<Notification
-				message={notification.message}
-				type={notification.type}
-			/>
+			<Alert message={Alert.message} type={Alert.type} />
 			<div className="middle">
 				<div className="top">
 					<p>Users list</p>
@@ -98,7 +95,7 @@ function UsersList({ channel, socket }: { channel: string; socket: any }) {
 								userInfo={userInfo}
 								isAdmin={isAdmin}
 								channelInfo={channelInfo}
-								setNotification={setNotification}
+								setAlert={setAlert}
 							/>
 						</li>
 					))}
