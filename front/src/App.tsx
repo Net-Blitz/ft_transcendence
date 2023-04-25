@@ -37,12 +37,13 @@ function App(this: any) {
 	const [reload, setReload] = useState(false);
 	const [socketQueue, setSocketQueue] = useState<Socket>({} as Socket);
 	const [socketGame, setSocketGame] = useState<Socket>({} as Socket);
+	const env = {host: process.env.REACT_APP_BACK_HOST, port: process.env.REACT_APP_BACK_PORT}
 
 	useEffect(() => {
-		setSocketQueue(io("http://localhost:3333/queue", {transports: ['websocket'], withCredentials: true}));
-		setSocketGame(io("http://localhost:3333/game", {transports: ['websocket'], withCredentials: true}));
+		setSocketQueue(io("http://" + env.host + ":" + env.port + "/queue", {transports: ['websocket'], withCredentials: true}));
+		setSocketGame(io("http://" + env.host + ":" + env.port + "/game", {transports: ['websocket'], withCredentials: true}));
 	}, []);
-
+	console.log("ENV", env, process.env);
 	if (status !== 'resolved' && status !== 'notAuth') return <div></div>;
 	return (
 		<div>
@@ -80,7 +81,7 @@ function App(this: any) {
 					/>
 					<Route
 						path="/game"
-						element={<GameRoute socketQueue={socketQueue} socketGame={socketGame} reload={reload} setReload={setReload}/>}
+						element={<GameRoute socketQueue={socketQueue} socketGame={socketGame} reload={reload} setReload={setReload} env={env}/>}
 					/>
 					<Route
 						path="/Notification"

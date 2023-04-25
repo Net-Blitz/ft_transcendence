@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateGameDto, GameState } from './dto';
+import { CreateGameDto, GameState, GameMode } from './dto';
 
 @Injectable()
 export class GameService {
@@ -31,6 +31,10 @@ export class GameService {
 			data: {
 				user1Id: dto.player1,
 				user2Id: dto.player2,
+				user3Id: dto.player3,
+				user4Id: dto.player4,
+				mode: dto.mode,
+
 			}
 		});
 	}

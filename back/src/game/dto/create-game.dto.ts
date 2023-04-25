@@ -2,6 +2,8 @@ import { IsInt, IsString, IsAlphanumeric, IsNotEmpty, IsDefined } from "class-va
 import { Type } from "class-transformer";
 import { isInt32Array } from "util/types";
 
+export type GameMode = 'ONEVONE' | 'TWOVTWO' | 'FREEFORALL';
+
 export class CreateGameDto {
 
 	//@IsString()
@@ -16,4 +18,14 @@ export class CreateGameDto {
 	@IsDefined()
 	@IsInt()
 	player2: number;
+
+	@IsInt()
+	player3: number;
+
+	@IsInt()
+	player4: number;
+
+	@IsDefined()
+	mode: GameMode;
+
 }
