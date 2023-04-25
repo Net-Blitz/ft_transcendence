@@ -873,11 +873,26 @@ export class QueueGateway {
 			client.emit("imInQueueResponse", {in: false});
 			return ;
 		}
-		const prismaUser = await this.prisma.user.findUnique({
-			where: {login: user.login}
-		});
-		if (!prismaUser)
-			return ;
-		client.emit("imInQueueResponse", {player1: {elo: prismaUser.elo, login: prismaUser.login, avatar: prismaUser.avatar}, in: true});
+
+		const group = this.findMyGroup(client.id);
+		let allPlayer = []
+
+		for (const player of [group.player1, group.player2, group.player3, group.player4])
+		{
+			if (player)
+			{
+				const prismaUser = await this.prisma.user.findUnique({
+					where: {login: player.login}
+				});
+				if (!prismaUser)
+					break ;
+				allPlayer.push({elo: prismaUser.elo, login: prismaUser.login, avatar: prismaUser.avatar, socketId: player.socketId});
+			}
+		}
+		client.emit("imInQueueResponse", {player1: {elo: allPlayer[0].elo, login: allPlayer[0].login, avatar: allPlayer[0].avatar},
+			player2: allPlayer.length >= 2 ? {elo: allPlayer[1].elo, login: allPlayer[1].login, avatar: allPlayer[1].avatar} : null,
+			player3: allPlayer.length >= 3 ? {elo: allPlayer[2].elo, login: allPlayer[2].login, avatar: allPlayer[2].avatar} : null,
+			player4: allPlayer.length >= 4 ? {elo: allPlayer[3].elo, login: allPlayer[3].login, avatar: allPlayer[3].avatar} : null,
+			in: true});
 	}
 }

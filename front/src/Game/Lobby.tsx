@@ -12,7 +12,7 @@ const LobbyBox = ({children}:any) => {
 
 const PlayerInLobby = ({player, env}:any) => {
 	return (
-		player !== undefined ?
+		player !== undefined && player !== null ?
 		<div className="game-waiting-player">
 			<div className="game-waiting-player-avatar-underdiv">
 				
@@ -137,7 +137,11 @@ function Lobby({socketQueue, login, setReload, reload, env}:any) {
 			if (!data || data.in === false)
 				setReload(!reload);
 			else
+			{
 				setPlayer1(data.player1);
+				setPlayer2(data.player2);
+				setPlayer3(data.player3);
+			}
 			socketQueue.off("imInQueueResponse");
 		}
 	
