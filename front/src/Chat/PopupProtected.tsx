@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
+import close from '../Profile/Components/MainInfo/Ressources/close.svg';
 
 interface PopupProtectedProps {
 	channel: string;
@@ -46,7 +47,10 @@ function PopupProtected({
 		setChannelName('');
 	};
 
-	const JoinProtectedChannel = async () => {
+	const JoinProtectedChannel = async (
+		event: React.FormEvent<HTMLFormElement>
+	) => {
+		event.preventDefault();
 		try {
 			await axios.post(
 				'http://localhost:3333/chat/join/' + ChannelName,
@@ -77,25 +81,28 @@ function PopupProtected({
 		<>
 			{ChannelName !== '' && (
 				<div ref={PopupRef} className="chat-overlay">
-					<div className="chat-popup">
-						<label
-							className="chat-close"
-							onClick={ClosePopupPassword}>
-							&times;
-						</label>
-						<h2>Protected Channel</h2>
-						<div className="chat-content">
-							<p>Enter the password of the channel</p>
-							<input
-								onChange={(e) => setPassword(e.target.value)}
-								placeholder="Enter password"
-								value={Password}
-								type="password"
-							/>
-							<button onClick={() => JoinProtectedChannel()}>
-								Join
-							</button>
-						</div>
+					<img
+						src={close}
+						alt="close-button"
+						className="chat-close"
+						onClick={ClosePopupPassword}
+					/>
+					<h2>Protected Channel</h2>
+					<div className="chat-content">
+						<form onSubmit={JoinProtectedChannel}>
+							<label>
+								<p>Enter the password of the channel</p>
+								<input
+									onChange={(e) =>
+										setPassword(e.target.value)
+									}
+									placeholder="Enter password"
+									value={Password}
+									type="password"
+								/>
+							</label>
+							<button type="submit">Join</button>
+						</form>
 					</div>
 				</div>
 			)}
