@@ -32,14 +32,14 @@ export class QueueGateway {
 		return new Promise(resolve => setTimeout(resolve, ms));
 	}
 
-	match4(mode: GameMode, queue: QueueGroup[]) {
+	match2v2(mode: GameMode) {
 		let allGroup = []
 		let count:number;
-		for (const group1 of queue)
+		for (const group1 of this.queue2v2)
 		{
 			count = this.groupCount(group1);
 			allGroup = [group1];
-			for (const group2 of queue)
+			for (const group2 of this.queue2v2)
 			{
 				if (group1 !== group2 && this.groupCount(group2) + count <= 4)
 				{
@@ -49,7 +49,8 @@ export class QueueGateway {
 				if (count === 4)
 				{
 					this.gameMatched.push({group1: allGroup[0], group2: allGroup[1], group3: allGroup.length >= 3 ? allGroup[2] : null, group4: allGroup.length >= 4 ? allGroup[3] : null, time: Date.now(), mode: mode});
-					queue = queue.filter(group => !allGroup.includes(group));
+					for (const group of allGroup)
+						this.queue2v2 = this.queue2v2.filter(groupe => groupe !== group); 
 					for (const group of allGroup)
 					{
 						for (const player of [group.player1, group.player2, group.player3, group.player4])
@@ -64,7 +65,40 @@ export class QueueGateway {
 		}
 	}
 
-	checkQueue() {
+	matchffa(mode: GameMode) {
+		let allGroup = []
+		let count:number;
+		for (const group1 of this.queueFFA)
+		{
+			count = this.groupCount(group1);
+			allGroup = [group1];
+			for (const group2 of this.queueFFA)
+			{
+				if (group1 !== group2 && this.groupCount(group2) + count <= 4)
+				{
+					allGroup.push(group2);
+					count += this.groupCount(group2);
+				}
+				if (count === 4)
+				{
+					for (const group of allGroup)
+						this.queueFFA = this.queueFFA.filter(groupe => groupe !== group); 
+					this.gameMatched.push({group1: allGroup[0], group2: allGroup[1], group3: allGroup.length >= 3 ? allGroup[2] : null, group4: allGroup.length >= 4 ? allGroup[3] : null, time: Date.now(), mode: mode});
+					for (const group of allGroup)
+					{
+						for (const player of [group.player1, group.player2, group.player3, group.player4])
+						{
+							if (player)
+								this.server.to(player.socketId).emit("GamePopUpSetup", {message: "show"});
+						}
+					}
+					return ;
+				}
+			}
+		}
+	}
+
+	checkQueue() { 
 		if (this.queue1v1.length >= 2)
 		{
 			const group1 = this.queue1v1.shift();
@@ -75,11 +109,11 @@ export class QueueGateway {
 		}
 		if (this.queue2v2.length >= 2)
 		{
-			this.match4("TWOVTWO", this.queue2v2);
+			this.match2v2("TWOVTWO");
 		}
 		if (this.queueFFA.length >= 2)
 		{
-			this.match4("FREEFORALL", this.queueFFA);
+			this.matchffa("FREEFORALL");
 		}
 	}
 
@@ -111,37 +145,39 @@ export class QueueGateway {
 	}
 
 	checkOneDeclined(match : GameMatched) {
+		let declineState;
 		if (this.oneGroupDeclined(match.group1) || this.oneGroupDeclined(match.group2) || this.oneGroupDeclined(match.group3) || this.oneGroupDeclined(match.group4))
 		{
 			for (const group of [match.group1, match.group2, match.group3, match.group4])
 			{
 				if (group)
 				{
-					if (!this.oneGroupDeclined(group))
+					declineState = this.oneGroupDeclined(group);
+					for (const player of [group.player1, group.player2, group.player3, group.player4])
+					{
+						if (player && declineState)
+						{
+							player.state = QueueState.Searching;
+							this.server.to(player.socketId).emit("GamePopUpResponse", {message: "KO"});
+						}
+						if (player && !declineState)
+						{
+							player.state = QueueState.Searching;
+							this.server.to(player.socketId).emit("GamePopUpResponse", {message: "KO", reason: "OtherDeclined"});
+						}
+					}
+					if (!declineState) 
 					{
 						if (group.mode === "ONEVONE")
 							this.queue1v1.push(group);
 						else if (group.mode === "TWOVTWO")
 							this.queue2v2.push(group);
-						else if (group.mode === "FFA")
+						else if (group.mode === "FREEFORALL")
 							this.queueFFA.push(group);
 					}
 					else
 					{
 						this.groups.push(group);
-					}
-					for (const player of [group.player1, group.player2, group.player3, group.player4])
-					{
-						if (player && this.oneGroupDeclined(group))
-						{
-							player.state = QueueState.Searching;
-							this.server.to(player.socketId).emit("GamePopUpResponse", {message: "KO"});
-						}
-						if (player && !this.oneGroupDeclined(group))
-						{
-							player.state = QueueState.Searching;
-							this.server.to(player.socketId).emit("GamePopUpResponse", {message: "KO", reason: "OtherDeclined"});
-						}
 					}
 
 				}
@@ -254,7 +290,7 @@ export class QueueGateway {
 						this.queue1v1.push(group);
 					else if (group.mode === "TWOVTWO")
 						this.queue2v2.push(group);
-					else if (group.mode === "FFA")
+					else if (group.mode === "FREEFORALL")
 						this.queueFFA.push(group);
 				}
 			}
@@ -281,22 +317,22 @@ export class QueueGateway {
 		while (1)
 		{
 			// console.log("This is the queue: ", this.queue1v1);
-			//console.log("===Group====")
-			//for (const group of this.groups)
-			//	console.log (group.player1.login, (!group.player2 || group.player2.login), (!group.player3 || group.player3.login), (!group.player4 || group.player4.login)) 
-			//console.log("=============");
-			//console.log("===Queue1v1====")
-			//for (const group of this.queue1v1)
-			//	console.log (group.player1.login, (!group.player2 || group.player2.login), (!group.player3 || group.player3.login), (!group.player4 || group.player4.login)) 
-			//console.log("=============");
-			//console.log("===Queue2v2====")
-			//for (const group of this.queue2v2)
-			//	console.log (group.player1.login, (!group.player2 || group.player2.login), (!group.player3 || group.player3.login), (!group.player4 || group.player4.login)) 
-			//console.log("=============");
-			//console.log("===QueueFFA====")
-			//for (const group of this.queueFFA)
-			//	console.log (group.player1.login, (!group.player2 || group.player2.login), (!group.player3 || group.player3.login), (!group.player4 || group.player4.login)) 
-			//console.log("=============");
+			console.log("===Group====")
+			for (const group of this.groups)
+				console.log (group.player1.login, (!group.player2 || group.player2.login), (!group.player3 || group.player3.login), (!group.player4 || group.player4.login)) 
+			console.log("=============");
+			// console.log("===Queue1v1====")
+			// for (const group of this.queue1v1)
+			// 	console.log (group.player1.login, (!group.player2 || group.player2.login), (!group.player3 || group.player3.login), (!group.player4 || group.player4.login)) 
+			// console.log("=============");
+			// console.log("===Queue2v2====")
+			// for (const group of this.queue2v2)
+			// 	console.log (group.player1.login, (!group.player2 || group.player2.login), (!group.player3 || group.player3.login), (!group.player4 || group.player4.login)) 
+			// console.log("=============");
+			console.log("===QueueFFA====")
+			for (const group of this.queueFFA)
+				console.log (group.player1.login, (!group.player2 || group.player2.login), (!group.player3 || group.player3.login), (!group.player4 || group.player4.login)) 
+			console.log("=============");
 			
 			this.checkQueue();
 			
@@ -384,6 +420,11 @@ export class QueueGateway {
 				return (queuer);
 		}
 		for (const queuer of this.queueFFA)
+		{
+			if (queuer.player1.socketId === socketId || (queuer.player2 && queuer.player2.socketId === socketId) || (queuer.player3 && queuer.player3.socketId === socketId) || (queuer.player4 && queuer.player4.socketId === socketId))
+				return (queuer);
+		}
+		for (const queuer of this.groups)
 		{
 			if (queuer.player1.socketId === socketId || (queuer.player2 && queuer.player2.socketId === socketId) || (queuer.player3 && queuer.player3.socketId === socketId) || (queuer.player4 && queuer.player4.socketId === socketId))
 				return (queuer);
@@ -557,7 +598,10 @@ export class QueueGateway {
 				else if (group.player4 === null)
 					group.player4 = me;
 				else
+				{
+					this.recreateGroup(me);
 					return client.emit("groupFull");
+				}
 
 				this.server.to(group.player1.socketId).emit("JoinGroupResponse", {message: "OK", group: group});
 				if (group.player2)

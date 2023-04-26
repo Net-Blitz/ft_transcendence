@@ -38,12 +38,12 @@ function App(this: any) {
 	const [socketQueue, setSocketQueue] = useState<Socket>({} as Socket);
 	const [socketGame, setSocketGame] = useState<Socket>({} as Socket);
 	const env = {host: process.env.REACT_APP_BACK_HOST, port: process.env.REACT_APP_BACK_PORT}
-
+	// transportOptions: { polling: { extraHeaders: { 'Access-Control-Allow-Origin': '*' } } }
 	useEffect(() => {
 		setSocketQueue(io("http://" + env.host + ":" + env.port + "/queue", {transports: ['websocket'], withCredentials: true}));
 		setSocketGame(io("http://" + env.host + ":" + env.port + "/game", {transports: ['websocket'], withCredentials: true}));
 	}, []);
-	console.log("ENV", env, process.env);
+	// console.log("ENV", env, process.env);
 	if (status !== 'resolved' && status !== 'notAuth') return <div></div>;
 	return (
 		<div>
