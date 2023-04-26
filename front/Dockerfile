@@ -1,5 +1,11 @@
 FROM node:alpine
 
-WORKDIR "/app"
+WORKDIR /app
 
-ENTRYPOINT [ "/bin/sh", "-c", "npm install && npm run start" ]
+COPY package*.json ./
+
+RUN npm ci
+
+COPY . .
+
+CMD ["npm","start"]
