@@ -87,6 +87,8 @@ function DirectMessage({
 			sender: userInfo.id,
 			receiver,
 		});
+		message.avatar = userInfo.avatar;
+		message.createdAt = new Date();
 		setMessages((messages) => [...messages, message]);
 	};
 
@@ -222,13 +224,8 @@ function DirectMessage({
 							</div>
 						))}
 					</div>
-					<div className="chat-write">
-						<MessageInput
-							sendMessage={sendMessage}
-							userInfo={userInfo}
-						/>
-					</div>
 				</BasicFrame>
+				<MessageInput sendMessage={sendMessage} userInfo={userInfo} />
 			</div>
 		</>
 	);

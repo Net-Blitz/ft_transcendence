@@ -205,9 +205,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 			const userSocket = this.DMs.get(message.receiver);
 			if (userSocket) {
-				this.server
-					.to(userSocket.id)
-					.emit("DM", { content, sender, receiver, DMid });
+				this.server.to(userSocket.id).emit("DM", {
+					content,
+					sender,
+					receiver,
+					DMid,
+					avatar: senderUser.avatar,
+					createdAt: new Date(),
+				});
 			}
 		} catch (e) {
 			console.error(e);
