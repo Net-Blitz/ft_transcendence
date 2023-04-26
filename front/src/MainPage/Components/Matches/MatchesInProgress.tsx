@@ -47,17 +47,6 @@ const MatchesInProgress: React.FC<MatchesInProgressProps> = ({
 	const headerMobilePart1 = ['Game mode', 'Team', 'Score', 'Map'];
 	const headerMobilePart2 = ['Date', 'Hour', 'Difficulty', 'Watch'];
 	const isMobileView = useWindowWidth() < 767;
-	const [columnCount, setColumnCount] = useState(0);
-	useEffect(() => {
-		const table = document.querySelector('table');
-		if (table) {
-			const columnCount = table.rows[0]?.cells.length || 0; //calculate the number of columns for the colSpan
-			setColumnCount(columnCount);
-		}
-	});
-	{
-		/** @TODO Lier au back */
-	}
 	const data: DataTable[] = [
 		{
 			gameMode: '1v1',
@@ -151,13 +140,13 @@ const MatchesInProgress: React.FC<MatchesInProgressProps> = ({
 			}
 			return true;
 		});
-		if (filters.sortBy == 'date') {
+		if (filters.sortBy === 'date') {
 			filteredData = sortByDate(filteredData);
 		}
-		if (filters.sortBy == 'map') {
+		if (filters.sortBy === 'map') {
 			filteredData = sortByMap(filteredData);
 		}
-		if (filters.sortBy == 'difficulty') {
+		if (filters.sortBy === 'difficulty') {
 			filteredData = sortByDifficulty(filteredData);
 		}
 		return filteredData;

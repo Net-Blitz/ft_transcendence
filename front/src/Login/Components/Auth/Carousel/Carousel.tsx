@@ -43,7 +43,8 @@ const Carousel = ({
 					style={{
 						backgroundImage: `url('${avatar[index].url}')`,
 						backgroundPosition: 'center',
-						backgroundSize: 'cover',
+						backgroundSize: 'contain',
+						backgroundRepeat: 'no-repeat',
 					}}
 					onClick={
 						setting === 'left'

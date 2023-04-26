@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { useRef, useState } from 'react';
+import close from '../Profile/Components/MainInfo/Ressources/close.svg';
 
 function CreateChannel({
 	ClosePopup,
@@ -51,44 +52,48 @@ function CreateChannel({
 
 	return (
 		<div ref={PopupRef} className="chat-overlay">
-			<div className="chat-popup chat-center">
-				<label className="chat-close" onClick={ClosePopup}>
-					&times;
-				</label>
-				<h2>Create a Channel</h2>
-				<div className="chat-content">
-					<form onSubmit={handleSubmit}>
-						<label>
-							Create a channel:
-							<input
-								onChange={(e) => setName(e.target.value)}
-								placeholder="Enter channel name"
-								value={name}
-								type="text"
-							/>
-						</label>
-						<label>
-							Privacy:
-							<select
-								value={privacy}
-								onChange={(e) => setPrivacy(e.target.value)}>
-								<option value="PUBLIC">Public</option>
-								<option value="PROTECTED">Protected</option>
-								<option value="PRIVATE">Private</option>
-							</select>
-						</label>
+			<img
+				src={close}
+				alt="close-button"
+				className="chat-close"
+				onClick={ClosePopup}
+			/>
+			<h2>Create a Channel</h2>
+			<div className="chat-content">
+				<form onSubmit={handleSubmit}>
+					<label>
+						<p>Create a channel</p>
+						<input
+							onChange={(e) => setName(e.target.value)}
+							placeholder="Enter channel name"
+							value={name}
+							type="text"
+						/>
+					</label>
+					<label>
+						<p>Privacy</p>
+						<select
+							value={privacy}
+							onChange={(e) => setPrivacy(e.target.value)}>
+							<option value="PUBLIC">Public</option>
+							<option value="PROTECTED">Protected</option>
+							<option value="PRIVATE">Private</option>
+						</select>
+					</label>
 
-						{privacy === 'PROTECTED' && (
+					{privacy === 'PROTECTED' && (
+						<label>
+							<p>Password</p>
 							<input
 								onChange={(e) => setPassword(e.target.value)}
 								placeholder="Enter password"
 								value={password}
 								type="password"
 							/>
-						)}
-						<button type="submit">Create</button>
-					</form>
-				</div>
+						</label>
+					)}
+					<button type="submit">Create</button>
+				</form>
 			</div>
 		</div>
 	);
