@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { MessageDto } from './Messages';
+import send from './Ressources/send.svg';
 
 function MessageInput({
 	sendMessage,
@@ -16,19 +17,17 @@ function MessageInput({
 	};
 
 	return (
-		<>
+		<div className="chat-write">
 			<input
 				onChange={(e) => setValue(e.target.value)}
 				placeholder="Type your message"
 				value={value}
 				type="text"
 			/>
-			<button
-				className="chat-write-link chat-send"
-				onClick={() => handleSendMessage()}>
-				Send
+			<button className="chat-send" onClick={() => handleSendMessage()}>
+				<img src={send} alt="send" />
 			</button>
-		</>
+		</div>
 	);
 }
 
