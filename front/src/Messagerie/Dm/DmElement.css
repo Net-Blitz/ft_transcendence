@@ -1,0 +1,75 @@
+/* DM */
+.dm-element {
+	display: flex;
+	width: 100%;
+	height: 100%;
+}
+
+/* ASIDE */
+.dm-element .dm-aside {
+	width: 21%;
+	margin-top: 36px;
+	background-color: #0A3D62;
+	box-shadow: 2px 2px 15px 2px rgba(206, 206, 206, 0.25);
+	border-radius: 10px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.dm-element .dm-aside button {
+	all: unset;
+	width: 102px;
+	height: 28px;
+	margin: 12px 0 16px 0;
+	border-radius: 5px;
+	background-color: #F9DA49;
+	text-align: center;
+	font-family: 'Poppins';
+	font-style: normal;
+	font-weight: 500;
+	font-size: 11px;
+	color: #0A3D62;
+	cursor: pointer;
+}
+
+/* Popup */
+.dm-aside .popup {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(255, 255, 255, 0.5);
+	z-index: 1;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+/* New-dm */
+.dm-aside .new-dm {
+	width: 484px;
+	height: 266px;
+	background-color: #0A3D62;
+	border-radius: 15px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.new-dm > img {
+	align-self: flex-end;
+	padding: 10px 10px 0 0;
+	cursor: pointer;
+}
+
+.new-dm > h3 {
+	margin: 0;
+	font-family: 'YesevaOne', sans-serif;
+	font-style: normal;
+	font-weight: 400;
+	font-size: 30px;
+	color: #FDFAD0;
+}

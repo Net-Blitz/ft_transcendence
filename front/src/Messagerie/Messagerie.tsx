@@ -1,5 +1,6 @@
 import React, { ReactNode, useState } from 'react';
 import './Messagerie.css';
+import { DmElement } from './Dm/DmElement';
 
 const MainFrame = ({
 	title,
@@ -50,6 +51,7 @@ export const Messagerie = () => {
 					navbarStatus={navbarStatus}
 					setNavbarStatus={setNavbarStatus}
 				/>
+				{navbarStatus === 'privateMessage' ? <DmElement /> : undefined}
 			</MainFrame>
 		</div>
 	);
