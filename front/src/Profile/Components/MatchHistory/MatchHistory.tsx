@@ -1,5 +1,7 @@
 import React from 'react';
 import './MatchHistory.css';
+import { useEffect, useState } from 'react';
+
 import { BasicFrame } from '../MiddleInfo/MiddleInfo';
 /* Ressources */
 import avatar1 from '../../../MainPage/Components/Ressources/avatar1.svg';
@@ -27,7 +29,26 @@ const TeamMatch = ({ img, level, index }: TeamMatchProps) => {
 	);
 };
 
+const useWindowWidth = () => {
+	const [windowWidth, setwindowWidth] = useState(window.innerWidth);
+	useEffect(() => {
+		const handleResize = () => {
+			setwindowWidth(window.innerWidth);
+		};
+		window.addEventListener('resize', handleResize);
+		handleResize();
+		return () => {
+			window.removeEventListener('resize', handleResize);
+		};
+	}, []);
+	console.log('windowWidth', windowWidth);
+	return windowWidth;
+};
+
 export const MatchHistory = () => {
+	const headerMobile = ['Game mode', 'Team', 'Score', 'XP Gained'];
+	const isMobileView = useWindowWidth() < 767;
+
 	const header: string[] = [
 		'Game mode',
 		'Team',
@@ -122,7 +143,7 @@ export const MatchHistory = () => {
 			XPgained: 1000,
 		},
 	];
-
+	console.log('isMobileView', isMobileView);
 	const dataHistory = ({ history, index }: dataHistoryProps) => {
 		return (
 			<tr key={index} className={index % 2 === 0 ? 'odd' : 'even'}>
@@ -137,14 +158,14 @@ export const MatchHistory = () => {
 						/>
 					))}
 				</td>
-				<td>{history.date}</td>
-				<td>{history.hour}</td>
+				{!isMobileView && <td>{history.date}</td>}
+				{!isMobileView && <td>{history.hour}</td>}
 				<td>
 					{history.score[0]} - {history.score[1]}
 				</td>
-				<td>{history.duration}</td>
-				<td>{history.difficulty}</td>
-				<td>{history.map}</td>
+				{!isMobileView && <td>{history.duration}</td>}
+				{!isMobileView && <td>{history.difficulty}</td>}
+				{!isMobileView && <td>{history.map}</td>}
 				<td>{history.XPgained}</td>
 			</tr>
 		);
@@ -152,13 +173,20 @@ export const MatchHistory = () => {
 
 	return (
 		<div className="match-history">
-			<BasicFrame height="100%" title="Match History">
+			<BasicFrame title="Match History">
 				<table className="matchesInProgress">
 					<thead>
 						<tr>
-							{header.map((header, index) => (
-								<th key={index}>{header}</th>
-							))}
+							{!isMobileView &&
+								header.map((header, index) => (
+									<th key={index}>{header}</th>
+								))}
+							{isMobileView &&
+								headerMobile.map((headerMobile, index) => (
+									<th className={headerMobile} key={index}>
+										{headerMobile}
+									</th>
+								))}
 						</tr>
 					</thead>
 					<tbody>
