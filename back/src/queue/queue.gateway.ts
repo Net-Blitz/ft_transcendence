@@ -342,41 +342,6 @@ export class QueueGateway {
 		}
 	}
 
-
-	//async addUserToQueue(userParam: any, client: Socket) {
-	//	const prismaUser = await this.prisma.user.findFirst({where: {login: userParam.login}});
-	//	if (!prismaUser)
-	//		return client.emit("close");
-	//	const user = this.queue1v1.find((queuer) => queuer.login === userParam.login);
-	//	if (user)
-	//	{
-	//		if (user.socketId !== client.id)
-	//		{
-	//			user.socketId = client.id;
-	//			user.mode = userParam.mode;
-	//			user.bonus1 = (userParam.bonus1 === undefined) ? false : true;
-	//			user.bonus2 = (userParam.bonus2 === undefined) ? false : true;
-	//			user.timeData = Date.now();
-	//			user.state = QueueState.Searching;
-	//		}
-	//	}
-	//	else
-	//	{
-	//	this.queue1v1.push({
-	//		id: prismaUser.id,
-	//		login: userParam.login,
-	//		socketId: client.id,
-	//		mode: userParam.mode,
-	//		avatar: prismaUser.avatar,
-	//		elo: prismaUser.elo,
-	//		bonus1: (userParam.bonus1 === undefined) ? false : true,
-	//		bonus2: (userParam.bonus2 === undefined) ? false : true,
-	//		timeData: Date.now(),
-	//		state : QueueState.Searching,
-	//		});
-	//	}
-	//}
-
 	findInQueue(socketId: string) {
 		for (const queuer of this.queue1v1)
 		{
@@ -446,17 +411,16 @@ export class QueueGateway {
 		return (count);
 	}
 
-	add1v1GroupToQueue(group: QueueGroup, groupParam: any) {
+	add1v1GroupToQueue(group: QueueGroup) {
 		if (this.groupCount(group) === 1)
 		{
 			group.timeData = Date.now();
-			group.mode = groupParam.mode;
 			this.queue1v1.push(group)
 			this.groups = this.groups.filter((groupe) => groupe.player1.socketId !== group.player1.socketId);
 		}
 		else if (this.groupCount(group) === 2)
 		{
-			this.gameMatched.push({group1: group, group2: null, group3: null, group4: null, time: Date.now(), mode: groupParam.mode});
+			this.gameMatched.push({group1: group, group2: null, group3: null, group4: null, time: Date.now(), mode: group.mode});
 			this.server.to(group.player1.socketId).emit("GamePopUpSetup", {message: "show"});
 			this.server.to(group.player2.socketId).emit("GamePopUpSetup", {message: "show"});
 			this.groups = this.groups.filter((groupe) => groupe.player1.socketId !== group.player1.socketId);
@@ -466,17 +430,16 @@ export class QueueGateway {
 		return (true);
 	}
 
-	add2v2GroupToQueue(group: QueueGroup, groupParam: any) {
+	add2v2GroupToQueue(group: QueueGroup) {
 		if (this.groupCount(group) === 1 || this.groupCount(group) === 2)
 		{
 			group.timeData = Date.now();
-			group.mode = groupParam.mode;
 			this.queue2v2.push(group);
 			this.groups = this.groups.filter((groupe) => groupe.player1.socketId !== group.player1.socketId);
 		}
 		else if (this.groupCount(group) === 4)
 		{
-			this.gameMatched.push({group1: group, group2: null, group3: null, group4: null, time: Date.now(), mode: groupParam.mode});
+			this.gameMatched.push({group1: group, group2: null, group3: null, group4: null, time: Date.now(), mode: group.mode});
 			this.server.to(group.player1.socketId).emit("GamePopUpSetup", {message: "show"});
 			this.server.to(group.player2.socketId).emit("GamePopUpSetup", {message: "show"});
 			this.server.to(group.player3.socketId).emit("GamePopUpSetup", {message: "show"});
@@ -489,17 +452,16 @@ export class QueueGateway {
 		return (true);
 	}
 
-	addFFAGroupToQueue(group: QueueGroup, groupParam: any) {
+	addFFAGroupToQueue(group: QueueGroup) {
 		if (this.groupCount(group) === 1 || this.groupCount(group) === 2 || this.groupCount(group) === 3)
 		{
 			group.timeData = Date.now();
-			group.mode = groupParam.mode;
 			this.queueFFA.push(group);
 			this.groups = this.groups.filter((groupe) => groupe.player1.socketId !== group.player1.socketId);
 		}
 		else if (this.groupCount(group) === 4)
 		{
-			this.gameMatched.push({group1: group, group2: null, group3: null, group4: null, time: Date.now(), mode: groupParam.mode});
+			this.gameMatched.push({group1: group, group2: null, group3: null, group4: null, time: Date.now(), mode: group.mode});
 			this.server.to(group.player1.socketId).emit("GamePopUpSetup", {message: "show"});
 			this.server.to(group.player2.socketId).emit("GamePopUpSetup", {message: "show"});
 			this.server.to(group.player3.socketId).emit("GamePopUpSetup", {message: "show"});
@@ -511,46 +473,42 @@ export class QueueGateway {
 		return (true);
 	}
 
-	addGroupToQueue(group: QueueGroup, groupParam: any) {
-		if (groupParam.mode === "ONEVONE")
-			return (this.add1v1GroupToQueue(group, groupParam));
-		if (groupParam.mode === "TWOVTWO")
-			return (this.add2v2GroupToQueue(group, groupParam));
-		if (groupParam.mode === "FREEFORALL")
-			return (this.addFFAGroupToQueue(group, groupParam));
+	addGroupToQueue(group: QueueGroup) {
+		if (group.mode === "ONEVONE")
+			return (this.add1v1GroupToQueue(group));
+		if (group.mode === "TWOVTWO")
+			return (this.add2v2GroupToQueue(group));
+		if (group.mode === "FREEFORALL")
+			return (this.addFFAGroupToQueue(group));
 		return (false);
-			
 	}
 
-	leaveGroup(client: Socket, login: string) {
+	leaveGroup(client: Socket, login: string, update = true) {
 		let me: QueueObject;
 		
 		for (const group of this.groups)
 		{
 			if (group.player1.socketId === client.id || (login && group.player1.login === login))
 			{
-				me = group.player1;
-				this.server.to(group.player1.socketId).emit("closeGroup");
-				if (group.player2)
-				{
-					this.recreateGroup(group.player2);
-					this.server.to(group.player2.socketId).emit("closeGroup");
-				}
-				if (group.player3)
-				{
-					this.recreateGroup(group.player3);
-					this.server.to(group.player3.socketId).emit("closeGroup");
-				}
-				if (group.player4)
-				{
-					this.recreateGroup(group.player4);
-					this.server.to(group.player4.socketId).emit("closeGroup");
-				}
 				if (login)
 					this.groups = this.groups.filter((groupe) => groupe.player1.login !== login);
 				else
 					this.groups = this.groups.filter((groupe) => groupe.player1.socketId !== client.id);
-				
+			
+				me = group.player1;
+				if (group.player2)
+				{
+					this.recreateGroup(group.player2);
+				}
+				if (group.player3)
+				{
+					this.recreateGroup(group.player3);
+				}
+				if (group.player4)
+				{
+					this.recreateGroup(group.player4);
+				}
+
 				return me;
 			}
 			if (group.player2 && ((group.player2.socketId === client.id) || (login && group.player2.login === login)))
@@ -573,15 +531,8 @@ export class QueueGateway {
 			}	
 			else
 				continue ;
-			this.server.to(group.player1.socketId).emit("leaveGroup", {group: group});
-			if (group.player2)
-				this.server.to(group.player2.socketId).emit("leaveGroup", {group: group});
-			if (group.player3)
-				this.server.to(group.player3.socketId).emit("leaveGroup", {group: group});
-			if (group.player4)
-				this.server.to(group.player4.socketId).emit("leaveGroup", {group: group}); 
-			
-			console.log("me: ", me);
+			if (update)
+				this.updateGroup(group); 
 			return me;
 		}
 	}
@@ -603,20 +554,21 @@ export class QueueGateway {
 					return client.emit("groupFull");
 				}
 
-				this.server.to(group.player1.socketId).emit("JoinGroupResponse", {message: "OK", group: group});
-				if (group.player2)
-					this.server.to(group.player2.socketId).emit("JoinGroupResponse", {message: "OK", group: group});
-				if (group.player3)
-					this.server.to(group.player3.socketId).emit("JoinGroupResponse", {message: "OK", group: group});
-				if (group.player4)
-					this.server.to(group.player4.socketId).emit("JoinGroupResponse", {message: "OK", group: group});
+				let count = this.groupCount(group);
+				if (count === 3)
+					group.mode = "FREEFORALL";
+				if (count === 4 && group.mode === "ONEVONE")
+					group.mode = "TWOVTWO";
+
+				this.updateGroup(group);
 				break ;
 			}
 		}
 	}
 
-	recreateGroup(group: QueueObject) {
-		this.groups.push( {player1: group, player2: null, player3: null, player4: null, mode: null, map: null, timeData: null});
+	recreateGroup(player: QueueObject) {
+		this.groups.push( {player1: player, player2: null, player3: null, player4: null, mode: "ONEVONE", map: "NORMAL", timeData: null});
+		this.updateGroup(this.findMyGroup(player.socketId));
 	}
 
 	async createGroup(login: string, client: Socket) {
@@ -629,7 +581,8 @@ export class QueueGateway {
 			login: login,
 			socketId: client.id,
 			state : QueueState.Searching,
-			}, player2: null, player3: null, player4: null, mode: null, map: null, timeData: null});
+			}, player2: null, player3: null, player4: null, mode: "ONEVONE", map: "NORMAL", timeData: null});
+		this.updateGroup(this.findMyGroup(client.id));
 	}
 
 	async handleConnection(client: Socket) { 
@@ -638,7 +591,12 @@ export class QueueGateway {
 		if (!cookie)
 			return ;
 		const parsedCookie = cookie.split("; ").find((cook) => cook.startsWith("jwt=")).replace("jwt=", "");
-		const decoded: any = jwt.verify(parsedCookie, process.env.JWT_SECRET);
+		let decoded: any;
+		try {
+			decoded = jwt.verify(parsedCookie, process.env.JWT_SECRET);
+		} catch (err) {
+			return ;
+		}
 		this.createGroup(decoded.login, client);
 		return ;
 	} 
@@ -692,13 +650,12 @@ export class QueueGateway {
 	}
 
 	@SubscribeMessage("ConnectToQueue")
-	async connectToQueue(@ConnectedSocket() client: Socket, @MessageBody() groupParam: any) {
+	async connectToQueue(@ConnectedSocket() client: Socket) {
 		const groupUser = this.groups.find((group) => group.player1.socketId === client.id);
 		if (!groupUser)
 			return ;
 		
-		console.log("ConnectToQueue", groupParam);
-		let ret = this.addGroupToQueue(groupUser, groupParam);
+		let ret = this.addGroupToQueue(groupUser);
 		if (!ret)
 			return client.emit("notPossible");
 
@@ -740,11 +697,13 @@ export class QueueGateway {
 		const group = this.findMyGroup(client.id);
 		if (!group)
 			return ;
+		
 
-		this.queue1v1 = this.queue1v1.filter((queuer) => queuer.player1.socketId !== group.player1.socketId);
+		this.queue1v1 = this.queue1v1.filter((queuer) => queuer.player1.socketId !== group.player1.socketId);  
 		this.queue2v2 = this.queue2v2.filter((queuer) => queuer.player1.socketId !== group.player1.socketId);
 		this.queueFFA = this.queueFFA.filter((queuer) => queuer.player1.socketId !== group.player1.socketId);
-		this.groups.push(group);
+		if (this.groups.includes(group) === false)
+			this.groups.push(group);
 
 		await this.prisma.user.update({
 			where: {login: group.player1.login},
@@ -764,7 +723,7 @@ export class QueueGateway {
 			await this.prisma.user.update({
 				where: {login: group.player4.login},
 				data: {state: "ONLINE"}
-			});
+			}); 
 		
 		this.server.to(group.player1.socketId).emit("DisconnectFromQueueResponse", {message: "OK"});
 		if (group.player2)
@@ -778,7 +737,17 @@ export class QueueGateway {
 	@SubscribeMessage("LeaveGroup")
 	async handleLeaveGroup(@ConnectedSocket() client: Socket) {
 		const me: QueueObject = this.leaveGroup(client, undefined);
-		this.createGroup(me.login, client);
+		const prismaUser = await this.prisma.user.findFirst({where: {login: me.login}});
+		if (!prismaUser)
+			return client.emit("close");
+		this.groups.push( {player1:{
+			id: prismaUser.id,
+			login: me.login,
+			socketId: client.id,
+			state : QueueState.Searching,
+			}, player2: null, player3: null, player4: null, mode: "ONEVONE", map: "NORMAL", timeData: null});
+		this.updateGroup(this.findMyGroup(client.id));
+		
 	}
 
 	@SubscribeMessage("JoinGroup")
@@ -788,11 +757,13 @@ export class QueueGateway {
 			return ;
 		if (groupLeader.state !== "ONLINE")
 			return ;
-		const me: QueueObject = this.leaveGroup(client, undefined);
+		const me: QueueObject = this.leaveGroup(client, undefined, false);
 		if (me.login === groupParam.groupLogin)
 			this.recreateGroup(me);
 		else
+		{
 			this.joinGroup(client, me, groupParam);
+		}
 	}
 
 	@SubscribeMessage("AcceptGame")
@@ -939,4 +910,70 @@ export class QueueGateway {
 			player4: allPlayer.length >= 4 ? {elo: allPlayer[3].elo, login: allPlayer[3].login, avatar: allPlayer[3].avatar} : null,
 			in: true});
 	}
+
+	async updateGroup(group: QueueGroup) {
+		const allPlayers = [];
+		let prismaUser;
+		for (const player of [group.player1, group.player2, group.player3, group.player4])
+		{
+			if (player)
+			{
+				prismaUser =  await this.prisma.user.findUnique({
+					where: {login: player.login}
+				});
+				if (!prismaUser)
+					continue ;
+				
+				allPlayers.push({level: prismaUser.experience, pseudo: prismaUser.username, avatar: prismaUser.avatar, status: prismaUser.state});
+			}
+		}
+		this.server.to(group.player1.socketId).emit("UpdateGroupResponse", {players: allPlayers, mode: group.mode, map: group.map});
+		if (group.player2)
+			this.server.to(group.player2.socketId).emit("UpdateGroupResponse", {players: allPlayers, mode: group.mode, map: group.map});
+		if (group.player3)
+			this.server.to(group.player3.socketId).emit("UpdateGroupResponse", {players: allPlayers, mode: group.mode, map: group.map});
+		if (group.player4)
+			this.server.to(group.player4.socketId).emit("UpdateGroupResponse", {players: allPlayers, mode: group.mode, map: group.map});
+	}
+
+	@SubscribeMessage("UpdateGroup")
+	async handleUpdateGroup(@ConnectedSocket() client: Socket, @MessageBody() message: any) {
+		const group = this.findMyGroup(client.id);
+		if (!group)
+			return ;
+		if (!group.player1 || group.player1.socketId !== client.id)
+			return ;
+		if (message.type === "MODE")
+		{
+			if (this.groupCount(group) <= 2 || (this.groupCount(group) === 3 && message.value !== "ONEVONE" && message.value !== "TWOVTWO") || (this.groupCount(group) === 4 && message.value !== "ONEVONE") )
+				group.mode = message.value;
+		}
+		if (message.type === "MAP")
+			group.map = message.value;
+		this.updateGroup(group);
+	}
+
+	@SubscribeMessage("GetMyGroup")
+	async handleGetMyGroup(@ConnectedSocket() client: Socket) {
+		const group = this.findMyGroup(client.id);
+		if (!group)
+			return ;
+		const allPlayers = [];
+		let prismaUser;
+		for (const player of [group.player1, group.player2, group.player3, group.player4])
+		{
+			if (player)
+			{
+				prismaUser =  await this.prisma.user.findUnique({
+					where: {login: player.login}
+				});
+				if (!prismaUser)
+					continue ;
+				
+				allPlayers.push({level: prismaUser.experience, pseudo: prismaUser.username, avatar: prismaUser.avatar, status: prismaUser.state});
+			}
+		}
+		client.emit("UpdateGroupResponse", {players: allPlayers, mode: group.mode, map: group.map});
+	}
+
 }
