@@ -1,0 +1,25 @@
+
+.game-creation-background {
+	position: absolute;
+	top: 14px;
+	left: calc(81px + 14px + 14px);
+	height: calc(100% - 40px);
+	width: calc(100% - 81px - 14px - 14px - 14px);
+	
+	background: #FFFDE4;
+	box-shadow: 0px 4px 29px 7px rgba(217, 217, 217, 0.5);
+	border-radius: 15px;
+
+	/* display: block; */
+}
+
+
+@media (max-width: 1020px) {
+
+	.game-creation-background {
+		left: 14px;
+		height: calc(100% - 60px - 14px - 81px);
+		width: calc(100% - 14px - 14px);
+		
+	}
+}

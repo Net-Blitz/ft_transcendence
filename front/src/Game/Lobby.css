@@ -17,9 +17,9 @@
 
 .game-waiting-background {
 	position: absolute;
-	top: 30px;
+	top: 14px;
 	left: calc(81px + 14px + 14px);
-	height: calc(100% - 60px);
+	height: calc(100% - 40px);
 	width: calc(100% - 81px - 14px - 14px - 14px);
 	
 	background: #FFFDE4;
@@ -284,7 +284,7 @@
     border: 0.14rem solid #0A3D62;
     border-radius: 1recm;
     cursor: pointer;
-    text-align: center;
+	
     border-radius: 10px;
     transition-duration: 0.4s;    
     background-color: #0A3D62;
@@ -298,9 +298,13 @@
 	bottom: 0px;
     left: 50%;
     transform: translate(-50%,-50%);
+	display: flex;
+	text-align: center;
+	justify-content: center;
+	align-items: center;
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1020px) {
 	
 	.game-waiting-chat {
 		width: calc(100% - 14px - 14px);
@@ -315,7 +319,8 @@
 		transform: none;
 		width: 50vw; 
 		max-width: 400px;
-		height: min(10vw, 5vh);
+		height: 72px;
+
 		max-height: 56px;
 		min-height: 25px;
 	}
@@ -336,6 +341,12 @@
 		/* fond beige */
 		
 		background: #FFFDE4;
+	}
+}
+
+@media (max-height: 620px) {
+	.game-waiting-chat {
+		display: none;
 	}
 }
 	
