@@ -616,7 +616,24 @@ export class ChatService {
 				);
 			});
 
-			return res.status(200).json(DMs);
+			let DMStmp: any = DMs;
+			DMStmp = await Promise.all(
+				DMStmp.map(async (DM) => {
+					return {
+						...DM,
+						sender: {
+							...DM.sender,
+							avatar: "http://localhost:3333/" + DM.sender.avatar,
+						},
+						receiver: {
+							...DM.receiver,
+							avatar:
+								"http://localhost:3333/" + DM.receiver.avatar,
+						},
+					};
+				})
+			);
+			return res.status(200).json(DMStmp);
 		} catch (e) {
 			return res.status(404).json({ message: "DMs not found" });
 		}
@@ -719,11 +736,10 @@ export class ChatService {
 					});
 					return {
 						...message,
-						avatar: user.avatar,
+						avatar: "http://localhost:3333/" + user.avatar,
 					};
 				})
 			);
-
 			return res.status(200).json(messagesAvatar);
 		} catch (e) {
 			return res.status(404).json({ message: "Messages not found" });

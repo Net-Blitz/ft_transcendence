@@ -130,7 +130,7 @@
 	display: flex;
 	flex-direction: column-reverse;
 	padding: 10px;
-	max-height: 688px;
+	max-height: 688px; /* scroll bug */
 }
 .chat-bubble {
 	display: flex;
@@ -267,4 +267,41 @@
 	font-weight: 300;
 	font-size: 13px;
 	color: #0A3D62;
+}
+
+/* DM list */
+.dm-list {
+	width: 100%;
+}
+
+.dm-list > .dm-list-element {
+	display: flex;
+	align-items: center;
+	height: 37px;
+	border-bottom: 0.3px solid #FDFAD0;
+}
+
+.dm-list > .dm-list-element .dm-list-element-avatar {
+	width: 24px;
+	height: 24px;
+	margin-left: 17px;
+}
+
+.dm-list > .dm-list-element h4 {
+	margin: 0 0 0 11px;
+	font-family: 'Poppins';
+	font-style: normal;
+	font-weight: 300;
+	font-size: 12px;
+	color: #FDFAD0;
+}
+
+.dm-list > .dm-list-element .dm-list-buttons {
+	margin-left: auto;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-items: center;
+	width: 45px;
+	background-color: red;
 }
