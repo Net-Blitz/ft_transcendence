@@ -17,7 +17,7 @@
 	align-items: center;
 }
 
-.dm-element .dm-aside button {
+.dm-element .dm-aside > button {
 	all: unset;
 	width: 102px;
 	height: 28px;
@@ -67,9 +67,74 @@
 
 .new-dm > h3 {
 	margin: 0;
-	font-family: 'YesevaOne', sans-serif;
+	font-family: 'Poppins', sans-serif;
 	font-style: normal;
-	font-weight: 400;
+	font-weight: 300;
 	font-size: 30px;
 	color: #FDFAD0;
+	margin-bottom: 30px;
+}
+
+.new-dm .new-dm-buttons {
+	display: flex;
+	margin-top: 40px;
+}
+
+.new-dm .new-dm-buttons button {
+	all: unset;
+	width: 200px;
+	height: 46px;
+	border-radius: 10px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-family: 'Poppins', sans-serif;
+	font-style: normal;
+	font-weight: 400;
+	font-size: 15px;
+	cursor: pointer;
+}
+
+.new-dm .new-dm-buttons button:nth-child(1) {
+	background-color: #F9DA49;
+	color: #0A3D62;
+	margin-right: 20px;
+	border: 1px solid #F9DA49;
+
+}
+
+.new-dm .new-dm-buttons button:nth-child(2) {
+	background-color: #0A3D62;
+	color: #FDFAD0;
+	border: 1px solid #FDFAD0;
+	border-radius: 10px;
+}
+
+/* Input-flat */
+.input-flat {
+	width: 410px;
+	background-color: #FDFAD0;
+	border-radius: 5px;
+	display: flex;
+	align-items: center;
+	padding: 4px 7px 4px 7px;
+}
+
+.input-flat > input {
+	all: unset;
+	margin-left: 15px;
+	flex-grow: 1;
+	font-family: 'Poppins', sans-serif;
+	font-style: normal;
+	font-weight: 300;
+	font-size: 13px;
+	color: #0A3D62;
+}
+
+.input-flat > input::placeholder {
+	font-family: 'Poppins', sans-serif;
+	font-style: normal;
+	font-weight: 300;
+	font-size: 13px;
+	color: #0A3D62;
 }
