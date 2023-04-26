@@ -13,7 +13,7 @@ export interface ChannelDto {
 }
 
 const Chat = () => {
-	const [channelOrDM, setChannelOrDM] = useState<'channel' | 'dm'>('channel');
+	const [channelOrDM, setChannelOrDM] = useState<'channel' | 'dm'>('dm');
 	const [channels, setChannels] = useState<ChannelDto[]>([]);
 	const [userInfo, setUserInfo] = useState<any>();
 	const [DMList, setDMList] = useState<DirectMessageDto[]>([]);
@@ -59,12 +59,6 @@ const Chat = () => {
 		return () => clearInterval(interval);
 	}, [userInfo?.username]);
 
-	const handleOptionChange = (
-		event: React.ChangeEvent<HTMLSelectElement>
-	) => {
-		setChannelOrDM(event.target.value as 'channel' | 'dm');
-	};
-
 	return (
 		<div>
 			{channelOrDM === 'channel' ? (
@@ -72,7 +66,7 @@ const Chat = () => {
 					ChannelsList={channels}
 					userInfo={userInfo}
 					channelOrDM={channelOrDM}
-					handleOptionChange={handleOptionChange}
+					handleOptionChange={setChannelOrDM}
 					socket={socket}
 				/>
 			) : (
@@ -81,7 +75,7 @@ const Chat = () => {
 					userInfo={userInfo}
 					socket={socket}
 					channelOrDM={channelOrDM}
-					handleOptionChange={handleOptionChange}
+					handleOptionChange={setChannelOrDM}
 				/>
 			)}
 		</div>

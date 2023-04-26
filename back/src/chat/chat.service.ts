@@ -703,7 +703,28 @@ export class ChatService {
 				},
 			});
 
-			return res.status(200).json(messages);
+			if (!messages) {
+				return res.status(404).json({ message: "Messages not found" });
+			}
+
+			const messagesAvatar = await Promise.all(
+				messages.map(async (message) => {
+					const user = await this.prisma.user.findUnique({
+						where: {
+							id: message.userId,
+						},
+						select: {
+							avatar: true,
+						},
+					});
+					return {
+						...message,
+						avatar: user.avatar,
+					};
+				})
+			);
+
+			return res.status(200).json(messagesAvatar);
 		} catch (e) {
 			return res.status(404).json({ message: "Messages not found" });
 		}
