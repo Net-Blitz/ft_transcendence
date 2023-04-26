@@ -9,3 +9,5 @@ RUN npm ci
 COPY . .
 
 CMD ["npm","start"]
+
+CMD ["npm","start"]
