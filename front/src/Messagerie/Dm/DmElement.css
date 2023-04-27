@@ -72,7 +72,7 @@
 	font-style: normal;
 	font-weight: 300;
 	font-size: 30px;
-	color: #FDFAD0;
+	color: #fdfad0;
 	margin-bottom: 30px;
 }
 
@@ -216,7 +216,7 @@
 
 .new-dm .new-dm-buttons {
 	display: flex;
-	margin-top: 40px;
+	margin-top: 25px;
 }
 
 .new-dm .new-dm-buttons button {
@@ -235,24 +235,23 @@
 }
 
 .new-dm .new-dm-buttons button:nth-child(1) {
-	background-color: #F9DA49;
-	color: #0A3D62;
+	background-color: #f9da49;
+	color: #0a3d62;
 	margin-right: 20px;
-	border: 1px solid #F9DA49;
-
+	border: 1px solid #f9da49;
 }
 
 .new-dm .new-dm-buttons button:nth-child(2) {
-	background-color: #0A3D62;
-	color: #FDFAD0;
-	border: 1px solid #FDFAD0;
+	background-color: #0a3d62;
+	color: #fdfad0;
+	border: 1px solid #fdfad0;
 	border-radius: 10px;
 }
 
 /* Input-flat */
 .input-flat {
 	width: 410px;
-	background-color: #FDFAD0;
+	background-color: #fdfad0;
 	border-radius: 5px;
 	display: flex;
 	align-items: center;
@@ -267,7 +266,7 @@
 	font-style: normal;
 	font-weight: 300;
 	font-size: 13px;
-	color: #0A3D62;
+	color: #0a3d62;
 }
 
 .input-flat > input::placeholder {
@@ -275,7 +274,7 @@
 	font-style: normal;
 	font-weight: 300;
 	font-size: 13px;
-	color: #0A3D62;
+	color: #0a3d62;
 }
 
 /* DM list */
@@ -287,7 +286,7 @@
 	display: flex;
 	align-items: center;
 	height: 37px;
-	border-bottom: 0.3px solid #FDFAD0;
+	border-bottom: 0.3px solid #fdfad0;
 }
 
 .dm-list > .dm-list-element .dm-list-element-avatar {
@@ -302,7 +301,7 @@
 	font-style: normal;
 	font-weight: 300;
 	font-size: 12px;
-	color: #FDFAD0;
+	color: #fdfad0;
 }
 
 .dm-list > .dm-list-element .dm-list-buttons {
@@ -320,7 +319,7 @@
 	justify-content: center;
 	width: 19px;
 	height: 19px;
-	background-color: #FDFAD0;
+	background-color: #fdfad0;
 	border-radius: 50%;
 }
 
@@ -329,7 +328,35 @@
 }
 
 .dm-list > .active {
-	color: #0A3D62;
-	background-color: #F9DA49;
-	border-bottom: 0.3px solid #F9DA49;
+	color: #0a3d62;
+	background-color: #f9da49;
+	border-bottom: 0.3px solid #f9da49;
+}
+
+.input-select select {
+	appearance: none;
+	background-color: #fdfad0;
+	border-radius: 4px;
+	box-shadow: none;
+	color: #0a3d62;
+	font-size: 16px;
+	padding: 8px 24px 8px 10px;
+	width: 100%;
+	margin-top: 20px;
+}
+.input-select select:focus {
+	border: 1px solid #f9da49;
+	box-shadow: 0 0 5px rgba(0, 119, 204, 0.5);
+	outline: none;
+}
+.input-select select option {
+	color: #0a3d62;
+	font-size: 16px;
+}
+.input-select select option:hover {
+	background-color: #f2f2f2;
+}
+.input-select select option:checked {
+	background-color: #0077cc;
+	color: #fff;
 }
