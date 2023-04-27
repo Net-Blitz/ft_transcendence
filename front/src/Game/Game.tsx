@@ -17,15 +17,12 @@ function Podium({color, height, point, avatar, env}:any) {
 	)
 }
 
-
 function Game({socketGame, room, login, env}:any) {
 	const [here, updateHere] = useState(true);
 	const [gameEnd, updateGameEnd] = useState({} as any);
 	const navigate = useNavigate();
-	// const location = useLocation();
-	// const room = location.state.gameId;
-	// const login = location.state.login;
 	const [spectator, updateSpectator] = useState(0);
+	const [board, updateBoard] = useState(true);
 
 	useEffect(() => {
 		socketGame.emit("gameConnection", {room: room});
@@ -45,13 +42,33 @@ function Game({socketGame, room, login, env}:any) {
 
 	useEffect(() => {
 		const updateGameState = (gameState: any) => {
-			// console.log("gameState", gameState.player1_score, gameState.player2_score)
 			let ball = document.querySelector<HTMLElement>(".game-playing-ball");
 			let player1 = document.querySelector<HTMLElement>("#game-playing-player1");
 			let player2 = document.querySelector<HTMLElement>("#game-playing-player2");
-			let gameDiv = document.querySelector<HTMLElement>(".game-playing-board");
-			// console.log(ball, gameDiv)
+			let player3 = undefined;
+			let player4 = undefined;
+			let score3 = undefined;
+			let score4 = undefined;
+			let gameDiv = document.querySelector<HTMLElement>("#game-board");
+			console.log("gameState", gameState);
 			if (gameDiv) {
+				if (gameState.board)
+				{
+					gameDiv.classList.remove("game-playing-board");
+					gameDiv.classList.remove("game-playing-big-board");
+					if (gameState.board === 1)
+						gameDiv.classList.add("game-playing-board");
+					else if (gameState.board === 2)
+						gameDiv.classList.add("game-playing-big-board");
+					updateBoard(gameState.board === 1 ? true : false);
+					if (gameState.board === 2)
+					{
+						player3 = document.querySelector<HTMLElement>("#game-playing-player3");
+						player4 = document.querySelector<HTMLElement>("#game-playing-player4");
+						score3 = document.querySelector<HTMLElement>("#game-playing-score3");
+						score4 = document.querySelector<HTMLElement>("#game-playing-score4");
+					}
+				}
 				if (ball) {
 					ball.style.width = (gameDiv.offsetWidth) * gameState.ball_size + 'px';
 					ball.style.height = (gameDiv.offsetWidth) * gameState.ball_size + 'px';
@@ -70,13 +87,25 @@ function Game({socketGame, room, login, env}:any) {
 					player2.style.top = (gameDiv.offsetHeight - 3 - player2.offsetHeight) * gameState.player2_y + 'px';
 					player2.style.right = (gameDiv.offsetWidth - player2.offsetWidth) * (1 - gameState.player2_x)  + 'px';
 				}
+				if (player3) {
+					player3.style.height = (gameDiv.offsetHeight) * gameState.player_width + 'px';
+					player3.style.width = (gameDiv.offsetWidth) * gameState.player3_size + 'px';
+					player3.style.top = (gameDiv.offsetHeight - player3.offsetHeight) * gameState.player3_y + 'px';
+					player3.style.left = (gameDiv.offsetWidth - 3 - player3.offsetWidth) * gameState.player3_x + 'px';
+				}
+				if (player4) {
+					player4.style.height = (gameDiv.offsetHeight) * gameState.player_width + 'px';
+					player4.style.width = (gameDiv.offsetWidth) * gameState.player4_size + 'px';
+					player4.style.bottom = (gameDiv.offsetHeight - player4.offsetHeight) * (1 - gameState.player4_y) + 'px';
+					player4.style.left = (gameDiv.offsetWidth - 3 - player4.offsetWidth) * gameState.player4_x + 'px';
+				}
 				
 				let score1 = document.querySelector<HTMLElement>("#game-playing-score1");
 				let score2 = document.querySelector<HTMLElement>("#game-playing-score2"); 
-				if (score1)
-					score1.innerHTML = gameState.player1_score;
-				if (score2)
-					score2.innerHTML = gameState.player2_score;
+				if (score1) score1.innerHTML = gameState.player1_score;
+				if (score2) score2.innerHTML = gameState.player2_score;
+				if (score3) score3.innerHTML = gameState.player3_score;
+				if (score4) score4.innerHTML = gameState.player4_score;
 			}
 		}
 
@@ -130,8 +159,8 @@ function Game({socketGame, room, login, env}:any) {
 			socketGame.off("endGame");
 			socketGame.off("error");
 			socketGame.off("quickChatMessageResponse");
-			socketGame.off("updateSpectator")
-			socketGame.off("getEndStatus")
+			socketGame.off("updateSpectator");
+			socketGame.off("getEndStatus");
 			socketGame.on("gameState", updateGameState);
 			socketGame.on("endGame", endGame);
 			socketGame.on("error", errorGame);
@@ -143,7 +172,6 @@ function Game({socketGame, room, login, env}:any) {
 	}, [here]);
 	
 	document.addEventListener('keydown', (event) => {
-		//event.preventDefault();
 		if (event.key === 'ArrowUp')
 		{
 			event.preventDefault();
@@ -153,6 +181,16 @@ function Game({socketGame, room, login, env}:any) {
 		{
 			event.preventDefault();
 			socketGame.emit('keyPress', 'DOWN');
+		}
+		else if (event.key === 'ArrowLeft')
+		{
+			event.preventDefault();
+			socketGame.emit('keyPress', 'LEFT');
+		}
+		else if (event.key === 'ArrowRight')
+		{
+			event.preventDefault();
+			socketGame.emit('keyPress', 'RIGHT');
 		}
 		else if (event.key >= '0' && event.key <= '9')
 		{
@@ -171,6 +209,16 @@ function Game({socketGame, room, login, env}:any) {
 			event.preventDefault();
 			socketGame.emit('keyRelease', 'DOWN');
 		}
+		else if (event.key === 'ArrowLeft')
+		{
+			event.preventDefault();
+			socketGame.emit('keyRelease', 'LEFT');
+		}
+		else if (event.key === 'ArrowRight')
+		{
+			event.preventDefault();
+			socketGame.emit('keyRelease', 'RIGHT');
+		}
 	});
 
 	const surrend = () => {
@@ -180,7 +228,6 @@ function Game({socketGame, room, login, env}:any) {
 	const returnToHome = () => {
 		navigate("/");
 	}
-
 	 
 	return (
 		<div className="game-playing-parent">
@@ -194,17 +241,7 @@ function Game({socketGame, room, login, env}:any) {
 					  : {spectator}
 				</div>
 			</div>
-			{ here ?
-			<div className="game-playing-board">
-				<span className="game-playing-ball"></span>
-				<span className="game-playing-player" id="game-playing-player1"></span>
-				<span className="game-playing-player" id="game-playing-player2"></span>
-				<div className="game-playing-score-div">
-					<span className="game-playing-score" id="game-playing-score1">0</span>
-					<span className="game-playing-score" id="game-playing-score2">0</span>
-				</div>
-			</div>
-	 		: 
+			{ !here ? 
 			 <div className="game-end">
 				<div className="game-end-podium">
 					<Podium color="#C0C0C0" height="45%"  point={gameEnd.score2} avatar={gameEnd.avatar2} env={env}/>
@@ -214,6 +251,31 @@ function Game({socketGame, room, login, env}:any) {
 				</div>
 				<div className="game-end-elo"></div>
 				<div className="game-end-recap"></div>
+			</div>
+			:
+			board ?
+			<div className="game-playing-board" id="game-board">
+				<span className="game-playing-ball"></span>
+				<span className="game-playing-player" id="game-playing-player1"></span>
+				<span className="game-playing-player" id="game-playing-player2"></span>
+				<div className="game-playing-score-div">
+					<span className="game-playing-score" id="game-playing-score1">0</span>
+					<span className="game-playing-score" id="game-playing-score2">0</span>
+				</div>
+			</div>
+			: 
+			<div className="game-playing-big-board" id="game-board">
+				<span className="game-playing-ball"></span>
+				<span className="game-playing-player" id="game-playing-player1"></span>
+				<span className="game-playing-player" id="game-playing-player2"></span>
+				<span className="game-playing-player-hor" id="game-playing-player3"></span>
+				<span className="game-playing-player-hor" id="game-playing-player4"></span>
+				<div className="game-playing-score-div">
+					<span className="game-playing-score" id="game-playing-score1">4</span>
+					<span className="game-playing-score" id="game-playing-score2">4</span>
+					<span className="game-playing-score" id="game-playing-score3">4</span>
+					<span className="game-playing-score" id="game-playing-score4">4</span>
+				</div>
 			</div>
 			}
 			{ here ?

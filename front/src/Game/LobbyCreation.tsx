@@ -64,7 +64,7 @@ const LobbyCreation = ({socketQueue, reload, setReload, login}:any) => {
 			else if (data.mode === "TWOVTWO") but_2v2?.classList.replace("game-creation-button-unclicked", "game-creation-button-clicked")
 			else if (data.mode === "FREEFORALL") but_ffa?.classList.replace("game-creation-button-unclicked", "game-creation-button-clicked")
 			if (data.players.length > 2) but_1v1?.classList.replace("game-creation-button-unclicked", "game-creation-button-impossible")
-			else if (data.players.length === 3) but_2v2?.classList.replace("game-creation-button-unclicked", "game-creation-button-impossible")
+			if (data.players.length === 3) but_2v2?.classList.replace("game-creation-button-unclicked", "game-creation-button-impossible")
 
 			but_normal?.classList.add("game-creation-button-unclicked")
 			but_beach?.classList.add("game-creation-button-unclicked")
@@ -135,7 +135,7 @@ const LobbyCreation = ({socketQueue, reload, setReload, login}:any) => {
 				<button className="game-creation-button" onClick={leaveGroup}>Leave Lobby</button>
 				<button className="game-creation-button"  onClick={joinQueue}>Start Game</button>
 			</div>
-			{/* <button onClick={joinGroup}>joinGroup</button> */}
+			<button onClick={joinGroup}>joinGroup</button>
 			{/* <button>joinQueue</button>
 			<button onClick={leaveGroup}>leaveGroup</button>
 			<select name="oui" id="oui" onChange={updateMode}>

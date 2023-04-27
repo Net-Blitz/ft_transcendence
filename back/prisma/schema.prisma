@@ -111,6 +111,8 @@ model Game {
     state      GameState @default(CREATING)
     score1     Int       @default(0)
     score2     Int       @default(0)
+    score3     Int       @default(0)
+    score4     Int       @default(0)
     winner    Int       @default(0)     
     user1Id Int
     user2Id Int

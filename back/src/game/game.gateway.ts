@@ -3,8 +3,8 @@ import { Server, Socket } from "socket.io";
 import { PrismaService } from "src/prisma/prisma.service";
 import { SocketUser } from "./dto";
 import * as jwt from 'jsonwebtoken'
-import { Game, User } from "@prisma/client";
-import { GameRoom } from "./class";
+import { Game, GameMode, User } from "@prisma/client";
+import { GameRoom, GameRoomFFA } from "./class";
 
 @WebSocketGateway({namespace:"game", cors: {origin: "*"}})
 export class GameGateway {
@@ -14,7 +14,7 @@ export class GameGateway {
 	server: Server;
 	
 	ConnectedSockets: SocketUser[] = [];
-	GamePlaying : {room: number, specList: string[]}[] = [];
+	GamePlaying : {room: number, mode: GameMode, specList: string[]}[] = [];
 
 	async sleep(ms: number) {
 		return new Promise(resolve => setTimeout(resolve, ms));
@@ -27,7 +27,13 @@ export class GameGateway {
 		const player2 = this.ConnectedSockets.find((socket) =>
 			socket.roomName === "game-" + room &&
 			socket.state === "player2");
-		return ({player1, player2})
+		const player3 = this.ConnectedSockets.find((socket) =>
+			socket.roomName === "game-" + room &&
+			socket.state === "player3");
+		const player4 = this.ConnectedSockets.find((socket) =>
+			socket.roomName === "game-" + room &&
+			socket.state === "player4");
+		return ({player1, player2, player3, player4});
 	}
 
 	private async moveBall(gameRoom: GameRoom, room: number) {
@@ -54,16 +60,52 @@ export class GameGateway {
 		gameRoom.updatePlayerPosition(players.player2);
 	}
 
-	private async waitingPlayerConnection(room: number) {
+	private async moveBallFFA(gameRoom: GameRoomFFA, room: number) {
+
+		let increment_x = gameRoom.ball.speed_x * Math.cos(gameRoom.ball.direction);
+		let increment_y = gameRoom.ball.speed_y * Math.sin(gameRoom.ball.direction);
+		
+		gameRoom.checkBallBounce(increment_x);
+		gameRoom.checkBallBounceY(increment_y);
+		// gameRoom.incrementBallY(increment_y);
+
+		if (gameRoom.checkBallScore()) {
+			await this.prisma.game.update({
+				where: { id: room },
+				data: { score1: gameRoom.player1.score, score2: gameRoom.player2.score, score3: gameRoom.player3.score, score4: gameRoom.player4.score }
+			})
+		}
+	}
+
+	private movePlayerFFA(gameRoom: GameRoomFFA, room: number) {
+		let players = this.getPlayerSocket(room);
+
+		if (players.player1 && !players.player1.surrender)
+			gameRoom.updatePlayerPosition(players.player1);
+		if (players.player2 && !players.player2.surrender)
+			gameRoom.updatePlayerPosition(players.player2);
+		if (players.player3 && !players.player3.surrender)
+			gameRoom.updatePlayerPosition(players.player3);
+		if (players.player4 && !players.player4.surrender)
+			gameRoom.updatePlayerPosition(players.player4);
+	}
+
+	private async waitingPlayerConnection(room: number, mode: GameMode) {
+		let count = 0;
 		while (this.ConnectedSockets.findIndex((socket) => socket.roomName === "game-" + room && socket.state === "player1") === -1 ||
-				this.ConnectedSockets.findIndex((socket) => socket.roomName === "game-" + room && socket.state === "player2") === -1) {
-				await this.sleep(1000); // can add a timeout here --> if timeout, delete the game or make cancel state
+				this.ConnectedSockets.findIndex((socket) => socket.roomName === "game-" + room && socket.state === "player2") === -1 ||
+				(mode !== "ONEVONE" && this.ConnectedSockets.findIndex((socket) => socket.roomName === "game-" + room && socket.state === "player3") === -1) ||
+				(mode !== "ONEVONE" && this.ConnectedSockets.findIndex((socket) => socket.roomName === "game-" + room && socket.state === "player4") === -1)) {
+				count += 1;
+				if (count > 30)
+					return ({state: true, mode: "disconnected"});
+				await this.sleep(1000);
 		}
 		await this.prisma.game.update({
 			where: { id: room },
-			data: { score1: 0, score2: 0, state: "PLAYING"}
+			data: { state: "PLAYING"}
 		})
-		//faire une animation parce que c'est jolie // probablement du front enfaite
+		return null;
 	}
 
 	private checkConnected(room: number) {
@@ -74,6 +116,21 @@ export class GameGateway {
 			return ({state: true, mode: "surrender", player: 1});
 		else if (players.player2 && players.player2.surrender)
 			return ({state: true, mode: "surrender", player: 2});
+		return ({state: false, mode: "none"});
+	}
+
+	private checkConnectedFFA(room: number) {
+		let players = this.getPlayerSocket(room);
+		if (players.player1 === undefined && players.player2 === undefined && players.player3 === undefined && players.player4 === undefined)
+			return ({state: true, mode: "disconnected"});
+		else if (players.player1 && players.player1.surrender && players.player2 && players.player2.surrender && players.player3 && players.player3.surrender)
+			return ({state: true, mode: "surrender", player: 4});
+		else if (players.player1 && players.player1.surrender && players.player2 && players.player2.surrender && players.player4 && players.player4.surrender)
+			return ({state: true, mode: "surrender", player: 3});
+		else if (players.player1 && players.player1.surrender && players.player3 && players.player3.surrender && players.player4 && players.player4.surrender)
+			return ({state: true, mode: "surrender", player: 2});
+		else if (players.player2 && players.player2.surrender && players.player3 && players.player3.surrender && players.player4 && players.player4.surrender)
+			return ({state: true, mode: "surrender", player: 1});
 		return ({state: false, mode: "none"});
 	}
 
@@ -90,6 +147,33 @@ export class GameGateway {
 			if (end.state)
 				return (end);
 			end = this.checkConnected(room);
+			if (end.state && end.mode === "disconnected") 
+			{
+				if (wait > 2500)
+					return (end);
+				else
+					wait += 1;
+			}
+			else if (end.state)
+				return (end);
+			else
+				wait = 0;
+			await this.sleep(5)
+		}
+	}
+
+	private async gameRunFFA(gameRoom: GameRoomFFA, room: number) {
+		let end;
+		let wait = 0;
+
+		while (true) {
+			this.movePlayerFFA(gameRoom, room);
+			await this.moveBallFFA(gameRoom, room);
+			this.server.to("game-" + room).emit("gameState", gameRoom.getGameRoomInfo());
+			end = gameRoom.checkEndGame();
+			if (end.state)
+				return (end);
+			end = this.checkConnectedFFA(room);
 			if (end.state && end.mode === "disconnected") 
 			{
 				if (wait > 2500)
@@ -184,15 +268,122 @@ export class GameGateway {
 		//jE PENSE QU'IL FAUDRAIT AUSSI DELETE ROOM
 	}
 
-	async gameLoop(room: number) {
+	private async gameEndFFA(gameRoom: GameRoomFFA, room: number, endMode: any) {
+		await this.prisma.game.update({
+			where: { id: room },
+			data: { state: "ENDED"}
+		})
+		const game = await this.prisma.game.findUnique({where: {id: room}});
+		if (!game)
+			return (false);
+		
+		if (endMode.mode === "normal") {
+			if (gameRoom.player1.score > gameRoom.player2.score && gameRoom.player1.score > gameRoom.player3.score && gameRoom.player1.score > gameRoom.player4.score)
+			{
+				await this.prisma.game.update({
+					where: { id: room },
+					data: { winner: game.user1Id }})
+			}
+			else if (gameRoom.player2.score > gameRoom.player1.score && gameRoom.player2.score > gameRoom.player3.score && gameRoom.player2.score > gameRoom.player4.score)
+			{
+				await this.prisma.game.update({
+					where: { id: room },
+					data: { winner: game.user2Id }})
+			}
+			else if (gameRoom.player3.score > gameRoom.player1.score && gameRoom.player3.score > gameRoom.player2.score && gameRoom.player3.score > gameRoom.player4.score)
+			{
+				await this.prisma.game.update({
+					where: { id: room },
+					data: { winner: game.user3Id }})
+			}
+			else if (gameRoom.player4.score > gameRoom.player1.score && gameRoom.player4.score > gameRoom.player2.score && gameRoom.player4.score > gameRoom.player3.score)
+			{
+				await this.prisma.game.update({
+					where: { id: room },
+					data: { winner: game.user4Id }})
+			}
+		}
+		else if (endMode.mode === "surrender") {
+			if (endMode.player === 1)
+			{
+				await this.prisma.game.update({
+					where: { id: room },
+					data: { winner: game.user1Id }})
+			}
+			else if (endMode.player === 2)
+			{
+				await this.prisma.game.update({
+					where: { id: room },
+					data: { winner: game.user2Id }})
+			}
+			else if (endMode.player === 3)
+			{
+				await this.prisma.game.update({
+					where: { id: room },
+					data: { winner: game.user3Id }})
+			}
+			else if (endMode.player === 4)
+			{
+				await this.prisma.game.update({
+					where: { id: room },
+					data: { winner: game.user4Id }})
+			}
+		}
+		await this.prisma.user.update({
+			where: { id: game.user1Id },
+			data: { state: "ONLINE", experience: { increment: 100 + gameRoom.player1.score * 100 } }})
+		await this.prisma.user.update({
+			where: { id: game.user2Id },
+			data: { state: "ONLINE", experience: { increment: 100 + gameRoom.player2.score * 100 } }})
+		await this.prisma.user.update({
+			where: { id: game.user3Id },
+			data: { state: "ONLINE", experience: { increment: 100 + gameRoom.player3.score * 100 } }})
+		await this.prisma.user.update({
+			where: { id: game.user4Id },
+			data: { state: "ONLINE", experience: { increment: 100 + gameRoom.player4.score * 100 } }})
+
+		// this.GamePlaying.splice(this.GamePlaying.indexOf(room), 1);
+		this.GamePlaying.splice(this.GamePlaying.findIndex((game) => game.room === room), 1);
+		//disconnect all socket to the room associated and navigate to the end page
+		this.server.to("game-" + room).emit("endGame", {player1_score: gameRoom.player1.score, player2_score: gameRoom.player2.score, player3_score: gameRoom.player3.score, player4_score: gameRoom.player4.score});
+		//jE PENSE QU'IL FAUDRAIT AUSSI DELETE ROOM
+	}
+
+
+
+	async gameLoop1V1(room: number) {
 		let gameRoom = new GameRoom(room);
+		let end;
 
-		await this.waitingPlayerConnection(room);
-
-		let end: any = await this.gameRun(gameRoom, room);
+		end = await this.waitingPlayerConnection(room, "ONEVONE");
+		if (!end)
+			end = await this.gameRun(gameRoom, room);
 
 		await this.gameEnd(gameRoom, room, end);
 	}
+
+	async gameLoopFFA(room: number) {
+		let end;
+		let gameRoom = new GameRoomFFA(room);
+
+		end = await this.waitingPlayerConnection(room, "FREEFORALL");
+		if (!end)
+			end = await this.gameRunFFA(gameRoom, room);
+
+		await this.gameEndFFA(gameRoom, room, end);
+	}
+
+	// async gameLoop2V2(room: number) {
+	// 	let gameRoom = new GameRoom2V2(room);
+
+	// 	let end;
+
+	// 	end = await this.waitingPlayerConnection(room, "TWOVTWO");
+	// 	if (!end)
+	// 		end = await this.gameRun(gameRoom, room);
+
+	// 	await this.gameEnd(gameRoom, room, end);
+	// }
 
 	private async checkUserConnection(client: Socket, data: any) {
 	
@@ -238,7 +429,11 @@ export class GameGateway {
 		if (game.user1Id == user.id)
 			state = "player1";
 		else if (game.user2Id == user.id)
-			state = "player2";	
+			state = "player2";
+		else if (game.user3Id == user.id)
+			state = "player3";
+		else if (game.user4Id == user.id)
+			state = "player4";
 		else
 		{
 			state = "spectator";
@@ -272,6 +467,8 @@ export class GameGateway {
 				state: state,
 				up: 0,
 				down: 0,
+				left: 0,
+				right: 0,
 				surrender: false
 			});
 			client.join("game-" + room);
@@ -291,25 +488,45 @@ export class GameGateway {
 		this.setupUserSocket(client, userCheck.user, userCheck.game, userCheck.login, userCheck.room);
 		
 		if (userCheck.game.state === "CREATING")// || userCheck.game.state === "PLAYING")
-			client.emit("gameState", {
-				ball_x: 0.5,
-				ball_y: 0.5,
-				ball_size: 0.03,
-				
-				player1_x: 0.006,
-				player1_y: 0.5,
-				player1_size: 0.2,
-				player1_score: 0,
-	
-				player2_x: 0.994,
-				player2_y: 0.5,
-				player2_size: 0.2,
-				player2_score: 0,
-			});
+		{
+			if(userCheck.game.mode === "ONEVONE")
+				client.emit("gameState", {
+					ball_x: 0.5,ball_y: 0.5,ball_size: 0.03,
+					player1_x: 0.006,player1_y: 0.5,player1_size: 0.2,player1_score: 0,
+					player2_x: 0.994,player2_y: 0.5,player2_size: 0.2,player2_score: 0,
+					board: 1,
+					mode: "rayah",
+				});
+			if (userCheck.game.mode === "TWOVTWO")
+				client.emit("gameState", {
+					ball_x: 0.5,ball_y: 0.5,ball_size: 0.03,
+					player1_x: 0.006,player1_y: 0.5,player1_size: 0.2,player1_score: 0,
+					player2_x: 0.02,player2_y: 0.5,player2_size: 0.2,player2_score: 0,
+					player3_x: 0.994,player3_y: 0.5,player3_size: 0.2,player3_score: 0,
+					player4_x: 0.980,player4_y: 0.5,player4_size: 0.2,player4_score: 0,
+					board: 2,
+					mode: "roro",
+				});
+			if (userCheck.game.mode === "FREEFORALL")
+				client.emit("gameState", {
+					ball_x: 0.5,ball_y: 0.5,ball_size: 0.03,
+					player1_x: 0.006,player1_y: 0.5,player1_size: 0.2,player1_score: 4,
+					player2_x: 0.994,player2_y: 0.5,player2_size: 0.2,player2_score: 4,
+					player3_x: 0.5,player3_y: 0.006,player3_size: 0.2,player3_score: 4,
+					player4_x: 0.5,player4_y: 0.994,player4_size: 0.2,player4_score: 4,
+					board: 2,
+					mode: "riru",
+				});
+		}
 		if (this.GamePlaying.findIndex(x => x.room === userCheck.room) === -1)
 		{
-			this.GamePlaying.push({room: userCheck.room, specList: []});
-			this.gameLoop(userCheck.room);
+			this.GamePlaying.push({room: userCheck.room, mode: userCheck.game.mode, specList: []});
+			if (userCheck.game.mode === "ONEVONE")
+				this.gameLoop1V1(userCheck.room);
+			else if (userCheck.game.mode === "FREEFORALL")
+				this.gameLoopFFA(userCheck.room);
+			// else
+			// 	this.gameLoop2V2(userCheck.room);
 		}
 		return (true);
 	}
@@ -358,12 +575,24 @@ export class GameGateway {
 			{
 				const player1 = await this.prisma.user.findFirst({where: {id: game.user1Id}});
 				const player2 = await this.prisma.user.findFirst({where: {id: game.user2Id}});
+				let player3 = undefined;
+				let player4 = undefined;
+				if (game.mode !== "ONEVONE")
+				{
+					player3 = await this.prisma.user.findFirst({where: {id: game.user3Id}});
+					player4 = await this.prisma.user.findFirst({where: {id: game.user4Id}});
+				}
 				if (player1 && player2) 
 				{
 					if (game.winner === game.user1Id)
-						client.emit("getEndStatus", {score1: game.score1, score2: game.score2, avatar1: player1.avatar, avatar2: player2.avatar} )
-					else
-						client.emit("getEndStatus", {score1: game.score2, score2: game.score1, avatar1: player2.avatar, avatar2: player1.avatar} )
+						client.emit("getEndStatus", {score1: game.score1, score2: game.score2, score3: player3 ? game.score3 : null, avatar1: player1.avatar, avatar2: player2.avatar, avatar3: player3 ? player3.avatar : null} )
+					else if (game.winner === game.user2Id)
+						client.emit("getEndStatus", {score1: game.score2, score2: game.score1, score3: player3 ? game.score3 : null, avatar1: player2.avatar, avatar2: player1.avatar, avatar3: player3 ? player3.avatar : null} )
+					else if (game.winner === game.user3Id)
+						client.emit("getEndStatus", {score1: game.score3, score2: game.score1, score3: game.score2, avatar1: player3.avatar, avatar2: player1.avatar, avatar3: player2.avatar} )
+					else if (game.winner === game.user4Id)
+						client.emit("getEndStatus", {score1: game.score4, score2: game.score2, score3: game.score1, avatar1: player4.avatar, avatar2: player2.avatar, avatar3: player1.avatar} )
+
 				}
 			}
 		}
@@ -384,6 +613,16 @@ export class GameGateway {
 				if (sockUser.up === 1)
 					sockUser.up = 2;
 			}
+			if (data === "LEFT") {
+				sockUser.left = 1;
+				if (sockUser.right === 1)
+					sockUser.right = 2;
+			}
+			else if (data === "RIGHT") {
+				sockUser.right = 1;
+				if (sockUser.left === 1)
+					sockUser.left = 2;
+			}
 		}
 	}
 
@@ -402,6 +641,16 @@ export class GameGateway {
 				if (sockUser.up === 2)
 					sockUser.up = 1;
 			}
+			if (data === "LEFT") {
+				sockUser.left = 0;
+				if (sockUser.right === 2)
+					sockUser.right = 1;
+			}
+			else if (data === "RIGHT") {
+				sockUser.right = 0;
+				if (sockUser.left === 2)
+					sockUser.left = 1;
+			}
 		}
 	}
 
@@ -409,10 +658,14 @@ export class GameGateway {
 	HandleSurrender(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
 		const players = this.getPlayerSocket(data.room);
 		
-		if (players.player1 != null && players.player1.login === data.login)
+		if (players.player1 != null && players.player1.socketId === client.id)
 			players.player1.surrender = true;
-		if (players.player2 != null && players.player2.login === data.login)
+		if (players.player2 != null && players.player2.socketId === client.id)
 			players.player2.surrender = true;
+		if (players.player3 != null && players.player3.socketId === client.id)
+			players.player3.surrender = true;
+		if (players.player4 != null && players.player4.socketId === client.id)
+			players.player4.surrender = true;
 	}
 
 	@SubscribeMessage("quickChatMessage")

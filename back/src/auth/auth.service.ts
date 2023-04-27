@@ -55,7 +55,8 @@ export class AuthService {
 				return this.createUser(res, user);
 			});
 		} catch (error) {
-			throw new ForbiddenException("callback error");
+			console.log(error)
+			throw new ForbiddenException("getUserInfo error");
 		}
 	}
 

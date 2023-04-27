@@ -32,7 +32,7 @@ const NotFound = () => {
 
 function App(this: any) {
 	useGetUser();
-	const status = useSelector(selectUser).status;
+	const user = useSelector(selectUser);
 	const currentPath = window.location.pathname;
 	const [reload, setReload] = useState(false);
 	const [socketQueue, setSocketQueue] = useState<Socket>({} as Socket);
@@ -40,11 +40,14 @@ function App(this: any) {
 	const env = {host: process.env.REACT_APP_BACK_HOST, port: process.env.REACT_APP_BACK_PORT}
 	// transportOptions: { polling: { extraHeaders: { 'Access-Control-Allow-Origin': '*' } } }
 	useEffect(() => {
-		setSocketQueue(io("http://" + env.host + ":" + env.port + "/queue", {transports: ['websocket'], withCredentials: true}));
-		setSocketGame(io("http://" + env.host + ":" + env.port + "/game", {transports: ['websocket'], withCredentials: true}));
-	}, []);
+		if (user.status === 'resolved' && user.auth)
+		{				
+			setSocketQueue(io("http://" + env.host + ":" + env.port + "/queue", {transports: ['websocket'], withCredentials: true}));
+			setSocketGame(io("http://" + env.host + ":" + env.port + "/game", {transports: ['websocket'], withCredentials: true}));
+		}
+	}, [user]);
 	// console.log("ENV", env, process.env);
-	if (status !== 'resolved' && status !== 'notAuth') return <div></div>;
+	if (user.status !== 'resolved' && user.status !== 'notAuth') return <div></div>;
 	return (
 		<div>
 			<GamePopUp socketQueue={socketQueue} reload={reload} setReload={setReload} />

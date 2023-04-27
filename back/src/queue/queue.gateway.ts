@@ -207,20 +207,13 @@ export class QueueGateway {
 			await this.prisma.user.updateMany({
 				where: {login: {in: players.map(player => player.login)}}, 
 				data: {state: "PLAYING"}});
-			
+			let score;
+			if (match.mode === "ONEVONE" || match.mode === "TWOVTWO") score = 0;
+			else score = 4;
 			await this.prisma.game.create({ 
-				data: {user1Id: players[0].id, user2Id: players[1].id, user3Id: players[2] ? players[2].id : players[0].id, user4Id: players[3] ? players[3].id : players[1].id, mode: match.mode}
+				data: {user1Id: players[0].id, user2Id: players[1].id, user3Id: players[2] ? players[2].id : players[0].id, user4Id: players[3] ? players[3].id : players[1].id, mode: match.mode,
+				score1: score, score2: score, score3: score, score4: score}
 			});
-
-			const game = await this.prisma.game.findFirst({ 
-				where: {
-					state: "CREATING",
-					AND: [
-						{ user1Id: players[0].id },
-						{ user2Id: players[1].id },
-						{user3Id: players[2] ? players[2].id : players[0].id},
-						{user4Id: players[3] ? players[3].id : players[1].id}]}
-				});
 
 			this.server.to(players[0].socketId).emit("GamePopUpResponse", {message: "OK"});
 			this.server.to(players[1].socketId).emit("GamePopUpResponse", {message: "OK"});
@@ -317,10 +310,10 @@ export class QueueGateway {
 		while (1)
 		{
 			// console.log("This is the queue: ", this.queue1v1);
-			console.log("===Group====")
-			for (const group of this.groups)
-				console.log (group.player1.login, (!group.player2 || group.player2.login), (!group.player3 || group.player3.login), (!group.player4 || group.player4.login)) 
-			console.log("=============");
+			// console.log("===Group====")
+			// for (const group of this.groups)
+			// 	console.log (group.player1.login, (!group.player2 || group.player2.login), (!group.player3 || group.player3.login), (!group.player4 || group.player4.login)) 
+			// console.log("=============");
 			// console.log("===Queue1v1====")
 			// for (const group of this.queue1v1)
 			// 	console.log (group.player1.login, (!group.player2 || group.player2.login), (!group.player3 || group.player3.login), (!group.player4 || group.player4.login)) 
@@ -329,11 +322,11 @@ export class QueueGateway {
 			// for (const group of this.queue2v2)
 			// 	console.log (group.player1.login, (!group.player2 || group.player2.login), (!group.player3 || group.player3.login), (!group.player4 || group.player4.login)) 
 			// console.log("=============");
-			console.log("===QueueFFA====")
-			for (const group of this.queueFFA)
-				console.log (group.player1.login, (!group.player2 || group.player2.login), (!group.player3 || group.player3.login), (!group.player4 || group.player4.login)) 
-			console.log("=============");
-			
+			// console.log("===QueueFFA====")
+			// for (const group of this.queueFFA)
+			// 	console.log (group.player1.login, (!group.player2 || group.player2.login), (!group.player3 || group.player3.login), (!group.player4 || group.player4.login)) 
+			// console.log("=============");
+			 
 			this.checkQueue();
 			
 			await this.checkMatch();
@@ -590,7 +583,9 @@ export class QueueGateway {
 		const cookie = client.handshake.headers.cookie;
 		if (!cookie)
 			return ;
-		const parsedCookie = cookie.split("; ").find((cook) => cook.startsWith("jwt=")).replace("jwt=", "");
+		const parsedCookie = cookie.split("; ").find((cook) => cook.startsWith("jwt="))?.replace("jwt=", "");
+		if (!parsedCookie)
+			return ;
 		let decoded: any;
 		try {
 			decoded = jwt.verify(parsedCookie, process.env.JWT_SECRET);

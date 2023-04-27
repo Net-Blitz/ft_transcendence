@@ -16,6 +16,8 @@ export class QueueService {
 	//}
 
 	async checkPermission(userLogin: string) {
+		if (!userLogin)
+			return ({canJoin: false, reason: "User not found or not online"});
 		const user = await this.prisma.user.findUnique({
 			where: {login: userLogin,}});
 		if (!user || user.state === "OFFLINE")
