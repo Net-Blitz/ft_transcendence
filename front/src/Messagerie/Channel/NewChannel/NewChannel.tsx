@@ -10,13 +10,22 @@ import search from '../../Ressources/search.svg';
 const InputChannel = ({
 	title,
 	content,
+	typeChannel,
 }: {
 	title: string;
 	content: string;
+	typeChannel?: string;
 }) => {
 	return (
 		<>
-			<div className="input-channel">
+			<div
+				className="input-channel"
+				style={{
+					display:
+						typeChannel === 'private' || typeChannel === 'public'
+							? 'none'
+							: 'block',
+				}}>
 				<h4>{title}</h4>
 				<span>
 					<input type="text" placeholder={content} />
@@ -45,7 +54,14 @@ export const NewChannel = ({
 	}, [me, handleNewDmTrigger]);
 
 	return (
-		<div className="new-dm" style={{ height: '321px' }}>
+		<div
+			className="new-dm"
+			style={{
+				height:
+					typeChannel === 'private' || typeChannel === 'public'
+						? '280px'
+						: '321px',
+			}}>
 			<img src={close} alt="close-button" onClick={handleNewDmTrigger} />
 			<h3 style={{ height: '24px' }}>Create Channel</h3>
 			<InputChannel title="Name" content="enter the channel name" />
@@ -68,7 +84,11 @@ export const NewChannel = ({
 					Protected
 				</button>
 			</div>
-			<InputChannel title="Password" content="enter the new password" />
+			<InputChannel
+				title="Password"
+				content="enter the new password"
+				typeChannel={typeChannel}
+			/>
 			<div className="new-dm-buttons">
 				<button>Create</button>
 				<button onClick={handleNewDmTrigger}>Cancel</button>

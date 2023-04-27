@@ -125,7 +125,7 @@ const ChannelListElement = ({
 				channel: channel.name,
 				username: userInfo?.username,
 			});
-		};
+		}
 		//} else if (channel?.state === 'PROTECTED') {
 		//	if (
 		//		SaveChannel.find((channelName) => channelName === channel.name)
@@ -221,7 +221,7 @@ const Aside = ({
 		React.SetStateAction<ChannelDto | undefined>
 	>;
 }) => {
-	const [newDmTrigger, setNewDmTrigger] = useState(true);
+	const [newDmTrigger, setNewDmTrigger] = useState(false);
 
 	const handleNewDmTrigger = useCallback(() => {
 		setNewDmTrigger(!newDmTrigger);

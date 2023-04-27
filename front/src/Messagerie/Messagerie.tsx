@@ -44,7 +44,7 @@ const Navbar = ({ navbarStatus, setNavbarStatus }: NavbarProps) => {
 };
 
 export const Messagerie = () => {
-	const [navbarStatus, setNavbarStatus] = useState('channel');
+	const [navbarStatus, setNavbarStatus] = useState('privateMessage');
 	const [socket, setSocket] = useState<Socket>();
 
 	useEffect(() => {
