@@ -17,16 +17,19 @@ const InputFlat = ({
 	icon,
 	content,
 	userInfo,
-	handleCreateDM,
+	selectedUser,
+	setSelectedUser,
 }: {
 	icon: string;
 	content: string;
 	userInfo: userInfoDto | undefined;
-	handleCreateDM: (username: string) => void;
+	selectedUser: string;
+	setSelectedUser: React.Dispatch<React.SetStateAction<string>>;
 }) => {
 	const [searchTerm, setSearchTerm] = useState('');
 	const [searchResults, setSearchResults] = useState<userInfoDto[]>([]);
 	const [users, setUsers] = useState<userInfoDto[]>([]);
+
 
 	useEffect(() => {
 		const FetchUsers = async () => {
@@ -73,51 +76,23 @@ const InputFlat = ({
 					}}
 				/>
 			</div>
-			<ul>
-				{searchTerm.length > 0
-					? searchResults.map((user, index) => (
-							<li key={index}>
-								<div className="search-result" key={index}>
-									<img
-										src={
-											'http://localhost:3333/' +
-											user.avatar
-										}
-										alt="avatar"
-									/>
-									<h4>{user.username}</h4>
-									<button
-										onClick={() =>
-											handleCreateDM(user.username)
-										}
-										value={user.username}>
-										DM
-									</button>
-								</div>
-							</li>
-					  ))
-					: users.map((user, index) => (
-							<li key={index}>
-								<div className="search-result" key={index}>
-									<img
-										src={
-											'http://localhost:3333/' +
-											user.avatar
-										}
-										alt="avatar"
-									/>
-									<h4>{user.username}</h4>
-									<button
-										onClick={() =>
-											handleCreateDM(user.username)
-										}
-										value={user.username}>
-										DM
-									</button>
-								</div>
-							</li>
-					  ))}
-			</ul>
+			<div className="input-select">
+				<select
+					value={selectedUser}
+					onChange={(e) => setSelectedUser(e.target.value)}>
+					{searchResults.length > 0
+						? searchResults.map((user, index) => (
+								<option key={index} value={user.username}>
+									{user.username}
+								</option>
+						))
+						: users.map((user, index) => (
+								<option key={index} value={user.username}>
+									{user.username}
+								</option>
+						))}
+				</select>
+			</div>
 		</>
 	);
 };
@@ -131,6 +106,7 @@ const NewDm = ({
 }) => {
 	const me = document.getElementsByClassName('popup');
 	const [blocked, setBlocked] = useState<userInfoDto[]>([]);
+	const [selectedUser, setSelectedUser] = useState('');
 
 	useEffect(() => {
 		window.onclick = (event: any) => {
@@ -156,6 +132,7 @@ const NewDm = ({
 	}, []);
 
 	const handleCreateDM = async (username: string) => {
+		if (username === '') return;
 		if (blocked?.find((user) => user.username === username)) {
 			console.log('user blocked');
 			return;
@@ -181,10 +158,11 @@ const NewDm = ({
 				icon={search}
 				content="Search a user"
 				userInfo={userInfo}
-				handleCreateDM={handleCreateDM}
+				selectedUser={selectedUser}
+				setSelectedUser={setSelectedUser}
 			/>
 			<div className="new-dm-buttons">
-				<button onClick={() => handleCreateDM('')}>Create</button>
+				<button onClick={() => handleCreateDM(selectedUser)}>Create</button>
 				<button onClick={handleNewDmTrigger}>Cancel</button>
 			</div>
 		</div>
