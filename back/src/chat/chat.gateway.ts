@@ -210,7 +210,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					sender,
 					receiver,
 					DMid,
-					avatar: senderUser.avatar,
+					avatar: "http://localhost:3333/" + senderUser.avatar,
 					createdAt: new Date(),
 				});
 			}

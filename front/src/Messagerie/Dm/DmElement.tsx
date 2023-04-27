@@ -61,38 +61,64 @@ const InputFlat = ({
 	}, [searchTerm, users]);
 
 	return (
-		<div className="input-flat">
-			<img src={icon} alt="search icon" />
-			<input
-				type="text"
-				placeholder={content}
-				value={searchTerm}
-				onChange={(e) => {
-					setSearchTerm(e.target.value);
-				}}
-			/>
+		<>
+			<div className="input-flat">
+				<img src={icon} alt="search icon" />
+				<input
+					type="text"
+					placeholder={content}
+					value={searchTerm}
+					onChange={(e) => {
+						setSearchTerm(e.target.value);
+					}}
+				/>
+			</div>
 			<ul>
-				{searchTerm.length > 0 &&
-					searchResults.map((user, index) => (
-						<li key={index}>
-							<div className="search-result" key={index}>
-								<img
-									src={'http://localhost:3333/' + user.avatar}
-									alt="avatar"
-								/>
-								<h4>{user.username}</h4>
-								<button
-									onClick={() =>
-										handleCreateDM(user.username)
-									}
-									value={user.username}>
-									DM
-								</button>
-							</div>
-						</li>
-					))}
+				{searchTerm.length > 0
+					? searchResults.map((user, index) => (
+							<li key={index}>
+								<div className="search-result" key={index}>
+									<img
+										src={
+											'http://localhost:3333/' +
+											user.avatar
+										}
+										alt="avatar"
+									/>
+									<h4>{user.username}</h4>
+									<button
+										onClick={() =>
+											handleCreateDM(user.username)
+										}
+										value={user.username}>
+										DM
+									</button>
+								</div>
+							</li>
+					  ))
+					: users.map((user, index) => (
+							<li key={index}>
+								<div className="search-result" key={index}>
+									<img
+										src={
+											'http://localhost:3333/' +
+											user.avatar
+										}
+										alt="avatar"
+									/>
+									<h4>{user.username}</h4>
+									<button
+										onClick={() =>
+											handleCreateDM(user.username)
+										}
+										value={user.username}>
+										DM
+									</button>
+								</div>
+							</li>
+					  ))}
 			</ul>
-		</div>
+		</>
 	);
 };
 
@@ -131,7 +157,7 @@ const NewDm = ({
 
 	const handleCreateDM = async (username: string) => {
 		if (blocked?.find((user) => user.username === username)) {
-			alert('You cannot DM this user');
+			console.log('user blocked');
 			return;
 		}
 		try {
@@ -142,7 +168,7 @@ const NewDm = ({
 			);
 			handleNewDmTrigger();
 		} catch (error) {
-			alert('DM already exist');
+			console.log('DM already exist');
 			console.log(error);
 		}
 	};
@@ -168,26 +194,57 @@ const NewDm = ({
 const DmListElement = ({
 	DM,
 	userInfo,
+	selectedDM,
+	setSelectedDM,
 }: {
 	DM: DirectMessageDto;
 	userInfo: userInfoDto | undefined;
+	selectedDM: DirectMessageDto | undefined;
+	setSelectedDM: React.Dispatch<
+		React.SetStateAction<DirectMessageDto | undefined>
+	>;
 }) => {
 	const user: userInfoDto =
 		userInfo?.id === DM.senderId ? DM.receiver : DM.sender;
 
+	const handleBlock = async (username: string) => {
+		try {
+			await axios.post(
+				'http://localhost:3333/friend/block/' + username,
+				{},
+				{ withCredentials: true }
+			);
+			console.log('You have block ' + username);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	const handleInvite = async (username: string) => {
+		console.log('You invited ' + username);
+	};
+
 	return (
-		<div className="dm-list-element">
+		<div
+			className={`dm-list-element ${
+				DM.id === selectedDM?.id && 'active'
+			}`}
+			onClick={() => setSelectedDM(DM)}>
 			<img className="dm-list-element-avatar" src={user.avatar} alt="" />
 			<h4>{user.username}</h4>
 			<div className="dm-list-buttons">
-				<div className="buttons-wrapper">
+				<div
+					className="buttons-wrapper"
+					onClick={() => handleInvite(user.username)}>
 					<img
 						className="dm-list-element-controller"
 						src={controller}
 						alt="controller icon"
 					/>
 				</div>
-				<div className="buttons-wrapper">
+				<div
+					className="buttons-wrapper"
+					onClick={() => handleBlock(user.username)}>
 					<img
 						className="dm-list-element-block"
 						src={block}
@@ -202,15 +259,27 @@ const DmListElement = ({
 const DmList = ({
 	DMList,
 	userInfo,
+	selectedDM,
+	setSelectedDM,
 }: {
 	DMList: DirectMessageDto[];
 	userInfo: userInfoDto | undefined;
+	selectedDM: DirectMessageDto | undefined;
+	setSelectedDM: React.Dispatch<
+		React.SetStateAction<DirectMessageDto | undefined>
+	>;
 }) => {
 	return (
 		<div className="dm-list">
 			{DMList.map((DM, index) => {
 				return (
-					<DmListElement DM={DM} key={index} userInfo={userInfo} />
+					<DmListElement
+						DM={DM}
+						key={index}
+						userInfo={userInfo}
+						selectedDM={selectedDM}
+						setSelectedDM={setSelectedDM}
+					/>
 				);
 			})}
 		</div>
@@ -221,10 +290,16 @@ const Aside = ({
 	buttonContent,
 	DMList,
 	userInfo,
+	selectedDM,
+	setSelectedDM,
 }: {
 	buttonContent: string;
 	DMList: DirectMessageDto[];
 	userInfo: userInfoDto | undefined;
+	selectedDM: DirectMessageDto | undefined;
+	setSelectedDM: React.Dispatch<
+		React.SetStateAction<DirectMessageDto | undefined>
+	>;
 }) => {
 	const [newDmTrigger, setNewDmTrigger] = useState(false);
 
@@ -237,7 +312,12 @@ const Aside = ({
 			<button className="new-input" onClick={handleNewDmTrigger}>
 				{buttonContent}
 			</button>
-			<DmList DMList={DMList} userInfo={userInfo} />
+			<DmList
+				DMList={DMList}
+				userInfo={userInfo}
+				selectedDM={selectedDM}
+				setSelectedDM={setSelectedDM}
+			/>
 			<PopUp trigger={newDmTrigger}>
 				<NewDm
 					handleNewDmTrigger={handleNewDmTrigger}
@@ -250,7 +330,7 @@ const Aside = ({
 
 interface Props {
 	socket: Socket;
-	DM: DirectMessageDto;
+	DM: DirectMessageDto | undefined;
 	userInfo: userInfoDto | undefined;
 }
 
@@ -302,7 +382,7 @@ const Beside = ({ socket, DM, userInfo }: Props) => {
 			sender: userInfo?.id,
 			receiver,
 		});
-		message.avatar = userInfo?.avatar;
+		message.avatar = 'http://localhost:3333/' + userInfo?.avatar;
 		message.createdAt = new Date();
 		setMessages((messages) => [message, ...messages]);
 	};
@@ -318,55 +398,51 @@ const Beside = ({ socket, DM, userInfo }: Props) => {
 						? DM.receiver.username
 						: userInfo?.username
 				}>
-				<div className="chat-bubble-container">
-					{messages.map((message, index) => (
-						<div
-							key={index}
-							className={`chat-bubble ${
-								userInfo?.username === message.username
-									? 'chat-me'
-									: 'chat-you'
-							}`}>
-							{(userInfo?.username === message.username && (
-								<>
-									<p>{message.content}</p>
-									<img
-										className="chat-avatar"
-										src={message.avatar}
-										alt="avatar"
-									/>
-									<p>
-										{new Date(
-											message.createdAt
-										).getHours() +
-											':' +
-											new Date(
-												message.createdAt
-											).getMinutes()}
-									</p>
-								</>
-							)) || (
-								<>
-									<p>
-										{new Date(
-											message.createdAt
-										).getHours() +
-											':' +
-											new Date(
-												message.createdAt
-											).getMinutes()}
-									</p>
-									<img
-										className="chat-avatar"
-										src={message.avatar}
-										alt="avatar"
-									/>
-									<p>{message.content}</p>
-								</>
-							)}
-						</div>
-					))}
-				</div>
+				{messages.map((message, index) => (
+					<div
+						key={index}
+						className={`chat-bubble ${
+							userInfo?.username === message.username
+								? 'chat-me'
+								: 'chat-you'
+						}`}>
+						{(userInfo?.username === message.username && (
+							<>
+								<p>{message.content}</p>
+								<img
+									className="chat-avatar"
+									src={message.avatar}
+									alt="avatar"
+								/>
+								<p>
+									{new Date(message.createdAt).getHours() +
+										':' +
+										new Date(message.createdAt)
+											.getMinutes()
+											.toString()
+											.padStart(2, '0')}
+								</p>
+							</>
+						)) || (
+							<>
+								<p>
+									{new Date(message.createdAt).getHours() +
+										':' +
+										new Date(message.createdAt)
+											.getMinutes()
+											.toString()
+											.padStart(2, '0')}
+								</p>
+								<img
+									className="chat-avatar"
+									src={message.avatar}
+									alt="avatar"
+								/>
+								<p>{message.content}</p>
+							</>
+						)}
+					</div>
+				))}
 			</BasicFrame>
 			<MessageInput sendMessage={sendMessage} userInfo={userInfo} />
 		</div>
@@ -393,6 +469,7 @@ export const DmElement = () => {
 	const [userInfo, setUserInfo] = useState<userInfoDto>();
 	const [socket, setSocket] = useState<any>();
 	const [DMList, setDMList] = useState<DirectMessageDto[]>([]);
+	const [selectedDM, setSelectedDM] = useState<DirectMessageDto>();
 
 	useEffect(() => {
 		const newSocket = io('http://localhost:3334');
@@ -431,8 +508,14 @@ export const DmElement = () => {
 
 	return (
 		<div className="dm-element">
-			<Aside buttonContent="New DM" DMList={DMList} userInfo={userInfo} />
-			<Beside socket={socket} DM={DMList[0]} userInfo={userInfo} />
+			<Aside
+				buttonContent="New DM"
+				DMList={DMList}
+				userInfo={userInfo}
+				selectedDM={selectedDM}
+				setSelectedDM={setSelectedDM}
+			/>
+			<Beside socket={socket} DM={selectedDM} userInfo={userInfo} />
 		</div>
 	);
 };
