@@ -6,17 +6,16 @@ import { Link, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { selectUserData } from '../../utils/redux/selectors';
 import logo from './Ressources/logo.svg';
-import avatar from './Ressources/avatar.svg';
+
 // Inactive
 import chat_blue from './Ressources/chat_blue.svg';
 import contact_blue from './Ressources/contact_blue.svg';
 import game_blue from './Ressources/game_blue.svg';
-import notif_blue from './Ressources/notif_blue.svg';
+
 // Active
 import chat_white from './Ressources/chat_white.svg';
 import contact_white from './Ressources/contact_white.svg';
 import game_white from './Ressources/game_white.svg';
-import notif_white from './Ressources/notif_white.svg';
 
 const Navbar = () => {
 	/* 	SELECTORS	*/
@@ -43,12 +42,6 @@ const Navbar = () => {
 			href: '/chat',
 			imgSrc: chat_blue,
 			activeImgSrc: chat_white,
-		},
-		{
-			content: 'Alert',
-			href: '/Alert',
-			imgSrc: notif_blue,
-			activeImgSrc: notif_white,
 		},
 		{ content: 'Profile', href: '/profile', imgSrc: userData.avatar },
 	];

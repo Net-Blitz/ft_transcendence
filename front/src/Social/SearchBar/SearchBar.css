@@ -1,0 +1,43 @@
+.searchBar{
+	border: none;
+	color:#FDFAD0;
+	font-size: 13px;
+	font-weight: 300;
+	width: 100%;
+	padding: 5px 0px 5px 5px;
+	border-radius: 5px;
+	box-shadow: 0px 4px 4px rgba(10, 61, 98, 0.3);
+	background-color: transparent;
+}
+
+.searchBar::placeholder{
+	color:#FDFAD0;
+}
+.searchBar:focus{
+	outline: none;
+}
+
+.searchBarImgInput{
+	border-radius: 5px;
+	display: flex;
+	flex-direction: row;
+	background-color: #0A3D62;
+	align-items: center;
+}
+
+.searchBarImgInput img{
+	width: 17px;
+	height: 17px;
+	padding-left:5px;
+}
+.searchBarFilteredUsers{
+	font-family: 'Poppins';
+	width: 90%;
+	margin-top:20px;
+}
+
+.nameSearched{
+	font-size: 10px;
+	font-weight: 300;
+	color: #0A3D62;
+}

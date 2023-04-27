@@ -1,14 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useSelector } from 'react-redux';
 import { FilteredUsers } from '../FilteredUsers/FilteredUsers';
+import './SearchBar.css';
+
+/*	SELECTORS	*/
+import { selectUserData } from '../../utils/redux/selectors';
+
+//Ressources
+import search_white from '../Ressources/search_white.svg';
 
 interface userDataInt {
 	username: string;
-	level: number;
-	status: string;
+	experience: number;
+	state: string;
+	avatar: string;
 }
 
 export const SearchBar = () => {
+	const myUsername = useSelector(selectUserData).username;
+
 	const [users, setUsers] = useState<{ username: string }[]>([]);
 	const [filteredUsername, setFilteredUsername] = useState<
 		{ username: string }[]
@@ -38,8 +49,10 @@ export const SearchBar = () => {
 
 	//Filter users
 	useEffect(() => {
-		const results = users.filter((user) =>
-			user.username.toLowerCase().includes(searchQuery.toLowerCase())
+		const results = users.filter(
+			(user) =>
+				user.username !== myUsername &&
+				user.username.toLowerCase().includes(searchQuery.toLowerCase())
 		);
 		setFilteredUsername(results);
 	}, [searchQuery, users]);
@@ -73,13 +86,20 @@ export const SearchBar = () => {
 	}, [filteredUsername]);
 
 	return (
-		<div>
-			<input
-				type="text"
-				placeholder="Search"
-				value={searchQuery}
-				onChange={handleInputChange}
-			/>
+		<div className="searchBarFilteredUsers">
+			<div className="searchBarImgInput">
+				<img src={search_white} alt="search img" />
+				<input
+					className="searchBar"
+					type="text"
+					placeholder="Search"
+					value={searchQuery}
+					onChange={handleInputChange}
+				/>
+			</div>
+			{searchQuery.length > 0 && (
+				<p className="nameSearched">You searched "{searchQuery}"</p>
+			)}
 			<FilteredUsers
 				searchQuery={searchQuery}
 				filteredUsers={filteredUsers}

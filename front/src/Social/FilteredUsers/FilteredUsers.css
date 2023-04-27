@@ -1,0 +1,60 @@
+.allFriendsSearch button{
+	background: none;
+	border: none;
+	padding: 0;
+	margin: 0;
+	outline: none;
+	font-family: inherit;
+	font-size: inherit;
+	color: inherit;
+	text-align: inherit;
+	cursor: pointer;
+	font-family: 'Poppins';
+	font-weight: 300;
+}
+.friendsInfoAll{
+	display: flex;
+	background-color: #0A3D62;
+	width: 303px;
+	align-items: center;
+	justify-content: space-evenly;
+	padding: 20px 0 20px 0;
+	border-radius: 10px;
+}
+
+.friendsInfoAll p{
+	margin:0;
+	font-family: 'Poppins';
+	font-weight: 300;
+	padding: 0 5px 0 5px ;
+}
+
+.imgUser{
+	background-color: #FDFAD0;
+	border-radius: 15px;
+	width: 80px;
+	height: 80px;
+	padding: 10px;
+}
+
+
+.friendsInfoSpe{
+	display: flex;
+	align-items: center;
+}
+
+.friendsInfoSpe p:nth-child(1){
+	color:#D9D9D9;
+	font-size: 12px;
+}
+
+.friendsInfoSpe p:nth-child(2){
+	color:#FDFAD0;
+	font-size: 15px;
+}
+
+.allFriendsSearch{
+	display: flex;
+	padding: 0;
+	justify-content: space-around;
+}
