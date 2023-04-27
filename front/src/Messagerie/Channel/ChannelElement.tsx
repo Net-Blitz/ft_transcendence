@@ -129,7 +129,9 @@ const ChannelListElement = ({
 			});
 		} else if (channel?.state === 'PROTECTED') {
 			if (
-				SaveChannel.find((savechannel) => savechannel.name === channel.name)
+				SaveChannel.find(
+					(savechannel) => savechannel.name === channel.name
+				)
 			) {
 				setSelectedChannel(channel);
 				socket?.emit('join', {
@@ -166,12 +168,14 @@ const ChannelListElement = ({
 	}, [ChannelPasswordTrigger, setChannelPasswordTrigger]);
 
 	return (
-		<div
-			className={`dm-list-element ${
-				Channel.id === selectedChannel?.id && 'active'
-			}`}
-			onClick={() => handleSelectChannel(Channel)}>
-			<h4>{Channel.name}</h4>
+		<>
+			<div
+				className={`dm-list-element ${
+					Channel.id === selectedChannel?.id && 'active'
+				}`}
+				onClick={() => handleSelectChannel(Channel)}>
+				<h4>{Channel.name}</h4>
+			</div>
 			<PopUp trigger={ChannelPasswordTrigger}>
 				<ChannelPassword
 					handleChannelPasswordTrigger={handleChannelPasswordTrigger}
@@ -179,7 +183,7 @@ const ChannelListElement = ({
 					setSaveChannel={setSaveChannel}
 				/>
 			</PopUp>
-		</div>
+		</>
 	);
 };
 

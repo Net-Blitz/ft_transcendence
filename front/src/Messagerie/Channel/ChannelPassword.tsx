@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { ChannelDto } from "./ChannelElement";
-import axios from "axios";
+import { useEffect, useState } from 'react';
+import { ChannelDto } from './ChannelElement';
+import axios from 'axios';
 /*	Ressources	*/
 import close from '../../Profile/Components/MainInfo/Ressources/close.svg';
 import search from '../Ressources/search.svg';
@@ -53,7 +53,10 @@ export const ChannelPassword = ({
 		};
 	}, [me, handleChannelPasswordTrigger]);
 
-	const handleJoinProtected = async (Channel: ChannelDto, password: string) => {
+	const handleJoinProtected = async (
+		Channel: ChannelDto,
+		password: string
+	) => {
 		if (!Channel) return;
 		if (Channel.state !== 'PROTECTED') return;
 		if (!password) return;
@@ -72,7 +75,11 @@ export const ChannelPassword = ({
 
 	return (
 		<div className="new-dm">
-			<img src={close} alt="close-button" onClick={handleChannelPasswordTrigger} />
+			<img
+				src={close}
+				alt="close-button"
+				onClick={handleChannelPasswordTrigger}
+			/>
 			<h3>Join {Channel.name}</h3>
 			<InputPassword
 				icon={search}
@@ -81,7 +88,9 @@ export const ChannelPassword = ({
 				setPassword={setPassword}
 			/>
 			<div className="new-dm-buttons">
-				<button onClick={() => handleJoinProtected(Channel ,password)}>Join</button>
+				<button onClick={() => handleJoinProtected(Channel, password)}>
+					Join
+				</button>
 				<button onClick={handleChannelPasswordTrigger}>Cancel</button>
 			</div>
 		</div>
