@@ -111,7 +111,7 @@ const ChannelListElement = ({
 }) => {
 	const [ban, setBan] = useState<any[]>([]);
 	const [ChannelPasswordTrigger, setChannelPasswordTrigger] = useState(false);
-	const { setMessages, SaveChannel, setSaveChannel } = useContext(MessagesContext);
+	const { setMessages, SaveChannel } = useContext(MessagesContext);
 
 	const handleSelectChannel = async (channel: ChannelDto) => {
 		const response = await axios.get(
@@ -183,7 +183,6 @@ const ChannelListElement = ({
 				<ChannelPassword
 					handleChannelPasswordTrigger={handleChannelPasswordTrigger}
 					Channel={Channel}
-					setSaveChannel={setSaveChannel}
 				/>
 			</PopUp>
 		</>
