@@ -1,16 +1,14 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import axios from 'axios';
 import { Socket } from 'socket.io-client';
-import './DmElement.css';
+import '../Dm/DmElement.css';
 /*	Components	*/
 import { PopUp } from '../../Profile/Components/MainInfo/MainInfo';
-import MessageInput from './MessageInput';
+import MessageInput from '../Dm/MessageInput';
 import { BasicFrame } from '../../Profile/Components/MiddleInfo/MiddleInfo';
 /*	Ressources	*/
 import close from '../../Profile/Components/MainInfo/Ressources/close.svg';
 import search from '../Ressources/search.svg';
-import block from '../Ressources/block.svg';
-import controller from '../Ressources/controller.svg';
 
 const InputFlat = ({
 	icon,
@@ -96,7 +94,7 @@ const InputFlat = ({
 	);
 };
 
-const NewDm = ({
+const NewChannel = ({
 	handleNewDmTrigger,
 	userInfo,
 }: {
@@ -168,94 +166,50 @@ const NewDm = ({
 	);
 };
 
-const DmListElement = ({
-	DM,
-	userInfo,
-	selectedDM,
-	setSelectedDM,
+const ChannelListElement = ({
+	Channel,
+	selectedChannel,
+	setSelectedChannel,
 }: {
-	DM: DirectMessageDto;
-	userInfo: userInfoDto | undefined;
-	selectedDM: DirectMessageDto | undefined;
-	setSelectedDM: React.Dispatch<
-		React.SetStateAction<DirectMessageDto | undefined>
+	Channel: ChannelDto;
+	selectedChannel: ChannelDto | undefined;
+	setSelectedChannel: React.Dispatch<
+		React.SetStateAction<ChannelDto | undefined>
 	>;
 }) => {
-	const user: userInfoDto =
-		userInfo?.id === DM.senderId ? DM.receiver : DM.sender;
-
-	const handleBlock = async (username: string) => {
-		try {
-			await axios.post(
-				'http://localhost:3333/friend/block/' + username,
-				{},
-				{ withCredentials: true }
-			);
-			console.log('You have block ' + username);
-		} catch (error) {
-			console.log(error);
-		}
-	};
-
-	const handleInvite = async (username: string) => {
-		console.log('You invited ' + username);
-	};
-
 	return (
 		<div
 			className={`dm-list-element ${
-				DM.id === selectedDM?.id && 'active'
+				Channel.id === selectedChannel?.id && 'active'
 			}`}
-			onClick={() => setSelectedDM(DM)}>
-			<img className="dm-list-element-avatar" src={user.avatar} alt="" />
-			<h4>{user.username}</h4>
-			<div className="dm-list-buttons">
-				<div
-					className="buttons-wrapper"
-					onClick={() => handleInvite(user.username)}>
-					<img
-						className="dm-list-element-controller"
-						src={controller}
-						alt="controller icon"
-					/>
-				</div>
-				<div
-					className="buttons-wrapper"
-					onClick={() => handleBlock(user.username)}>
-					<img
-						className="dm-list-element-block"
-						src={block}
-						alt="block icon"
-					/>
-				</div>
-			</div>
+			onClick={() => setSelectedChannel(Channel)}>
+			<h4>{Channel.name}</h4>
 		</div>
 	);
 };
 
-const DmList = ({
-	DMList,
+const ChannelLists = ({
+	ChannelList,
 	userInfo,
-	selectedDM,
-	setSelectedDM,
+	selectedChannel,
+	setSelectedChannel,
 }: {
-	DMList: DirectMessageDto[];
+	ChannelList: ChannelDto[];
 	userInfo: userInfoDto | undefined;
-	selectedDM: DirectMessageDto | undefined;
-	setSelectedDM: React.Dispatch<
-		React.SetStateAction<DirectMessageDto | undefined>
+	selectedChannel: ChannelDto | undefined;
+	setSelectedChannel: React.Dispatch<
+		React.SetStateAction<ChannelDto | undefined>
 	>;
 }) => {
 	return (
 		<div className="dm-list">
-			{DMList.map((DM, index) => {
+			{ChannelList.map((Channel, index) => {
 				return (
-					<DmListElement
-						DM={DM}
+					<ChannelListElement
+						Channel={Channel}
 						key={index}
-						userInfo={userInfo}
-						selectedDM={selectedDM}
-						setSelectedDM={setSelectedDM}
+						selectedChannel={selectedChannel}
+						setSelectedChannel={setSelectedChannel}
 					/>
 				);
 			})}
@@ -265,17 +219,17 @@ const DmList = ({
 
 const Aside = ({
 	buttonContent,
-	DMList,
+	ChannelList,
 	userInfo,
-	selectedDM,
-	setSelectedDM,
+	selectedChannel,
+	setSelectedChannel,
 }: {
 	buttonContent: string;
-	DMList: DirectMessageDto[];
+	ChannelList: ChannelDto[];
 	userInfo: userInfoDto | undefined;
-	selectedDM: DirectMessageDto | undefined;
-	setSelectedDM: React.Dispatch<
-		React.SetStateAction<DirectMessageDto | undefined>
+	selectedChannel: ChannelDto | undefined;
+	setSelectedChannel: React.Dispatch<
+		React.SetStateAction<ChannelDto | undefined>
 	>;
 }) => {
 	const [newDmTrigger, setNewDmTrigger] = useState(false);
@@ -289,14 +243,14 @@ const Aside = ({
 			<button className="new-input" onClick={handleNewDmTrigger}>
 				{buttonContent}
 			</button>
-			<DmList
-				DMList={DMList}
+			<ChannelLists
+				ChannelList={ChannelList}
 				userInfo={userInfo}
-				selectedDM={selectedDM}
-				setSelectedDM={setSelectedDM}
+				selectedChannel={selectedChannel}
+				setSelectedChannel={setSelectedChannel}
 			/>
 			<PopUp trigger={newDmTrigger}>
-				<NewDm
+				<NewChannel
 					handleNewDmTrigger={handleNewDmTrigger}
 					userInfo={userInfo}
 				/>
@@ -307,60 +261,61 @@ const Aside = ({
 
 interface Props {
 	socket: Socket;
-	DM: DirectMessageDto | undefined;
+	Channel: ChannelDto | undefined;
 	userInfo: userInfoDto | undefined;
+	setSelectedChannel: React.Dispatch<
+		React.SetStateAction<ChannelDto | undefined>
+	>;
 }
 
-const Beside = ({ socket, DM, userInfo }: Props) => {
+const Beside = ({ socket, Channel, userInfo, setSelectedChannel }: Props) => {
 	const [messages, setMessages] = useState<any[]>([]);
+	const [blocked, setBlocked] = useState<userInfoDto[]>([]);
 
 	useEffect(() => {
-		if (!DM) return;
-		const getMessages = async () => {
+		const fetchBlocked = async () => {
 			try {
-				const reponse = await axios.get(
-					'http://localhost:3333/chat/dm/messages/' + DM.id,
-					{ withCredentials: true }
+				const response = await axios.get(
+					'http://localhost:3333/friend/blocked',
+					{
+						withCredentials: true,
+					}
 				);
-				reponse.data.map((message: any) => {
-					return (
-						message.userId === userInfo?.id
-							? (message.username = userInfo?.username)
-							: (message.username = ''),
-						(message.content = message.message)
-					);
-				});
-				setMessages(reponse.data.reverse());
-			} catch (error) {
-				console.log(error);
+				setBlocked(response.data);
+			} catch (error) {}
+		};
+		fetchBlocked();
+	}, [messages]);
+
+	useEffect(() => {
+		const handleMessage = (message: any) => {
+			if (!blocked.find((user) => user.username === message.username))
+				setMessages([...messages, message]);
+		};
+
+		socket?.on('chat', handleMessage);
+		socket?.on('kick', (data: any) => {
+			if (data?.username === userInfo?.username) {
+				setSelectedChannel(Channel);
+				setMessages([]);
 			}
-		};
-
-		socket?.on('DM', (message: any) => {
-			if (message.DMid === DM.id)
-				setMessages((messages) => [message, ...messages]);
 		});
-		socket?.emit('ConnectedDM', { id: userInfo?.id });
-
-		getMessages();
-
+		socket?.on('ban', (data: any) => {
+			if (data?.username === userInfo?.username) {
+				setSelectedChannel(Channel);
+				setMessages([]);
+			}
+		});
 		return () => {
-			socket?.off('DM');
+			socket?.off('chat', handleMessage);
+			socket?.off('kick');
+			socket?.off('ban');
 		};
-	}, [DM, socket, userInfo?.id, userInfo?.username]);
+	}, [Channel, blocked, messages, setSelectedChannel, socket, userInfo?.username]);
 
 	const sendMessage = (message: any) => {
-		if (!message.content || !DM) return;
-		const receiver =
-			DM?.senderId === userInfo?.id ? DM?.receiverId : DM?.senderId;
-		socket?.emit('DM', {
-			...message,
-			DMid: DM.id,
-			sender: userInfo?.id,
-			receiver,
-		});
-		message.avatar = 'http://localhost:3333/' + userInfo?.avatar;
-		message.createdAt = new Date();
+		if (!message.content || !Channel) return;
+		socket?.emit('chat', { ...message, channel: Channel.name });
 		setMessages((messages) => [message, ...messages]);
 	};
 
@@ -369,11 +324,9 @@ const Beside = ({ socket, DM, userInfo }: Props) => {
 			<BasicFrame
 				height="91%"
 				title={
-					!DM || DM.id === 0
+					!Channel || Channel.id === 0
 						? 'No Chat selected'
-						: DM.senderId === userInfo?.id
-						? DM.receiver.username
-						: userInfo?.username
+						: Channel.name
 				}>
 				{messages.map((message, index) => (
 					<div
@@ -426,14 +379,12 @@ const Beside = ({ socket, DM, userInfo }: Props) => {
 	);
 };
 
-export interface DirectMessageDto {
+export interface ChannelDto {
 	id: number;
-	createdAt: string;
-	messages: any[];
-	senderId: number;
-	receiverId: number;
-	sender: any;
-	receiver: any;
+	name: string;
+	state: string;
+	ownerId: number;
+	ChatUsers: any[];
 }
 
 export interface userInfoDto {
@@ -442,10 +393,10 @@ export interface userInfoDto {
 	avatar: string;
 }
 
-export const DmElement = ({socket }: {socket: Socket}) => {
+export const ChannelElement = ({socket}: {socket: Socket}) => {
 	const [userInfo, setUserInfo] = useState<userInfoDto>();
-	const [DMList, setDMList] = useState<DirectMessageDto[]>([]);
-	const [selectedDM, setSelectedDM] = useState<DirectMessageDto>();
+	const [ChannelList, setChannelList] = useState<ChannelDto[]>([]);
+	const [selectedChannel, setSelectedChannel] = useState<ChannelDto>();
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -457,11 +408,11 @@ export const DmElement = ({socket }: {socket: Socket}) => {
 
 		const fetchChats = async () => {
 			try {
-				const DMS = await axios.get<DirectMessageDto[]>(
-					'http://localhost:3333/chat/dm',
+				const Channels = await axios.get<ChannelDto[]>(
+					'http://localhost:3333/chat/channels',
 					{ withCredentials: true }
 				);
-				setDMList(DMS.data);
+				setChannelList(Channels.data);
 			} catch (error) {
 				console.error(error);
 			}
@@ -476,13 +427,13 @@ export const DmElement = ({socket }: {socket: Socket}) => {
 	return (
 		<div className="dm-element">
 			<Aside
-				buttonContent="New DM"
-				DMList={DMList}
+				buttonContent="New Channel"
+				ChannelList={ChannelList}
 				userInfo={userInfo}
-				selectedDM={selectedDM}
-				setSelectedDM={setSelectedDM}
+				selectedChannel={selectedChannel}
+				setSelectedChannel={setSelectedChannel}
 			/>
-			<Beside socket={socket} DM={selectedDM} userInfo={userInfo} />
+			<Beside socket={socket} Channel={selectedChannel} userInfo={userInfo} setSelectedChannel={setSelectedChannel} />
 		</div>
 	);
 };

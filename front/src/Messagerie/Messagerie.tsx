@@ -1,6 +1,8 @@
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import './Messagerie.css';
 import { DmElement } from './Dm/DmElement';
+import { ChannelElement } from './Channel/ChannelElement';
+import { Socket, io } from 'socket.io-client';
 
 const MainFrame = ({
 	title,
@@ -43,6 +45,18 @@ const Navbar = ({ navbarStatus, setNavbarStatus }: NavbarProps) => {
 
 export const Messagerie = () => {
 	const [navbarStatus, setNavbarStatus] = useState('privateMessage');
+	const [socket, setSocket] = useState<Socket>();
+
+	useEffect(() => {
+		const newSocket = io('http://localhost:3334');
+		setSocket(newSocket);
+
+		return () => {
+			newSocket.disconnect();
+		};
+	}, []);
+
+	if (!socket) return <div>Loading...</div>;
 
 	return (
 		<div className="messagerie">
@@ -51,7 +65,7 @@ export const Messagerie = () => {
 					navbarStatus={navbarStatus}
 					setNavbarStatus={setNavbarStatus}
 				/>
-				{navbarStatus === 'privateMessage' ? <DmElement /> : undefined}
+				{navbarStatus === 'privateMessage' ? <DmElement socket={socket} /> : <ChannelElement socket={socket} />}
 			</MainFrame>
 		</div>
 	);

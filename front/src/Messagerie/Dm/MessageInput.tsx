@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import send from './Ressources/send.svg';
+import send from '../Ressources/send.svg';
 
 function MessageInput({
 	sendMessage,
