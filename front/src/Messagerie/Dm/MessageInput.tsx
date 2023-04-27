@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { KeyboardEvent, useRef } from 'react';
 import send from './Ressources/send.svg';
 
 function MessageInput({
@@ -8,22 +8,34 @@ function MessageInput({
 	sendMessage: (value: { username: string; content: string }) => void;
 	userInfo: any;
 }) {
-	const [value, setValue] = useState('');
+	const inputRef = useRef<HTMLInputElement>(null);
 
 	const handleSendMessage = () => {
-		sendMessage({ username: userInfo.username, content: value });
-		setValue('');
+		if (inputRef.current) {
+			sendMessage({
+				username: userInfo.username,
+				content: inputRef.current.value,
+			});
+			inputRef.current.value = '';
+		}
+	};
+
+	const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === 'Enter') {
+			e.preventDefault();
+			handleSendMessage();
+		}
 	};
 
 	return (
 		<div className="chat-write">
 			<input
-				onChange={(e) => setValue(e.target.value)}
 				placeholder="Type your message"
-				value={value}
 				type="text"
+				ref={inputRef}
+				onKeyDown={handleKeyPress}
 			/>
-			<button className="chat-send" onClick={() => handleSendMessage()}>
+			<button onClick={() => handleSendMessage()} className="chat-send">
 				<img src={send} alt="send" />
 			</button>
 		</div>
