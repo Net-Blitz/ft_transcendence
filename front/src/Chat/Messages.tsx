@@ -1,6 +1,8 @@
 export interface MessageDto {
 	username: string;
 	content: string;
+	avatar?: string;
+	createdAt: string;
 }
 
 function Messages({

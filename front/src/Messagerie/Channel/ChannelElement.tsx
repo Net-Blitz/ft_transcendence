@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { Socket } from 'socket.io-client';
 import '../Dm/DmElement.css';
@@ -8,6 +8,8 @@ import MessageInput from '../Dm/MessageInput';
 import { BasicFrame } from '../../Profile/Components/MiddleInfo/MiddleInfo';
 import { NewChannel } from './NewChannel/NewChannel';
 import { ChannelPassword } from './ChannelPassword';
+import { ChannelDto, MessagesContext, MessagesProvider, userInfoDto } from './ChannelsUtils';
+import Invite from './Invite';
 
 export const InputFlat = ({
 	icon,
@@ -107,9 +109,9 @@ const ChannelListElement = ({
 		React.SetStateAction<ChannelDto | undefined>
 	>;
 }) => {
-	const [SaveChannel, setSaveChannel] = useState<ChannelDto[]>([]);
 	const [ban, setBan] = useState<any[]>([]);
 	const [ChannelPasswordTrigger, setChannelPasswordTrigger] = useState(false);
+	const { setMessages, SaveChannel, setSaveChannel } = useContext(MessagesContext);
 
 	const handleSelectChannel = async (channel: ChannelDto) => {
 		const response = await axios.get(
@@ -123,6 +125,7 @@ const ChannelListElement = ({
 		}
 		if (channel?.state === 'PUBLIC') {
 			setSelectedChannel(channel);
+			setMessages([]);
 			socket?.emit('join', {
 				channel: channel.name,
 				username: userInfo?.username,
@@ -134,6 +137,7 @@ const ChannelListElement = ({
 				)
 			) {
 				setSelectedChannel(channel);
+				setMessages([]);
 				socket?.emit('join', {
 					channel: channel.name,
 					username: userInfo?.username,
@@ -141,26 +145,25 @@ const ChannelListElement = ({
 			} else {
 				handleChannelPasswordTrigger();
 			}
+		} else if (channel?.state === 'PRIVATE') {
+			if (channel.ownerId === userInfo?.id) {
+				setSelectedChannel(channel);
+				socket?.emit('join', {
+					channel: channel.name,
+					username: userInfo?.username,
+				});
+			} else if (
+				SaveChannel.find((savechannel) => savechannel.name === channel.name)
+			) {
+				setSelectedChannel(channel);
+				socket?.emit('join', {
+					channel: channel.name,
+					username: userInfo?.username,
+				});
+			} else {
+				console.log("You don't have access to this channel");
+			}
 		}
-		//} else if (channel?.state === 'PRIVATE') {
-		//	if (channel.ownerId === userInfo.id) {
-		//		setSelectedChannel(channel);
-		//		socket?.emit('join', {
-		//			channel: channel.name,
-		//			username: userInfo?.username,
-		//		});
-		//	} else if (
-		//		SaveChannel.find((channelName) => channelName === channel.name)
-		//	) {
-		//		setSelectedChannel(channel);
-		//		socket?.emit('join', {
-		//			channel: channel.name,
-		//			username: userInfo?.username,
-		//		});
-		//	} else {
-		//		console.log("You don't have access to this channel");
-		//	}
-		//}
 	};
 
 	const handleChannelPasswordTrigger = useCallback(() => {
@@ -216,6 +219,7 @@ const ChannelLists = ({
 					/>
 				);
 			})}
+			<Invite socket={socket} userInfo={userInfo} setSelectedChannel={setSelectedChannel} />
 		</div>
 	);
 };
@@ -275,7 +279,7 @@ interface Props {
 }
 
 const Beside = ({ socket, Channel, userInfo, setSelectedChannel }: Props) => {
-	const [messages, setMessages] = useState<any[]>([]);
+	const { messages, setMessages } = useContext(MessagesContext);
 	const [blocked, setBlocked] = useState<userInfoDto[]>([]);
 
 	useEffect(() => {
@@ -317,14 +321,7 @@ const Beside = ({ socket, Channel, userInfo, setSelectedChannel }: Props) => {
 			socket?.off('kick');
 			socket?.off('ban');
 		};
-	}, [
-		Channel,
-		blocked,
-		messages,
-		setSelectedChannel,
-		socket,
-		userInfo?.username,
-	]);
+	}, [Channel, blocked, messages, setMessages, setSelectedChannel, socket, userInfo?.username]);
 
 	const sendMessage = (message: any) => {
 		if (!message.content || !Channel) return;
@@ -391,20 +388,6 @@ const Beside = ({ socket, Channel, userInfo, setSelectedChannel }: Props) => {
 	);
 };
 
-export interface ChannelDto {
-	id: number;
-	name: string;
-	state: string;
-	ownerId: number;
-	ChatUsers: any[];
-}
-
-export interface userInfoDto {
-	id: number;
-	username: string;
-	avatar: string;
-}
-
 export const ChannelElement = ({ socket }: { socket: Socket }) => {
 	const [userInfo, setUserInfo] = useState<userInfoDto>();
 	const [ChannelList, setChannelList] = useState<ChannelDto[]>([]);
@@ -438,20 +421,23 @@ export const ChannelElement = ({ socket }: { socket: Socket }) => {
 
 	return (
 		<div className="dm-element">
-			<Aside
-				buttonContent="New Channel"
-				ChannelList={ChannelList}
-				userInfo={userInfo}
-				socket={socket}
-				selectedChannel={selectedChannel}
-				setSelectedChannel={setSelectedChannel}
-			/>
-			<Beside
-				socket={socket}
-				Channel={selectedChannel}
-				userInfo={userInfo}
-				setSelectedChannel={setSelectedChannel}
-			/>
+			<MessagesProvider>
+				<Aside
+					buttonContent="New Channel"
+					ChannelList={ChannelList}
+					userInfo={userInfo}
+					socket={socket}
+					selectedChannel={selectedChannel}
+					setSelectedChannel={setSelectedChannel}
+				/>
+				<Beside
+					socket={socket}
+					Channel={selectedChannel}
+					userInfo={userInfo}
+					setSelectedChannel={setSelectedChannel}
+				/>
+			</MessagesProvider>
 		</div>
 	);
 };
+

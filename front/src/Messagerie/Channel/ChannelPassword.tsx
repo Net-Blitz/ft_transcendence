@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ChannelDto } from './ChannelElement';
+import { ChannelDto } from './ChannelsUtils';
 import axios from 'axios';
 /*	Ressources	*/
 import close from '../../Profile/Components/MainInfo/Ressources/close.svg';
