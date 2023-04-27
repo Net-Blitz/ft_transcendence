@@ -44,7 +44,7 @@ const Navbar = ({ navbarStatus, setNavbarStatus }: NavbarProps) => {
 };
 
 export const Messagerie = () => {
-	const [navbarStatus, setNavbarStatus] = useState('privateMessage');
+	const [navbarStatus, setNavbarStatus] = useState('channel');
 	const [socket, setSocket] = useState<Socket>();
 
 	useEffect(() => {
@@ -65,7 +65,11 @@ export const Messagerie = () => {
 					navbarStatus={navbarStatus}
 					setNavbarStatus={setNavbarStatus}
 				/>
-				{navbarStatus === 'privateMessage' ? <DmElement socket={socket} /> : <ChannelElement socket={socket} />}
+				{navbarStatus === 'privateMessage' ? (
+					<DmElement socket={socket} />
+				) : (
+					<ChannelElement socket={socket} />
+				)}
 			</MainFrame>
 		</div>
 	);

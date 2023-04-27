@@ -6,11 +6,9 @@ import '../Dm/DmElement.css';
 import { PopUp } from '../../Profile/Components/MainInfo/MainInfo';
 import MessageInput from '../Dm/MessageInput';
 import { BasicFrame } from '../../Profile/Components/MiddleInfo/MiddleInfo';
-/*	Ressources	*/
-import close from '../../Profile/Components/MainInfo/Ressources/close.svg';
-import search from '../Ressources/search.svg';
+import { NewChannel } from './NewChannel/NewChannel';
 
-const InputFlat = ({
+export const InputFlat = ({
 	icon,
 	content,
 	userInfo,
@@ -26,7 +24,6 @@ const InputFlat = ({
 	const [searchTerm, setSearchTerm] = useState('');
 	const [searchResults, setSearchResults] = useState<userInfoDto[]>([]);
 	const [users, setUsers] = useState<userInfoDto[]>([]);
-
 
 	useEffect(() => {
 		const FetchUsers = async () => {
@@ -82,87 +79,15 @@ const InputFlat = ({
 								<option key={index} value={user.username}>
 									{user.username}
 								</option>
-						))
+						  ))
 						: users.map((user, index) => (
 								<option key={index} value={user.username}>
 									{user.username}
 								</option>
-						))}
+						  ))}
 				</select>
 			</div>
 		</>
-	);
-};
-
-const NewChannel = ({
-	handleNewDmTrigger,
-	userInfo,
-}: {
-	handleNewDmTrigger: () => void;
-	userInfo: userInfoDto | undefined;
-}) => {
-	const me = document.getElementsByClassName('popup');
-	const [blocked, setBlocked] = useState<userInfoDto[]>([]);
-	const [selectedUser, setSelectedUser] = useState('');
-
-	useEffect(() => {
-		window.onclick = (event: any) => {
-			if (event.target === me[0]) {
-				handleNewDmTrigger();
-			}
-		};
-	}, [me, handleNewDmTrigger]);
-
-	useEffect(() => {
-		const FetchBlocked = async () => {
-			try {
-				const response = await axios.get(
-					'http://localhost:3333/friend/blocked',
-					{ withCredentials: true }
-				);
-				setBlocked(response.data);
-			} catch (error) {
-				console.log(error);
-			}
-		};
-		FetchBlocked();
-	}, []);
-
-	const handleCreateDM = async (username: string) => {
-		if (username === '') return;
-		if (blocked?.find((user) => user.username === username)) {
-			console.log('user blocked');
-			return;
-		}
-		try {
-			await axios.post(
-				'http://localhost:3333/chat/dm/create',
-				{ username },
-				{ withCredentials: true }
-			);
-			handleNewDmTrigger();
-		} catch (error) {
-			console.log('DM already exist');
-			console.log(error);
-		}
-	};
-
-	return (
-		<div className="new-dm">
-			<img src={close} alt="close-button" onClick={handleNewDmTrigger} />
-			<h3>New DM</h3>
-			<InputFlat
-				icon={search}
-				content="Search a user"
-				userInfo={userInfo}
-				selectedUser={selectedUser}
-				setSelectedUser={setSelectedUser}
-			/>
-			<div className="new-dm-buttons">
-				<button onClick={() => handleCreateDM(selectedUser)}>Create</button>
-				<button onClick={handleNewDmTrigger}>Cancel</button>
-			</div>
-		</div>
 	);
 };
 
@@ -232,7 +157,7 @@ const Aside = ({
 		React.SetStateAction<ChannelDto | undefined>
 	>;
 }) => {
-	const [newDmTrigger, setNewDmTrigger] = useState(false);
+	const [newDmTrigger, setNewDmTrigger] = useState(true);
 
 	const handleNewDmTrigger = useCallback(() => {
 		setNewDmTrigger(!newDmTrigger);
@@ -311,7 +236,14 @@ const Beside = ({ socket, Channel, userInfo, setSelectedChannel }: Props) => {
 			socket?.off('kick');
 			socket?.off('ban');
 		};
-	}, [Channel, blocked, messages, setSelectedChannel, socket, userInfo?.username]);
+	}, [
+		Channel,
+		blocked,
+		messages,
+		setSelectedChannel,
+		socket,
+		userInfo?.username,
+	]);
 
 	const sendMessage = (message: any) => {
 		if (!message.content || !Channel) return;
@@ -393,7 +325,7 @@ export interface userInfoDto {
 	avatar: string;
 }
 
-export const ChannelElement = ({socket}: {socket: Socket}) => {
+export const ChannelElement = ({ socket }: { socket: Socket }) => {
 	const [userInfo, setUserInfo] = useState<userInfoDto>();
 	const [ChannelList, setChannelList] = useState<ChannelDto[]>([]);
 	const [selectedChannel, setSelectedChannel] = useState<ChannelDto>();
@@ -433,7 +365,12 @@ export const ChannelElement = ({socket}: {socket: Socket}) => {
 				selectedChannel={selectedChannel}
 				setSelectedChannel={setSelectedChannel}
 			/>
-			<Beside socket={socket} Channel={selectedChannel} userInfo={userInfo} setSelectedChannel={setSelectedChannel} />
+			<Beside
+				socket={socket}
+				Channel={selectedChannel}
+				userInfo={userInfo}
+				setSelectedChannel={setSelectedChannel}
+			/>
 		</div>
 	);
 };
