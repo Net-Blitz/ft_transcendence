@@ -9,6 +9,7 @@ import { BasicFrame } from '../../Profile/Components/MiddleInfo/MiddleInfo';
 /*	Ressources	*/
 import close from '../../Profile/Components/MainInfo/Ressources/close.svg';
 import search from '../Ressources/search.svg';
+import { ChannelPassword } from './ChannelPassword';
 
 const InputFlat = ({
 	icon,
@@ -181,39 +182,39 @@ const ChannelListElement = ({
 		React.SetStateAction<ChannelDto | undefined>
 	>;
 }) => {
-	const handleSelectChannel = (channel: ChannelDto) => {
-		//const response = await axios.get(
-		//	'http://localhost:3333/chat/ban/' + userInfo?.username,
-		//	{
-		//		withCredentials: true,
-		//	}
-		//);
-		//setBan(response.data);
-		//if (ban?.find((ban: any) => ban.name === channel.name)) {
-		//	setAlert({
-		//		message: 'You are banned from this channel',
-		//		type: 'error',
-		//	});
+	const [SaveChannel, setSaveChannel] = useState<ChannelDto[]>([]);
+	const [ban, setBan] = useState<any[]>([]);
+	const [ChannelPasswordTrigger, setChannelPasswordTrigger] = useState(false);
+
+	const handleSelectChannel = async (channel: ChannelDto) => {
+		const response = await axios.get(
+			'http://localhost:3333/chat/ban/' + userInfo?.username,
+			{ withCredentials: true }
+		);
+		setBan(response.data);
+		if (ban?.find((ban: any) => ban.name === channel.name)) {
+			console.log('You are banned from this channel');
+			return;
+		}
 		if (channel?.state === 'PUBLIC') {
 			setSelectedChannel(channel);
 			socket?.emit('join', {
 				channel: channel.name,
 				username: userInfo?.username,
 			});
-		};
-		//} else if (channel?.state === 'PROTECTED') {
-		//	if (
-		//		SaveChannel.find((channelName) => channelName === channel.name)
-		//	) {
-		//		setSelectedChannel(channel);
-		//		socket?.emit('join', {
-		//			channel: channel.name,
-		//			username: userInfo?.username,
-		//		});
-		//		handleTogglePopupPassword('');
-		//	} else {
-		//		handleTogglePopupPassword(channel.name);
-		//	}
+		} else if (channel?.state === 'PROTECTED') {
+			if (
+				SaveChannel.find((savechannel) => savechannel.name === channel.name)
+			) {
+				setSelectedChannel(channel);
+				socket?.emit('join', {
+					channel: channel.name,
+					username: userInfo?.username,
+				});
+			} else {
+				handleChannelPasswordTrigger();
+			}
+		}
 		//} else if (channel?.state === 'PRIVATE') {
 		//	if (channel.ownerId === userInfo.id) {
 		//		setSelectedChannel(channel);
@@ -235,6 +236,10 @@ const ChannelListElement = ({
 		//}
 	};
 
+	const handleChannelPasswordTrigger = useCallback(() => {
+		setChannelPasswordTrigger(!ChannelPasswordTrigger);
+	}, [ChannelPasswordTrigger, setChannelPasswordTrigger]);
+
 	return (
 		<div
 			className={`dm-list-element ${
@@ -242,6 +247,13 @@ const ChannelListElement = ({
 			}`}
 			onClick={() => handleSelectChannel(Channel)}>
 			<h4>{Channel.name}</h4>
+			<PopUp trigger={ChannelPasswordTrigger}>
+				<ChannelPassword
+					handleChannelPasswordTrigger={handleChannelPasswordTrigger}
+					Channel={Channel}
+					setSaveChannel={setSaveChannel}
+				/>
+			</PopUp>
 		</div>
 	);
 };

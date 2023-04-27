@@ -23,8 +23,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	private DMs: Map<string, Socket> = new Map();
 
-	async handleConnection(client: Socket) {
-		console.log("Client connected: " + client);
+	async handleConnection() {
+		//console.log("Client connected: " + client.client);
 	}
 
 	async handleDisconnect(client: Socket) {
