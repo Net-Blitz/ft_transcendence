@@ -168,21 +168,79 @@ const NewChannel = ({
 
 const ChannelListElement = ({
 	Channel,
+	userInfo,
+	socket,
 	selectedChannel,
 	setSelectedChannel,
 }: {
 	Channel: ChannelDto;
+	userInfo: userInfoDto | undefined;
+	socket: Socket;
 	selectedChannel: ChannelDto | undefined;
 	setSelectedChannel: React.Dispatch<
 		React.SetStateAction<ChannelDto | undefined>
 	>;
 }) => {
+	const handleSelectChannel = (channel: ChannelDto) => {
+		//const response = await axios.get(
+		//	'http://localhost:3333/chat/ban/' + userInfo?.username,
+		//	{
+		//		withCredentials: true,
+		//	}
+		//);
+		//setBan(response.data);
+		//if (ban?.find((ban: any) => ban.name === channel.name)) {
+		//	setAlert({
+		//		message: 'You are banned from this channel',
+		//		type: 'error',
+		//	});
+		if (channel?.state === 'PUBLIC') {
+			setSelectedChannel(channel);
+			socket?.emit('join', {
+				channel: channel.name,
+				username: userInfo?.username,
+			});
+		};
+		//} else if (channel?.state === 'PROTECTED') {
+		//	if (
+		//		SaveChannel.find((channelName) => channelName === channel.name)
+		//	) {
+		//		setSelectedChannel(channel);
+		//		socket?.emit('join', {
+		//			channel: channel.name,
+		//			username: userInfo?.username,
+		//		});
+		//		handleTogglePopupPassword('');
+		//	} else {
+		//		handleTogglePopupPassword(channel.name);
+		//	}
+		//} else if (channel?.state === 'PRIVATE') {
+		//	if (channel.ownerId === userInfo.id) {
+		//		setSelectedChannel(channel);
+		//		socket?.emit('join', {
+		//			channel: channel.name,
+		//			username: userInfo?.username,
+		//		});
+		//	} else if (
+		//		SaveChannel.find((channelName) => channelName === channel.name)
+		//	) {
+		//		setSelectedChannel(channel);
+		//		socket?.emit('join', {
+		//			channel: channel.name,
+		//			username: userInfo?.username,
+		//		});
+		//	} else {
+		//		console.log("You don't have access to this channel");
+		//	}
+		//}
+	};
+
 	return (
 		<div
 			className={`dm-list-element ${
 				Channel.id === selectedChannel?.id && 'active'
 			}`}
-			onClick={() => setSelectedChannel(Channel)}>
+			onClick={() => handleSelectChannel(Channel)}>
 			<h4>{Channel.name}</h4>
 		</div>
 	);
@@ -191,11 +249,13 @@ const ChannelListElement = ({
 const ChannelLists = ({
 	ChannelList,
 	userInfo,
+	socket,
 	selectedChannel,
 	setSelectedChannel,
 }: {
 	ChannelList: ChannelDto[];
 	userInfo: userInfoDto | undefined;
+	socket: Socket;
 	selectedChannel: ChannelDto | undefined;
 	setSelectedChannel: React.Dispatch<
 		React.SetStateAction<ChannelDto | undefined>
@@ -207,6 +267,8 @@ const ChannelLists = ({
 				return (
 					<ChannelListElement
 						Channel={Channel}
+						userInfo={userInfo}
+						socket={socket}
 						key={index}
 						selectedChannel={selectedChannel}
 						setSelectedChannel={setSelectedChannel}
@@ -221,12 +283,14 @@ const Aside = ({
 	buttonContent,
 	ChannelList,
 	userInfo,
+	socket,
 	selectedChannel,
 	setSelectedChannel,
 }: {
 	buttonContent: string;
 	ChannelList: ChannelDto[];
 	userInfo: userInfoDto | undefined;
+	socket: Socket;
 	selectedChannel: ChannelDto | undefined;
 	setSelectedChannel: React.Dispatch<
 		React.SetStateAction<ChannelDto | undefined>
@@ -245,6 +309,7 @@ const Aside = ({
 			</button>
 			<ChannelLists
 				ChannelList={ChannelList}
+				socket={socket}
 				userInfo={userInfo}
 				selectedChannel={selectedChannel}
 				setSelectedChannel={setSelectedChannel}
@@ -290,7 +355,7 @@ const Beside = ({ socket, Channel, userInfo, setSelectedChannel }: Props) => {
 	useEffect(() => {
 		const handleMessage = (message: any) => {
 			if (!blocked.find((user) => user.username === message.username))
-				setMessages([...messages, message]);
+				setMessages([message, ...messages]);
 		};
 
 		socket?.on('chat', handleMessage);
@@ -316,7 +381,6 @@ const Beside = ({ socket, Channel, userInfo, setSelectedChannel }: Props) => {
 	const sendMessage = (message: any) => {
 		if (!message.content || !Channel) return;
 		socket?.emit('chat', { ...message, channel: Channel.name });
-		setMessages((messages) => [message, ...messages]);
 	};
 
 	return (
@@ -430,6 +494,7 @@ export const ChannelElement = ({socket}: {socket: Socket}) => {
 				buttonContent="New Channel"
 				ChannelList={ChannelList}
 				userInfo={userInfo}
+				socket={socket}
 				selectedChannel={selectedChannel}
 				setSelectedChannel={setSelectedChannel}
 			/>
