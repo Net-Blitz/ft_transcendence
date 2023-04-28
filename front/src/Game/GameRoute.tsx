@@ -27,6 +27,17 @@ const GameRoute = ({socketQueue, socketGame, reload, setReload, env}:any) => {
 
 	}, [reload, update]);
 
+	useEffect(() => {
+		if (socketQueue && socketQueue.connected !== undefined)
+		{
+			socketQueue.off("stateUpdate")
+			socketQueue.on("stateUpdate", (data:any) => {
+				setReload(data);
+			});
+		}
+	}, [socketQueue]);
+
+
 	if (state.code === undefined)
 		return <div></div>
 	if (state.code === 0)
