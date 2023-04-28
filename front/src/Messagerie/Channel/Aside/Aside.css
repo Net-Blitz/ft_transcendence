@@ -1,0 +1,82 @@
+/* CHANNEL BUTTON */
+.channel-button {
+	width: 20px;
+	height: 20px;
+	background-color: #FDFAD0;
+	object-fit: cover;
+	border-radius: 50%;
+	padding: 4px;
+	margin-left: 2px;
+}
+
+/* ASIDE CHANNEL */
+.aside-channel {
+	display: flex;
+	flex-direction: column;
+	width: 21%;
+}
+
+/* USER CHANNEL LIST */
+
+	/*	Basic Frame*/
+	.aside-channel .basic-frame {
+		margin-top: 14px;
+		background-color: #0A3D62;
+		box-shadow: 2px 2px 15px 2px rgba(206, 206, 206, 0.25);
+		border-radius: 10px;
+		box-sizing: border-box;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		flex-grow: 1;
+	}
+
+	/* FOR SCROLLBAR */
+	.aside-channel .basic-frame > .content-wrapper {
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		height: 100%;
+		overflow: scroll;
+		-ms-overflow-style: none;
+		scrollbar-width: none;
+	}
+
+	.aside-channel .basic-frame > .content-wrapper::-webkit-scrollbar {
+		display: none;
+	}
+
+	.aside-channel .basic-frame h3 {
+		font-family: 'YesevaOne', sans-serif;
+		font-style: normal;
+		font-size: 18px;
+		font-weight: 400;
+		color: #FDFAD0;
+		margin: 8px 0 0 0;
+	}
+
+	.aside-channel .basic-frame .title-wrapper {
+		height: 45px;
+		width: 100%;
+		border-bottom: 0.5px solid #FDFAD0;
+	}
+
+/* USER CHANNEL ELEMENT */
+.user-channel-list-element {
+	height: 40px;
+	display: flex;
+	align-items: center;
+}
+
+.user-channel-list-element h4 {
+	text-align: center;
+}
+
+.user-channel-list-element .user-channel-list-buttons {
+	height: 20px;
+	margin-left: auto;
+}
+
+.user-channel-list-element .user-channel-list-buttons:last-child {
+	margin-right: 10px;
+}
