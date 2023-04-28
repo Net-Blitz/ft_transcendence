@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useContext } from 'react';
+import React, { useState, useCallback, useContext, useEffect } from 'react';
 import './Aside.css';
 import { Socket } from 'socket.io-client';
 import axios from 'axios';
@@ -9,7 +9,7 @@ import { MessagesContext } from '../ChannelsUtils';
 /* Components */
 import { PopUp } from '../../../Profile/Components/MainInfo/MainInfo';
 import { ChannelPassword } from '../ChannelPassword';
-import { NewChannel } from '../NewChannel/NewChannel';
+import { NewChannel, UpdateChannel } from '../NewChannel/NewChannel';
 import { BasicFrame } from '../../../Profile/Components/MiddleInfo/MiddleInfo';
 /* Ressources */
 import controller from '../../Ressources/controller.svg';
@@ -17,10 +17,21 @@ import settings from '../../Ressources/settings.svg';
 import add from '../../Ressources/add.svg';
 import profile from '../../Ressources/profile.svg';
 
-const ChannelButton = ({ icon }: { icon: string }) => {
+export const ChannelButton = ({
+	icon,
+	onClick,
+}: {
+	icon: string;
+	onClick?: any;
+}) => {
 	return (
 		<>
-			<img className="channel-button" src={icon} alt="icon" />
+			<img
+				className="channel-button"
+				src={icon}
+				alt="icon"
+				onClick={onClick}
+			/>
 		</>
 	);
 };
@@ -42,6 +53,7 @@ const ChannelListElement = ({
 }) => {
 	const [ban, setBan] = useState<any[]>([]);
 	const [ChannelPasswordTrigger, setChannelPasswordTrigger] = useState(false);
+	const [ChannelSettingsTrigger, setChannelSettingsTrigger] = useState(false);
 	const { setMessages, SaveChannel } = useContext(MessagesContext);
 
 	const handleSelectChannel = async (channel: ChannelDto) => {
@@ -103,6 +115,10 @@ const ChannelListElement = ({
 		setChannelPasswordTrigger(!ChannelPasswordTrigger);
 	}, [ChannelPasswordTrigger, setChannelPasswordTrigger]);
 
+	const handleChannelSettingsTrigger = useCallback(() => {
+		setChannelSettingsTrigger(!ChannelSettingsTrigger);
+	}, [ChannelSettingsTrigger, setChannelSettingsTrigger]);
+
 	return (
 		<>
 			<div
@@ -111,6 +127,16 @@ const ChannelListElement = ({
 				}`}
 				onClick={() => handleSelectChannel(Channel)}>
 				<h4>{Channel.name}</h4>
+				<ChannelButton
+					icon={settings}
+					onClick={handleChannelSettingsTrigger}
+				/>
+				<PopUp trigger={ChannelSettingsTrigger}>
+					<UpdateChannel
+						handleNewDmTrigger={handleChannelSettingsTrigger}
+						selectedChannel={selectedChannel}
+					/>
+				</PopUp>
 			</div>
 			<PopUp trigger={ChannelPasswordTrigger}>
 				<ChannelPassword

@@ -1,5 +1,5 @@
 /* INPUT CHANNEL */
-.input-channel h4 {
+.new-dm .input-channel > .header-input-channel {
 	margin: 0 0 2px 2px;
 	font-family: 'Poppins', sans-serif;
 	font-style: normal;

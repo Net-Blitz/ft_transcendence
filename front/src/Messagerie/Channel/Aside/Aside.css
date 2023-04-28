@@ -7,6 +7,7 @@
 	border-radius: 50%;
 	padding: 4px;
 	margin-left: 2px;
+	cursor: pointer;
 }
 
 /* ASIDE CHANNEL */
@@ -69,7 +70,14 @@
 }
 
 .user-channel-list-element h4 {
+	margin: 0;
 	text-align: center;
+	font-family: 'Poppins';
+	font-style: normal;
+	font-weight: 400;
+	font-size: 11px;
+	color: #FDFAD0;
+	margin-left: 10px;
 }
 
 .user-channel-list-element .user-channel-list-buttons {
@@ -78,5 +86,11 @@
 }
 
 .user-channel-list-element .user-channel-list-buttons:last-child {
+	margin-right: 10px;
+}
+
+/* CHANNEL LIST ELEMENT */
+.dm-list-element .channel-button {
+	margin-left: auto;
 	margin-right: 10px;
 }
