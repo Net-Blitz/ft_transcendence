@@ -144,20 +144,37 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					A: channelExists.id,
 					B: userExists.id,
 				},
+				select: {
+					A: true,
+					B: true,
+					MutedUntil: true,
+				},
 			});
 
-			if ((await mutedUser).length > 0) {
-				if (mutedUser[0].mutedUntil > new Date()) {
-					console.log(userExists.username + " is muted");
-					return;
-				}
-				await this.prisma.mute.deleteMany({
-					where: {
-						A: channelExists.id,
-						B: userExists.id,
-					},
+			let isMuted = false;
+
+			mutedUser.then((res) => {
+				res.forEach((element) => {
+					if (element.MutedUntil > new Date()) {
+						console.log("User is muted");
+						isMuted = true;
+						return;
+					} else {
+						console.log("User is unmuted after 5 minutes");
+						this.prisma.mute.deleteMany({
+							where: {
+								A: channelExists.id,
+								B: userExists.id,
+							},
+						});
+					}
 				});
+			});
+			console.log(isMuted);
+			if (isMuted) {
+				return;
 			}
+
 			message["avatar"] = "http://localhost:3333/" + userExists.avatar;
 			message["createdAt"] = new Date();
 			console.log(channel, ": ", username, ": ", message.content);
@@ -493,9 +510,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				data: {
 					A: channelExists.id,
 					B: userExists.id,
-					//MutedUntil: new Date(Date.now() + 50000),
+					MutedUntil: new Date(Date.now() + 300000),
 				},
 			});
+
 			console.log("isAdmin: ", isAdmin);
 			if (isAdmin) {
 				console.log(

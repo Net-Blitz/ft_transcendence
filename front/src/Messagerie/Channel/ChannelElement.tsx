@@ -23,9 +23,7 @@ const Beside = ({ socket }: { socket: Socket }) => {
 			try {
 				const response = await axios.get(
 					'http://localhost:3333/friend/blocked',
-					{
-						withCredentials: true,
-					}
+					{ withCredentials: true }
 				);
 				setBlocked(response.data);
 			} catch (error) {}

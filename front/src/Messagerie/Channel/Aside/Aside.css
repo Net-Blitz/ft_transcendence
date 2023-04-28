@@ -19,17 +19,21 @@
 
 /* USER CHANNEL LIST */
 
+.user-channel-list {
+	flex-grow: 1;
+	margin-top: 12px;
+	background-color: #0A3D62;
+	border-radius: 10px;
+}
+
 	/*	Basic Frame*/
 	.aside-channel .basic-frame {
-		margin-top: 14px;
 		background-color: #0A3D62;
-		box-shadow: 2px 2px 15px 2px rgba(206, 206, 206, 0.25);
-		border-radius: 10px;
 		box-sizing: border-box;
 		display: flex;
 		flex-direction: column;
+		border-radius: 10px;
 		align-items: center;
-		flex-grow: 1;
 	}
 
 	/* FOR SCROLLBAR */
@@ -61,6 +65,11 @@
 		width: 100%;
 		border-bottom: 0.5px solid #FDFAD0;
 	}
+
+.ban-list-dropdown-channel {
+	display: flex;
+	justify-content: center;
+}
 
 /* USER CHANNEL ELEMENT */
 .user-channel-list-element {

@@ -165,6 +165,9 @@ const ChannelListElement = ({
 				}`}
 				onClick={() => handleSelectChannel(Channel)}>
 				<h4>{Channel.name}</h4>
+				{Channel.id === selectedChannel?.id && (
+					<button>Disconnect</button>
+				)}
 				{connectedUser.id === Channel.ownerId && (
 					<ChannelButton
 						icon={settings}
@@ -462,17 +465,33 @@ const UserChannelList = ({
 	}, [channel, userConnected]);
 
 	return (
-		<BasicFrame title="In this channel">
-			{usersList.map((user, index) => (
-				<UserChannelElement
-					socket={socket}
-					user={user}
-					key={index}
-					channel={channel}
-					isAdmin={isAdmin}
-				/>
-			))}
-		</BasicFrame>
+		<div className="user-channel-list">
+			<BasicFrame title="In this channel" height="90%">
+				{usersList.map((user, index) => (
+					<UserChannelElement
+						socket={socket}
+						user={user}
+						key={index}
+						channel={channel}
+						isAdmin={isAdmin}
+					/>
+				))}
+			</BasicFrame>
+			{isAdmin && (
+				<div className="ban-list-dropdown-channel">
+					<select>
+						{usersList
+							.filter((user) => user.role === 'banned')
+							.map((bannedUser, index) => (
+								<option key={index}>
+									{bannedUser.username}
+								</option>
+							))}
+					</select>
+					<button>Unban</button>
+				</div>
+			)}
+		</div>
 	);
 };
 
