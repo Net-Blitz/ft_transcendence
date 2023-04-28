@@ -16,8 +16,6 @@ import controller from '../../Ressources/controller.svg';
 import settings from '../../Ressources/settings.svg';
 import add from '../../Ressources/add.svg';
 import profile from '../../Ressources/profile.svg';
-/* Tmp */
-import friend from './Tmp/friend1.png';
 
 const ChannelButton = ({ icon }: { icon: string }) => {
 	return (
