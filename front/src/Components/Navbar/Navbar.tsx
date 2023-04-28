@@ -27,8 +27,8 @@ const Navbar = () => {
 	const buttons = [
 		{ content: 'Home', href: '/', imgSrc: logo },
 		{
-			content: 'Contact',
-			href: '/contact',
+			content: 'Social',
+			href: '/social',
 			imgSrc: contact_blue,
 			activeImgSrc: contact_white,
 		},

@@ -3,6 +3,8 @@ import Alert from './Alert';
 import { useEffect, useState } from 'react';
 import PopupDM from './PopupDM';
 import axios from 'axios';
+import { Socket } from 'socket.io-client';
+import { BasicFrame } from '../Profile/Components/MiddleInfo/MiddleInfo';
 
 export interface DirectMessageDto {
 	id: number;
@@ -14,13 +16,21 @@ export interface DirectMessageDto {
 	receiver: any;
 }
 
+interface Props {
+	DMList: DirectMessageDto[];
+	userInfo: any;
+	socket: Socket;
+	channelOrDM: string;
+	handleOptionChange: (e: any) => void;
+}
+
 function DirectMessage({
 	DMList,
 	userInfo,
 	socket,
 	channelOrDM,
 	handleOptionChange,
-}: any) {
+}: Props) {
 	const [selectedDM, setSelectedDM] = useState<number>(0);
 	const [messages, setMessages] = useState<any[]>([]);
 	const [alert, setAlert] = useState({ message: '', type: '' });
@@ -98,13 +108,10 @@ function DirectMessage({
 				<div className="chat-container">
 					<div className="chat-left">
 						<div className="chat-top">
-							<select
-								id="channelOrDM"
-								value={channelOrDM}
-								onChange={handleOptionChange}>
-								<option value="channel">Channels</option>
-								<option value="dm">Direct Message</option>
-							</select>
+							<button
+								onClick={() => handleOptionChange('channel')}>
+								Channels
+							</button>
 							<button onClick={handleTogglePopupNewDm}>
 								New DM
 							</button>
@@ -114,15 +121,19 @@ function DirectMessage({
 								<li
 									key={DM.id}
 									className={`chat-person ${
-										selectedDM === DM.id ? 'active' : ''
+										selectedDM === DM.id
+											? 'chat-active'
+											: ''
 									}`}
 									onClick={() => handleDMClick(DM)}>
 									<img
 										className="chat-friend-img"
 										src={
 											userInfo.id === DM.senderId
-												? DM.receiver.avatar
-												: DM.sender.avatar
+												? 'http://localhost:3333/' +
+												  DM.receiver.avatar
+												: 'http://localhost:3333/' +
+												  DM.sender.avatar
 										}
 										alt="avatar"
 									/>
@@ -135,54 +146,89 @@ function DirectMessage({
 							))}
 						</ul>
 					</div>
-					<div className="chat-right">
-						<div className="chat-top">
-							<span>
-								To:{' '}
-								<span className="chat-name">
-									{selectedDM === 0
-										? 'No Chat selected'
-										: DMList.find(
-												(DM: DirectMessageDto) =>
-													DM.id === selectedDM
-										  )?.senderId === userInfo.id
-										? DMList.find(
-												(DM: DirectMessageDto) =>
-													DM.id === selectedDM
-										  )?.receiver.username
-										: DMList.find(
-												(DM: DirectMessageDto) =>
-													DM.id === selectedDM
-										  )?.sender.username}
-								</span>
-							</span>
-						</div>
-						{selectedDM === 0 && (
-							<div className="chat-chat center">
-								<p>No Chat selected</p>
-							</div>
-						)}
-						<div className="chat-chat">
-							{messages.map((message, index) => (
-								<div
-									key={index}
-									className={`chat-bubble ${
-										userInfo.username === message.username
-											? 'chat-me'
-											: 'chat-you'
-									}`}>
-									{message.content}
-								</div>
-							))}
-						</div>
-						<div className="chat-write">
-							<MessageInput
-								sendMessage={sendMessage}
-								userInfo={userInfo}
-							/>
-						</div>
-					</div>
 				</div>
+			</div>
+			<div className="chat-frame">
+				<BasicFrame
+					height="550px"
+					title={
+						selectedDM === 0
+							? 'No Chat selected'
+							: DMList.find(
+									(DM: DirectMessageDto) =>
+										DM.id === selectedDM
+							  )?.senderId === userInfo.id
+							? DMList.find(
+									(DM: DirectMessageDto) =>
+										DM.id === selectedDM
+							  )?.receiver.username
+							: DMList.find(
+									(DM: DirectMessageDto) =>
+										DM.id === selectedDM
+							  )?.sender.username
+					}>
+					<div className="chat-bubble-container">
+						{messages.reverse().map((message, index) => (
+							<div
+								key={index}
+								className={`chat-bubble ${
+									userInfo.username === message.username
+										? 'chat-me'
+										: 'chat-you'
+								}`}>
+								{(userInfo.username === message.username && (
+									<>
+										<p>{message.content}</p>
+										<img
+											className="chat-avatar"
+											src={
+												'http://localhost:3333/' +
+												message?.avatar
+											}
+											alt="avatar"
+										/>
+										<p>
+											{new Date(
+												message.createdAt
+											).getHours() +
+												':' +
+												new Date(
+													message.createdAt
+												).getMinutes()}
+										</p>
+									</>
+								)) || (
+									<>
+										<p>
+											{new Date(
+												message.createdAt
+											).getHours() +
+												':' +
+												new Date(
+													message.createdAt
+												).getMinutes()}
+										</p>
+										<img
+											className="chat-avatar"
+											src={
+												'http://localhost:3333/' +
+												message.avatar
+											}
+											alt="avatar"
+										/>
+										<p>{message.content}</p>
+									</>
+								)}
+							</div>
+						))}
+					</div>
+					<div className="chat-write">
+						<MessageInput
+							sendMessage={sendMessage}
+							userInfo={userInfo}
+						/>
+					</div>
+				</BasicFrame>
 			</div>
 		</>
 	);

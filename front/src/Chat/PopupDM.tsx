@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import close from '../Profile/Components/MainInfo/Ressources/close.svg';
 
 function PopupDM({ ClosePopup, setAlert, userInfo }: any) {
 	const [users, setUsers] = useState<any[]>([]);
@@ -79,20 +80,26 @@ function PopupDM({ ClosePopup, setAlert, userInfo }: any) {
 
 	return (
 		<div ref={PopupRef} className="chat-overlay">
-			<div className="chat-popup center">
-				<label className="chat-close" onClick={ClosePopup}>
-					&times;
-				</label>
-				<h2>New Direct Message</h2>
-				<div className="chat-content-dm">
-					<input
-						type="text"
-						placeholder="Search a user"
-						value={searchTerm}
-						onChange={(e) => {
-							setSearchTerm(e.target.value);
-						}}
-					/>
+			<img
+				src={close}
+				alt="close-button"
+				className="chat-close"
+				onClick={ClosePopup}
+			/>
+			<h2>New Direct Message</h2>
+			<div className="chat-content">
+				<form>
+					<label>
+						<p>Search User</p>
+						<input
+							type="text"
+							placeholder="Search a user"
+							value={searchTerm}
+							onChange={(e) => {
+								setSearchTerm(e.target.value);
+							}}
+						/>
+					</label>
 					<ul className="chat-users">
 						{searchResults.map((user) => (
 							<li className="chat-person" key={user.id}>
@@ -100,10 +107,15 @@ function PopupDM({ ClosePopup, setAlert, userInfo }: any) {
 									<div className="chat-users-list">
 										<img
 											className="chat-friend-img"
-											src={user.avatar}
+											src={
+												'http://localhost:3333/' +
+												user.avatar
+											}
 											alt="avatar"
 										/>
-										<span className="chat-name">
+										<span
+											className="chat-name"
+											style={{ color: '#0a3d62' }}>
 											{user.username}
 										</span>
 									</div>
@@ -119,7 +131,7 @@ function PopupDM({ ClosePopup, setAlert, userInfo }: any) {
 							</li>
 						))}
 					</ul>
-				</div>
+				</form>
 			</div>
 		</div>
 	);

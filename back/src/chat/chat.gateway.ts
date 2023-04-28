@@ -23,8 +23,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	private DMs: Map<string, Socket> = new Map();
 
-	async handleConnection() {
-		//console.log("Client connected");
+	async handleConnection(client: Socket) {
+		console.log("Client connected: " + client);
 	}
 
 	async handleDisconnect(client: Socket) {
@@ -204,9 +204,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			});
 
 			const userSocket = this.DMs.get(message.receiver);
-			this.server
-				.to(userSocket.id)
-				.emit("DM", { content, sender, receiver, DMid });
+			if (userSocket) {
+				this.server
+					.to(userSocket.id)
+					.emit("DM", { content, sender, receiver, DMid });
+			}
 		} catch (e) {
 			console.error(e);
 		}

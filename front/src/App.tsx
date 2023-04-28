@@ -4,15 +4,18 @@ import './App.css';
 
 /*	COMPONENTS	*/
 import MainPage from './MainPage/MainPage';
-import Contact from './Contact/Contact';
+import { Social } from './Social/Social';
+import { AddFriends } from './Social/AddFriends';
 import { Login, Login2fa, Config, Config2fa } from './Login/Login';
 import Chat from './Chat/Chat';
+import { Messagerie } from './Messagerie/Messagerie';
 import AppLayout from './AppLayout';
 import GameRoute from './Game/GameRoute';
 import Notification from './Notification/Notification';
 import { Profile } from './Profile/Profile';
 import { AuthRoutes } from './utils/PrivateRoutes';
 import { useSelector } from 'react-redux';
+import Admin from './Admin';
 /*	HOOKS	*/
 import { useGetUser } from './utils/hooks';
 /*	SELECTORS	*/
@@ -52,7 +55,11 @@ function App(this: any) {
 	if (user.status !== 'resolved' && user.status !== 'notAuth') return <div></div>;
 	return (
 		<div>
-			<GamePopUp socketQueue={socketQueue} reload={reload} setReload={setReload} />
+			<GamePopUp
+				socketQueue={socketQueue}
+				reload={reload}
+				setReload={setReload}
+			/>
 			<GameInvitation socketQueue={socketQueue} />
 			<Routes>
 				<Route element={<AuthRoutes />}>
@@ -68,16 +75,34 @@ function App(this: any) {
 					<Route path="/login/config" element={<Config />} />
 					<Route path="/login/2faconfig" element={<Config2fa />} />
 					<Route
-						path="/contact"
+						path="/social"
 						element={
 							<AppLayout>
 								{' '}
-								<Contact />
+								<Social />
+							</AppLayout>
+						}
+					/>
+					<Route
+						path="/addfriends"
+						element={
+							<AppLayout>
+								{' '}
+								<AddFriends />
 							</AppLayout>
 						}
 					/>
 					<Route
 						path="/chat"
+						element={
+							<AppLayout>
+								{' '}
+								<Messagerie />
+							</AppLayout>
+						}
+					/>
+					<Route
+						path="/chat_test"
 						element={
 							<AppLayout>
 								{' '}
@@ -111,6 +136,7 @@ function App(this: any) {
 				<Route path="/login" element={<Login />} />
 				<Route path="/login/2fa/:login" element={<Login2fa />} />
 				<Route path="*" element={<NotFound />} />
+				<Route path="/admin" element={<Admin />} />
 			</Routes>
 		</div>
 	);
