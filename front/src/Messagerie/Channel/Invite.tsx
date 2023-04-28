@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useContext, useEffect, useState } from 'react';
-import { ChannelDto, MessagesContext, userInfoDto } from './ChannelsUtils';
+import { ChannelDto, ChannelsProvider, userInfoDto } from './ChannelsUtils';
 import { Socket } from 'socket.io-client';
 import close from '../../Profile/Components/MainInfo/Ressources/close.svg';
 
@@ -12,13 +12,10 @@ interface InviteProps {
 	>;
 }
 
-function Invite({
-	socket,
-	userInfo,
-	setSelectedChannel,
-}: InviteProps) {
+function Invite({ socket, userInfo, setSelectedChannel }: InviteProps) {
 	const [Invites, setInvites] = useState<any[]>([]);
-	const { SaveChannel, setSaveChannel, setMessages } = useContext(MessagesContext);
+	const { SaveChannel, setSaveChannel, setMessages } =
+		useContext(ChannelsProvider);
 
 	useEffect(() => {
 		const fetchInvites = async () => {
@@ -52,7 +49,7 @@ function Invite({
 			});
 			setSaveChannel([...SaveChannel, Channel]);
 		} catch (error) {
-			console.log(error)
+			console.log(error);
 		}
 	};
 
@@ -70,20 +67,21 @@ function Invite({
 	return (
 		<>
 			{Invites.map((invite, index) => (
-				<div className="dm-list-element" style={{justifyContent: "space-around"}} key={index}>
+				<div
+					className="dm-list-element"
+					style={{ justifyContent: 'space-around' }}
+					key={index}>
 					<h4>You are intive to {invite.channels.name}</h4>
-					<span style={{ color: "#fdfad0" }}
+					<span
+						style={{ color: '#fdfad0' }}
 						className="chat-accept-invite"
-						onClick={() =>
-							JoinPrivateChannel(invite.channels)
-						}>
+						onClick={() => JoinPrivateChannel(invite.channels)}>
 						&#10003;
 					</span>
 					<img
 						src={close}
 						alt="decline invite"
-						onClick={() => DeclineInvite(invite.channels)}>
-					</img>
+						onClick={() => DeclineInvite(invite.channels)}></img>
 				</div>
 			))}
 		</>

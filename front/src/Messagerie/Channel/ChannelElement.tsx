@@ -6,23 +6,18 @@ import '../Dm/DmElement.css';
 import MessageInput from '../Dm/MessageInput';
 import { BasicFrame } from '../../Profile/Components/MiddleInfo/MiddleInfo';
 import { Aside } from './Aside/Aside';
-import { MessagesProvider } from './ChannelsUtils';
 /* Interfaces */
-import { ChannelDto } from './ChannelsUtils';
+import { ChannelsContext, ChannelsProvider } from './ChannelsUtils';
 import { userInfoDto } from './ChannelsUtils';
-import { MessagesContext } from './ChannelsUtils';
 
 interface Props {
 	socket: Socket;
-	Channel: ChannelDto | undefined;
 	userInfo: userInfoDto | undefined;
-	setSelectedChannel: React.Dispatch<
-		React.SetStateAction<ChannelDto | undefined>
-	>;
 }
 
-const Beside = ({ socket, Channel, userInfo, setSelectedChannel }: Props) => {
-	const { messages, setMessages } = useContext(MessagesContext);
+const Beside = ({ socket, userInfo }: Props) => {
+	const { messages, setMessages, selectedChannel, setSelectedChannel } =
+		useContext(ChannelsContext);
 	const [blocked, setBlocked] = useState<userInfoDto[]>([]);
 
 	useEffect(() => {
@@ -49,13 +44,13 @@ const Beside = ({ socket, Channel, userInfo, setSelectedChannel }: Props) => {
 		socket?.on('chat', handleMessage);
 		socket?.on('kick', (data: any) => {
 			if (data?.username === userInfo?.username) {
-				setSelectedChannel(Channel);
+				setSelectedChannel(selectedChannel);
 				setMessages([]);
 			}
 		});
 		socket?.on('ban', (data: any) => {
 			if (data?.username === userInfo?.username) {
-				setSelectedChannel(Channel);
+				setSelectedChannel(selectedChannel);
 				setMessages([]);
 			}
 		});
@@ -65,7 +60,7 @@ const Beside = ({ socket, Channel, userInfo, setSelectedChannel }: Props) => {
 			socket?.off('ban');
 		};
 	}, [
-		Channel,
+		selectedChannel,
 		blocked,
 		messages,
 		setMessages,
@@ -75,8 +70,8 @@ const Beside = ({ socket, Channel, userInfo, setSelectedChannel }: Props) => {
 	]);
 
 	const sendMessage = (message: any) => {
-		if (!message.content || !Channel) return;
-		socket?.emit('chat', { ...message, channel: Channel.name });
+		if (!message.content || selectedChannel.id === 0) return;
+		socket?.emit('chat', { ...message, channel: selectedChannel.name });
 	};
 
 	return (
@@ -84,9 +79,9 @@ const Beside = ({ socket, Channel, userInfo, setSelectedChannel }: Props) => {
 			<BasicFrame
 				height="91%"
 				title={
-					!Channel || Channel.id === 0
+					selectedChannel.id === 0
 						? 'No Chat selected'
-						: Channel.name
+						: selectedChannel.name
 				}>
 				{messages.map((message, index) => (
 					<div
@@ -141,8 +136,6 @@ const Beside = ({ socket, Channel, userInfo, setSelectedChannel }: Props) => {
 
 export const ChannelElement = ({ socket }: { socket: Socket }) => {
 	const [userInfo, setUserInfo] = useState<userInfoDto>();
-	const [ChannelList, setChannelList] = useState<ChannelDto[]>([]);
-	const [selectedChannel, setSelectedChannel] = useState<ChannelDto>();
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -152,42 +145,19 @@ export const ChannelElement = ({ socket }: { socket: Socket }) => {
 			setUserInfo(response.data);
 		};
 
-		const fetchChats = async () => {
-			try {
-				const Channels = await axios.get<ChannelDto[]>(
-					'http://localhost:3333/chat/channels',
-					{ withCredentials: true }
-				);
-				setChannelList(Channels.data);
-			} catch (error) {
-				console.error(error);
-			}
-		};
-
 		fetchData();
-		fetchChats();
-		const interval = setInterval(fetchChats, 5000);
-		return () => clearInterval(interval);
-	}, [userInfo?.username]);
+	}, []);
 
 	return (
 		<div className="dm-element">
-			<MessagesProvider>
+			<ChannelsProvider>
 				<Aside
 					buttonContent="New Channel"
-					ChannelList={ChannelList}
 					userInfo={userInfo}
 					socket={socket}
-					selectedChannel={selectedChannel}
-					setSelectedChannel={setSelectedChannel}
 				/>
-				<Beside
-					socket={socket}
-					Channel={selectedChannel}
-					userInfo={userInfo}
-					setSelectedChannel={setSelectedChannel}
-				/>
-			</MessagesProvider>
+				<Beside socket={socket} userInfo={userInfo} />
+			</ChannelsProvider>
 		</div>
 	);
 };

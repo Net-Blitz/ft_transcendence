@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import './NewChannel.css';
 import axios from 'axios';
 /* Types */
-import { ChannelDto } from '../ChannelsUtils';
+import { ChannelsContext } from '../ChannelsUtils';
 /* Ressources */
 import close from '../../../Profile/Components/MainInfo/Ressources/close.svg';
 // import search from '../../Ressources/search.svg';
@@ -149,15 +149,14 @@ export const NewChannel = ({
 
 export const UpdateChannel = ({
 	handleNewDmTrigger,
-	selectedChannel,
 }: {
-	selectedChannel: ChannelDto | undefined;
 	handleNewDmTrigger: () => void;
 }) => {
 	const me = document.getElementsByClassName('popup');
 	const [typeChannel, setTypeChannel] = useState('private');
 	const [name, setName] = useState('');
 	const [password, setPassword] = useState('');
+	const { selectedChannel } = useContext(ChannelsContext);
 
 	useEffect(() => {
 		window.onclick = (event: any) => {
@@ -175,7 +174,7 @@ export const UpdateChannel = ({
 	}, [selectedChannel]);
 
 	const handleCreateChannel = async () => {
-		if (!selectedChannel) return;
+		if (selectedChannel.id === 0) return;
 		try {
 			let state = 'PUBLIC';
 			switch (typeChannel) {
@@ -189,7 +188,15 @@ export const UpdateChannel = ({
 					state = 'PRIVATE';
 					break;
 			}
-			console.log(selectedChannel.name, ": ", name, " ", state, " ", password)
+			console.log(
+				selectedChannel.name,
+				': ',
+				name,
+				' ',
+				state,
+				' ',
+				password
+			);
 			await axios.patch(
 				'http://localhost:3333/chat/edit/' + selectedChannel.name,
 				{ name, state, password },

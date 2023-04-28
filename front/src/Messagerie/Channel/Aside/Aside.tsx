@@ -1,11 +1,10 @@
-import React, { useState, useCallback, useContext } from 'react';
+import React, { useState, useCallback, useContext, useEffect } from 'react';
 import './Aside.css';
 import { Socket } from 'socket.io-client';
 import axios from 'axios';
 /* Interface */
-import { ChannelDto } from '../ChannelsUtils';
+import { ChannelDto, ChannelsContext } from '../ChannelsUtils';
 import { userInfoDto } from '../ChannelsUtils';
-import { MessagesContext } from '../ChannelsUtils';
 /* Components */
 import { PopUp } from '../../../Profile/Components/MainInfo/MainInfo';
 import { ChannelPassword } from '../ChannelPassword';
@@ -40,21 +39,16 @@ const ChannelListElement = ({
 	Channel,
 	userInfo,
 	socket,
-	selectedChannel,
-	setSelectedChannel,
 }: {
 	Channel: ChannelDto;
 	userInfo: userInfoDto | undefined;
 	socket: Socket;
-	selectedChannel: ChannelDto | undefined;
-	setSelectedChannel: React.Dispatch<
-		React.SetStateAction<ChannelDto | undefined>
-	>;
 }) => {
 	const [ban, setBan] = useState<any[]>([]);
 	const [ChannelPasswordTrigger, setChannelPasswordTrigger] = useState(false);
 	const [ChannelSettingsTrigger, setChannelSettingsTrigger] = useState(false);
-	const { setMessages, SaveChannel } = useContext(MessagesContext);
+	const { setMessages, SaveChannel, selectedChannel, setSelectedChannel } =
+		useContext(ChannelsContext);
 
 	const handleSelectChannel = async (channel: ChannelDto) => {
 		const response = await axios.get(
@@ -134,7 +128,6 @@ const ChannelListElement = ({
 				<PopUp trigger={ChannelSettingsTrigger}>
 					<UpdateChannel
 						handleNewDmTrigger={handleChannelSettingsTrigger}
-						selectedChannel={selectedChannel}
 					/>
 				</PopUp>
 			</div>
@@ -149,20 +142,14 @@ const ChannelListElement = ({
 };
 
 const ChannelLists = ({
-	ChannelList,
 	userInfo,
 	socket,
-	selectedChannel,
-	setSelectedChannel,
 }: {
-	ChannelList: ChannelDto[];
 	userInfo: userInfoDto | undefined;
 	socket: Socket;
-	selectedChannel: ChannelDto | undefined;
-	setSelectedChannel: React.Dispatch<
-		React.SetStateAction<ChannelDto | undefined>
-	>;
 }) => {
+	const { ChannelList } = useContext(ChannelsContext);
+
 	return (
 		<div className="dm-list">
 			{ChannelList.map((Channel, index) => {
@@ -172,8 +159,6 @@ const ChannelLists = ({
 						userInfo={userInfo}
 						socket={socket}
 						key={index}
-						selectedChannel={selectedChannel}
-						setSelectedChannel={setSelectedChannel}
 					/>
 				);
 			})}
@@ -181,11 +166,15 @@ const ChannelLists = ({
 	);
 };
 
-const UserChannelElement = () => {
+const UserChannelElement = ({ user }: { user: userInfoDto }) => {
 	return (
 		<div className="user-channel-list-element">
-			{/* <img className="dm-list-element-avatar" src={friend} alt="" /> */}
-			<h4>xxxx</h4>
+			<img
+				className="dm-list-element-avatar"
+				src={'http://localhost:3333/' + user.avatar}
+				alt=""
+			/>
+			<h4>{user.username}</h4>
 			<div className="user-channel-list-buttons">
 				<ChannelButton icon={controller} />
 				<ChannelButton icon={add} />
@@ -196,32 +185,45 @@ const UserChannelElement = () => {
 	);
 };
 
-const UserChannelList = () => {
+const UserChannelList = ({ channel }: { channel: ChannelDto }) => {
+	const [usersList, setUsersList] = useState<userInfoDto[]>([]);
+
+	useEffect(() => {
+		if (!channel.name) return;
+		const getUsers = async () => {
+			if (!channel) return;
+			const response = await axios.get(
+				'http://localhost:3333/chat/channel/' + channel.name,
+				{ withCredentials: true }
+			);
+			setUsersList(response.data.users);
+		};
+		getUsers();
+
+		const interval = setInterval(getUsers, 2500);
+		return () => clearInterval(interval);
+	}, [channel]);
+
 	return (
 		<BasicFrame title="In this channel">
-			<UserChannelElement />
+			{usersList.map((user, index) => (
+				<UserChannelElement user={user} key={index} />
+			))}
 		</BasicFrame>
 	);
 };
 
 export const Aside = ({
 	buttonContent,
-	ChannelList,
 	userInfo,
 	socket,
-	selectedChannel,
-	setSelectedChannel,
 }: {
 	buttonContent: string;
-	ChannelList: ChannelDto[];
 	userInfo: userInfoDto | undefined;
 	socket: Socket;
-	selectedChannel: ChannelDto | undefined;
-	setSelectedChannel: React.Dispatch<
-		React.SetStateAction<ChannelDto | undefined>
-	>;
 }) => {
 	const [newDmTrigger, setNewDmTrigger] = useState(false);
+	const { selectedChannel } = useContext(ChannelsContext);
 
 	const handleNewDmTrigger = useCallback(() => {
 		setNewDmTrigger(!newDmTrigger);
@@ -233,18 +235,12 @@ export const Aside = ({
 				<button className="new-input" onClick={handleNewDmTrigger}>
 					{buttonContent}
 				</button>
-				<ChannelLists
-					ChannelList={ChannelList}
-					socket={socket}
-					userInfo={userInfo}
-					selectedChannel={selectedChannel}
-					setSelectedChannel={setSelectedChannel}
-				/>
+				<ChannelLists socket={socket} userInfo={userInfo} />
 				<PopUp trigger={newDmTrigger}>
 					<NewChannel handleNewDmTrigger={handleNewDmTrigger} />
 				</PopUp>
 			</div>
-			<UserChannelList />
+			<UserChannelList channel={selectedChannel} />
 		</div>
 	);
 };
