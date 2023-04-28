@@ -41,7 +41,7 @@ export class QueueGroup {
 	player2: QueueObject | null;
 	player3: QueueObject | null;
 	player4: QueueObject | null;
-	mode: string | null;
+	mode: GameMode;
 	map: string | null;
 	timeData: number;
 }

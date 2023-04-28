@@ -16,7 +16,7 @@ const PlayerInLobby = ({player, env}:any) => {
 		<div className="game-waiting-player">
 			<div className="game-waiting-player-avatar-underdiv">
 				
-				<img className="game-waiting-player-avatar" src={'http://' + env.host + ":" + env.port + '/' + player.avatar} alt="Avatar" />
+				<img className="game-waiting-player-avatar" src={player.avatar ? 'http://' + env.host + ":" + env.port + '/' + player.avatar : ""} alt="Avatar" />
 			</div>
 			<div className="game-waiting-player-name">{player.login}</div>
 			<div className="game-waiting-player-rank">{player.elo} LP</div>
@@ -135,7 +135,7 @@ function Lobby({socketQueue, login, setReload, reload, env}:any) {
 	useEffect(() => {
 		const setPlayer = (data:any) => {
 			if (!data || data.in === false)
-				setReload(!reload);
+				setReload(987456);
 			else
 			{
 				setPlayer1(data.player1);
@@ -146,7 +146,8 @@ function Lobby({socketQueue, login, setReload, reload, env}:any) {
 		}
 	
 		const DisconnectFromQueueResponse = (data:any) => {
-			setReload(!reload);
+			setReload(22654563);
+			console.log("discofromqueue")
 			socketQueue.off("DisconnectFromQueueResponse")
 		}
 
