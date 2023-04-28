@@ -29,7 +29,6 @@ const InputFlat = ({
 	const [searchResults, setSearchResults] = useState<userInfoDto[]>([]);
 	const [users, setUsers] = useState<userInfoDto[]>([]);
 
-
 	useEffect(() => {
 		const FetchUsers = async () => {
 			try {
@@ -37,19 +36,18 @@ const InputFlat = ({
 					'http://localhost:3333/users/login',
 					{ withCredentials: true }
 				);
-				setUsers(
-					response.data.filter(
-						(user: userInfoDto) =>
-							user.username !== userInfo?.username
-					)
+				const users = response.data.filter(
+					(user: userInfoDto) => user.username !== userInfo?.username
 				);
+				setUsers(users);
+				setSelectedUser(users[0].username);
 			} catch (error) {
 				console.log(error);
 			}
 		};
 
 		FetchUsers();
-	}, [userInfo]);
+	}, [userInfo, setSelectedUser]);
 
 	useEffect(() => {
 		const searchUsers = (searchTerm: string) => {
@@ -84,12 +82,12 @@ const InputFlat = ({
 								<option key={index} value={user.username}>
 									{user.username}
 								</option>
-						))
+						  ))
 						: users.map((user, index) => (
 								<option key={index} value={user.username}>
 									{user.username}
 								</option>
-						))}
+						  ))}
 				</select>
 			</div>
 		</>
@@ -146,6 +144,7 @@ const NewDm = ({
 		} catch (error) {
 			console.log('DM already exist');
 			console.log(error);
+			handleNewDmTrigger();
 		}
 	};
 
@@ -161,7 +160,9 @@ const NewDm = ({
 				setSelectedUser={setSelectedUser}
 			/>
 			<div className="new-dm-buttons">
-				<button onClick={() => handleCreateDM(selectedUser)}>Create</button>
+				<button onClick={() => handleCreateDM(selectedUser)}>
+					Create
+				</button>
 				<button onClick={handleNewDmTrigger}>Cancel</button>
 			</div>
 		</div>
@@ -442,7 +443,7 @@ export interface userInfoDto {
 	avatar: string;
 }
 
-export const DmElement = ({socket }: {socket: Socket}) => {
+export const DmElement = ({ socket }: { socket: Socket }) => {
 	const [userInfo, setUserInfo] = useState<userInfoDto>();
 	const [DMList, setDMList] = useState<DirectMessageDto[]>([]);
 	const [selectedDM, setSelectedDM] = useState<DirectMessageDto>();
