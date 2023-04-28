@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { Socket } from 'socket.io-client';
 import '../Dm/DmElement.css';
@@ -6,6 +6,11 @@ import '../Dm/DmElement.css';
 import MessageInput from '../Dm/MessageInput';
 import { BasicFrame } from '../../Profile/Components/MiddleInfo/MiddleInfo';
 import { Aside } from './Aside/Aside';
+import { MessagesProvider } from './ChannelsUtils';
+/* Interfaces */
+import { ChannelDto } from './ChannelsUtils';
+import { userInfoDto } from './ChannelsUtils';
+import { MessagesContext } from './ChannelsUtils';
 
 interface Props {
 	socket: Socket;
@@ -17,7 +22,7 @@ interface Props {
 }
 
 const Beside = ({ socket, Channel, userInfo, setSelectedChannel }: Props) => {
-	const [messages, setMessages] = useState<any[]>([]);
+	const { messages, setMessages } = useContext(MessagesContext);
 	const [blocked, setBlocked] = useState<userInfoDto[]>([]);
 
 	useEffect(() => {
@@ -63,6 +68,7 @@ const Beside = ({ socket, Channel, userInfo, setSelectedChannel }: Props) => {
 		Channel,
 		blocked,
 		messages,
+		setMessages,
 		setSelectedChannel,
 		socket,
 		userInfo?.username,
@@ -133,20 +139,6 @@ const Beside = ({ socket, Channel, userInfo, setSelectedChannel }: Props) => {
 	);
 };
 
-export interface ChannelDto {
-	id: number;
-	name: string;
-	state: string;
-	ownerId: number;
-	ChatUsers: any[];
-}
-
-export interface userInfoDto {
-	id: number;
-	username: string;
-	avatar: string;
-}
-
 export const ChannelElement = ({ socket }: { socket: Socket }) => {
 	const [userInfo, setUserInfo] = useState<userInfoDto>();
 	const [ChannelList, setChannelList] = useState<ChannelDto[]>([]);
@@ -180,20 +172,22 @@ export const ChannelElement = ({ socket }: { socket: Socket }) => {
 
 	return (
 		<div className="dm-element">
-			<Aside
-				buttonContent="New Channel"
-				ChannelList={ChannelList}
-				userInfo={userInfo}
-				socket={socket}
-				selectedChannel={selectedChannel}
-				setSelectedChannel={setSelectedChannel}
-			/>
-			<Beside
-				socket={socket}
-				Channel={selectedChannel}
-				userInfo={userInfo}
-				setSelectedChannel={setSelectedChannel}
-			/>
+			<MessagesProvider>
+				<Aside
+					buttonContent="New Channel"
+					ChannelList={ChannelList}
+					userInfo={userInfo}
+					socket={socket}
+					selectedChannel={selectedChannel}
+					setSelectedChannel={setSelectedChannel}
+				/>
+				<Beside
+					socket={socket}
+					Channel={selectedChannel}
+					userInfo={userInfo}
+					setSelectedChannel={setSelectedChannel}
+				/>
+			</MessagesProvider>
 		</div>
 	);
 };

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './NewChannel.css';
 // import axios from 'axios';
 /* Types */
-import { userInfoDto } from '../ChannelElement';
+import { userInfoDto } from '../ChannelsUtils';
 /* Ressources */
 import close from '../../../Profile/Components/MainInfo/Ressources/close.svg';
 import axios from 'axios';
@@ -72,13 +72,13 @@ export const NewChannel = ({
 		try {
 			let state = 'PUBLIC';
 			switch (typeChannel) {
-				case 'PUBLIC':
+				case 'public':
 					state = 'PUBLIC';
 					break;
-				case 'PROTECTED':
+				case 'protected':
 					state = 'PROTECTED';
 					break;
-				case 'PRIVATE':
+				case 'private':
 					state = 'PRIVATE';
 					break;
 			}

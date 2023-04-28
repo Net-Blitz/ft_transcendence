@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { ChannelDto } from './ChannelElement';
+import { useContext, useEffect, useState } from 'react';
+import { ChannelDto, MessagesContext } from './ChannelsUtils';
 import axios from 'axios';
 /*	Ressources	*/
 import close from '../../Profile/Components/MainInfo/Ressources/close.svg';
@@ -36,14 +36,13 @@ const InputPassword = ({
 export const ChannelPassword = ({
 	handleChannelPasswordTrigger,
 	Channel,
-	setSaveChannel,
 }: {
 	handleChannelPasswordTrigger: () => void;
 	Channel: ChannelDto;
-	setSaveChannel: React.Dispatch<React.SetStateAction<ChannelDto[]>>;
 }) => {
 	const me = document.getElementsByClassName('popup');
 	const [password, setPassword] = useState('');
+	const { SaveChannel, setSaveChannel } = useContext(MessagesContext);
 
 	useEffect(() => {
 		window.onclick = (event: any) => {
@@ -66,7 +65,7 @@ export const ChannelPassword = ({
 				{ state: 'PROTECTED', password: password },
 				{ withCredentials: true }
 			);
-			setSaveChannel((prev) => [...prev, Channel]);
+			setSaveChannel([...SaveChannel, Channel]);
 			handleChannelPasswordTrigger();
 		} catch (error) {
 			console.log(error);

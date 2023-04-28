@@ -73,6 +73,82 @@ export class ChatService {
 		return res.status(200).json({ message: "Channel created" });
 	}
 
+	async EditChannel(
+		@Param("channel") channel: string,
+		state: string,
+		@Res() res: Response,
+		@GetUser() user: any
+	) {
+		const channelExists = await this.prisma.channel.findUnique({
+			where: {
+				name: channel,
+			},
+		});
+		if (!channelExists) {
+			return res.status(404).json({ message: "Channel not found" });
+		}
+		if (channelExists.ownerId !== user.id) {
+			return res.status(400).json({ message: "You are not the owner" });
+		}
+		if (state !== "PUBLIC" && state !== "PRIVATE")
+			return res.status(400).json({ message: "Invalid state" });
+		try {
+			await this.prisma.channel.update({
+				where: {
+					name: channel,
+				},
+				data: {
+					state: state as ChannelState,
+					hash: null,
+				},
+			});
+		} catch (e) {
+			console.log({ e });
+			return res.status(400).json({ message: "Same Channel state" });
+		}
+		return res.status(200).json({ message: "Channel edited" });
+	}
+
+	async EditProtectedChannel(
+		@Param("channel") channel: string,
+		password: string,
+		@Res() res: Response,
+		@GetUser() user: any
+	) {
+		const channelExists = await this.prisma.channel.findUnique({
+			where: {
+				name: channel,
+			},
+		});
+		if (!channelExists) {
+			return res.status(404).json({ message: "Channel not found" });
+		}
+		if (channelExists.ownerId !== user.id) {
+			return res.status(400).json({ message: "You are not the owner" });
+		}
+		if (!password) {
+			return res.status(400).json({ message: "Invalid password" });
+		}
+		const hashedPassword = await bcrypt.hash(password, 10);
+		try {
+			await this.prisma.channel.update({
+				where: {
+					name: channel,
+				},
+				data: {
+					state: "PROTECTED",
+					hash: hashedPassword,
+				},
+			});
+		} catch (e) {
+			console.log({ e });
+			return res
+				.status(400)
+				.json({ message: "Error while update password channel" });
+		}
+		return res.status(200).json({ message: "Channel edited" });
+	}
+
 	async JoinChannel(
 		@Param("channel") channel: string,
 		@Res() res: Response,

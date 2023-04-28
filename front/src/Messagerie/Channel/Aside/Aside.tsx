@@ -1,10 +1,11 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useContext } from 'react';
 import './Aside.css';
 import { Socket } from 'socket.io-client';
 import axios from 'axios';
 /* Interface */
-import { ChannelDto } from '../ChannelElement';
-import { userInfoDto } from '../ChannelElement';
+import { ChannelDto } from '../ChannelsUtils';
+import { userInfoDto } from '../ChannelsUtils';
+import { MessagesContext } from '../ChannelsUtils';
 /* Components */
 import { PopUp } from '../../../Profile/Components/MainInfo/MainInfo';
 import { ChannelPassword } from '../ChannelPassword';
@@ -41,9 +42,9 @@ const ChannelListElement = ({
 		React.SetStateAction<ChannelDto | undefined>
 	>;
 }) => {
-	const [SaveChannel, setSaveChannel] = useState<ChannelDto[]>([]);
 	const [ban, setBan] = useState<any[]>([]);
 	const [ChannelPasswordTrigger, setChannelPasswordTrigger] = useState(false);
+	const { setMessages, SaveChannel } = useContext(MessagesContext);
 
 	const handleSelectChannel = async (channel: ChannelDto) => {
 		const response = await axios.get(
@@ -57,6 +58,7 @@ const ChannelListElement = ({
 		}
 		if (channel?.state === 'PUBLIC') {
 			setSelectedChannel(channel);
+			setMessages([]);
 			socket?.emit('join', {
 				channel: channel.name,
 				username: userInfo?.username,
@@ -68,6 +70,7 @@ const ChannelListElement = ({
 				)
 			) {
 				setSelectedChannel(channel);
+				setMessages([]);
 				socket?.emit('join', {
 					channel: channel.name,
 					username: userInfo?.username,
@@ -75,26 +78,27 @@ const ChannelListElement = ({
 			} else {
 				handleChannelPasswordTrigger();
 			}
+		} else if (channel?.state === 'PRIVATE') {
+			if (channel.ownerId === userInfo?.id) {
+				setSelectedChannel(channel);
+				socket?.emit('join', {
+					channel: channel.name,
+					username: userInfo?.username,
+				});
+			} else if (
+				SaveChannel.find(
+					(savechannel) => savechannel.name === channel.name
+				)
+			) {
+				setSelectedChannel(channel);
+				socket?.emit('join', {
+					channel: channel.name,
+					username: userInfo?.username,
+				});
+			} else {
+				console.log("You don't have access to this channel");
+			}
 		}
-		//} else if (channel?.state === 'PRIVATE') {
-		//	if (channel.ownerId === userInfo.id) {
-		//		setSelectedChannel(channel);
-		//		socket?.emit('join', {
-		//			channel: channel.name,
-		//			username: userInfo?.username,
-		//		});
-		//	} else if (
-		//		SaveChannel.find((channelName) => channelName === channel.name)
-		//	) {
-		//		setSelectedChannel(channel);
-		//		socket?.emit('join', {
-		//			channel: channel.name,
-		//			username: userInfo?.username,
-		//		});
-		//	} else {
-		//		console.log("You don't have access to this channel");
-		//	}
-		//}
 	};
 
 	const handleChannelPasswordTrigger = useCallback(() => {
@@ -114,7 +118,6 @@ const ChannelListElement = ({
 				<ChannelPassword
 					handleChannelPasswordTrigger={handleChannelPasswordTrigger}
 					Channel={Channel}
-					setSaveChannel={setSaveChannel}
 				/>
 			</PopUp>
 		</>

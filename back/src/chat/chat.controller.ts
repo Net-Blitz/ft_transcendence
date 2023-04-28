@@ -4,6 +4,7 @@ import {
 	Delete,
 	Get,
 	Param,
+	Patch,
 	Post,
 	Res,
 } from "@nestjs/common";
@@ -32,6 +33,31 @@ export class ChatController {
 			);
 		else if (state === "PROTECTED")
 			return await this.chatService.CreateProtectedChannel(
+				channel,
+				password,
+				res,
+				user
+			);
+		else return res.status(400).json({ message: "Invalid channel state" });
+	}
+
+	@Patch("edit/:channel")
+	async EditChannel(
+		@Param("channel") channel: string,
+		@Body("state") state: string,
+		@Body("password") password: string,
+		@Res() res: Response,
+		@GetUser() user: any
+	) {
+		if (state === "PUBLIC" || state === "PRIVATE")
+			return await this.chatService.EditChannel(
+				channel,
+				state,
+				res,
+				user
+			);
+		else if (state === "PROTECTED")
+			return await this.chatService.EditProtectedChannel(
 				channel,
 				password,
 				res,
