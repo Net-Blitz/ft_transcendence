@@ -10,20 +10,17 @@ import close from '../../../Profile/Components/MainInfo/Ressources/close.svg';
 export const InputChannel = ({
 	title,
 	content,
+	entry,
 	typeChannel,
 	setContent,
 }: {
 	title: string;
 	content: string;
+	entry?: string;
 	typeChannel?: string;
 	setContent?: any;
 }) => {
 	const [input, setInput] = useState('');
-
-	useEffect(() => {
-		console.log(content);
-		setInput(content);
-	}, [content, setInput]);
 
 	useEffect(() => {
 		setContent(input);
@@ -44,7 +41,7 @@ export const InputChannel = ({
 					<input
 						type="text"
 						placeholder={content}
-						value={input}
+						value={entry}
 						onChange={(e) => setInput(e.target.value)}
 					/>
 				</span>
@@ -153,7 +150,7 @@ export const UpdateChannel = ({
 	handleNewDmTrigger: () => void;
 }) => {
 	const me = document.getElementsByClassName('popup');
-	const [typeChannel, setTypeChannel] = useState('private');
+	const [typeChannel, setTypeChannel] = useState('');
 	const [name, setName] = useState('');
 	const [password, setPassword] = useState('');
 	const { selectedChannel } = useContext(ChannelsContext);
@@ -224,6 +221,7 @@ export const UpdateChannel = ({
 			<InputChannel
 				title="Name"
 				content="enter the channel name"
+				entry={name}
 				setContent={setName}
 			/>
 			<div className="channel-select-buttons">

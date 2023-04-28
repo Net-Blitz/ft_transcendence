@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useContext, useEffect, useState } from 'react';
-import { ChannelDto, ChannelsProvider, userInfoDto } from './ChannelsUtils';
+import { ChannelDto, ChannelsContext, userInfoDto } from './ChannelsUtils';
 import { Socket } from 'socket.io-client';
 import close from '../../Profile/Components/MainInfo/Ressources/close.svg';
 
@@ -15,7 +15,7 @@ interface InviteProps {
 function Invite({ socket, userInfo, setSelectedChannel }: InviteProps) {
 	const [Invites, setInvites] = useState<any[]>([]);
 	const { SaveChannel, setSaveChannel, setMessages } =
-		useContext(ChannelsProvider);
+		useContext(ChannelsContext);
 
 	useEffect(() => {
 		const fetchInvites = async () => {
@@ -34,6 +34,26 @@ function Invite({ socket, userInfo, setSelectedChannel }: InviteProps) {
 		return () => clearInterval(interval);
 	}, []);
 
+	const getMessages = async (Channel: ChannelDto) => {
+		try {
+			const response = await axios.get(
+				'http://localhost:3333/chat/channel/messages/' + Channel.id,
+				{ withCredentials: true }
+			);
+			response.data.map((message: any) => {
+				return (
+					message.userId === userInfo?.id
+						? (message.username = userInfo?.username)
+						: (message.username = ''),
+					(message.content = message.message)
+				);
+			});
+			setMessages(response.data.reverse());
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
 	const JoinPrivateChannel = async (Channel: ChannelDto) => {
 		try {
 			await axios.post(
@@ -42,7 +62,7 @@ function Invite({ socket, userInfo, setSelectedChannel }: InviteProps) {
 				{ withCredentials: true }
 			);
 			setSelectedChannel(Channel);
-			setMessages([]);
+			getMessages(Channel);
 			socket?.emit('join', {
 				channel: Channel.name,
 				username: userInfo?.username,

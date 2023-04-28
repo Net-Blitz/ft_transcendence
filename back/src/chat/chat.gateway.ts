@@ -154,6 +154,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			message["createdAt"] = new Date();
 			console.log(channel, ": ", username, ": ", message.content);
 			this.server.to(channel).emit("chat", message);
+			await this.prisma.message.create({
+				data: {
+					createdAt: new Date(),
+					message: message.content,
+					channel: {
+						connect: {
+							name: channel,
+						},
+					},
+					user: {
+						connect: {
+							username: username,
+						},
+					},
+				},
+			});
 		} catch (e) {
 			console.log(e);
 		}

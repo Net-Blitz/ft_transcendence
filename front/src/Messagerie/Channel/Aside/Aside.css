@@ -69,6 +69,18 @@
 	align-items: center;
 }
 
+.user-channel-list-element .dm-list-element-avatar {
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	margin-left: 10px;
+	background-color: #FDFAD0;
+}
+
+.user-channel-list-element .admin-avatar {
+	background-color: #F9DA49;
+}
+
 .user-channel-list-element h4 {
 	margin: 0;
 	text-align: center;
@@ -87,6 +99,10 @@
 
 .user-channel-list-element .user-channel-list-buttons:last-child {
 	margin-right: 10px;
+}
+
+.user-channel-list-element .admin {
+	color: #F9DA49;
 }
 
 /* CHANNEL LIST ELEMENT */

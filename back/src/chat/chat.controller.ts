@@ -214,4 +214,13 @@ export class ChatController {
 	) {
 		return await this.chatService.getDMMessages(id, res, user);
 	}
+
+	@Get("channel/messages/:id")
+	async getChannelMessages(
+		@Param("id") id: string,
+		@Res() res: Response,
+		@GetUser() user: any
+	) {
+		return await this.chatService.getChannelMessages(id, res, user);
+	}
 }

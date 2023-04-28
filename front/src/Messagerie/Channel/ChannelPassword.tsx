@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import { ChannelDto, ChannelsProvider } from './ChannelsUtils';
+import { ChannelDto, ChannelsContext } from './ChannelsUtils';
 import axios from 'axios';
 /*	Ressources	*/
 import close from '../../Profile/Components/MainInfo/Ressources/close.svg';
@@ -42,7 +42,7 @@ export const ChannelPassword = ({
 }) => {
 	const me = document.getElementsByClassName('popup');
 	const [password, setPassword] = useState('');
-	const { SaveChannel, setSaveChannel } = useContext(ChannelsProvider);
+	const { SaveChannel, setSaveChannel } = useContext(ChannelsContext);
 
 	useEffect(() => {
 		window.onclick = (event: any) => {

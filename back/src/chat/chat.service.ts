@@ -830,4 +830,63 @@ export class ChatService {
 			return res.status(404).json({ message: "Messages not found" });
 		}
 	}
+
+	async getChannelMessages(
+		@Param("id") id: string,
+		@Res() res: Response,
+		@GetUser() user: any
+	) {
+		try {
+			const channel = await this.prisma.channel.findUnique({
+				where: {
+					id: parseInt(id),
+				},
+			});
+			if (!channel) {
+				return res.status(404).json({ message: "Channel not found" });
+			}
+			const users = await this.prisma.chatUsers.findMany({
+				where: {
+					A: channel.id,
+				},
+				select: {
+					B: true,
+				},
+			});
+			const usersIds = users.map((user) => user.B);
+			if (!usersIds.includes(user.id)) {
+				return res.status(403).json({ message: "Forbidden" });
+			}
+
+			const messages = await this.prisma.message.findMany({
+				where: {
+					channelId: channel.id,
+				},
+			});
+
+			if (!messages) {
+				return res.status(404).json({ message: "Messages not found" });
+			}
+
+			const messagesAvatar = await Promise.all(
+				messages.map(async (message) => {
+					const user = await this.prisma.user.findUnique({
+						where: {
+							id: message.userId,
+						},
+						select: {
+							avatar: true,
+						},
+					});
+					return {
+						...message,
+						avatar: "http://localhost:3333/" + user.avatar,
+					};
+				})
+			);
+			return res.status(200).json(messagesAvatar);
+		} catch (e) {
+			return res.status(404).json({ message: "Messages not found" });
+		}
+	}
 }
