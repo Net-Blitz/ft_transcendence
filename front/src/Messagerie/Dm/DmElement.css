@@ -18,6 +18,17 @@
 	align-items: center;
 }
 
+.dm-element .dm-aside .content-dm-aside {
+	width: 100%;
+	overflow-y: scroll;
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+
+.dm-element .dm-aside .content-dm-aside::-webkit-scrollbar {
+	display: none;
+}
+
 .dm-element .dm-aside > button {
 	all: unset;
 	width: 102px;

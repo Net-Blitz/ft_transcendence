@@ -67,6 +67,7 @@
 	height: 40px;
 	display: flex;
 	align-items: center;
+	position: relative;
 }
 
 .user-channel-list-element .dm-list-element-avatar {
@@ -102,6 +103,30 @@
 }
 
 .user-channel-list-element .admin {
+	color: #F9DA49;
+}
+
+.user-channel-list-element .dropdown-settings-user-channel {
+	background-color: #FDFAD0;
+	position: absolute;
+	right: 2px;
+	top: 34px;
+	z-index: 1;
+	padding: 4px;
+	border-radius: 5px;
+}
+
+.user-channel-list-element .dropdown-settings-user-channel p {
+	margin: 0;
+	font-family: 'Poppins';
+	font-style: normal;
+	font-weight: 400;
+	font-size: 11px;
+	color: #0A3D62;
+	cursor: pointer;
+}
+
+.user-channel-list-element .dropdown-settings-user-channel p:hover {
 	color: #F9DA49;
 }
 

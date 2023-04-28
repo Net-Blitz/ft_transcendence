@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import './NewChannel.css';
 import axios from 'axios';
 /* Types */
-import { ChannelsContext } from '../ChannelsUtils';
+import { ChannelsContext, ChannelDto } from '../ChannelsUtils';
 /* Ressources */
 import close from '../../../Profile/Components/MainInfo/Ressources/close.svg';
 import {
@@ -63,6 +63,7 @@ export const NewChannel = ({
 	const [typeChannel, setTypeChannel] = useState('private');
 	const [name, setName] = useState('');
 	const [password, setPassword] = useState('');
+	const { setChannelList } = useContext(ChannelsContext);
 
 	useEffect(() => {
 		window.onclick = (event: any) => {
@@ -102,6 +103,11 @@ export const NewChannel = ({
 			setName('');
 			setPassword('');
 			handleNewDmTrigger();
+			const Channels = await axios.get<ChannelDto[]>(
+				'http://localhost:3333/chat/channels',
+				{ withCredentials: true }
+			);
+			setChannelList(Channels.data);
 		} catch (error) {
 			console.log(error);
 		}
@@ -165,7 +171,7 @@ export const UpdateChannel = ({
 	const [typeChannel, setTypeChannel] = useState('');
 	const [name, setName] = useState('');
 	const [password, setPassword] = useState('');
-	const { selectedChannel } = useContext(ChannelsContext);
+	const { selectedChannel, setChannelList } = useContext(ChannelsContext);
 
 	useEffect(() => {
 		window.onclick = (event: any) => {
@@ -213,6 +219,11 @@ export const UpdateChannel = ({
 			setName('');
 			setPassword('');
 			handleNewDmTrigger();
+			const Channels = await axios.get<ChannelDto[]>(
+				'http://localhost:3333/chat/channels',
+				{ withCredentials: true }
+			);
+			setChannelList(Channels.data);
 		} catch (error) {
 			console.log(error);
 		}

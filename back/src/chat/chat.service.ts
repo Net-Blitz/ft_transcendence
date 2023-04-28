@@ -632,7 +632,35 @@ export class ChatService {
 		});
 		return res.status(200).json(channels);
 	}
-
+	async getMute(@Param("username") username: string, @Res() res: Response) {
+		const userExists = await this.prisma.user.findUnique({
+			where: {
+				username: username,
+			},
+		});
+		if (!userExists) {
+			return res.status(404).json({ message: "User not found" });
+		}
+		const mute = await this.prisma.mute.findMany({
+			where: {
+				B: userExists.id,
+			},
+		});
+		if (!mute) {
+			return res.status(404).json({ message: "Mute not found" });
+		}
+		const channels = await this.prisma.channel.findMany({
+			where: {
+				id: {
+					in: mute.map((mute) => mute.A),
+				},
+			},
+			select: {
+				name: true,
+			},
+		});
+		return res.status(200).json(channels);
+	}
 	async getBans(@Param("channel") channel: string, @Res() res: Response) {
 		const channelExists = await this.prisma.channel.findUnique({
 			where: {
@@ -654,6 +682,32 @@ export class ChatService {
 			where: {
 				id: {
 					in: ban.map((ban) => ban.B),
+				},
+			},
+		});
+		return res.status(200).json(users);
+	}
+	async getMutes(@Param("channel") channel: string, @Res() res: Response) {
+		const channelExists = await this.prisma.channel.findUnique({
+			where: {
+				name: channel,
+			},
+		});
+		if (!channelExists) {
+			return res.status(404).json({ message: "Channel not found" });
+		}
+		const mute = await this.prisma.mute.findMany({
+			where: {
+				A: channelExists.id,
+			},
+		});
+		if (!mute) {
+			return res.status(404).json({ message: "Mute not found" });
+		}
+		const users = await this.prisma.user.findMany({
+			where: {
+				id: {
+					in: mute.map((mute) => mute.B),
 				},
 			},
 		});
@@ -845,18 +899,18 @@ export class ChatService {
 			if (!channel) {
 				return res.status(404).json({ message: "Channel not found" });
 			}
-			const users = await this.prisma.chatUsers.findMany({
-				where: {
-					A: channel.id,
-				},
-				select: {
-					B: true,
-				},
-			});
-			const usersIds = users.map((user) => user.B);
-			if (!usersIds.includes(user.id)) {
-				return res.status(403).json({ message: "Forbidden" });
-			}
+			//const users = await this.prisma.chatUsers.findMany({
+			//	where: {
+			//		A: channel.id,
+			//	},
+			//	select: {
+			//		B: true,
+			//	},
+			//});
+			//const usersIds = users.map((user) => user.B);
+			//if (!usersIds.includes(user.id)) {
+			//	return res.status(403).json({ message: "Forbidden" });
+			//}
 
 			const messages = await this.prisma.message.findMany({
 				where: {

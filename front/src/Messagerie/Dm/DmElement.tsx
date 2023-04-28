@@ -290,18 +290,20 @@ const Aside = ({
 			<button className="new-input" onClick={handleNewDmTrigger}>
 				{buttonContent}
 			</button>
-			<DmList
-				DMList={DMList}
-				userInfo={userInfo}
-				selectedDM={selectedDM}
-				setSelectedDM={setSelectedDM}
-			/>
-			<PopUp trigger={newDmTrigger}>
-				<NewDm
-					handleNewDmTrigger={handleNewDmTrigger}
+			<div className="content-dm-aside">
+				<DmList
+					DMList={DMList}
 					userInfo={userInfo}
+					selectedDM={selectedDM}
+					setSelectedDM={setSelectedDM}
 				/>
-			</PopUp>
+				<PopUp trigger={newDmTrigger}>
+					<NewDm
+						handleNewDmTrigger={handleNewDmTrigger}
+						userInfo={userInfo}
+					/>
+				</PopUp>
+			</div>
 		</div>
 	);
 };
@@ -364,6 +366,7 @@ const Beside = ({ socket, DM, userInfo }: Props) => {
 		message.createdAt = new Date();
 		setMessages((messages) => [message, ...messages]);
 	};
+	if (!userInfo) return <>Loading...</>;
 
 	return (
 		<div className="dm-beside">

@@ -9,16 +9,14 @@ import { Aside } from './Aside/Aside';
 /* Interfaces */
 import { ChannelsContext, ChannelsProvider } from './ChannelsUtils';
 import { userInfoDto } from './ChannelsUtils';
+import { useSelector } from 'react-redux';
+import { selectUserData } from '../../utils/redux/selectors';
 
-interface Props {
-	socket: Socket;
-	userInfo: userInfoDto | undefined;
-}
-
-const Beside = ({ socket, userInfo }: Props) => {
+const Beside = ({ socket }: { socket: Socket }) => {
 	const { messages, setMessages, selectedChannel, setSelectedChannel } =
 		useContext(ChannelsContext);
 	const [blocked, setBlocked] = useState<userInfoDto[]>([]);
+	const connectedUser = useSelector(selectUserData);
 
 	useEffect(() => {
 		const fetchBlocked = async () => {
@@ -43,14 +41,24 @@ const Beside = ({ socket, userInfo }: Props) => {
 
 		socket?.on('chat', handleMessage);
 		socket?.on('kick', (data: any) => {
-			if (data?.username === userInfo?.username) {
-				setSelectedChannel(selectedChannel);
+			if (data?.username === connectedUser.username) {
+				setSelectedChannel({
+					id: 0,
+					name: '',
+					state: '',
+					ownerId: 0,
+				});
 				setMessages([]);
 			}
 		});
 		socket?.on('ban', (data: any) => {
-			if (data?.username === userInfo?.username) {
-				setSelectedChannel(selectedChannel);
+			if (data?.username === connectedUser.username) {
+				setSelectedChannel({
+					id: 0,
+					name: '',
+					state: '',
+					ownerId: 0,
+				});
 				setMessages([]);
 			}
 		});
@@ -66,7 +74,7 @@ const Beside = ({ socket, userInfo }: Props) => {
 		setMessages,
 		setSelectedChannel,
 		socket,
-		userInfo?.username,
+		connectedUser.username,
 	]);
 
 	const sendMessage = (message: any) => {
@@ -87,11 +95,11 @@ const Beside = ({ socket, userInfo }: Props) => {
 					<div
 						key={index}
 						className={`chat-bubble ${
-							userInfo?.username === message.username
+							connectedUser.username === message.username
 								? 'chat-me'
 								: 'chat-you'
 						}`}>
-						{(userInfo?.username === message.username && (
+						{(connectedUser.username === message.username && (
 							<>
 								<p>{message.content}</p>
 								<img
@@ -129,34 +137,17 @@ const Beside = ({ socket, userInfo }: Props) => {
 					</div>
 				))}
 			</BasicFrame>
-			<MessageInput sendMessage={sendMessage} userInfo={userInfo} />
+			<MessageInput sendMessage={sendMessage} userInfo={connectedUser} />
 		</div>
 	);
 };
 
 export const ChannelElement = ({ socket }: { socket: Socket }) => {
-	const [userInfo, setUserInfo] = useState<userInfoDto>();
-
-	useEffect(() => {
-		const fetchData = async () => {
-			const response = await axios.get('http://localhost:3333/users/me', {
-				withCredentials: true,
-			});
-			setUserInfo(response.data);
-		};
-
-		fetchData();
-	}, []);
-
 	return (
 		<div className="dm-element">
 			<ChannelsProvider>
-				<Aside
-					buttonContent="New Channel"
-					userInfo={userInfo}
-					socket={socket}
-				/>
-				<Beside socket={socket} userInfo={userInfo} />
+				<Aside buttonContent="New Channel" socket={socket} />
+				<Beside socket={socket} />
 			</ChannelsProvider>
 		</div>
 	);

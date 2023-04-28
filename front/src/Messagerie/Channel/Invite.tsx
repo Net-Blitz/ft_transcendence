@@ -1,21 +1,16 @@
 import axios from 'axios';
 import { useContext, useEffect, useState } from 'react';
-import { ChannelDto, ChannelsContext, userInfoDto } from './ChannelsUtils';
+import { ChannelDto, ChannelsContext } from './ChannelsUtils';
 import { Socket } from 'socket.io-client';
 import close from '../../Profile/Components/MainInfo/Ressources/close.svg';
+import { useSelector } from 'react-redux';
+import { selectUserData } from '../../utils/redux/selectors';
 
-interface InviteProps {
-	socket: Socket;
-	userInfo: userInfoDto | undefined;
-	setSelectedChannel: React.Dispatch<
-		React.SetStateAction<ChannelDto | undefined>
-	>;
-}
-
-function Invite({ socket, userInfo, setSelectedChannel }: InviteProps) {
+function Invite({ socket }: { socket: Socket }) {
 	const [Invites, setInvites] = useState<any[]>([]);
-	const { SaveChannel, setSaveChannel, setMessages } =
+	const { SaveChannel, setSaveChannel, setMessages, setSelectedChannel } =
 		useContext(ChannelsContext);
+	const connectedUser = useSelector(selectUserData);
 
 	useEffect(() => {
 		const fetchInvites = async () => {
@@ -30,7 +25,7 @@ function Invite({ socket, userInfo, setSelectedChannel }: InviteProps) {
 			}
 		};
 		fetchInvites();
-		const interval = setInterval(fetchInvites, 5000);
+		const interval = setInterval(fetchInvites, 2500);
 		return () => clearInterval(interval);
 	}, []);
 
@@ -42,8 +37,8 @@ function Invite({ socket, userInfo, setSelectedChannel }: InviteProps) {
 			);
 			response.data.map((message: any) => {
 				return (
-					message.userId === userInfo?.id
-						? (message.username = userInfo?.username)
+					message.userId === connectedUser.id
+						? (message.username = connectedUser.username)
 						: (message.username = ''),
 					(message.content = message.message)
 				);
@@ -65,7 +60,7 @@ function Invite({ socket, userInfo, setSelectedChannel }: InviteProps) {
 			getMessages(Channel);
 			socket?.emit('join', {
 				channel: Channel.name,
-				username: userInfo?.username,
+				username: connectedUser.username,
 			});
 			setSaveChannel([...SaveChannel, Channel]);
 		} catch (error) {

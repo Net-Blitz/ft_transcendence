@@ -147,8 +147,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			});
 
 			if ((await mutedUser).length > 0) {
-				console.log(userExists.username + " is muted");
-				return;
+				if (mutedUser[0].mutedUntil > new Date()) {
+					console.log(userExists.username + " is muted");
+					return;
+				}
+				await this.prisma.mute.deleteMany({
+					where: {
+						A: channelExists.id,
+						B: userExists.id,
+					},
+				});
 			}
 			message["avatar"] = "http://localhost:3333/" + userExists.avatar;
 			message["createdAt"] = new Date();
@@ -485,6 +493,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				data: {
 					A: channelExists.id,
 					B: userExists.id,
+					//MutedUntil: new Date(Date.now() + 50000),
 				},
 			});
 			console.log("isAdmin: ", isAdmin);
@@ -557,6 +566,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 						B: userExists.id,
 					},
 				});
+				this.server
+					.to(channel)
+					.emit("Unmute", { username: data.login, channel: channel });
 			}
 		} catch (e) {
 			console.log(e);

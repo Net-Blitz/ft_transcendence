@@ -1,12 +1,13 @@
 import React, { KeyboardEvent, useRef } from 'react';
 import send from '../Ressources/send.svg';
+import { userInfoDto } from '../Channel/ChannelsUtils';
 
 function MessageInput({
 	sendMessage,
 	userInfo,
 }: {
 	sendMessage: (value: { username: string; content: string }) => void;
-	userInfo: any;
+	userInfo: userInfoDto;
 }) {
 	const inputRef = useRef<HTMLInputElement>(null);
 

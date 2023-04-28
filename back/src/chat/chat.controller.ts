@@ -186,10 +186,17 @@ export class ChatController {
 	async getBan(@Param("username") username: string, @Res() res: Response) {
 		return await this.chatService.getBan(username, res);
 	}
-
+	@Get("mute/:username")
+	async getMute(@Param("username") username: string, @Res() res: Response) {
+		return await this.chatService.getMute(username, res);
+	}
 	@Get("bans/:channel")
 	async getBans(@Param("channel") channel: string, @Res() res: Response) {
 		return await this.chatService.getBans(channel, res);
+	}
+	@Get("mutes/:channel")
+	async getMutes(@Param("channel") channel: string, @Res() res: Response) {
+		return await this.chatService.getMutes(channel, res);
 	}
 
 	@Get("dm")
