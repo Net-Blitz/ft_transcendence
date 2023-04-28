@@ -4,11 +4,16 @@ import eyePNG from "./assets/eye.png"
 import crown from "./assets/crown.png"
 import "./Game.css";
 
-function Podium({color, height, point, avatar, env}:any) {
+function Podium({color, height, point, avatar, avatar2 = null, env}:any) {
 	return (
 		<div className="game-end-podium-div">
-			{avatar ? 
-			<img src={'http://' + env.host + ':' + env.port + '/' + avatar} alt="a" className="game-end-podium-avatar"/>
+			{avatar ?
+			<div>
+				
+				{height === "60%" ? <img src={crown} className="game-end-crown" /> : null}
+				<img src={'http://' + env.host + ':' + env.port + '/' + avatar} alt="a" className="game-end-podium-avatar"/>
+				{avatar2 ? <img src={'http://' + env.host + ':' + env.port + '/' + avatar2} alt="a" className="game-end-podium-avatar"/> : null}
+			</div>
 			: null}
 			<div className="game-end-podium-stone" style={{backgroundColor: color, height: height}}>
 				<div className="game-end-podium-point" >{point}</div>
@@ -22,7 +27,7 @@ function Game({socketGame, room, login, env}:any) {
 	const [gameEnd, updateGameEnd] = useState({} as any);
 	const navigate = useNavigate();
 	const [spectator, updateSpectator] = useState(0);
-	const [board, updateBoard] = useState(true);
+	const [board, updateBoard] = useState(1);
 
 	useEffect(() => {
 		socketGame.emit("gameConnection", {room: room});
@@ -54,19 +59,20 @@ function Game({socketGame, room, login, env}:any) {
 			if (gameDiv) {
 				if (gameState.board)
 				{
-					gameDiv.classList.remove("game-playing-board");
-					gameDiv.classList.remove("game-playing-big-board");
-					if (gameState.board === 1)
-						gameDiv.classList.add("game-playing-board");
-					else if (gameState.board === 2)
-						gameDiv.classList.add("game-playing-big-board");
-					updateBoard(gameState.board === 1 ? true : false);
+					updateBoard(gameState.board);
 					if (gameState.board === 2)
 					{
 						player3 = document.querySelector<HTMLElement>("#game-playing-player3");
 						player4 = document.querySelector<HTMLElement>("#game-playing-player4");
 						score3 = document.querySelector<HTMLElement>("#game-playing-score3");
 						score4 = document.querySelector<HTMLElement>("#game-playing-score4");
+					}
+					if (gameState.board === 3)
+					{
+						player1 = document.querySelector<HTMLElement>("#game-playing-player5");
+						player2 = document.querySelector<HTMLElement>("#game-playing-player6");
+						player3 = document.querySelector<HTMLElement>("#game-playing-player7");
+						player4 = document.querySelector<HTMLElement>("#game-playing-player8");
 					}
 				}
 				if (ball) {
@@ -75,35 +81,66 @@ function Game({socketGame, room, login, env}:any) {
 					ball.style.left = (gameDiv.offsetWidth - ball.offsetWidth - 3) * gameState.ball_x + 'px';
 					ball.style.top = (gameDiv.offsetHeight - ball.offsetWidth - 3) * gameState.ball_y + 'px';
 				}
-				if (player1) { 
-					player1.style.height = (gameDiv.offsetHeight) * gameState.player1_size + 'px';
-					player1.style.width = (gameDiv.offsetWidth) * gameState.player_width + 'px';
-					player1.style.top = (gameDiv.offsetHeight - 3 - player1.offsetHeight) * gameState.player1_y + 'px';
-					player1.style.left = (gameDiv.offsetWidth - player1.offsetWidth) * gameState.player1_x + 'px';
+				if (gameState.board === 3)
+				{
+					if (player1) { 
+						player1.style.height = (gameDiv.offsetHeight) * gameState.player1_size + 'px';
+						player1.style.width = (gameDiv.offsetWidth) * gameState.player_width + 'px';
+						player1.style.top = (gameDiv.offsetHeight - 3 - player1.offsetHeight) * gameState.player1_y + 'px';
+						player1.style.left = (gameDiv.offsetWidth - player1.offsetWidth) * gameState.player1_x + 'px';
+					}
+					if (player2) {
+						player2.style.height = (gameDiv.offsetHeight) * gameState.player2_size + 'px';
+						player2.style.width = (gameDiv.offsetWidth) * gameState.player_width + 'px';
+						player2.style.top = (gameDiv.offsetHeight - 3 - player2.offsetHeight) * gameState.player2_y + 'px';
+						player2.style.left = (gameDiv.offsetWidth - player2.offsetWidth) * gameState.player2_x + 'px';
+					}
+					if (player3) {
+						player3.style.height = (gameDiv.offsetHeight) * gameState.player3_size + 'px';
+						player3.style.width = (gameDiv.offsetWidth) * gameState.player_width + 'px';
+						player3.style.top = (gameDiv.offsetHeight - 3 - player3.offsetHeight) * gameState.player3_y + 'px';
+						player3.style.right = (gameDiv.offsetWidth - player3.offsetWidth) * (1 - gameState.player3_x)  + 'px';
+					}
+					if (player4) {
+						player4.style.height = (gameDiv.offsetHeight) * gameState.player4_size + 'px';
+						player4.style.width = (gameDiv.offsetWidth) * gameState.player_width + 'px';
+						player4.style.top = (gameDiv.offsetHeight - 3 - player4.offsetHeight) * gameState.player4_y + 'px';
+						player4.style.right = (gameDiv.offsetWidth - player4.offsetWidth) * (1 - gameState.player4_x)  + 'px';
+					}
 				}
-				if (player2) {
-					player2.style.height = (gameDiv.offsetHeight) * gameState.player2_size + 'px';
-					player2.style.width = (gameDiv.offsetWidth) * gameState.player_width + 'px';
-					player2.style.top = (gameDiv.offsetHeight - 3 - player2.offsetHeight) * gameState.player2_y + 'px';
-					player2.style.right = (gameDiv.offsetWidth - player2.offsetWidth) * (1 - gameState.player2_x)  + 'px';
-				}
-				if (player3) {
-					player3.style.height = (gameDiv.offsetHeight) * gameState.player_width + 'px';
-					player3.style.width = (gameDiv.offsetWidth) * gameState.player3_size + 'px';
-					player3.style.top = (gameDiv.offsetHeight - player3.offsetHeight) * gameState.player3_y + 'px';
-					player3.style.left = (gameDiv.offsetWidth - 3 - player3.offsetWidth) * gameState.player3_x + 'px';
-				}
-				if (player4) {
-					player4.style.height = (gameDiv.offsetHeight) * gameState.player_width + 'px';
-					player4.style.width = (gameDiv.offsetWidth) * gameState.player4_size + 'px';
-					player4.style.bottom = (gameDiv.offsetHeight - player4.offsetHeight) * (1 - gameState.player4_y) + 'px';
-					player4.style.left = (gameDiv.offsetWidth - 3 - player4.offsetWidth) * gameState.player4_x + 'px';
+				else
+				{
+					if (player1) { 
+						player1.style.height = (gameDiv.offsetHeight) * gameState.player1_size + 'px';
+						player1.style.width = (gameDiv.offsetWidth) * gameState.player_width + 'px';
+						player1.style.top = (gameDiv.offsetHeight - 3 - player1.offsetHeight) * gameState.player1_y + 'px';
+						player1.style.left = (gameDiv.offsetWidth - player1.offsetWidth) * gameState.player1_x + 'px';
+					}
+					if (player2) {
+						player2.style.height = (gameDiv.offsetHeight) * gameState.player2_size + 'px';
+						player2.style.width = (gameDiv.offsetWidth) * gameState.player_width + 'px';
+						player2.style.top = (gameDiv.offsetHeight - 3 - player2.offsetHeight) * gameState.player2_y + 'px';
+						player2.style.right = (gameDiv.offsetWidth - player2.offsetWidth) * (1 - gameState.player2_x)  + 'px';
+					}
+					if (player3) {
+						player3.style.height = (gameDiv.offsetHeight) * gameState.player_width + 'px';
+						player3.style.width = (gameDiv.offsetWidth) * gameState.player3_size + 'px';
+						player3.style.top = (gameDiv.offsetHeight - player3.offsetHeight) * gameState.player3_y + 'px';
+						player3.style.left = (gameDiv.offsetWidth - 3 - player3.offsetWidth) * gameState.player3_x + 'px';
+					}
+					if (player4) {
+						player4.style.height = (gameDiv.offsetHeight) * gameState.player_width + 'px';
+						player4.style.width = (gameDiv.offsetWidth) * gameState.player4_size + 'px';
+						player4.style.bottom = (gameDiv.offsetHeight - player4.offsetHeight) * (1 - gameState.player4_y) + 'px';
+						player4.style.left = (gameDiv.offsetWidth - 3 - player4.offsetWidth) * gameState.player4_x + 'px';
+					}
 				}
 				
 				let score1 = document.querySelector<HTMLElement>("#game-playing-score1");
 				let score2 = document.querySelector<HTMLElement>("#game-playing-score2"); 
 				if (score1) score1.innerHTML = gameState.player1_score;
-				if (score2) score2.innerHTML = gameState.player2_score;
+				if (score2 && gameState.board !== 3) score2.innerHTML = gameState.player2_score;
+				if (score2 && gameState.board === 3) score2.innerHTML = gameState.player3_score;
 				if (score3) score3.innerHTML = gameState.player3_score;
 				if (score4) score4.innerHTML = gameState.player4_score;
 			}
@@ -241,19 +278,30 @@ function Game({socketGame, room, login, env}:any) {
 					  : {spectator}
 				</div>
 			</div>
-			{ !here ? 
+			{ !here ?
+			board === 1 || board === 2 ?
 			 <div className="game-end">
 				<div className="game-end-podium">
 					<Podium color="#C0C0C0" height="45%"  point={gameEnd.score2} avatar={gameEnd.avatar2} env={env}/>
 					<Podium color="#FFD700" height="60%" point={gameEnd.score1} avatar={gameEnd.avatar1} env={env}/>
 					<Podium color="#CD7F32" height= "30%" point={gameEnd.score3} avatar={gameEnd.avatar3} env={env}/>
-					<img src={crown} className="game-end-crown" />
 				</div>
-				<div className="game-end-elo"></div>
-				<div className="game-end-recap"></div>
+				{/* <img src={crown} className="game-end-crown" /> */}
+				{/* <div className="game-end-elo"></div>
+				<div className="game-end-recap"></div> */}
 			</div>
 			:
-			board ?
+			<div className="game-end">
+				<div className="game-end-podium">
+					<Podium color="#C0C0C0" height="45%"  point={gameEnd.score2} avatar={gameEnd.avatar3} avatar2={gameEnd.avatar4} env={env}/>
+					<Podium color="#FFD700" height="60%" point={gameEnd.score1} avatar={gameEnd.avatar1} avatar2={gameEnd.avatar2} env={env}/>
+					<Podium color="#CD7F32" height= "30%" point={gameEnd.score3} avatar={null} env={env}/>
+				</div>
+				{/* <div className="game-end-elo"></div>
+				<div className="game-end-recap"></div> */}
+			</div>
+			:
+			board === 1 ?
 			<div className="game-playing-board" id="game-board">
 				<span className="game-playing-ball"></span>
 				<span className="game-playing-player" id="game-playing-player1"></span>
@@ -264,6 +312,7 @@ function Game({socketGame, room, login, env}:any) {
 				</div>
 			</div>
 			: 
+			board === 2 ?
 			<div className="game-playing-big-board" id="game-board">
 				<span className="game-playing-ball"></span>
 				<span className="game-playing-player" id="game-playing-player1"></span>
@@ -275,6 +324,18 @@ function Game({socketGame, room, login, env}:any) {
 					<span className="game-playing-score" id="game-playing-score2">4</span>
 					<span className="game-playing-score" id="game-playing-score3">4</span>
 					<span className="game-playing-score" id="game-playing-score4">4</span>
+				</div>
+			</div>
+			:
+			<div className="game-playing-board" id="game-board">
+				<span className="game-playing-ball"></span>
+				<span className="game-playing-player-little" id="game-playing-player5"></span>
+				<span className="game-playing-player-little" id="game-playing-player6"></span>
+				<span className="game-playing-player-little" id="game-playing-player7"></span>
+				<span className="game-playing-player-little" id="game-playing-player8"></span>
+				<div className="game-playing-score-div">
+					<span className="game-playing-score" id="game-playing-score1">0</span>
+					<span className="game-playing-score" id="game-playing-score2">0</span>
 				</div>
 			</div>
 			}

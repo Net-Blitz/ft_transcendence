@@ -4,7 +4,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { SocketUser } from "./dto";
 import * as jwt from 'jsonwebtoken'
 import { Game, GameMode, User } from "@prisma/client";
-import { GameRoom, GameRoomFFA } from "./class";
+import { GameRoom, GameRoom2V2, GameRoomFFA } from "./class";
 
 @WebSocketGateway({namespace:"game", cors: {origin: "*"}})
 export class GameGateway {
@@ -90,6 +90,36 @@ export class GameGateway {
 			gameRoom.updatePlayerPosition(players.player4);
 	}
 
+	private async moveBall2V2(gameRoom: GameRoom2V2, room: number) {
+
+		let increment_x = gameRoom.ball.speed_x * Math.cos(gameRoom.ball.direction);
+		let increment_y = gameRoom.ball.speed_y * Math.sin(gameRoom.ball.direction);
+		
+		gameRoom.checkBallBounce(increment_x);
+		
+		gameRoom.incrementBallY(increment_y);
+
+		if (gameRoom.checkBallScore()) {
+			await this.prisma.game.update({
+				where: { id: room },
+				data: { score1: gameRoom.player1.score, score2: gameRoom.player2.score, score3: gameRoom.player3.score, score4: gameRoom.player4.score }
+			})
+		}
+	}
+
+	private movePlayer2V2(gameRoom: GameRoom2V2, room: number) {
+		let players = this.getPlayerSocket(room);
+
+		if (players.player1 && !(players.player1.surrender && players.player2.surrender))
+			gameRoom.updatePlayerPosition(players.player1);
+		if (players.player2 && !(players.player1.surrender && players.player2.surrender))
+			gameRoom.updatePlayerPosition(players.player2);
+		if (players.player3 && !(players.player3.surrender && players.player4.surrender))
+			gameRoom.updatePlayerPosition(players.player3);
+		if (players.player4 && !(players.player3.surrender && players.player4.surrender))
+			gameRoom.updatePlayerPosition(players.player4);
+	}
+
 	private async waitingPlayerConnection(room: number, mode: GameMode) {
 		let count = 0;
 		while (this.ConnectedSockets.findIndex((socket) => socket.roomName === "game-" + room && socket.state === "player1") === -1 ||
@@ -134,6 +164,17 @@ export class GameGateway {
 		return ({state: false, mode: "none"});
 	}
 
+	private checkConnected2V2(room: number) {
+		let players = this.getPlayerSocket(room);
+		if (players.player1 === undefined && players.player2 === undefined && players.player3 === undefined && players.player4 === undefined)
+			return ({state: true, mode: "disconnected"});
+		else if (players.player1 && players.player1.surrender && players.player2 && players.player2.surrender)
+			return ({state: true, mode: "surrender", player: 2});
+		else if (players.player3 && players.player3.surrender && players.player4 && players.player4.surrender)
+			return ({state: true, mode: "surrender", player: 1});
+		return ({state: false, mode: "none"});
+	}
+
 
 	private async gameRun(gameRoom: GameRoom, room: number) {
 		let end;
@@ -174,6 +215,33 @@ export class GameGateway {
 			if (end.state)
 				return (end);
 			end = this.checkConnectedFFA(room);
+			if (end.state && end.mode === "disconnected") 
+			{
+				if (wait > 2500)
+					return (end);
+				else
+					wait += 1;
+			}
+			else if (end.state)
+				return (end);
+			else
+				wait = 0;
+			await this.sleep(5)
+		}
+	}
+
+	private async gameRun2V2(gameRoom: GameRoom2V2, room: number) {
+		let end;
+		let wait = 0;
+
+		while (true) {
+			this.movePlayer2V2(gameRoom, room);
+			await this.moveBall2V2(gameRoom, room);
+			this.server.to("game-" + room).emit("gameState", gameRoom.getGameRoomInfo());
+			end = gameRoom.checkEndGame();
+			if (end.state)
+				return (end);
+			end = this.checkConnected2V2(room);
 			if (end.state && end.mode === "disconnected") 
 			{
 				if (wait > 2500)
@@ -346,9 +414,63 @@ export class GameGateway {
 		this.GamePlaying.splice(this.GamePlaying.findIndex((game) => game.room === room), 1);
 		//disconnect all socket to the room associated and navigate to the end page
 		this.server.to("game-" + room).emit("endGame", {player1_score: gameRoom.player1.score, player2_score: gameRoom.player2.score, player3_score: gameRoom.player3.score, player4_score: gameRoom.player4.score});
-		//jE PENSE QU'IL FAUDRAIT AUSSI DELETE ROOM
 	}
 
+	private async gameEnd2V2(gameRoom: GameRoom2V2, room: number, endMode: any) {
+		await this.prisma.game.update({
+			where: { id: room },
+			data: { state: "ENDED"}
+		})
+		const game = await this.prisma.game.findUnique({where: {id: room}});
+		if (!game)
+			return (false);
+		
+		if (endMode.mode === "normal") {
+			if (gameRoom.player1.score > gameRoom.player3.score)
+			{
+				await this.prisma.game.update({
+					where: { id: room },
+					data: { winner: game.user1Id }})
+			}
+			else
+			{
+				await this.prisma.game.update({
+					where: { id: room },
+					data: { winner: game.user3Id }})
+			}
+		}
+		else if (endMode.mode === "surrender") {
+			if (endMode.player === 2)
+			{
+				await this.prisma.game.update({
+					where: { id: room },
+					data: { winner: game.user3Id }})
+			}
+			else if (endMode.player === 1)
+			{
+				await this.prisma.game.update({
+					where: { id: room },
+					data: { winner: game.user1Id }})
+			}
+		}
+		await this.prisma.user.update({
+			where: { id: game.user1Id },
+			data: { state: "ONLINE", experience: { increment: 100 + gameRoom.player1.score * 20 } }})
+		await this.prisma.user.update({
+			where: { id: game.user2Id },
+			data: { state: "ONLINE", experience: { increment: 100 + gameRoom.player2.score * 20 } }})
+		await this.prisma.user.update({
+			where: { id: game.user3Id },
+			data: { state: "ONLINE", experience: { increment: 100 + gameRoom.player3.score * 20 } }})
+		await this.prisma.user.update({
+			where: { id: game.user4Id },
+			data: { state: "ONLINE", experience: { increment: 100 + gameRoom.player4.score * 20 } }})
+
+		// this.GamePlaying.splice(this.GamePlaying.indexOf(room), 1);
+		this.GamePlaying.splice(this.GamePlaying.findIndex((game) => game.room === room), 1);
+		//disconnect all socket to the room associated and navigate to the end page
+		this.server.to("game-" + room).emit("endGame", {player1_score: gameRoom.player1.score, player2_score: gameRoom.player2.score, player3_score: gameRoom.player3.score, player4_score: gameRoom.player4.score});
+	}
 
 
 	async gameLoop1V1(room: number) {
@@ -373,17 +495,17 @@ export class GameGateway {
 		await this.gameEndFFA(gameRoom, room, end);
 	}
 
-	// async gameLoop2V2(room: number) {
-	// 	let gameRoom = new GameRoom2V2(room);
+	async gameLoop2V2(room: number) {
+		let gameRoom = new GameRoom2V2(room);
 
-	// 	let end;
+		let end;
 
-	// 	end = await this.waitingPlayerConnection(room, "TWOVTWO");
-	// 	if (!end)
-	// 		end = await this.gameRun(gameRoom, room);
+		end = await this.waitingPlayerConnection(room, "TWOVTWO");
+		if (!end)
+			end = await this.gameRun2V2(gameRoom, room);
 
-	// 	await this.gameEnd(gameRoom, room, end);
-	// }
+		await this.gameEnd2V2(gameRoom, room, end);
+	}
 
 	private async checkUserConnection(client: Socket, data: any) {
 	
@@ -495,7 +617,7 @@ export class GameGateway {
 					player1_x: 0.006,player1_y: 0.5,player1_size: 0.2,player1_score: 0,
 					player2_x: 0.994,player2_y: 0.5,player2_size: 0.2,player2_score: 0,
 					board: 1,
-					mode: "rayah",
+					mode: "ONEVONE",
 				});
 			if (userCheck.game.mode === "TWOVTWO")
 				client.emit("gameState", {
@@ -504,8 +626,8 @@ export class GameGateway {
 					player2_x: 0.02,player2_y: 0.5,player2_size: 0.2,player2_score: 0,
 					player3_x: 0.994,player3_y: 0.5,player3_size: 0.2,player3_score: 0,
 					player4_x: 0.980,player4_y: 0.5,player4_size: 0.2,player4_score: 0,
-					board: 2,
-					mode: "roro",
+					board: 3,
+					mode: "TWOVTWO",
 				});
 			if (userCheck.game.mode === "FREEFORALL")
 				client.emit("gameState", {
@@ -515,7 +637,7 @@ export class GameGateway {
 					player3_x: 0.5,player3_y: 0.006,player3_size: 0.2,player3_score: 4,
 					player4_x: 0.5,player4_y: 0.994,player4_size: 0.2,player4_score: 4,
 					board: 2,
-					mode: "riru",
+					mode: "FREEFORALL",
 				});
 		}
 		if (this.GamePlaying.findIndex(x => x.room === userCheck.room) === -1)
@@ -525,8 +647,8 @@ export class GameGateway {
 				this.gameLoop1V1(userCheck.room);
 			else if (userCheck.game.mode === "FREEFORALL")
 				this.gameLoopFFA(userCheck.room);
-			// else
-			// 	this.gameLoop2V2(userCheck.room);
+			else
+				this.gameLoop2V2(userCheck.room);
 		}
 		return (true);
 	}
@@ -584,15 +706,24 @@ export class GameGateway {
 				}
 				if (player1 && player2) 
 				{
-					if (game.winner === game.user1Id)
-						client.emit("getEndStatus", {score1: game.score1, score2: game.score2, score3: player3 ? game.score3 : null, avatar1: player1.avatar, avatar2: player2.avatar, avatar3: player3 ? player3.avatar : null} )
-					else if (game.winner === game.user2Id)
-						client.emit("getEndStatus", {score1: game.score2, score2: game.score1, score3: player3 ? game.score3 : null, avatar1: player2.avatar, avatar2: player1.avatar, avatar3: player3 ? player3.avatar : null} )
-					else if (game.winner === game.user3Id)
-						client.emit("getEndStatus", {score1: game.score3, score2: game.score1, score3: game.score2, avatar1: player3.avatar, avatar2: player1.avatar, avatar3: player2.avatar} )
-					else if (game.winner === game.user4Id)
-						client.emit("getEndStatus", {score1: game.score4, score2: game.score2, score3: game.score1, avatar1: player4.avatar, avatar2: player2.avatar, avatar3: player1.avatar} )
-
+					if (game.mode === "TWOVTWO")
+					{
+						if (game.winner === game.user1Id)
+							client.emit("getEndStatus", {mode: game.mode, score1: game.score1, score2: game.score3, avatar1: player1.avatar, avatar2: player2.avatar, avatar3: player3.avatar, avatar4: player4.avatar} )
+						else if (game.winner === game.user3Id)
+							client.emit("getEndStatus", {mode: game.mode, score1: game.score3, score2: game.score1, avatar1: player3.avatar, avatar2: player4.avatar, avatar3: player1.avatar, avatar4: player2.avatar} )
+					}
+					else
+					{
+						if (game.winner === game.user1Id)
+							client.emit("getEndStatus", {mode: game.mode, score1: game.score1, score2: game.score2, score3: player3 ? game.score3 : null, avatar1: player1.avatar, avatar2: player2.avatar, avatar3: player3 ? player3.avatar : null} )
+						else if (game.winner === game.user2Id)
+							client.emit("getEndStatus", {mode: game.mode, score1: game.score2, score2: game.score1, score3: player3 ? game.score3 : null, avatar1: player2.avatar, avatar2: player1.avatar, avatar3: player3 ? player3.avatar : null} )
+						else if (game.winner === game.user3Id)
+							client.emit("getEndStatus", {mode: game.mode, score1: game.score3, score2: game.score1, score3: game.score2, avatar1: player3.avatar, avatar2: player1.avatar, avatar3: player2.avatar} )
+						else if (game.winner === game.user4Id)
+							client.emit("getEndStatus", {mode: game.mode, score1: game.score4, score2: game.score2, score3: game.score1, avatar1: player4.avatar, avatar2: player2.avatar, avatar3: player1.avatar} )
+					}
 				}
 			}
 		}
