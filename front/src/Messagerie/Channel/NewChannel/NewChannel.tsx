@@ -5,6 +5,10 @@ import axios from 'axios';
 import { ChannelsContext } from '../ChannelsUtils';
 /* Ressources */
 import close from '../../../Profile/Components/MainInfo/Ressources/close.svg';
+import {
+	inputProtectionChannel,
+	inputProtectionPassword,
+} from '../../../Login/Components/Auth/Input/inputProtection';
 // import search from '../../Ressources/search.svg';
 
 export const InputChannel = ({
@@ -69,6 +73,14 @@ export const NewChannel = ({
 	}, [me, handleNewDmTrigger]);
 
 	const handleCreateChannel = async () => {
+		if (inputProtectionChannel(name) === false) {
+			setName('');
+			return;
+		}
+		if (typeChannel === 'protected' && !inputProtectionPassword(password)) {
+			setPassword('');
+			return;
+		}
 		try {
 			let state = 'PUBLIC';
 			switch (typeChannel) {
@@ -171,6 +183,14 @@ export const UpdateChannel = ({
 	}, [selectedChannel]);
 
 	const handleCreateChannel = async () => {
+		if (!inputProtectionChannel(name)) {
+			setName('');
+			return;
+		}
+		if (typeChannel === 'protected' && !inputProtectionPassword(password)) {
+			setPassword('');
+			return;
+		}
 		if (selectedChannel.id === 0) return;
 		try {
 			let state = 'PUBLIC';
@@ -185,15 +205,6 @@ export const UpdateChannel = ({
 					state = 'PRIVATE';
 					break;
 			}
-			console.log(
-				selectedChannel.name,
-				': ',
-				name,
-				' ',
-				state,
-				' ',
-				password
-			);
 			await axios.patch(
 				'http://localhost:3333/chat/edit/' + selectedChannel.name,
 				{ name, state, password },

@@ -4,6 +4,7 @@ import axios from 'axios';
 /*	Ressources	*/
 import close from '../../Profile/Components/MainInfo/Ressources/close.svg';
 import search from '../Ressources/search.svg';
+import { inputProtectionPassword } from '../../Login/Components/Auth/Input/inputProtection';
 
 const InputPassword = ({
 	icon,
@@ -56,6 +57,10 @@ export const ChannelPassword = ({
 		Channel: ChannelDto,
 		password: string
 	) => {
+		if (!inputProtectionPassword(password)) {
+			setPassword('');
+			return;
+		}
 		if (!Channel) return;
 		if (Channel.state !== 'PROTECTED') return;
 		if (!password) return;
