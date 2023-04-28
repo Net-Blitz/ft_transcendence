@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import eyePNG from "./assets/eye.png"
 import crown from "./assets/crown.png"
+import beach from "./assets/beachImage.jpg"
+import space from "./assets/spaceImage.jpg"
+import jungle from "./assets/jungleImage.jpg"
 import "./Game.css";
 
 function Podium({color, height, point, avatar, avatar2 = null, env}:any) {
@@ -55,8 +58,18 @@ function Game({socketGame, room, login, env}:any) {
 			let score3 = undefined;
 			let score4 = undefined;
 			let gameDiv = document.querySelector<HTMLElement>("#game-board");
-			console.log("gameState", gameState);
 			if (gameDiv) {
+				if (gameState.map)
+				{
+					if (gameState.map === "NORMAL")
+						gameDiv.style.backgroundImage = "none";
+					else if (gameState.map === "BEACH")
+						gameDiv.style.backgroundImage = "url(" + beach + ")";
+					else if (gameState.map === "SPACE")
+						gameDiv.style.backgroundImage = "url(" + space + ")";
+					else if (gameState.map === "JUNGLE")
+						gameDiv.style.backgroundImage = "url(" + jungle + ")";
+				}
 				if (gameState.board)
 				{
 					updateBoard(gameState.board);

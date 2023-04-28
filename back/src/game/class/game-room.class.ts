@@ -45,7 +45,7 @@ export class GameRoom {
 	player1: PlayerBar;
 	player2: PlayerBar;
 
-	constructor(private roomNumber : number) {
+	constructor(private roomNumber : number, private map: string) {
 		this.ball = new Ball(0.5, 0.5, 0.0045 * GameRatio, 0.0045, 0.03, this.getRandomDirection());
 		this.player1 = new PlayerBar(0.006, 0.5, 0.2, 0.0125, 0.015);
 		this.player2 = new PlayerBar(0.994, 0.5, 0.2, 0.0125, 0.015);
@@ -66,6 +66,8 @@ export class GameRoom {
 			player2_y: this.player2.y,
 			player2_size: this.player2.size,
 			player2_score: this.player2.score,
+
+			map: this.map,
 			board: 1,
 		})
 	}
@@ -202,7 +204,7 @@ export class GameRoom {
 	}
 
 	checkEndGame() {
-		if ((this.player1.score >= 1000 || this.player2.score >= 1000) && Math.abs(this.player1.score - this.player2.score) >= 2)
+		if ((this.player1.score >= 10 || this.player2.score >= 10) && Math.abs(this.player1.score - this.player2.score) >= 2)
 			return {state: true, mode: "normal"} /* TEMP */ //return true;
 		return {state: false, mode: "none"}
 	} 
@@ -215,7 +217,7 @@ export class GameRoom2V2 {
 	player3: PlayerBar;
 	player4: PlayerBar;
 
-	constructor(private roomNumber : number) {
+	constructor(private roomNumber : number, private map: string) {
 		this.ball = new Ball(0.5, 0.5, 0.0045 * GameRatio, 0.0045, 0.03, this.getRandomDirection());
 		this.player1 = new PlayerBar(0.006, 0.5, 0.15, 0.0125, 0.015);
 		this.player2 = new PlayerBar(0.02, 0.5, 0.15, 0.0125, 0.015);
@@ -248,6 +250,8 @@ export class GameRoom2V2 {
 			player4_y: this.player4.y,
 			player4_size: this.player4.size,
 			player4_score: this.player4.score,
+
+			map: this.map,
 			board: 3,
 		})
 	}
@@ -447,7 +451,7 @@ export class GameRoomFFA {
 	player3: PlayerBar;
 	player4: PlayerBar;
 
-	constructor(private roomNumber : number) {
+	constructor(private roomNumber : number, private map: string) {
 		this.ball = new Ball(0.5, 0.5, 0.0045, 0.0045, 0.03, this.getRandomDirection());
 		this.player1 = new PlayerBar(0.006, 0.5, 0.2, 0.0125, 0.015);
 		this.player2 = new PlayerBar(0.994, 0.5, 0.2, 0.0125, 0.015);
@@ -484,6 +488,8 @@ export class GameRoomFFA {
 			player4_y: this.player4.y,
 			player4_size: this.player4.width,
 			player4_score: this.player4.score,
+
+			map: this.map,
 
 			board: 2,
 		})
@@ -716,24 +722,24 @@ export class GameRoomFFA {
 			else if (this.ball.y + increment_y > 1 && this.player4.score <= 0)
 			{
 				this.ball.direction = -this.ball.direction;
-				// increment_y = 1 - Math.abs(this.ball.y + increment_y);
 				increment_y = 0;
 			}
 		}
-		this.ball.y += increment_y;
+		this.ball.y += increment_y; 
 	}
 
 
 	checkBallScore() {
-		if ((this.ball.x < 0) || (this.ball.x > 1) || (this.ball.y < 0) || (this.ball.y > 1))
+		if ((this.ball.x < 0 && this.player1.score > 0) || (this.ball.x > 1 && this.player2.score > 0)
+			|| (this.ball.y < 0 && this.player3.score > 0) || (this.ball.y > 1 && this.player4.score > 0))
 		{
-			if (this.ball.x < 0)
+			if (this.ball.x < 0 && this.player1.score > 0)
 				this.player1.score--;
-			else if (this.ball.x > 1)
+			else if (this.ball.x > 1 && this.player2.score > 0)
 				this.player2.score--;
-			else if (this.ball.y < 0)
+			else if (this.ball.y < 0 && this.player3.score > 0)
 				this.player3.score--;
-			else if (this.ball.y > 1)
+			else if (this.ball.y > 1 && this.player4.score > 0)
 				this.player4.score--;
 			if (this.player1.score === 0)
 			{
@@ -756,6 +762,12 @@ export class GameRoomFFA {
 				this.player4.size = 0;
 			}
 
+			this.reset();
+			return (true);
+		}
+		else if ((this.ball.x < -0.1) || (this.ball.x > 1.1)
+			|| (this.ball.y < -0.1) || (this.ball.y > 1.1))
+		{
 			this.reset();
 			return (true);
 		}

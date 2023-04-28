@@ -257,6 +257,57 @@ export class GameGateway {
 		}
 	}
 
+	private async updateAchievements(winner: User, loser: User, winnerScore: number, loserScore: number) {
+		if (winnerScore === 10 && loserScore === 0) {
+			await this.prisma.achievements.update({
+				where: { id: 1 },
+				data: { users: { connect: { id: winner.id } } }
+			})
+		}
+		if (winnerScore >= 20) {
+			await this.prisma.achievements.update({
+				where: { id: 2 },
+				data: { users: { connect: { id: winner.id } } }
+			})
+		}
+		if (winnerScore <= 1) {
+			await this.prisma.achievements.update({
+				where: { id: 3 },
+				data: { users: { connect: { id: winner.id } } }
+			})
+		}
+		if (winner.wins === 1)
+		{
+			await this.prisma.achievements.update({
+				where: { id: 4 },
+				data: { users: { connect: { id: winner.id } } }
+			})
+		}
+		if (winner.wins === 10)
+		{
+			await this.prisma.achievements.update({
+				where: { id: 5 },
+				data: { users: { connect: { id: winner.id } } }
+			})
+		}
+		if (winner.experience >= 20000)
+		{
+			await this.prisma.achievements.update({
+				where: { id: 6 },
+				data: { users: { connect: { id: winner.id } } }
+			})
+		}
+		if (loser.experience >= 20000)
+		{
+			await this.prisma.achievements.update({
+				where: { id: 6 },
+				data: { users: { connect: { id: loser.id } } }
+			})
+		}
+
+	
+	}
+
 	private async gameEnd(gameRoom: GameRoom, room: number, endMode: any) {
 		await this.prisma.game.update({
 			where: { id: room },
@@ -318,14 +369,36 @@ export class GameGateway {
 					data: { state: "ONLINE", losses: { increment: 1 }, elo: { decrement: 10 }, experience: { increment: 100 + gameRoom.player1.score * 20 } }})
 			}
 		}
-		else if (endMode.mode === "disconnected") {
-			await this.prisma.user.update({
-				where: { id: game.user2Id },
-				data: { state: "ONLINE"}})
-			await this.prisma.user.update({
-				where: { id: game.user1Id },
-				data: { state: "ONLINE"}})
-
+		let players = this.getPlayerSocket(room);
+		let ids = [];
+		for (const player of [players.player1, players.player2])
+		{
+			if (player)
+				ids.push(player.prismaId)
+		}
+		for (const id of [game.user1Id, game.user2Id])
+		{
+			if (ids.includes(id))
+			{
+				await this.prisma.user.update({
+					where: { id: id },
+					data: { state: "ONLINE" }})
+			}
+			else
+			{
+				await this.prisma.user.update({
+					where: { id: id },
+					data: { state: "OFFLINE" }})
+			}
+		}
+		let player1 = await this.prisma.user.findUnique({where: {id: game.user1Id}});
+		let player2 = await this.prisma.user.findUnique({where: {id: game.user2Id}});
+		if (player1 && player2)
+		{
+			if (game.user1Id === player1.id)
+				await this.updateAchievements(player1, player2, gameRoom.player1.score, gameRoom.player2.score);
+			else
+				await this.updateAchievements(player2, player1, gameRoom.player2.score, gameRoom.player1.score);
 		}
 			
 		
@@ -397,18 +470,28 @@ export class GameGateway {
 					data: { winner: game.user4Id }})
 			}
 		}
-		await this.prisma.user.update({
-			where: { id: game.user1Id },
-			data: { state: "ONLINE", experience: { increment: 100 + gameRoom.player1.score * 100 } }})
-		await this.prisma.user.update({
-			where: { id: game.user2Id },
-			data: { state: "ONLINE", experience: { increment: 100 + gameRoom.player2.score * 100 } }})
-		await this.prisma.user.update({
-			where: { id: game.user3Id },
-			data: { state: "ONLINE", experience: { increment: 100 + gameRoom.player3.score * 100 } }})
-		await this.prisma.user.update({
-			where: { id: game.user4Id },
-			data: { state: "ONLINE", experience: { increment: 100 + gameRoom.player4.score * 100 } }})
+		let players = this.getPlayerSocket(room);
+		let ids = [];
+		for (const player of [players.player1, players.player2, players.player3, players.player4])
+		{
+			if (player)
+				ids.push(player.prismaId)
+		}
+		for (const id of [game.user1Id, game.user2Id, game.user3Id, game.user4Id])
+		{
+			if (ids.includes(id))
+			{
+				await this.prisma.user.update({
+					where: { id: id },
+					data: { state: "ONLINE", experience: { increment: 100 + gameRoom.player1.score * 100 } }})
+			}
+			else
+			{
+				await this.prisma.user.update({
+					where: { id: id },
+					data: { state: "OFFLINE", experience: { increment: 100 + gameRoom.player1.score * 100 } }})
+			}
+		}
 
 		// this.GamePlaying.splice(this.GamePlaying.indexOf(room), 1);
 		this.GamePlaying.splice(this.GamePlaying.findIndex((game) => game.room === room), 1);
@@ -453,18 +536,28 @@ export class GameGateway {
 					data: { winner: game.user1Id }})
 			}
 		}
-		await this.prisma.user.update({
-			where: { id: game.user1Id },
-			data: { state: "ONLINE", experience: { increment: 100 + gameRoom.player1.score * 20 } }})
-		await this.prisma.user.update({
-			where: { id: game.user2Id },
-			data: { state: "ONLINE", experience: { increment: 100 + gameRoom.player2.score * 20 } }})
-		await this.prisma.user.update({
-			where: { id: game.user3Id },
-			data: { state: "ONLINE", experience: { increment: 100 + gameRoom.player3.score * 20 } }})
-		await this.prisma.user.update({
-			where: { id: game.user4Id },
-			data: { state: "ONLINE", experience: { increment: 100 + gameRoom.player4.score * 20 } }})
+		let players = this.getPlayerSocket(room);
+		let ids = [];
+		for (const player of [players.player1, players.player2, players.player3, players.player4])
+		{
+			if (player)
+				ids.push(player.prismaId)
+		}
+		for (const id of [game.user1Id, game.user2Id, game.user3Id, game.user4Id])
+		{
+			if (ids.includes(id))
+			{
+				await this.prisma.user.update({
+					where: { id: id },
+					data: { state: "ONLINE", experience: { increment: 100 + gameRoom.player1.score * 100 } }})
+			}
+			else
+			{
+				await this.prisma.user.update({
+					where: { id: id },
+					data: { state: "OFFLINE", experience: { increment: 100 + gameRoom.player1.score * 100 } }})
+			}
+		}
 
 		// this.GamePlaying.splice(this.GamePlaying.indexOf(room), 1);
 		this.GamePlaying.splice(this.GamePlaying.findIndex((game) => game.room === room), 1);
@@ -473,8 +566,8 @@ export class GameGateway {
 	}
 
 
-	async gameLoop1V1(room: number) {
-		let gameRoom = new GameRoom(room);
+	async gameLoop1V1(room: number, map: string) {
+		let gameRoom = new GameRoom(room, map);
 		let end;
 
 		end = await this.waitingPlayerConnection(room, "ONEVONE");
@@ -484,9 +577,9 @@ export class GameGateway {
 		await this.gameEnd(gameRoom, room, end);
 	}
 
-	async gameLoopFFA(room: number) {
+	async gameLoopFFA(room: number, map: string) {
 		let end;
-		let gameRoom = new GameRoomFFA(room);
+		let gameRoom = new GameRoomFFA(room, map);
 
 		end = await this.waitingPlayerConnection(room, "FREEFORALL");
 		if (!end)
@@ -495,8 +588,8 @@ export class GameGateway {
 		await this.gameEndFFA(gameRoom, room, end);
 	}
 
-	async gameLoop2V2(room: number) {
-		let gameRoom = new GameRoom2V2(room);
+	async gameLoop2V2(room: number, map: string) {
+		let gameRoom = new GameRoom2V2(room, map);
 
 		let end;
 
@@ -608,7 +701,7 @@ export class GameGateway {
 		}
 		
 		this.setupUserSocket(client, userCheck.user, userCheck.game, userCheck.login, userCheck.room);
-		
+		console.log("data", data);
 		if (userCheck.game.state === "CREATING")// || userCheck.game.state === "PLAYING")
 		{
 			if(userCheck.game.mode === "ONEVONE")
@@ -617,6 +710,7 @@ export class GameGateway {
 					player1_x: 0.006,player1_y: 0.5,player1_size: 0.2,player1_score: 0,
 					player2_x: 0.994,player2_y: 0.5,player2_size: 0.2,player2_score: 0,
 					board: 1,
+					map: userCheck.game.map,
 					mode: "ONEVONE",
 				});
 			if (userCheck.game.mode === "TWOVTWO")
@@ -627,6 +721,7 @@ export class GameGateway {
 					player3_x: 0.994,player3_y: 0.5,player3_size: 0.2,player3_score: 0,
 					player4_x: 0.980,player4_y: 0.5,player4_size: 0.2,player4_score: 0,
 					board: 3,
+					map: userCheck.game.map,
 					mode: "TWOVTWO",
 				});
 			if (userCheck.game.mode === "FREEFORALL")
@@ -637,6 +732,7 @@ export class GameGateway {
 					player3_x: 0.5,player3_y: 0.006,player3_size: 0.2,player3_score: 4,
 					player4_x: 0.5,player4_y: 0.994,player4_size: 0.2,player4_score: 4,
 					board: 2,
+					map: userCheck.game.map,
 					mode: "FREEFORALL",
 				});
 		}
@@ -644,11 +740,11 @@ export class GameGateway {
 		{
 			this.GamePlaying.push({room: userCheck.room, mode: userCheck.game.mode, specList: []});
 			if (userCheck.game.mode === "ONEVONE")
-				this.gameLoop1V1(userCheck.room);
+				this.gameLoop1V1(userCheck.room, userCheck.game.map);
 			else if (userCheck.game.mode === "FREEFORALL")
-				this.gameLoopFFA(userCheck.room);
+				this.gameLoopFFA(userCheck.room, userCheck.game.map);
 			else
-				this.gameLoop2V2(userCheck.room);
+				this.gameLoop2V2(userCheck.room, userCheck.game.map);
 		}
 		return (true);
 	}
@@ -656,6 +752,7 @@ export class GameGateway {
 	async handleConnection(client: Socket) {
 		console.log("Game Server Connection", client.id);
 
+		
 		return ;
 	}
 
