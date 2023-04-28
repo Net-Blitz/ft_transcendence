@@ -7,14 +7,6 @@ export class QueueService {
 
 	constructor(private prisma: PrismaService) {}
 
-	//async getQueue() {
-	//	return this.queue1v1;
-	//}
-
-	//getUserInQueue(userLogin: string) {
-	//	return this.queue1v1.find((queuer) => queuer.login === userLogin);
-	//}
-
 	async checkPermission(userLogin: string) {
 		if (!userLogin)
 			return ({canJoin: false, reason: "User not found or not online"});

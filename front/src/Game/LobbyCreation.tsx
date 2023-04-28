@@ -37,7 +37,7 @@ const LobbyCreation = ({socketQueue, reload, setReload, login}:any) => {
 
 	useEffect (() =>{
 		socketQueue.on("ConnectToQueueResponse", (data:any) => {
-			setReload(!reload)
+			setReload(357169)
 		})
 		socketQueue.emit("GetMyGroup") // update pour toi tous seul quand connection
 	}, [reload]);
@@ -91,6 +91,9 @@ const LobbyCreation = ({socketQueue, reload, setReload, login}:any) => {
 	const joinGroup = () => {
 		socketQueue.emit("JoinGroup", {groupLogin: "lgiband"}); // -> appuie sur le bouton plutot
 	}
+	const inviteGroup = () => {
+		socketQueue.emit("InviteGroup", {login: "lgiband"}); // -> appuie sur le bouton plutot
+	}
 
 
 	const leaveGroup = () => {
@@ -136,6 +139,7 @@ const LobbyCreation = ({socketQueue, reload, setReload, login}:any) => {
 				<button className="game-creation-button"  onClick={joinQueue}>Start Game</button>
 			</div>
 			<button onClick={joinGroup}>joinGroup</button>
+			<button onClick={inviteGroup}>inviteGroup</button>
 			{/* <button>joinQueue</button>
 			<button onClick={leaveGroup}>leaveGroup</button>
 			<select name="oui" id="oui" onChange={updateMode}>

@@ -135,7 +135,7 @@ function Lobby({socketQueue, login, setReload, reload, env}:any) {
 	useEffect(() => {
 		const setPlayer = (data:any) => {
 			if (!data || data.in === false)
-				setReload(!reload);
+				setReload(987456);
 			else
 			{
 				setPlayer1(data.player1);
@@ -146,7 +146,7 @@ function Lobby({socketQueue, login, setReload, reload, env}:any) {
 		}
 	
 		const DisconnectFromQueueResponse = (data:any) => {
-			setReload(!reload);
+			setReload(22654563);
 			console.log("discofromqueue")
 			socketQueue.off("DisconnectFromQueueResponse")
 		}

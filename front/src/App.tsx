@@ -21,6 +21,7 @@ import { selectUser } from './utils/redux/selectors';
 import { io, Socket } from 'socket.io-client';
 import { Manager } from "socket.io-client";
 import GamePopUp from './Game/GamePopUp';
+import GameInvitation from './Game/GameInvitation';
 
 const NotFound = () => {
 	return (
@@ -39,6 +40,7 @@ function App(this: any) {
 	const [socketGame, setSocketGame] = useState<Socket>({} as Socket);
 	const env = {host: process.env.REACT_APP_BACK_HOST, port: process.env.REACT_APP_BACK_PORT}
 	// transportOptions: { polling: { extraHeaders: { 'Access-Control-Allow-Origin': '*' } } }
+	
 	useEffect(() => {
 		if (user.status === 'resolved' && user.auth)
 		{				
@@ -51,6 +53,7 @@ function App(this: any) {
 	return (
 		<div>
 			<GamePopUp socketQueue={socketQueue} reload={reload} setReload={setReload} />
+			<GameInvitation socketQueue={socketQueue} />
 			<Routes>
 				<Route element={<AuthRoutes />}>
 					<Route

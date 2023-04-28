@@ -244,6 +244,7 @@ function Game({socketGame, room, login, env}:any) {
 		}
 		else if (event.key >= '0' && event.key <= '9')
 		{
+			console.log("quickChatMessage", event.key)
 			socketGame.emit('quickChatMessage', {key: event.key, room: room});
 		}
 	});

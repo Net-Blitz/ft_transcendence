@@ -701,7 +701,7 @@ export class GameGateway {
 		}
 		
 		this.setupUserSocket(client, userCheck.user, userCheck.game, userCheck.login, userCheck.room);
-		console.log("data", data);
+		// console.log("data", data);
 		if (userCheck.game.state === "CREATING")// || userCheck.game.state === "PLAYING")
 		{
 			if(userCheck.game.mode === "ONEVONE")
@@ -904,9 +904,10 @@ export class GameGateway {
 		
 		const game = await this.prisma.game.findUnique({where: {id: data.room}});
 
-		if (game === null || game.state === "ENDED" || (game.user1Id !== sockUser.prismaId && game.user2Id !== sockUser.prismaId))
+		if (game === null || game.state === "ENDED" || (game.user1Id !== sockUser.prismaId && game.user2Id !== sockUser.prismaId && game.user3Id !== sockUser.prismaId && game.user4Id !== sockUser.prismaId))
 			return ;
 
+		console.log("quickChatMessageResponse")
 		this.server.to("game-" + data.room).emit("quickChatMessageResponse", {login: sockUser.login, message: parseInt(data.key)});
 	}
 
