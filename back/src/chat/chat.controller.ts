@@ -44,6 +44,7 @@ export class ChatController {
 	@Patch("edit/:channel")
 	async EditChannel(
 		@Param("channel") channel: string,
+		@Body("name") name: string,
 		@Body("state") state: string,
 		@Body("password") password: string,
 		@Res() res: Response,
@@ -52,6 +53,7 @@ export class ChatController {
 		if (state === "PUBLIC" || state === "PRIVATE")
 			return await this.chatService.EditChannel(
 				channel,
+				name,
 				state,
 				res,
 				user
@@ -59,6 +61,7 @@ export class ChatController {
 		else if (state === "PROTECTED")
 			return await this.chatService.EditProtectedChannel(
 				channel,
+				name,
 				password,
 				res,
 				user

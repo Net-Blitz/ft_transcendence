@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useContext, useEffect } from 'react';
+import React, { useState, useCallback, useContext } from 'react';
 import './Aside.css';
 import { Socket } from 'socket.io-client';
 import axios from 'axios';
@@ -241,10 +241,7 @@ export const Aside = ({
 					setSelectedChannel={setSelectedChannel}
 				/>
 				<PopUp trigger={newDmTrigger}>
-					<NewChannel
-						handleNewDmTrigger={handleNewDmTrigger}
-						userInfo={userInfo}
-					/>
+					<NewChannel handleNewDmTrigger={handleNewDmTrigger} />
 				</PopUp>
 			</div>
 			<UserChannelList />

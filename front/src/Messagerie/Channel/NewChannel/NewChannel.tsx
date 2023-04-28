@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './NewChannel.css';
 import axios from 'axios';
 /* Types */
-import { ChannelDto, userInfoDto } from '../ChannelsUtils';
+import { ChannelDto } from '../ChannelsUtils';
 /* Ressources */
 import close from '../../../Profile/Components/MainInfo/Ressources/close.svg';
 // import search from '../../Ressources/search.svg';
@@ -55,10 +55,8 @@ export const InputChannel = ({
 
 export const NewChannel = ({
 	handleNewDmTrigger,
-	userInfo,
 }: {
 	handleNewDmTrigger: () => void;
-	userInfo: userInfoDto | undefined;
 }) => {
 	const me = document.getElementsByClassName('popup');
 	const [typeChannel, setTypeChannel] = useState('private');
@@ -177,6 +175,7 @@ export const UpdateChannel = ({
 	}, [selectedChannel]);
 
 	const handleCreateChannel = async () => {
+		if (!selectedChannel) return;
 		try {
 			let state = 'PUBLIC';
 			switch (typeChannel) {
@@ -190,9 +189,10 @@ export const UpdateChannel = ({
 					state = 'PRIVATE';
 					break;
 			}
-			await axios.post(
-				'http://localhost:3333/chat/create/' + name,
-				{ state, password },
+			console.log(selectedChannel.name, ": ", name, " ", state, " ", password)
+			await axios.patch(
+				'http://localhost:3333/chat/edit/' + selectedChannel.name,
+				{ name, state, password },
 				{ withCredentials: true }
 			);
 			setName('');

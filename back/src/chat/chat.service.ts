@@ -75,6 +75,7 @@ export class ChatService {
 
 	async EditChannel(
 		@Param("channel") channel: string,
+		name: string,
 		state: string,
 		@Res() res: Response,
 		@GetUser() user: any
@@ -98,6 +99,7 @@ export class ChatService {
 					name: channel,
 				},
 				data: {
+					name: name,
 					state: state as ChannelState,
 					hash: null,
 				},
@@ -111,6 +113,7 @@ export class ChatService {
 
 	async EditProtectedChannel(
 		@Param("channel") channel: string,
+		name: string,
 		password: string,
 		@Res() res: Response,
 		@GetUser() user: any
@@ -131,11 +134,17 @@ export class ChatService {
 		}
 		const hashedPassword = await bcrypt.hash(password, 10);
 		try {
+			console.log(
+				"PROTECTED update name: ",
+				name + " password: ",
+				password
+			);
 			await this.prisma.channel.update({
 				where: {
 					name: channel,
 				},
 				data: {
+					name: name,
 					state: "PROTECTED",
 					hash: hashedPassword,
 				},
