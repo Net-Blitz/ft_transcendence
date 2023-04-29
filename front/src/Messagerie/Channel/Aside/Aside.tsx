@@ -172,6 +172,10 @@ const ChannelListElement = ({
 		}
 	};
 
+	const handleLeave = () => {
+		window.location.reload();
+	};
+
 	const handleChannelPasswordTrigger = useCallback(() => {
 		setChannelPasswordTrigger(!ChannelPasswordTrigger);
 	}, [ChannelPasswordTrigger, setChannelPasswordTrigger]);
@@ -189,7 +193,11 @@ const ChannelListElement = ({
 				onClick={() => handleSelectChannel(Channel)}>
 				<h4>{Channel.name}</h4>
 				{Channel.id === selectedChannel?.id && (
-					<button className="button-disconnect-channel">Leave</button>
+					<button
+						className="button-disconnect-channel"
+						onClick={handleLeave}>
+						Leave
+					</button>
 				)}
 				{connectedUser.id === Channel.ownerId && (
 					<ChannelButton
