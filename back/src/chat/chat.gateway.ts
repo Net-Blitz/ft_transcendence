@@ -150,7 +150,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 			if (await mutedUser) {
 				if ((await mutedUser).MutedUntil < new Date()) {
-					console.log("User is unmuted after 5 minutes");
 					await this.prisma.mute.deleteMany({
 						where: {
 							A: channelExists.id,
@@ -158,7 +157,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 						},
 					});
 				} else {
-					console.log("User is muted");
 					return;
 				}
 			}
@@ -349,7 +347,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			let isAdmin = admins.some(
 				(admin) => admin.User.username === username
 			);
-
 			const userExists = await this.prisma.user.findUnique({
 				where: {
 					username: data.login,
@@ -377,6 +374,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				console.log(
 					username + " banned " + data.login + " from " + channel
 				);
+				await this.prisma.chatUsers.deleteMany({
+					where: {
+						A: channelExists.id,
+						B: userExists.id,
+					},
+				});
 				this.server
 					.to(channel)
 					.emit("ban", { username: data.login, channel: channel });

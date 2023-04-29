@@ -13,8 +13,13 @@ import { useSelector } from 'react-redux';
 import { selectUserData } from '../../utils/redux/selectors';
 
 const Beside = ({ socket }: { socket: Socket }) => {
-	const { messages, setMessages, selectedChannel, setSelectedChannel } =
-		useContext(ChannelsContext);
+	const {
+		messages,
+		setMessages,
+		selectedChannel,
+		setSelectedChannel,
+		setUsersList,
+	} = useContext(ChannelsContext);
 	const [blocked, setBlocked] = useState<userInfoDto[]>([]);
 	const connectedUser = useSelector(selectUserData);
 
@@ -29,10 +34,9 @@ const Beside = ({ socket }: { socket: Socket }) => {
 			} catch (error) {}
 		};
 		fetchBlocked();
-	}, [messages]);
 
-	useEffect(() => {
 		const handleMessage = (message: any) => {
+			fetchBlocked();
 			if (!blocked.find((user) => user.username === message.username))
 				setMessages([message, ...messages]);
 		};
@@ -47,6 +51,7 @@ const Beside = ({ socket }: { socket: Socket }) => {
 					ownerId: 0,
 				});
 				setMessages([]);
+				setUsersList([]);
 			}
 		});
 		socket?.on('ban', (data: any) => {
@@ -58,6 +63,7 @@ const Beside = ({ socket }: { socket: Socket }) => {
 					ownerId: 0,
 				});
 				setMessages([]);
+				setUsersList([]);
 			}
 		});
 		return () => {
@@ -73,6 +79,7 @@ const Beside = ({ socket }: { socket: Socket }) => {
 		setSelectedChannel,
 		socket,
 		connectedUser.username,
+		setUsersList,
 	]);
 
 	const sendMessage = (message: any) => {

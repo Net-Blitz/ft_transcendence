@@ -1,6 +1,7 @@
 import { ReactNode, createContext, useEffect, useState } from 'react';
-import { MessageDto } from '../../Chat/Messages';
 import axios from 'axios';
+import { useSelector } from 'react-redux';
+import { selectUserData } from '../../utils/redux/selectors';
 
 export interface ChannelDto {
 	id: number;
@@ -16,6 +17,13 @@ export interface userInfoDto {
 	role?: string;
 }
 
+export interface MessageDto {
+	username: string;
+	content: string;
+	avatar: string;
+	createdAt: string;
+}
+
 type ChannelsContextType = {
 	messages: MessageDto[];
 	setMessages: React.Dispatch<React.SetStateAction<MessageDto[]>>;
@@ -25,6 +33,9 @@ type ChannelsContextType = {
 	setChannelList: React.Dispatch<React.SetStateAction<ChannelDto[]>>;
 	selectedChannel: ChannelDto;
 	setSelectedChannel: React.Dispatch<React.SetStateAction<ChannelDto>>;
+	usersList: userInfoDto[];
+	setUsersList: React.Dispatch<React.SetStateAction<userInfoDto[]>>;
+	isAdmin: boolean;
 };
 
 export const ChannelsContext = createContext<ChannelsContextType>({
@@ -36,6 +47,9 @@ export const ChannelsContext = createContext<ChannelsContextType>({
 	setChannelList: () => {},
 	selectedChannel: { id: 0, name: '', state: '', ownerId: 0 },
 	setSelectedChannel: () => {},
+	usersList: [],
+	setUsersList: () => {},
+	isAdmin: false,
 });
 
 export const ChannelsProvider = ({ children }: { children: ReactNode }) => {
@@ -48,6 +62,9 @@ export const ChannelsProvider = ({ children }: { children: ReactNode }) => {
 		state: '',
 		ownerId: 0,
 	});
+	const [usersList, setUsersList] = useState<userInfoDto[]>([]);
+	const [isAdmin, setIsAdmin] = useState(false);
+	const userConnected = useSelector(selectUserData);
 
 	useEffect(() => {
 		const fetchChats = async () => {
@@ -61,11 +78,45 @@ export const ChannelsProvider = ({ children }: { children: ReactNode }) => {
 				console.error(error);
 			}
 		};
-
-		fetchChats();
-		const interval = setInterval(fetchChats, 2500);
+		const getUsers = async () => {
+			if (!selectedChannel.name) return;
+			try {
+				const response = await axios.get(
+					'http://localhost:3333/chat/channel/' +
+						selectedChannel.name,
+					{ withCredentials: true }
+				);
+				setUsersList(response.data.users);
+				setIsAdmin(false);
+				if (selectedChannel.ownerId === userConnected.id) {
+					setIsAdmin(true);
+				} else {
+					response.data.users.forEach((user: userInfoDto) => {
+						if (
+							user.id === userConnected.id &&
+							user.role === 'admin'
+						) {
+							setIsAdmin(true);
+						}
+					});
+				}
+			} catch (error) {
+				console.error(error);
+			}
+		};
+		const fetchAll = async () => {
+			await fetchChats();
+			await getUsers();
+		};
+		fetchAll();
+		const interval = setInterval(fetchAll, 2500);
 		return () => clearInterval(interval);
-	}, [setChannelList]);
+	}, [
+		selectedChannel.name,
+		selectedChannel.ownerId,
+		setChannelList,
+		userConnected.id,
+	]);
 
 	return (
 		<ChannelsContext.Provider
@@ -78,6 +129,9 @@ export const ChannelsProvider = ({ children }: { children: ReactNode }) => {
 				setChannelList,
 				selectedChannel,
 				setSelectedChannel,
+				usersList,
+				setUsersList,
+				isAdmin,
 			}}>
 			{children}
 		</ChannelsContext.Provider>
