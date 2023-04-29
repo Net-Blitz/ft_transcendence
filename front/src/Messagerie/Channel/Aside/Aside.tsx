@@ -20,9 +20,10 @@ import { BasicFrame } from '../../../Profile/Components/MiddleInfo/MiddleInfo';
 import controller from '../../Ressources/controller.svg';
 import settings from '../../Ressources/settings.svg';
 import profile from '../../Ressources/profile.svg';
+import invite from '../../Ressources/invite.svg';
 import { useSelector } from 'react-redux';
 import { selectUserData } from '../../../utils/redux/selectors';
-import Invite from '../Invite';
+import { Invite, InviteChannel } from '../Invite';
 
 export const ChannelButton = ({
 	icon,
@@ -56,6 +57,7 @@ const ChannelListElement = ({
 	const [ban, setBan] = useState<any[]>([]);
 	const [ChannelPasswordTrigger, setChannelPasswordTrigger] = useState(false);
 	const [ChannelSettingsTrigger, setChannelSettingsTrigger] = useState(false);
+	const [ChannelInviteTrigger, setChannelInviteTrigger] = useState(false);
 	const {
 		setMessages,
 		SaveChannel,
@@ -80,6 +82,7 @@ const ChannelListElement = ({
 		getBan();
 	}, [connectedUser.username]);
 	const getMessages = async () => {
+		if (Channel.id === 0) return;
 		try {
 			const response = await axios.get(
 				'http://localhost:3333/chat/channel/messages/' + Channel.id,
@@ -100,6 +103,7 @@ const ChannelListElement = ({
 	};
 
 	const getUsersList = async () => {
+		if (!selectedChannel.name) return;
 		try {
 			const response = await axios.get(
 				'http://localhost:3333/chat/channel/' + selectedChannel.name,
@@ -184,6 +188,10 @@ const ChannelListElement = ({
 		setChannelSettingsTrigger(!ChannelSettingsTrigger);
 	}, [ChannelSettingsTrigger, setChannelSettingsTrigger]);
 
+	const handleChannelInviteTrigger = useCallback(() => {
+		setChannelInviteTrigger(!ChannelInviteTrigger);
+	}, [ChannelInviteTrigger, setChannelInviteTrigger]);
+
 	return (
 		<>
 			<div
@@ -199,6 +207,13 @@ const ChannelListElement = ({
 						Leave
 					</button>
 				)}
+				{connectedUser.id === Channel.ownerId &&
+					Channel.state === 'PRIVATE' && (
+						<ChannelButton
+							icon={invite}
+							onClick={handleChannelInviteTrigger}
+						/>
+					)}
 				{connectedUser.id === Channel.ownerId && (
 					<ChannelButton
 						icon={settings}
@@ -214,6 +229,12 @@ const ChannelListElement = ({
 			<PopUp trigger={ChannelPasswordTrigger}>
 				<ChannelPassword
 					handleChannelPasswordTrigger={handleChannelPasswordTrigger}
+					Channel={Channel}
+				/>
+			</PopUp>
+			<PopUp trigger={ChannelInviteTrigger}>
+				<InviteChannel
+					handleChannelInviteTrigger={handleChannelInviteTrigger}
 					Channel={Channel}
 				/>
 			</PopUp>
@@ -317,6 +338,7 @@ const UserChannelElement = ({
 	if (user.id === userConnected.id) return <></>;
 
 	const getUsersList = async () => {
+		if (!selectedChannel.name) return;
 		try {
 			const response = await axios.get(
 				'http://localhost:3333/chat/channel/' + selectedChannel.name,
@@ -495,6 +517,7 @@ const UserChannelList = ({
 
 	useEffect(() => {
 		const getBans = async () => {
+			if (!channel.name) return;
 			const response = await axios.get(
 				'http://localhost:3333/chat/bans/' + channel.name,
 				{ withCredentials: true }
