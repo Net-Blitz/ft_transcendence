@@ -27,8 +27,8 @@ const Navbar = () => {
 	const buttons = [
 		{ content: 'Home', href: '/', imgSrc: logo },
 		{
-			content: 'Contact',
-			href: '/contact',
+			content: 'Social',
+			href: '/social',
 			imgSrc: contact_blue,
 			activeImgSrc: contact_white,
 		},
@@ -43,12 +43,6 @@ const Navbar = () => {
 			href: '/chat',
 			imgSrc: chat_blue,
 			activeImgSrc: chat_white,
-		},
-		{
-			content: 'Alert',
-			href: '/Alert',
-			imgSrc: notif_blue,
-			activeImgSrc: notif_white,
 		},
 		{ content: 'Profile', href: '/profile', imgSrc: userData.avatar },
 	];

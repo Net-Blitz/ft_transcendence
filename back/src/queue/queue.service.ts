@@ -7,15 +7,9 @@ export class QueueService {
 
 	constructor(private prisma: PrismaService) {}
 
-	//async getQueue() {
-	//	return this.queue1v1;
-	//}
-
-	//getUserInQueue(userLogin: string) {
-	//	return this.queue1v1.find((queuer) => queuer.login === userLogin);
-	//}
-
 	async checkPermission(userLogin: string) {
+		if (!userLogin)
+			return ({canJoin: false, reason: "User not found or not online"});
 		const user = await this.prisma.user.findUnique({
 			where: {login: userLogin,}});
 		if (!user || user.state === "OFFLINE")
@@ -24,7 +18,9 @@ export class QueueService {
 		{
 			const game = await this.prisma.game.findFirst({
 				where: {OR: [{state: "CREATING", user1Id: user.id}, {state: "PLAYING", user1Id: user.id},
-					{state: "CREATING", user2Id: user.id}, {state: "PLAYING", user2Id: user.id}]}
+					{state: "CREATING", user2Id: user.id}, {state: "PLAYING", user2Id: user.id},
+					{state: "CREATING", user3Id: user.id}, {state: "PLAYING", user3Id: user.id},
+					{state: "CREATING", user4Id: user.id}, {state: "PLAYING", user4Id: user.id}]}
 			});
 			if (game)
 				return ({canJoin: false, reason: "playing", gameId: game.id, login: userLogin});

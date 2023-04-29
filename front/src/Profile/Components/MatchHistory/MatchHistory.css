@@ -42,7 +42,7 @@
 
 /* Mobile */
 @media screen and (min-width: 320px) and (max-width: 767px) {
-	.match-history{
+	/* .match-history{
 		display: none;
-	}
+	} */
 }

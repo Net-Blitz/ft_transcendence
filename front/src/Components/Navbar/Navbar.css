@@ -57,7 +57,7 @@
 	margin: auto;
 }
 
-.Contact {
+.Social {
 	margin-top: 60px;
 }
 
@@ -115,7 +115,7 @@
 
 	.Home,
 	.Profile,
-	.Contact,
+	.Social,
 	.Game,
 	.Chat,
 	.Alert {
@@ -159,7 +159,7 @@
 
 	.Home,
 	.Profile,
-	.Contact,
+	.Social,
 	.Game,
 	.Chat,
 	.Alert {
@@ -174,7 +174,7 @@
 	}
 
 	.Profile img,
-	.Contact img,
+	.Social img,
 	.Game img,
 	.Chat img {
 		height: 30px;

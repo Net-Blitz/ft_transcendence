@@ -18,6 +18,7 @@ model User {
     losses               Int               @default(0)
     elo                  Int               @default(300)
     login                String            @unique
+    experience           Int               @default(1000)
     secret               String?
     blockByMe            Blocked[]         @relation("blockByMe")
     blockOnMe            Blocked[]         @relation("blockOnMe")
@@ -25,6 +26,8 @@ model User {
     friendwith           FriendsRelation[] @relation("friendwith")
     GameAsPlayer1        Game[]            @relation("player1")
     GameAsPlayer2        Game[]            @relation("player2")
+    GameAsPlayer3        Game[]            @relation("player3")
+    GameAsPlayer4        Game[]            @relation("player4")
     Admin                Admin[]
     Ban                  Ban[]
     ChatUsers            ChatUsers[]
@@ -35,6 +38,15 @@ model User {
     queue                Queue?            @relation("Queue")
     DirectMessageSend    DirectMessage[]   @relation("sender")
     DirectMessageReceive DirectMessage[]   @relation("receiver")
+    achievements         Achievements[]
+}
+
+model Achievements {
+    id          Int    @id @default(autoincrement())
+    title       String @unique
+    description String
+    image       String
+    users       User[]
 }
 
 /// /self many to many database
@@ -104,14 +116,23 @@ model Game {
     id Int @id @default(autoincrement())
 
     difficulty Int       @default(0)
+    mode       GameMode
+    map        String    @default("NORMAL")
     state      GameState @default(CREATING)
     score1     Int       @default(0)
     score2     Int       @default(0)
-    winner    Int       @default(0)     
+    score3     Int       @default(0)
+    score4     Int       @default(0)
+    winner     Int       @default(0)
+    date       DateTime  @default(now()) 
     user1Id Int
     user2Id Int
+    user3Id Int
+    user4Id Int
     user1   User @relation("player1", fields: [user1Id], references: [id])
     user2   User @relation("player2", fields: [user2Id], references: [id])
+    user3   User @relation("player3", fields: [user3Id], references: [id])
+    user4   User @relation("player4", fields: [user4Id], references: [id])
 }
 
 model Queue {
@@ -196,4 +217,10 @@ enum GameState {
     CREATING
     PLAYING
     ENDED
+}
+
+enum GameMode {
+    ONEVONE
+    TWOVTWO
+    FREEFORALL
 }

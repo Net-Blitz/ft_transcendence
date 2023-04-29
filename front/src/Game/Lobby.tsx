@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./Lobby.css"
+import axios from "axios";
 
 const LobbyBox = ({children}:any) => {
 	return (
@@ -9,13 +10,13 @@ const LobbyBox = ({children}:any) => {
 		</div>
 )}
 
-const PlayerInLobby = ({player}:any) => {
+const PlayerInLobby = ({player, env}:any) => {
 	return (
-		player !== undefined ?
+		player !== undefined && player !== null ?
 		<div className="game-waiting-player">
 			<div className="game-waiting-player-avatar-underdiv">
 				
-				<img className="game-waiting-player-avatar" src={'http://localhost:3333/' + player.avatar} alt="Avatar" />
+				<img className="game-waiting-player-avatar" src={player.avatar ? 'http://' + env.host + ":" + env.port + '/' + player.avatar : ""} alt="Avatar" />
 			</div>
 			<div className="game-waiting-player-name">{player.login}</div>
 			<div className="game-waiting-player-rank">{player.elo} LP</div>
@@ -70,8 +71,6 @@ const LobbyChat = ({socketQueue}:any) => {
 			return;
 		socketQueue.emit("ChatWithGroup", {message: message});
 
-		
-		
 		setInput("");
 		const inputDiv = document.querySelector("input");
 		if  (inputDiv !== null) {
@@ -84,9 +83,8 @@ const LobbyChat = ({socketQueue}:any) => {
 	}
 
 	const handleEnter = (e:any) => {
-		if (e.key === "Enter") {
+		if (e.key === "Enter")
 			sendFunction(input);
-		}
 	}
 
 	const handleMessage = (data:any) => {
@@ -110,9 +108,8 @@ const LobbyChat = ({socketQueue}:any) => {
 		const chatUl = document.querySelector("#lobby-chat");
 		const preMsg = localStorage.getItem("lobby-chat-storage");
 		
-		if (chatUl !== null && preMsg !== null) {
+		if (chatUl !== null && preMsg !== null)
 			chatUl.innerHTML = preMsg;
-		}
 		if (chatUl)
 			chatUl.scrollTop = chatUl.scrollHeight;
 
@@ -129,27 +126,31 @@ const LobbyChat = ({socketQueue}:any) => {
 	)
 }
 
-function Lobby({socketQueue, login, setReload, reload}:any) {
-	const navigate = useNavigate();
+function Lobby({socketQueue, login, setReload, reload, env}:any) {
 	const [player1, setPlayer1] = useState(undefined);
 	const [player2, setPlayer2] = useState(undefined);
 	const [player3, setPlayer3] = useState(undefined);
 
-	const setPlayer = (data:any) => {
-		if (!data || data.in === false)
-			setReload(!reload)
-		if (data && data.player1)
-			setPlayer1(data.player1);
-		socketQueue.off("imInQueueResponse");
-	}
-
-	const DisconnectFromQueueResponse = (data:any) => {
-		setReload(!reload);
-		socketQueue.off("DisconnectFromQueueResponse")
-
-	}
-
+	
 	useEffect(() => {
+		const setPlayer = (data:any) => {
+			if (!data || data.in === false)
+				setReload(987456);
+			else
+			{
+				setPlayer1(data.player1);
+				setPlayer2(data.player2);
+				setPlayer3(data.player3);
+			}
+			socketQueue.off("imInQueueResponse");
+		}
+	
+		const DisconnectFromQueueResponse = (data:any) => {
+			setReload(22654563);
+			console.log("discofromqueue")
+			socketQueue.off("DisconnectFromQueueResponse")
+		}
+
 		socketQueue.off("imInQueueResponse")
 		socketQueue.on("imInQueueResponse", setPlayer);
 		socketQueue.emit("imInQueue", {login: login});
@@ -173,9 +174,9 @@ function Lobby({socketQueue, login, setReload, reload}:any) {
 				<LobbyTimer socketQueue={socketQueue} />
 
 				<div className="game-waiting-players">
-					<PlayerInLobby player={player1}/>
-					<PlayerInLobby player={player2}/>
-					<PlayerInLobby player={player3}/>
+					<PlayerInLobby player={player1} env={env}/>
+					<PlayerInLobby player={player2} env={env}/>
+					<PlayerInLobby player={player3} env={env}/>
 				</div>
 
 				<LobbyChat socketQueue={socketQueue} />

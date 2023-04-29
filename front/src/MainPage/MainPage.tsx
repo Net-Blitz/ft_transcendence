@@ -2,7 +2,6 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import './MainPage.css';
 /*	SELECTORS	*/
-import { selectUserData } from '../utils/redux/selectors';
 
 // Components
 import FilterButton from './Components/Filter/FilterButton';
@@ -54,9 +53,6 @@ const MainPage = () => {
 		map: 'all',
 		difficulty: 'all',
 	});
-	{
-		/** @TODO Lier au back */
-	}
 	const data: DataTable[] = [
 		{
 			gameMode: '1v1',
@@ -127,7 +123,7 @@ const MainPage = () => {
 		return () => {
 			window.removeEventListener('resize', handleResize);
 		};
-	}, []);
+	}, [data.length]);
 
 	console.log('mainRectangle', mainRectangleMobile);
 	return (

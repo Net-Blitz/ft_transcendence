@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import Chart from 'chart.js/auto';
 import { CategoryScale } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
@@ -39,26 +39,16 @@ export const DonutLevel = () => {
 	return (
 		<div className="donutlevel-wrapper">
 			<div className="level-wrapper">
-				Lvl.{' '}
-				<span
-					style={{
-						color: '#0A3D62',
-						fontSize: '16px',
-						fontWeight: 600,
-					}}>
-					3
-				</span>
+				Lvl. <span>3</span>
 			</div>
-			<div
-				className="doughnut-wrapper"
-				style={{ width: '103px', height: '103px' }}>
+			<div className="doughnut-wrapper">
 				<div className="d-percentage">
 					{percentageValue.toString()} %
 				</div>
 				<Doughnut data={data} options={options} />
 			</div>
 			<div className="progression-wrapper">
-				<span style={{ color: '#F9DA49' }}>81</span> / 325
+				<span>81</span> / 325
 			</div>
 		</div>
 	);
