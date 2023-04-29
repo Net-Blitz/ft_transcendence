@@ -330,12 +330,19 @@
 	position: absolute;
 	/* transform: rotate(33.86deg); */
 	/* justify-content: center; */
-	left: 50%;
-	transform: translate(-50, -90%);
+	transform: translate(-50%, -70%);
 	width: 8vw;
 	height: 5vw;
 	max-width: 100px;
 	max-height: 62.5px;
+}
+
+#crown-2 {
+	left: 53%
+}
+
+#crown-1 {
+	left: 50%
 }
 
 .game-end-button-home {
