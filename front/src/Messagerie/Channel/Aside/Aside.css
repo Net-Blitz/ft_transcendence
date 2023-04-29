@@ -107,7 +107,6 @@
 .user-channel-list-element .user-channel-list-buttons {
 	height: 20px;
 	margin-left: auto;
-	position: relative;
 }
 
 .user-channel-list-element .user-channel-list-buttons:last-child {
@@ -121,13 +120,11 @@
 .user-channel-list-element .dropdown-settings-user-channel {
 	background-color: #FDFAD0;
 	position: absolute;
-	right: -5px;
-	top: 24px;
+	right: 5px;
+	top: 34px;
 	z-index: 1;
 	padding: 4px;
 	border-radius: 5px;
-	height: 94px;
-	width: 90px;
 }
 
 .user-channel-list-element .dropdown-settings-user-channel p {
