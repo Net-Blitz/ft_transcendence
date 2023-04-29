@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
-import { useStore } from 'react-redux';
+import { useSelector, useStore } from 'react-redux';
+import { selectUserData } from '../../../utils/redux/selectors';
 import './ProfileConfig.css';
 /*	Components	*/
 import Input from '../../../Login/Components/Auth/Input/Input';
@@ -14,6 +15,7 @@ import { fetchOrUpdateUser } from '../../../utils/redux/user';
 import close from './Ressources/close.svg';
 import id from './Ressources/id.svg';
 import refresh from './Ressources/refresh.svg';
+import { AvatarProps } from '../../../Login/Components/Auth/Carousel/genAvatars';
 
 interface ProfileConfigProps {
 	handleTrigger: () => void;
@@ -21,11 +23,12 @@ interface ProfileConfigProps {
 
 export const ProfileConfig = ({ handleTrigger }: ProfileConfigProps) => {
 	const [currentIndex, setCurrentIndex] = useState(0);
-	const [avatar, setAvatar] = useState(generateAvatars(12));
+	const [avatar, setAvatar] = useState<AvatarProps[]>([]);
 	const [usernames, setUsernames] = useState<string[]>([]);
 	const [inputError, setInputError] = useState('');
 	const me = document.getElementsByClassName('popup');
 	const store = useStore();
+	const userConnected = useSelector(selectUserData);
 
 	useEffect(() => {
 		async function fetchData() {
@@ -43,7 +46,22 @@ export const ProfileConfig = ({ handleTrigger }: ProfileConfigProps) => {
 			}
 		}
 		fetchData();
-	}, []);
+		const avatars: AvatarProps[] = generateAvatars(7);
+		const myAvatar: AvatarProps = {
+			file: undefined,
+			url: userConnected.avatar,
+			source: 'set',
+			type: '',
+		};
+		avatars.unshift(myAvatar);
+		setAvatar(avatars);
+		const inputPseudo = document.querySelector<HTMLInputElement>(
+			'.profileconfig-wrapper .input-wrapper input'
+		);
+		if (inputPseudo) {
+			inputPseudo.value = userConnected.username;
+		}
+	}, [userConnected]);
 
 	const handleClick = useCallback(async () => {
 		const inputPseudo: string | undefined =
@@ -56,6 +74,7 @@ export const ProfileConfig = ({ handleTrigger }: ProfileConfigProps) => {
 				const formData = new FormData();
 				formData.append('username', inputPseudo);
 				formData.append('file', avatar[currentIndex].file);
+				formData.append('source', avatar[currentIndex].source);
 				try {
 					await axios.post(
 						'http://localhost:3333/users/updateconfig',

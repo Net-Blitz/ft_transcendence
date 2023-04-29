@@ -126,38 +126,49 @@ export class UserService {
 		@GetUser() user: any,
 		@Res() res: Response,
 		file: any,
-		text: string
+		text: string,
+		source: string
 	) {
-		if ((await this.fileservice.checkFile(file)) === false)
-			return res.status(400).json({ message: "Bad file" });
-		try {
-			await fs.promises.unlink(user.avatar);
-		} catch (error) {
-			return res.status(400).json({ message: "Delete File error" });
+		if (source !== "set") {
+			if ((await this.fileservice.checkFile(file)) === false)
+				return res.status(400).json({ message: "Bad file" });
+			try {
+				await fs.promises.unlink(user.avatar);
+			} catch (error) {
+				return res.status(400).json({ message: "Delete File error" });
+			}
+			const extension = path.extname(file.originalname);
+			const filepath: string = path.join(
+				"public",
+				"uploads",
+				user.id + "-" + uuidv4() + extension
+			);
+			try {
+				await fs.promises.writeFile(filepath, file.buffer);
+			} catch (error) {
+				return res.status(400).json({ message: "Write File error" });
+			}
+			if (!user) {
+				return res.status(404).json({ message: `User not found` });
+			}
+			if (text) user.username = text;
+			if (file) user.avatar = filepath;
+			const updatedUser = await this.prisma.user.update({
+				where: {
+					login: user.login,
+				},
+				data: user,
+			});
+			return res.status(200).json(updatedUser);
+		} else {
+			if (text) user.username = text;
+			const updatedUser = await this.prisma.user.update({
+				where: {
+					login: user.login,
+				},
+				data: user,
+			});
+			return res.status(200).json(updatedUser);
 		}
-		const extension = path.extname(file.originalname);
-		const filepath: string = path.join(
-			"public",
-			"uploads",
-			user.id + "-" + uuidv4() + extension
-		);
-		try {
-			await fs.promises.writeFile(filepath, file.buffer);
-		} catch (error) {
-			return res.status(400).json({ message: "Write File error" });
-		}
-		if (!user) {
-			return res.status(204).json({ message: `User not found` });
-		}
-		if (text) user.username = text;
-		if (file) user.avatar = filepath;
-		user.config = true;
-		const updatedUser = await this.prisma.user.update({
-			where: {
-				login: user.login,
-			},
-			data: user,
-		});
-		return res.status(200).json(updatedUser);
 	}
 }
