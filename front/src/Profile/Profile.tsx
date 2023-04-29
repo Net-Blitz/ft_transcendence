@@ -25,8 +25,8 @@ export const Profile = () => {
 			</button>
 			<div className="main-wrapper">
 				<MainInfo userProfile={false} userData={userConnected} />
-				<MiddleInfo />
-				<MatchHistory />
+				<MiddleInfo userData={userConnected} />
+				<MatchHistory userData={userConnected} />
 			</div>
 		</div>
 	);

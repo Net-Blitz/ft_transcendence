@@ -1,8 +1,8 @@
 import React from 'react';
 import './Friends.css';
 import { BasicFrame } from '../../MiddleInfo';
-/*	TMP RESSOURCES	*/
-import friend1 from './Tmp/friend1.png';
+import { useAxios } from '../../../../../utils/hooks';
+import { useNavigate } from 'react-router-dom';
 
 interface FriendProps {
 	avatar: string;
@@ -11,8 +11,14 @@ interface FriendProps {
 }
 
 const Friend = ({ avatar, username, level }: FriendProps) => {
+	const navigate = useNavigate();
+
+	const handleNavigate = () => {
+		return navigate('/profile/' + username);
+	};
+
 	return (
-		<div className="friend">
+		<div className="friend" onClick={handleNavigate}>
 			<div className="avatar-wrapper">
 				<div className="level-wrapper">{level.toString()}</div>
 				<img src={avatar} alt="friend-avatar" />
@@ -22,25 +28,32 @@ const Friend = ({ avatar, username, level }: FriendProps) => {
 	);
 };
 
-export const Friends = () => {
+export const Friends = ({ userData }: { userData: any }) => {
+	const {
+		isLoading,
+		data,
+		error,
+	}: { isLoading: boolean; data: any; error: boolean } = useAxios(
+		'http://localhost:3333/users/friends/' + userData.username
+	);
+
+	if (isLoading && !error) return <></>;
+
 	return (
 		<div className="friends">
 			<BasicFrame title="Friends">
 				<div className="friends-in-wrapper">
-					<Friend avatar={friend1} username="name" level={2} />
-					<Friend avatar={friend1} username="name" level={2} />
-					<Friend avatar={friend1} username="name" level={2} />
-					<Friend avatar={friend1} username="name" level={2} />
-					<Friend avatar={friend1} username="name" level={2} />
-					<Friend avatar={friend1} username="name" level={2} />
-					<Friend avatar={friend1} username="name" level={2} />
-					<Friend avatar={friend1} username="name" level={2} />
-					<Friend avatar={friend1} username="name" level={2} />
-					<Friend avatar={friend1} username="name" level={2} />
-					<Friend avatar={friend1} username="name" level={2} />
-					<Friend avatar={friend1} username="name" level={2} />
-					<Friend avatar={friend1} username="name" level={2} />
-					<Friend avatar={friend1} username="name" level={2} />
+					{data.friends &&
+						data.friends.map((friend: any, index: any) => (
+							<Friend
+								key={index}
+								avatar={
+									'http://localhost:3333/' + friend.avatar
+								}
+								username={friend.username}
+								level={Math.floor(friend.experience / 1000)}
+							/>
+						))}
 				</div>
 			</BasicFrame>
 		</div>

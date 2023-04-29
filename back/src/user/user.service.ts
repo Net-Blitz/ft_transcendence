@@ -171,4 +171,91 @@ export class UserService {
 			return res.status(200).json(updatedUser);
 		}
 	}
+
+	async GetAchievement(
+		@Param("username") username: string,
+		@Res() res: Response
+	) {
+		try {
+			if (!username) {
+				return res.status(204).json({ message: `User not found` });
+			}
+			const achievements = await this.prisma.user.findUnique({
+				where: {
+					username,
+				},
+				select: {
+					achievements: true,
+				},
+			});
+			return res.status(200).json(achievements);
+		} catch (error) {
+			return res.status(204).json({ message: `User has no achievement` });
+		}
+	}
+
+	async GetFriends(
+		@Param("username") username: string,
+		@Res() res: Response
+	) {
+		try {
+			if (!username) {
+				return res.status(204).json({ message: "User not found" });
+			}
+
+			const friends = await this.prisma.user.findUnique({
+				where: {
+					username,
+				},
+				include: {
+					friendwith: true,
+				},
+			});
+
+			if (!friends) {
+				return res.status(204).json({ message: "friends not found" });
+			}
+
+			const friendsList = [];
+			let j = 0;
+			for (let i = 0; i < friends.friendwith.length; i++) {
+				const friend = await this.prisma.user.findUnique({
+					where: {
+						id: friends.friendwith[i].friendId,
+					},
+				});
+				if (friends.friendwith[i].status === "ACCEPTED") {
+					friendsList[j] = friend;
+					j++;
+				}
+			}
+			return res.status(200).json({
+				friends: friendsList,
+			});
+		} catch (error) {
+			return res.status(204).json({ message: `User has no friends` });
+		}
+	}
+
+	async GetMatchs(@Param("username") username: string, @Res() res: Response) {
+		try {
+			if (!username) {
+				return res.status(204).json({ message: `User not found` });
+			}
+			const matchs = await this.prisma.user.findUnique({
+				where: {
+					username,
+				},
+				select: {
+					GameAsPlayer1: true,
+					GameAsPlayer2: true,
+					GameAsPlayer3: true,
+					GameAsPlayer4: true,
+				},
+			});
+			return res.status(200).json(matchs);
+		} catch (error) {
+			return res.status(204).json({ message: `User has no matchs` });
+		}
+	}
 }

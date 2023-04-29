@@ -402,6 +402,7 @@ export class FriendService {
 				},
 				select: {
 					username: true,
+					id: true,
 				},
 			});
 			if (friends.friendwith[i].status === "BLOCKED") {

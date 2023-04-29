@@ -3,11 +3,7 @@ import './MatchHistory.css';
 import { useEffect, useState } from 'react';
 
 import { BasicFrame } from '../MiddleInfo/MiddleInfo';
-/* Ressources */
-import avatar1 from '../../../MainPage/Components/Ressources/avatar1.svg';
-import avatar2 from '../../../MainPage/Components/Ressources/avatar2.svg';
-import avatar3 from '../../../MainPage/Components/Ressources/avatar3.svg';
-import avatar4 from '../../../MainPage/Components/Ressources/avatar4.svg';
+import { useAxios } from '../../../utils/hooks';
 
 interface TeamMatchProps {
 	img: string;
@@ -45,9 +41,23 @@ const useWindowWidth = () => {
 	return windowWidth;
 };
 
-export const MatchHistory = () => {
+export const MatchHistory = ({ userData }: { userData: any }) => {
 	const headerMobile = ['Game mode', 'Team', 'Score', 'XP Gained'];
 	const isMobileView = useWindowWidth() < 767;
+	const {
+		isLoading,
+		data,
+		error,
+	}: { isLoading: boolean; data: any; error: boolean } = useAxios(
+		'http://localhost:3333/users/matchs/' + userData.username
+	);
+
+	if (isLoading && !error) return <></>;
+
+	console.log(data.GamePlayer1);
+	console.log(data.GamePlayer2);
+	console.log(data.GamePlayer3);
+	console.log(data.GamePlayer4);
 
 	const header: string[] = [
 		'Game mode',
@@ -61,88 +71,88 @@ export const MatchHistory = () => {
 		'XP Gained',
 	];
 
-	let data = [
-		{
-			gameMode: '1v1',
-			team: [
-				{ img: avatar1, level: 1 },
-				{ img: avatar2, level: 2 },
-				{ img: avatar3, level: 10 },
-				{ img: avatar4, level: 9 },
-			],
-			date: '02/04/2023',
-			hour: '3h38',
-			score: [3, 10],
-			duration: '30 min',
-			difficulty: 'easy',
-			map: 'beach',
-			XPgained: 1000,
-		},
-		{
-			gameMode: '1v1',
-			team: [
-				{ img: avatar1, level: 1 },
-				{ img: avatar2, level: 2 },
-				{ img: avatar3, level: 10 },
-				{ img: avatar4, level: 9 },
-			],
-			date: '02/04/2023',
-			hour: '3h38',
-			score: [3, 10],
-			duration: '30 min',
-			difficulty: 'easy',
-			map: 'beach',
-			XPgained: 1000,
-		},
-		{
-			gameMode: '1v1',
-			team: [
-				{ img: avatar1, level: 1 },
-				{ img: avatar2, level: 2 },
-				{ img: avatar3, level: 10 },
-				{ img: avatar4, level: 9 },
-			],
-			date: '02/04/2023',
-			hour: '3h38',
-			score: [3, 10],
-			duration: '30 min',
-			difficulty: 'easy',
-			map: 'beach',
-			XPgained: 1000,
-		},
-		{
-			gameMode: '1v1',
-			team: [
-				{ img: avatar1, level: 1 },
-				{ img: avatar2, level: 2 },
-				{ img: avatar3, level: 10 },
-				{ img: avatar4, level: 9 },
-			],
-			date: '02/04/2023',
-			hour: '3h38',
-			score: [3, 10],
-			duration: '30 min',
-			difficulty: 'easy',
-			map: 'beach',
-			XPgained: 1000,
-		},
-		{
-			gameMode: '1v1',
-			team: [
-				{ img: avatar1, level: 1 },
-				{ img: avatar2, level: 2 },
-				{ img: avatar3, level: 10 },
-				{ img: avatar4, level: 9 },
-			],
-			date: '02/04/2023',
-			hour: '3h38',
-			score: [3, 10],
-			duration: '30 min',
-			difficulty: 'easy',
-			map: 'beach',
-			XPgained: 1000,
-		},
-	];
+	//let data = [
+	//	{
+	//		gameMode: '1v1',
+	//		team: [
+	//			{ img: avatar1, level: 1 },
+	//			{ img: avatar2, level: 2 },
+	//			{ img: avatar3, level: 10 },
+	//			{ img: avatar4, level: 9 },
+	//		],
+	//		date: '02/04/2023',
+	//		hour: '3h38',
+	//		score: [3, 10],
+	//		duration: '30 min',
+	//		difficulty: 'easy',
+	//		map: 'beach',
+	//		XPgained: 1000,
+	//	},
+	//	{
+	//		gameMode: '1v1',
+	//		team: [
+	//			{ img: avatar1, level: 1 },
+	//			{ img: avatar2, level: 2 },
+	//			{ img: avatar3, level: 10 },
+	//			{ img: avatar4, level: 9 },
+	//		],
+	//		date: '02/04/2023',
+	//		hour: '3h38',
+	//		score: [3, 10],
+	//		duration: '30 min',
+	//		difficulty: 'easy',
+	//		map: 'beach',
+	//		XPgained: 1000,
+	//	},
+	//	{
+	//		gameMode: '1v1',
+	//		team: [
+	//			{ img: avatar1, level: 1 },
+	//			{ img: avatar2, level: 2 },
+	//			{ img: avatar3, level: 10 },
+	//			{ img: avatar4, level: 9 },
+	//		],
+	//		date: '02/04/2023',
+	//		hour: '3h38',
+	//		score: [3, 10],
+	//		duration: '30 min',
+	//		difficulty: 'easy',
+	//		map: 'beach',
+	//		XPgained: 1000,
+	//	},
+	//	{
+	//		gameMode: '1v1',
+	//		team: [
+	//			{ img: avatar1, level: 1 },
+	//			{ img: avatar2, level: 2 },
+	//			{ img: avatar3, level: 10 },
+	//			{ img: avatar4, level: 9 },
+	//		],
+	//		date: '02/04/2023',
+	//		hour: '3h38',
+	//		score: [3, 10],
+	//		duration: '30 min',
+	//		difficulty: 'easy',
+	//		map: 'beach',
+	//		XPgained: 1000,
+	//	},
+	//	{
+	//		gameMode: '1v1',
+	//		team: [
+	//			{ img: avatar1, level: 1 },
+	//			{ img: avatar2, level: 2 },
+	//			{ img: avatar3, level: 10 },
+	//			{ img: avatar4, level: 9 },
+	//		],
+	//		date: '02/04/2023',
+	//		hour: '3h38',
+	//		score: [3, 10],
+	//		duration: '30 min',
+	//		difficulty: 'easy',
+	//		map: 'beach',
+	//		XPgained: 1000,
+	//	},
+	//];
 	console.log('isMobileView', isMobileView);
 	const dataHistory = ({ history, index }: dataHistoryProps) => {
 		return (
@@ -173,7 +183,7 @@ export const MatchHistory = () => {
 
 	return (
 		<div className="match-history">
-			<BasicFrame title="Match History">
+			<BasicFrame title="Match History" height="100%">
 				<table className="matchesInProgress">
 					<thead>
 						<tr>
@@ -190,9 +200,9 @@ export const MatchHistory = () => {
 						</tr>
 					</thead>
 					<tbody>
-						{data.map((history, index) =>
+						{/*{data.map((history, index) =>
 							dataHistory({ history, index })
-						)}
+						)}*/}
 					</tbody>
 				</table>
 			</BasicFrame>

@@ -5,6 +5,8 @@ import './UserProfile.css';
 /*	Components	*/
 import { MainFrame } from '../Messagerie/Messagerie';
 import { MainInfo } from './Components/MainInfo/MainInfo';
+import { MiddleInfo } from './Components/MiddleInfo/MiddleInfo';
+import { MatchHistory } from './Components/MatchHistory/MatchHistory';
 
 export const UserProfile = () => {
 	const { username } = useParams();
@@ -21,7 +23,6 @@ export const UserProfile = () => {
 	useEffect(() => {
 		if (data) data.avatar = 'http://localhost:3333/' + data.avatar;
 		setUser(data);
-		// console.log(data);
 	}, [data]);
 
 	if (isLoading && !error) return <div></div>;
@@ -30,6 +31,8 @@ export const UserProfile = () => {
 		<>
 			<MainFrame title={username + "'s Profile"}>
 				<MainInfo userProfile={true} userData={user} />
+				<MiddleInfo userData={user} />
+				<MatchHistory userData={user} />
 			</MainFrame>
 		</>
 	);

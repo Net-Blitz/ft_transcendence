@@ -2,10 +2,13 @@ import React from 'react';
 import './Achievements.css';
 import { BasicFrame } from '../../MiddleInfo';
 /*	TMP RESSOURCES	*/
-import achievement1 from './Tmp/achievement1.png';
-import achievement2 from './Tmp/achievement2.png';
-import achievement3 from './Tmp/achievement3.png';
-import achievement4 from './Tmp/achievement4.png';
+import achievement1 from './Ressources/achievement1.png';
+import achievement2 from './Ressources/achievement2.png';
+import achievement3 from './Ressources/achievement3.png';
+import achievement4 from './Ressources/achievement4.png';
+import achievement5 from './Ressources/achievement5.png';
+import achievement6 from './Ressources/achievement6.png';
+import { useAxios } from '../../../../../utils/hooks';
 
 interface AchievementProps {
 	img: string;
@@ -28,7 +31,28 @@ const Achievement = ({ img, title, description, lock }: AchievementProps) => {
 	);
 };
 
-export const Achievements = () => {
+export const Achievements = ({ userData }: { userData: any }) => {
+	const {
+		isLoading,
+		data,
+		error,
+	}: { isLoading: boolean; data: any; error: boolean } = useAxios(
+		'http://localhost:3333/users/achievement/' + userData.username
+	);
+
+	const checkAchievement = (id: number) => {
+		if (data) {
+			for (const element of data.achievements) {
+				if (element.id === id) {
+					return true;
+				}
+			}
+			return false;
+		} else return false;
+	};
+
+	if (isLoading && !error) return <div></div>;
+
 	return (
 		<div className="achievements">
 			<BasicFrame title="Achievements">
@@ -36,23 +60,37 @@ export const Achievements = () => {
 					img={achievement1}
 					title="Ace"
 					description="Win a game without letting the opponent score a single point."
+					lock={checkAchievement(1) ? false : true}
 				/>
 				<Achievement
 					img={achievement2}
-					title="Paddle Master"
-					description="Score 10 points using only your paddle (no power-ups)."
+					title="Brave"
+					description="Win a game with 20pts or more"
+					lock={checkAchievement(2) ? false : true}
 				/>
 				<Achievement
 					img={achievement3}
-					title="Quick Reflexes"
-					description="Score a point within the first few seconds of the game."
-					lock={true}
+					title="Lucky"
+					description="Win a game with 1pt or less"
+					lock={checkAchievement(3) ? false : true}
 				/>
 				<Achievement
 					img={achievement4}
-					title="Friendly Power"
-					description="Win a game with a friend."
-					lock={true}
+					title="Beginner"
+					description="Win a game"
+					lock={checkAchievement(4) ? false : true}
+				/>
+				<Achievement
+					img={achievement5}
+					title="Experienced"
+					description="Win a game"
+					lock={checkAchievement(5) ? false : true}
+				/>
+				<Achievement
+					img={achievement6}
+					title="Veteran"
+					description="Reach Level 20"
+					lock={checkAchievement(6) ? false : true}
 				/>
 			</BasicFrame>
 		</div>

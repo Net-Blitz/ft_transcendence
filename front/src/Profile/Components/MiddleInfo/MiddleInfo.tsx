@@ -27,12 +27,12 @@ export const BasicFrame = ({
 	);
 };
 
-export const MiddleInfo = () => {
+export const MiddleInfo = ({ userData }: { userData: any }) => {
 	return (
 		<div className="middleinfo-wrapper">
-			<Achievements />
-			<DonutLevel />
-			<Friends />
+			<Achievements userData={userData} />
+			<DonutLevel userData={userData} />
+			<Friends userData={userData} />
 		</div>
 	);
 };

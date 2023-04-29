@@ -126,7 +126,9 @@ export const MainInfo = ({
 				/>
 				<InfoElement
 					title="WinRate"
-					content={Number.isNaN(winRate) ? '0%' : winRate.toString()}
+					content={
+						Number.isNaN(winRate) ? '0%' : winRate.toString() + '%'
+					}
 				/>
 			</div>
 			<MainElement

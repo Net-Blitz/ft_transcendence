@@ -35,7 +35,7 @@ const NotFound = () => {
 
 function App(this: any) {
 	useGetUser();
-	const user = useSelector(selectUser).user;
+	const user = useSelector(selectUser);
 	const [reload, setReload] = useState(false);
 	const [socketQueue, setSocketQueue] = useState<Socket>({} as Socket);
 	const [socketGame, setSocketGame] = useState<Socket>({} as Socket);
@@ -61,7 +61,6 @@ function App(this: any) {
 			);
 		}
 	}, [user, env.host, env.port]);
-	// console.log("ENV", env, process.env);
 	if (user.status !== 'resolved' && user.status !== 'notAuth')
 		return <div></div>;
 	return (
