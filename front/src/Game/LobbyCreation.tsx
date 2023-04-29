@@ -74,7 +74,6 @@ const LobbyCreation = ({socketQueue, reload, setReload, login}:any) => {
 			else if (data.map === "BEACH") but_beach?.classList.replace("game-creation-button-unclicked", "game-creation-button-clicked")
 			else if (data.map === "JUNGLE") but_jungle?.classList.replace("game-creation-button-unclicked", "game-creation-button-clicked")
 			else if (data.map === "SPACE") but_space?.classList.replace("game-creation-button-unclicked", "game-creation-button-clicked")
-			console.log(data)
 		}
 		socketQueue.off("UpdateGroupResponse")
 		socketQueue.on("UpdateGroupResponse", updateGroup)
@@ -85,7 +84,6 @@ const LobbyCreation = ({socketQueue, reload, setReload, login}:any) => {
 	const joinQueue = () => {
 		
 		socketQueue.emit("ConnectToQueue"); // -> appuie sur le bouton plutot
-		console.log("join queue")
 	} 
 
 	const joinGroup = () => {

@@ -1,19 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import eyePNG from './assets/eye.png';
-import crown from './assets/crown.png';
+import crownImg from './assets/crown.png';
 import beach from './assets/beachImage.jpg';
 import space from './assets/spaceImage.jpg';
 import jungle from './assets/jungleImage.jpg';
 import './Game.css';
 
-function Podium({ color, height, point, avatar, avatar2 = null, env }: any) {
+function Podium({ color, height, point, avatar, avatar2 = null, env, crown = null }: any) {
 	return (
 		<div className="game-end-podium-div">
 			{avatar ? (
 				<div>
 					{height === '60%' ? (
-						<img src={crown} className="game-end-crown" />
+						<img src={crownImg} className="game-end-crown" id={crown ? "crown-2" : "crown-1"}/>
 					) : null}
 					<img
 						src={
@@ -56,7 +56,7 @@ function Game({ socketGame, room, login, env }: any) {
 
 	useEffect(() => {
 		socketGame.emit('gameConnection', { room: room });
-		console.log('gameConection', room);
+		// console.log('gameConection', room);
 		localStorage.removeItem('lobby-chat-storage');
 
 		const chatUl = document.querySelector('#game-playing-chat');
@@ -319,12 +319,12 @@ function Game({ socketGame, room, login, env }: any) {
 		};
 
 		const updateSpectatorFonc = (data: any) => {
-			console.log('spectatorJoin', data.spectator);
+			// console.log('spectatorJoin', data.spectator);
 			updateSpectator(data.spectator);
 		};
 
 		const getEndStatus = (data: any) => {
-			console.log('getEndStatus', data);
+			// console.log('getEndStatus', data);
 			updateGameEnd(data);
 			socketGame.off('getEndStatus');
 		};
@@ -357,7 +357,6 @@ function Game({ socketGame, room, login, env }: any) {
 	useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
 			if (event.key === 'ArrowUp') {
-				console.log('up');
 				event.preventDefault();
 				socketGame.emit('keyPress', 'UP');
 			} else if (event.key === 'ArrowDown') {
@@ -370,7 +369,6 @@ function Game({ socketGame, room, login, env }: any) {
 				event.preventDefault();
 				socketGame.emit('keyPress', 'RIGHT');
 			} else if (event.key >= '0' && event.key <= '9') {
-				console.log('quickChatMessage', event.key);
 				socketGame.emit('quickChatMessage', {
 					key: event.key,
 					room: room,
@@ -467,6 +465,7 @@ function Game({ socketGame, room, login, env }: any) {
 								point={gameEnd.score1}
 								avatar={gameEnd.avatar1}
 								avatar2={gameEnd.avatar2}
+								crown={true}
 								env={env}
 							/>
 							<Podium
