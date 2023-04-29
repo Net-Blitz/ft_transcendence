@@ -7,6 +7,8 @@ import {
 	Post,
 	Query,
 	Req,
+	UseInterceptors,
+	UploadedFile,
 	Res,
 } from "@nestjs/common";
 import { AuthService } from "./auth.service";
@@ -15,13 +17,14 @@ import * as jwt from "jsonwebtoken";
 import { GetCookie, GetUser } from "./decorator";
 import { CookieDto } from "./decorator/cookie.dto";
 import { ConfigService } from "@nestjs/config";
+import { FileInterceptor } from "@nestjs/platform-express";
 
 @Controller("auth")
 export class AuthController {
 	constructor(
 		private authService: AuthService,
 		private config: ConfigService
-	) {} 
+	) {}
 
 	@Get("callback")
 	async auth42Callback(@Res() res: Response, @Query("code") code: string) {
@@ -74,9 +77,22 @@ export class AuthController {
 		return await this.authService.remove2fa(res, cookie);
 	}
 
-	@Get(":username")/*Temp*/
-	async getUserCheat(@Req() req: Request, @Res() res: Response, @Param("username") username: string) {
-		console.log("username: " + username)
+	@Get(":username") /*Temp*/ async getUserCheat(
+		@Req() req: Request,
+		@Res() res: Response,
+		@Param("username") username: string
+	) {
+		console.log("username: " + username);
 		return await this.authService.getUserCheat(res, username);
+	}
+
+	@Post("admin/create")
+	@UseInterceptors(FileInterceptor("file"))
+	async createUser(
+		@Res() res: Response,
+		@Body("username") username: string,
+		@UploadedFile() file
+	) {
+		return await this.authService.adminCreateUser(res, username, file);
 	}
 }

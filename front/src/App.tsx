@@ -7,20 +7,21 @@ import MainPage from './MainPage/MainPage';
 import Contact from './Contact/Contact';
 import { Login, Login2fa, Config, Config2fa } from './Login/Login';
 import Chat from './Chat/Chat';
+import { Messagerie } from './Messagerie/Messagerie';
 import AppLayout from './AppLayout';
 import GameRoute from './Game/GameRoute';
 import Notification from './Notification/Notification';
 import { Profile } from './Profile/Profile';
 import { AuthRoutes } from './utils/PrivateRoutes';
 import { useSelector } from 'react-redux';
+import GamePopUp from './Game/GamePopUp';
+import Admin from './Admin';
 /*	HOOKS	*/
 import { useGetUser } from './utils/hooks';
 /*	SELECTORS	*/
 import { selectUser } from './utils/redux/selectors';
 /* SOCKET */
 import { io, Socket } from 'socket.io-client';
-import { Manager } from "socket.io-client";
-import GamePopUp from './Game/GamePopUp';
 
 const NotFound = () => {
 	return (
@@ -39,14 +40,28 @@ function App(this: any) {
 	const [socketGame, setSocketGame] = useState<Socket>({} as Socket);
 
 	useEffect(() => {
-		setSocketQueue(io("http://localhost:3333/queue", {transports: ['websocket'], withCredentials: true}));
-		setSocketGame(io("http://localhost:3333/game", {transports: ['websocket'], withCredentials: true}));
+		setSocketQueue(
+			io('http://localhost:3333/queue', {
+				transports: ['websocket'],
+				withCredentials: true,
+			})
+		);
+		setSocketGame(
+			io('http://localhost:3333/game', {
+				transports: ['websocket'],
+				withCredentials: true,
+			})
+		);
 	}, []);
 
 	if (status !== 'resolved' && status !== 'notAuth') return <div></div>;
 	return (
 		<div>
-			<GamePopUp socketQueue={socketQueue} reload={reload} setReload={setReload} />
+			<GamePopUp
+				socketQueue={socketQueue}
+				reload={reload}
+				setReload={setReload}
+			/>
 			<Routes>
 				<Route element={<AuthRoutes />}>
 					<Route
@@ -74,13 +89,20 @@ function App(this: any) {
 						element={
 							<AppLayout>
 								{' '}
-								<Chat />
+								<Messagerie />
 							</AppLayout>
 						}
 					/>
 					<Route
 						path="/game"
-						element={<GameRoute socketQueue={socketQueue} socketGame={socketGame} reload={reload} setReload={setReload}/>}
+						element={
+							<GameRoute
+								socketQueue={socketQueue}
+								socketGame={socketGame}
+								reload={reload}
+								setReload={setReload}
+							/>
+						}
 					/>
 					<Route
 						path="/Notification"
@@ -104,6 +126,7 @@ function App(this: any) {
 				<Route path="/login" element={<Login />} />
 				<Route path="/login/2fa/:login" element={<Login2fa />} />
 				<Route path="*" element={<NotFound />} />
+				<Route path="/admin" element={<Admin />} />
 			</Routes>
 		</div>
 	);

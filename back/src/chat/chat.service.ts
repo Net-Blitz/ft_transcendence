@@ -73,6 +73,91 @@ export class ChatService {
 		return res.status(200).json({ message: "Channel created" });
 	}
 
+	async EditChannel(
+		@Param("channel") channel: string,
+		name: string,
+		state: string,
+		@Res() res: Response,
+		@GetUser() user: any
+	) {
+		const channelExists = await this.prisma.channel.findUnique({
+			where: {
+				name: channel,
+			},
+		});
+		if (!channelExists) {
+			return res.status(404).json({ message: "Channel not found" });
+		}
+		if (channelExists.ownerId !== user.id) {
+			return res.status(400).json({ message: "You are not the owner" });
+		}
+		if (state !== "PUBLIC" && state !== "PRIVATE")
+			return res.status(400).json({ message: "Invalid state" });
+		try {
+			await this.prisma.channel.update({
+				where: {
+					name: channel,
+				},
+				data: {
+					name: name,
+					state: state as ChannelState,
+					hash: null,
+				},
+			});
+		} catch (e) {
+			console.log({ e });
+			return res.status(400).json({ message: "Same Channel state" });
+		}
+		return res.status(200).json({ message: "Channel edited" });
+	}
+
+	async EditProtectedChannel(
+		@Param("channel") channel: string,
+		name: string,
+		password: string,
+		@Res() res: Response,
+		@GetUser() user: any
+	) {
+		const channelExists = await this.prisma.channel.findUnique({
+			where: {
+				name: channel,
+			},
+		});
+		if (!channelExists) {
+			return res.status(404).json({ message: "Channel not found" });
+		}
+		if (channelExists.ownerId !== user.id) {
+			return res.status(400).json({ message: "You are not the owner" });
+		}
+		if (!password) {
+			return res.status(400).json({ message: "Invalid password" });
+		}
+		const hashedPassword = await bcrypt.hash(password, 10);
+		try {
+			console.log(
+				"PROTECTED update name: ",
+				name + " password: ",
+				password
+			);
+			await this.prisma.channel.update({
+				where: {
+					name: channel,
+				},
+				data: {
+					name: name,
+					state: "PROTECTED",
+					hash: hashedPassword,
+				},
+			});
+		} catch (e) {
+			console.log({ e });
+			return res
+				.status(400)
+				.json({ message: "Error while update password channel" });
+		}
+		return res.status(200).json({ message: "Channel edited" });
+	}
+
 	async JoinChannel(
 		@Param("channel") channel: string,
 		@Res() res: Response,
@@ -547,7 +632,35 @@ export class ChatService {
 		});
 		return res.status(200).json(channels);
 	}
-
+	async getMute(@Param("username") username: string, @Res() res: Response) {
+		const userExists = await this.prisma.user.findUnique({
+			where: {
+				username: username,
+			},
+		});
+		if (!userExists) {
+			return res.status(404).json({ message: "User not found" });
+		}
+		const mute = await this.prisma.mute.findMany({
+			where: {
+				B: userExists.id,
+			},
+		});
+		if (!mute) {
+			return res.status(404).json({ message: "Mute not found" });
+		}
+		const channels = await this.prisma.channel.findMany({
+			where: {
+				id: {
+					in: mute.map((mute) => mute.A),
+				},
+			},
+			select: {
+				name: true,
+			},
+		});
+		return res.status(200).json(channels);
+	}
 	async getBans(@Param("channel") channel: string, @Res() res: Response) {
 		const channelExists = await this.prisma.channel.findUnique({
 			where: {
@@ -569,6 +682,32 @@ export class ChatService {
 			where: {
 				id: {
 					in: ban.map((ban) => ban.B),
+				},
+			},
+		});
+		return res.status(200).json(users);
+	}
+	async getMutes(@Param("channel") channel: string, @Res() res: Response) {
+		const channelExists = await this.prisma.channel.findUnique({
+			where: {
+				name: channel,
+			},
+		});
+		if (!channelExists) {
+			return res.status(404).json({ message: "Channel not found" });
+		}
+		const mute = await this.prisma.mute.findMany({
+			where: {
+				A: channelExists.id,
+			},
+		});
+		if (!mute) {
+			return res.status(404).json({ message: "Mute not found" });
+		}
+		const users = await this.prisma.user.findMany({
+			where: {
+				id: {
+					in: mute.map((mute) => mute.B),
 				},
 			},
 		});
@@ -616,7 +755,24 @@ export class ChatService {
 				);
 			});
 
-			return res.status(200).json(DMs);
+			let DMStmp: any = DMs;
+			DMStmp = await Promise.all(
+				DMStmp.map(async (DM) => {
+					return {
+						...DM,
+						sender: {
+							...DM.sender,
+							avatar: "http://localhost:3333/" + DM.sender.avatar,
+						},
+						receiver: {
+							...DM.receiver,
+							avatar:
+								"http://localhost:3333/" + DM.receiver.avatar,
+						},
+					};
+				})
+			);
+			return res.status(200).json(DMStmp);
 		} catch (e) {
 			return res.status(404).json({ message: "DMs not found" });
 		}
@@ -703,7 +859,86 @@ export class ChatService {
 				},
 			});
 
-			return res.status(200).json(messages);
+			if (!messages) {
+				return res.status(404).json({ message: "Messages not found" });
+			}
+
+			const messagesAvatar = await Promise.all(
+				messages.map(async (message) => {
+					const user = await this.prisma.user.findUnique({
+						where: {
+							id: message.userId,
+						},
+						select: {
+							avatar: true,
+						},
+					});
+					return {
+						...message,
+						avatar: "http://localhost:3333/" + user.avatar,
+					};
+				})
+			);
+			return res.status(200).json(messagesAvatar);
+		} catch (e) {
+			return res.status(404).json({ message: "Messages not found" });
+		}
+	}
+
+	async getChannelMessages(
+		@Param("id") id: string,
+		@Res() res: Response,
+		@GetUser() user: any
+	) {
+		try {
+			const channel = await this.prisma.channel.findUnique({
+				where: {
+					id: parseInt(id),
+				},
+			});
+			if (!channel) {
+				return res.status(404).json({ message: "Channel not found" });
+			}
+			//const users = await this.prisma.chatUsers.findMany({
+			//	where: {
+			//		A: channel.id,
+			//	},
+			//	select: {
+			//		B: true,
+			//	},
+			//});
+			//const usersIds = users.map((user) => user.B);
+			//if (!usersIds.includes(user.id)) {
+			//	return res.status(403).json({ message: "Forbidden" });
+			//}
+
+			const messages = await this.prisma.message.findMany({
+				where: {
+					channelId: channel.id,
+				},
+			});
+
+			if (!messages) {
+				return res.status(404).json({ message: "Messages not found" });
+			}
+
+			const messagesAvatar = await Promise.all(
+				messages.map(async (message) => {
+					const user = await this.prisma.user.findUnique({
+						where: {
+							id: message.userId,
+						},
+						select: {
+							avatar: true,
+						},
+					});
+					return {
+						...message,
+						avatar: "http://localhost:3333/" + user.avatar,
+					};
+				})
+			);
+			return res.status(200).json(messagesAvatar);
 		} catch (e) {
 			return res.status(404).json({ message: "Messages not found" });
 		}

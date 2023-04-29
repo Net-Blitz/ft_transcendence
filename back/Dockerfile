@@ -2,4 +2,12 @@ FROM node:alpine
 
 WORKDIR "/app"
 
-ENTRYPOINT [ "/bin/sh", "-c", "npm install && npx prisma migrate deploy && npm run start:dev" ]
+COPY ./package*.json ./
+
+RUN npm ci
+
+COPY . .
+
+RUN npx nest build --webpack
+
+ENTRYPOINT [ "npm", "run", "start:dev"]
