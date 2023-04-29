@@ -24,6 +24,7 @@
 	margin-top: 12px;
 	background-color: #0A3D62;
 	border-radius: 10px;
+	height: 2px;
 }
 
 	/*	Basic Frame*/
@@ -42,9 +43,10 @@
 		flex-direction: column;
 		width: 100%;
 		height: 100%;
-		overflow: scroll;
+		overflow-y: scroll;
 		-ms-overflow-style: none;
 		scrollbar-width: none;
+		margin-bottom: 10px;
 	}
 
 	.aside-channel .basic-frame > .content-wrapper::-webkit-scrollbar {
@@ -105,6 +107,7 @@
 .user-channel-list-element .user-channel-list-buttons {
 	height: 20px;
 	margin-left: auto;
+	position: relative;
 }
 
 .user-channel-list-element .user-channel-list-buttons:last-child {
@@ -118,11 +121,13 @@
 .user-channel-list-element .dropdown-settings-user-channel {
 	background-color: #FDFAD0;
 	position: absolute;
-	right: 2px;
-	top: 34px;
+	right: -5px;
+	top: 24px;
 	z-index: 1;
 	padding: 4px;
 	border-radius: 5px;
+	height: 94px;
+	width: 90px;
 }
 
 .user-channel-list-element .dropdown-settings-user-channel p {
