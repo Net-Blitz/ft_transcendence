@@ -347,7 +347,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			let isAdmin = admins.some(
 				(admin) => admin.User.username === username
 			);
-
 			const userExists = await this.prisma.user.findUnique({
 				where: {
 					username: data.login,
@@ -375,6 +374,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				console.log(
 					username + " banned " + data.login + " from " + channel
 				);
+				await this.prisma.chatUsers.deleteMany({
+					where: {
+						A: channelExists.id,
+						B: userExists.id,
+					},
+				});
 				this.server
 					.to(channel)
 					.emit("ban", { username: data.login, channel: channel });

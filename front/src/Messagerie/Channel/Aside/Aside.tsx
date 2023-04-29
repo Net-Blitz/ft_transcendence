@@ -507,20 +507,18 @@ const UserChannelList = ({
 					/>
 				))}
 			</BasicFrame>
-			{isAdmin ||
-				(channel.ownerId === userConnected.id && (
-					<div className="ban-list-dropdown-channel">
-						<select
-							onChange={(e) => setSelectedUser(e.target.value)}>
-							{bansList.map((bannedUser, index) => (
-								<option value={bannedUser.username} key={index}>
-									{bannedUser.username}
-								</option>
-							))}
-						</select>
-						<button onClick={handleUnban}>Unban</button>
-					</div>
-				))}
+			{(isAdmin || channel.ownerId === userConnected.id) && bansList.length > 0 && (
+				<div className="ban-list-dropdown-channel">
+					<select onChange={(e) => setSelectedUser(e.target.value)}>
+						{bansList.map((bannedUser, index) => (
+							<option value={bannedUser.username} key={index}>
+								{bannedUser.username}
+							</option>
+						))}
+					</select>
+					<button onClick={handleUnban}>Unban</button>
+				</div>
+			)}
 		</div>
 	);
 };
