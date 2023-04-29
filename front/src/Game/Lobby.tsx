@@ -147,7 +147,6 @@ function Lobby({socketQueue, login, setReload, reload, env}:any) {
 	
 		const DisconnectFromQueueResponse = (data:any) => {
 			setReload(22654563);
-			console.log("discofromqueue")
 			socketQueue.off("DisconnectFromQueueResponse")
 		}
 
