@@ -5,7 +5,6 @@ import './App.css';
 /*	COMPONENTS	*/
 import MainPage from './MainPage/MainPage';
 import { Social } from './Social/Social';
-import { AddFriends } from './Social/AddFriends';
 import { Login, Login2fa, Config, Config2fa } from './Login/Login';
 import Chat from './Chat/Chat';
 import { Messagerie } from './Messagerie/Messagerie';
@@ -35,17 +34,29 @@ const NotFound = () => {
 function App(this: any) {
 	useGetUser();
 	const status = useSelector(selectUser).status;
-	const currentPath = window.location.pathname;
 	const [reload, setReload] = useState(false);
 	const [socketQueue, setSocketQueue] = useState<Socket>({} as Socket);
 	const [socketGame, setSocketGame] = useState<Socket>({} as Socket);
-	const env = {host: process.env.REACT_APP_BACK_HOST, port: process.env.REACT_APP_BACK_PORT}
+	const env = {
+		host: process.env.REACT_APP_BACK_HOST,
+		port: process.env.REACT_APP_BACK_PORT,
+	};
 
 	useEffect(() => {
-		setSocketQueue(io("http://" + env.host + ":" + env.port + "/queue", {transports: ['websocket'], withCredentials: true}));
-		setSocketGame(io("http://" + env.host + ":" + env.port + "/game", {transports: ['websocket'], withCredentials: true}));
+		setSocketQueue(
+			io('http://' + env.host + ':' + env.port + '/queue', {
+				transports: ['websocket'],
+				withCredentials: true,
+			})
+		);
+		setSocketGame(
+			io('http://' + env.host + ':' + env.port + '/game', {
+				transports: ['websocket'],
+				withCredentials: true,
+			})
+		);
 	}, []);
-	console.log("ENV", env, process.env);
+	console.log('ENV', env, process.env);
 	if (status !== 'resolved' && status !== 'notAuth') return <div></div>;
 	return (
 		<div>
@@ -77,15 +88,6 @@ function App(this: any) {
 						}
 					/>
 					<Route
-						path="/addfriends"
-						element={
-							<AppLayout>
-								{' '}
-								<AddFriends />
-							</AppLayout>
-						}
-					/>
-					<Route
 						path="/chat"
 						element={
 							<AppLayout>
@@ -105,7 +107,15 @@ function App(this: any) {
 					/>
 					<Route
 						path="/game"
-						element={<GameRoute socketQueue={socketQueue} socketGame={socketGame} reload={reload} setReload={setReload} env={env}/>}
+						element={
+							<GameRoute
+								socketQueue={socketQueue}
+								socketGame={socketGame}
+								reload={reload}
+								setReload={setReload}
+								env={env}
+							/>
+						}
 					/>
 					<Route
 						path="/Notification"

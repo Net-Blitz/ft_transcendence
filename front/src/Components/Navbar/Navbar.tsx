@@ -17,6 +17,43 @@ import chat_white from './Ressources/chat_white.svg';
 import contact_white from './Ressources/contact_white.svg';
 import game_white from './Ressources/game_white.svg';
 
+interface Button {
+	content: string;
+	href: string;
+	imgSrc: string;
+	activeImgSrc?: string;
+}
+interface NavButtonProps {
+	button: Button;
+	isMatchingPath: boolean;
+	userData: any;
+}
+
+const NavbarButton: React.FC<NavButtonProps> = ({
+	button,
+	isMatchingPath,
+	userData,
+}) => {
+	return button.content === 'Profile' ? (
+		<div>
+			<div className="profile-img">
+				<img
+					src={isMatchingPath ? button.activeImgSrc : button.imgSrc}
+					alt={button.content}
+				/>
+			</div>
+			<p>{userData.username}</p>
+		</div>
+	) : (
+		<div className={isMatchingPath ? 'active' : 'inactive'}>
+			<img
+				src={isMatchingPath ? button.activeImgSrc : button.imgSrc}
+				alt={button.content}
+			/>
+		</div>
+	);
+};
+
 const Navbar = () => {
 	/* 	SELECTORS	*/
 	const userData = useSelector(selectUserData);
@@ -50,50 +87,22 @@ const Navbar = () => {
 		<div className="parent_container">
 			<div className="background_navbar">
 				{buttons.map((button) => {
+					const isMatchingPath =
+						(currentPath === button.href ||
+							(currentPath === '/addfriends' &&
+								button.content === 'Social')) &&
+						button.href !== '/' &&
+						button.href !== '/profile';
 					return (
 						<Link
 							key={button.content}
 							to={button.href}
 							className={button.content}>
-							{(() => {
-								//IIFE : function that is defined and executed after its creation
-								const isMatchingPath =
-									currentPath === button.href &&
-									button.href !== '/' &&
-									button.href !== '/profile';
-
-								return button.content === 'Profile' ? (
-									<div>
-										<div className="profile-img">
-											<img
-												src={
-													isMatchingPath
-														? button.activeImgSrc
-														: button.imgSrc
-												}
-												alt={button.content}
-											/>
-										</div>
-										<p>{userData.username}</p>
-									</div>
-								) : (
-									<div
-										className={
-											isMatchingPath
-												? 'active'
-												: 'inactive'
-										}>
-										<img
-											src={
-												isMatchingPath
-													? button.activeImgSrc
-													: button.imgSrc
-											}
-											alt={button.content}
-										/>
-									</div>
-								);
-							})()}
+							<NavbarButton
+								button={button}
+								isMatchingPath={isMatchingPath}
+								userData={userData}
+							/>
 						</Link>
 					);
 				})}

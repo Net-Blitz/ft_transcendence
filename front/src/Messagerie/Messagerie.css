@@ -19,7 +19,14 @@
 	color: #0A3D62;
 	font-weight: 400;
 }
-
+.showBlockModalActive > * {
+	opacity: 0.3;
+	transition: opacity 0.2s ease-in-out;
+  }
+  
+.showBlockModalActive.childrenMainFrame > *:last-child {
+	opacity: 1;
+  }
 /*	NAVBAR */
 .messagerie .navbar {
 	display: flex;
@@ -68,7 +75,13 @@
 /* Mobile */
 @media screen and (min-width: 320px) and (max-width: 767px) {
 	.main-frame {
-		min-height: 86vh;
+		min-height: 82vh;
+	}
+	.main-frame h1{
+		font-size: 25px;
+	}
+	.friends .navbar{
+		margin-top: 10px;
 	}
 }
 	

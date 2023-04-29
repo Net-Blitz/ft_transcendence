@@ -1,10 +1,14 @@
+/* MainFrame */
+.childrenMainFrame{
+	width: 90%;
+}
+
 /*	NAVBAR */
 .friends .navbar {
 	display: flex;
 	margin-top: 37px;
 	justify-content: space-between;
 	align-self: center;
-	width: 90%;
 }
 
 .friends .navbar button {
@@ -15,7 +19,8 @@
 	font-weight: 300;
 	font-size: 13px;
 	border: 1px solid #0A3D62;
-	width: 142px;
+	width: fit-content;
+	padding: 0 10px 0 10px;
 	height: 30px;
 }
 
@@ -36,4 +41,37 @@
 .friends .navbar .addFriends {
 	background-color: #0A3D62;
 	color: #FFFDE4;
+}
+
+/* Ipad */
+@media screen and (min-width: 768px) and (max-width: 1020px) {
+	/* .friends .navbar button {
+		height: 50px;
+	} */
+}
+
+
+/* Mobile */
+@media screen and (min-width: 320px) and (max-width: 767px) {
+	.navbar{
+		flex-wrap: wrap;
+		justify-content: space-evenly !important;
+	}
+	/* .friends .navbar button {
+		height: 50px;
+	} */
+	.friends .navbar :not(:first-child)
+	{
+		margin-left: 0;
+	}
+	.addFriends{
+		margin-top:10px;
+	}
+	.navbarLeft button{
+		margin: 0 5px 5px 5px !important;
+	}
+	.navbarLeft{
+		flex-wrap: wrap;
+		justify-content: center;
+	}
 }

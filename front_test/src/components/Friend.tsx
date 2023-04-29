@@ -135,7 +135,7 @@ function Friend() {
 		<div>
 			<h1>List of friends</h1>
 			<ul>
-				{friends.map((friend) => (
+				{friends.map((friend, index) => (
 					<li key={friend.id}>
 						<div className="friend-info">
 							<Link to={"/profile/" + friend.username}>

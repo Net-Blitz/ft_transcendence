@@ -1,94 +1,69 @@
-import { useEffect, useState } from 'react';
-
-import './AddFriends.css';
-import axios from 'axios';
+import React, { useState } from 'react';
+import { FilteredUsers } from '../FilteredUsers/FilteredUsers';
+import { User } from '../types';
 
 //Ressources
-import add_blue from '../Ressources/add_blue.svg';
+import search_white from '../Ressources/search_white.svg';
 
-export interface User {
-	avatar: string;
-	elo: number;
-	id: number;
-	wins: number;
-	losses: number;
-	status: string;
-	twoFactor: boolean;
-	username: string;
-	login: string;
-}
+import './AddFriends.css';
 
 interface AddFriendsProps {
-	username: string;
+	AddFriendFunction: (username: string) => Promise<void>;
+	users: User[];
+	friends: User[];
+	userInfo: User | undefined;
+	pending: User[];
+	demands: User[];
+	blocked: User[];
+	setNavbarStatus: (status: string) => void;
 }
 
-export const AddFriends: React.FC<AddFriendsProps> = ({ username }) => {
-	const [userInfo, setUserInfo] = useState<User>();
-	const [users, setUsers] = useState<User[]>([]);
-	const [pending, setPending] = useState<User[]>([]);
-	const [demands, setDemand] = useState<User[]>([]);
-	const [friends, setFriends] = useState<User[]>([]);
-
-	const fetchUsers = async () => {
-		try {
-			const response = await axios.get<User[]>(
-				'http://localhost:3333/users/login',
-				{ withCredentials: true }
-			);
-			setUsers(response.data);
-		} catch (error) {
-			console.error(error);
-		}
+export const AddFriends = ({
+	AddFriendFunction,
+	setNavbarStatus,
+	users,
+	friends,
+	userInfo,
+	pending,
+	demands,
+	blocked,
+}: AddFriendsProps) => {
+	const [searchQuery, setSearchQuery] = useState('');
+	const handleInputChange = (event: any) => {
+		setSearchQuery(event.target.value);
 	};
-	const fetchFriends = async () => {
-		try {
-			const response = await axios.get(
-				'http://localhost:3333/friend/friends',
-				{ withCredentials: true }
-			);
-			setFriends(response.data.friendsList);
-			setPending(response.data.pendingList);
-			setDemand(response.data.demandList);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	useEffect(() => {
-		const fetchData = async () => {
-			const response = await axios.get('http://localhost:3333/users/me', {
-				withCredentials: true,
-			});
-			setUserInfo(response.data);
-		};
-
-		fetchData();
-		fetchUsers();
-		fetchFriends();
-
-		const interval = setInterval(fetchFriends, 5000);
-		return () => clearInterval(interval);
-	}, []);
-
-	const AddFriend = async (event: React.MouseEvent<HTMLButtonElement>) => {
-		console.log('username', username);
-		try {
-			const response = await axios.post(
-				'http://localhost:3333/friend/add/' + username,
-				{},
-				{ withCredentials: true }
-			);
-			fetchUsers();
-			fetchFriends();
-			console.log(response.data);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
 	return (
-		<button className="addUser" onClick={AddFriend}>
-			<img src={add_blue} alt="all user" />
-		</button>
+		<>
+			<div className="searchBarFilteredUsers">
+				<div className="searchBarImgInput">
+					<img src={search_white} alt="search img" />
+					<input
+						className="searchBar"
+						type="text"
+						placeholder="Search"
+						value={searchQuery}
+						onChange={handleInputChange}
+					/>
+				</div>
+				{searchQuery.length > 0 && (
+					<p className="nameSearched">You searched "{searchQuery}"</p>
+				)}
+				<FilteredUsers
+					AddFriendFunction={AddFriendFunction}
+					searchQuery={searchQuery}
+					users={users}
+					blocked={blocked}
+					friends={friends}
+					userInfo={userInfo}
+					pending={pending}
+					demands={demands}
+				/>
+			</div>
+			<button
+				className="buttonViewMyFriends"
+				onClick={() => setNavbarStatus('Myfriends')}>
+				View my friends
+			</button>
+		</>
 	);
 };

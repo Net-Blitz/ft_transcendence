@@ -53,6 +53,7 @@ const MainPage = () => {
 		map: 'all',
 		difficulty: 'all',
 	});
+
 	const data: DataTable[] = [
 		{
 			gameMode: '1v1',
