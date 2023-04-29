@@ -272,7 +272,7 @@ export const UpdateChannel = ({
 				setContent={setPassword}
 			/>
 			<div className="new-dm-buttons">
-				<button onClick={handleCreateChannel}>Create</button>
+				<button onClick={handleCreateChannel}>Update</button>
 				<button onClick={handleNewDmTrigger}>Cancel</button>
 			</div>
 		</div>
