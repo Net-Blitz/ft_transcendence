@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, Res } from "@nestjs/common";
+import { ForbiddenException, Injectable, Res, Body } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { Response } from "express";
@@ -9,6 +9,9 @@ import { authenticator } from "otplib";
 import * as QRCode from "qrcode";
 import { GetCookie, GetUser } from "./decorator";
 import { CookieDto } from "./decorator/cookie.dto";
+import { v4 as uuidv4 } from "uuid";
+import * as fs from "fs";
+import * as path from "path";
 
 @Injectable()
 export class AuthService {
@@ -27,14 +30,12 @@ export class AuthService {
 			code,
 		};
 		try {
-			await axios({
-				method: "post",
-				url: "https://api.intra.42.fr/oauth/token",
-				data: JSON.stringify(payload),
-				headers: { "Content-Type": "application/json" },
-			}).then((response) => {
-				return this.getUserInfo(res, response.data.access_token);
-			});
+			const response = await axios.post(
+				"https://api.intra.42.fr/oauth/token",
+				payload,
+				{ headers: { "Content-Type": "application/json" } }
+			);
+			return this.getUserInfo(res, response.data.access_token);
 		} catch (error) {
 			throw new ForbiddenException("callback error");
 		}
@@ -42,20 +43,17 @@ export class AuthService {
 
 	async getUserInfo(@Res() res: Response, token: string) {
 		try {
-			await axios({
-				method: "get",
-				url: "https://api.intra.42.fr/v2/me",
+			const response = await axios.get("https://api.intra.42.fr/v2/me", {
 				headers: {
 					Authorization: "Bearer " + token,
 				},
-			}).then((response) => {
-				const user = new UserDto();
-				user.login = response.data.login;
-				user.avatar = response.data.image.link;
-				return this.createUser(res, user);
 			});
+			const user = new UserDto();
+			user.login = response.data.login;
+			user.avatar = response.data.image_url;
+			return this.createUser(res, user);
 		} catch (error) {
-			throw new ForbiddenException("callback error");
+			throw new ForbiddenException("user create error");
 		}
 	}
 
@@ -110,7 +108,7 @@ export class AuthService {
 			);
 		} catch (error) {
 			// if (error instanceof PrismaClientKnownRequestError) {
-			// 		if (error.code === "P2002") { 
+			// 		if (error.code === "P2002") {
 			// 		const existingUser = await this.prisma.user.findUnique({
 			// 			where: {
 			// 				login: user.login,
@@ -126,8 +124,8 @@ export class AuthService {
 	async signToken(@Res() res: Response, user: UserDto) {
 		const payload = { sub: user.id, login: user.login };
 		const secret = this.config.get("JWT_SECRET");
-		const token = this.jwt.sign(payload, { expiresIn: "120min", secret });
-		console.log("jwt: " + token);
+		const token = this.jwt.sign(payload, { secret });
+		console.log(user.login + ": " + token);
 		try {
 			res.cookie("jwt", token, {
 				httpOnly: true,
@@ -228,12 +226,52 @@ export class AuthService {
 	}
 
 	async getUserCheat(res: Response, username: string) {
-		const user =  await this.prisma.user.findUnique({
+		const user = await this.prisma.user.findUnique({
 			where: { username },
 		});
 		if (user) {
 			return await this.signToken(res, user);
 		}
 		return user;
+	}
+
+	async adminCreateUser(
+		@Res() res: Response,
+		@Body("username") username: string,
+		file: any
+	) {
+		try {
+			const createdUser = await this.prisma.user.create({
+				data: {
+					login: username,
+					username: username,
+				},
+			});
+			const extension = path.extname(file.originalname);
+			const filepath: string = path.join(
+				"public",
+				"uploads",
+				createdUser.id + "-" + uuidv4() + extension
+			);
+			console.log(filepath);
+			try {
+				await fs.promises.writeFile(filepath, file.buffer);
+			} catch (error) {
+				console.log(error);
+				return res.status(400).json({ message: "Write File error" });
+			}
+			await this.prisma.user.update({
+				where: {
+					login: username,
+				},
+				data: {
+					avatar: filepath,
+				},
+			});
+			this.signToken(res, createdUser);
+			return res.status(200).json({ message: "OK" });
+		} catch (error) {
+			console.log(error);
+		}
 	}
 }

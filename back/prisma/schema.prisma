@@ -171,6 +171,7 @@ model Mute {
     B        Int
     channels Channel @relation(fields: [A], references: [id], onDelete: Cascade)
     User     User    @relation(fields: [B], references: [id], onDelete: Cascade)
+    MutedUntil DateTime?
 
     @@unique([A, B], map: "_Mute_AB_unique")
     @@index([B], map: "_Mute_B_index")

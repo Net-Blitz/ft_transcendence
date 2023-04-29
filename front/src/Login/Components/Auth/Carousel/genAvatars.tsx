@@ -2,7 +2,7 @@ import { createAvatar } from '@dicebear/core';
 import { adventurer } from '@dicebear/collection';
 import { v4 as uuidv4 } from 'uuid';
 
-interface AvatarProps {
+export interface AvatarProps {
 	file: any;
 	url: any;
 	source: string;
@@ -19,7 +19,7 @@ const generateAvatarFile = (avatar: any, seed: string): File => {
 	return file;
 };
 
-const createAvatarObject = (seed: string): AvatarProps => {
+export const createAvatarObject = (seed: string): AvatarProps => {
 	const avatar = createAvatar(adventurer, {
 		seed: seed,
 		size: 32,
@@ -35,7 +35,7 @@ const createAvatarObject = (seed: string): AvatarProps => {
 	};
 };
 
-export const generateAvatars = (number: number) => {
+export const generateAvatars = (number: number): AvatarProps[] => {
 	let AvatarData: AvatarProps[] = [];
 	for (let i = 0; i < number; i++) {
 		let seed = generateSeed();
