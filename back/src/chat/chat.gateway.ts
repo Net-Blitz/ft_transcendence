@@ -150,7 +150,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 			if (await mutedUser) {
 				if ((await mutedUser).MutedUntil < new Date()) {
-					console.log("User is unmuted after 5 minutes");
 					await this.prisma.mute.deleteMany({
 						where: {
 							A: channelExists.id,
@@ -158,7 +157,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 						},
 					});
 				} else {
-					console.log("User is muted");
 					return;
 				}
 			}

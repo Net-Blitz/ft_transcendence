@@ -442,6 +442,8 @@ const UserChannelList = ({
 }) => {
 	const [usersList, setUsersList] = useState<userInfoDto[]>([]);
 	const [isAdmin, setIsAdmin] = useState(false);
+	const [bansList, setBansList] = useState<userInfoDto[]>([]);
+	const [selectedUser, setSelectedUser] = useState<string>();
 	const userConnected = useSelector(selectUserData);
 
 	useEffect(() => {
@@ -459,10 +461,34 @@ const UserChannelList = ({
 				}
 			});
 		};
-		getUsers();
-		const interval = setInterval(getUsers, 2500);
+		const getBans = async () => {
+			const response = await axios.get(
+				'http://localhost:3333/chat/bans/' + channel.name,
+				{ withCredentials: true }
+			);
+			setBansList(response.data);
+			if (response.data.length > 0)
+				setSelectedUser(response.data[0].username);
+		};
+		const fetchAll = async () => {
+			await getUsers();
+			await getBans();
+		};
+
+		fetchAll();
+		const interval = setInterval(fetchAll, 2500);
 		return () => clearInterval(interval);
 	}, [channel, userConnected]);
+
+	const handleUnban = async () => {
+		if (!selectedUser) return;
+		socket?.emit('ToUnban', {
+			username: userConnected.username,
+			channel: channel.name,
+			login: selectedUser,
+		});
+		console.log(selectedUser + ' has been unbanned');
+	};
 
 	return (
 		<div className="user-channel-list">
@@ -477,20 +503,20 @@ const UserChannelList = ({
 					/>
 				))}
 			</BasicFrame>
-			{isAdmin && (
-				<div className="ban-list-dropdown-channel">
-					<select>
-						{usersList
-							.filter((user) => user.role === 'banned')
-							.map((bannedUser, index) => (
-								<option key={index}>
+			{isAdmin ||
+				(channel.ownerId === userConnected.id && (
+					<div className="ban-list-dropdown-channel">
+						<select
+							onChange={(e) => setSelectedUser(e.target.value)}>
+							{bansList.map((bannedUser, index) => (
+								<option value={bannedUser.username} key={index}>
 									{bannedUser.username}
 								</option>
 							))}
-					</select>
-					<button>Unban</button>
-				</div>
-			)}
+						</select>
+						<button onClick={handleUnban}>Unban</button>
+					</div>
+				))}
 		</div>
 	);
 };
