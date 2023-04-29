@@ -123,7 +123,8 @@ model Game {
     score2     Int       @default(0)
     score3     Int       @default(0)
     score4     Int       @default(0)
-    winner     Int       @default(0)     
+    winner     Int       @default(0)
+    date       DateTime  @default(now()) 
     user1Id Int
     user2Id Int
     user3Id Int

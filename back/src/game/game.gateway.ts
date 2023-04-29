@@ -110,13 +110,13 @@ export class GameGateway {
 	private movePlayer2V2(gameRoom: GameRoom2V2, room: number) {
 		let players = this.getPlayerSocket(room);
 
-		if (players.player1 && !(players.player1.surrender && players.player2.surrender))
+		if (players.player1 && players.player2 && !(players.player1.surrender && players.player2.surrender))
 			gameRoom.updatePlayerPosition(players.player1);
-		if (players.player2 && !(players.player1.surrender && players.player2.surrender))
+		if (players.player2 && players.player1 && !(players.player1.surrender && players.player2.surrender))
 			gameRoom.updatePlayerPosition(players.player2);
-		if (players.player3 && !(players.player3.surrender && players.player4.surrender))
+		if (players.player3 && players.player4 && !(players.player3.surrender && players.player4.surrender))
 			gameRoom.updatePlayerPosition(players.player3);
-		if (players.player4 && !(players.player3.surrender && players.player4.surrender))
+		if (players.player4 && players.player3 && !(players.player3.surrender && players.player4.surrender))
 			gameRoom.updatePlayerPosition(players.player4);
 	}
 
