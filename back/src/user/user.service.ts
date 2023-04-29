@@ -26,7 +26,7 @@ export class UserService {
 			},
 		});
 		if (!user) {
-			return res.status(404).json({ message: "User not found" });
+			return res.status(204).json({ message: "User not found" });
 		}
 		return res.status(200).json(user);
 	}
@@ -41,7 +41,7 @@ export class UserService {
 			},
 		});
 		if (!user) {
-			return res.status(404).json({ message: "User not found" });
+			return res.status(204).json({ message: "User not found" });
 		}
 		return res.status(200).json(user);
 	}
@@ -57,7 +57,7 @@ export class UserService {
 		@Body("updateUser") updateUserDto: UpdateUserDto
 	) {
 		if (!user) {
-			return res.status(404).json({ message: `User not found` });
+			return res.status(204).json({ message: `User not found` });
 		}
 
 		if (updateUserDto.username) user.username = updateUserDto.username;
@@ -108,7 +108,7 @@ export class UserService {
 			return res.status(400).json({ message: "Write File error" });
 		}
 		if (!user) {
-			return res.status(404).json({ message: `User not found` });
+			return res.status(204).json({ message: `User not found` });
 		}
 		if (text) user.username = text;
 		if (file) user.avatar = filepath;
@@ -147,7 +147,7 @@ export class UserService {
 			return res.status(400).json({ message: "Write File error" });
 		}
 		if (!user) {
-			return res.status(404).json({ message: `User not found` });
+			return res.status(204).json({ message: `User not found` });
 		}
 		if (text) user.username = text;
 		if (file) user.avatar = filepath;

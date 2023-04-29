@@ -86,7 +86,7 @@ export class ChatService {
 			},
 		});
 		if (!channelExists) {
-			return res.status(404).json({ message: "Channel not found" });
+			return res.status(204).json({ message: "Channel not found" });
 		}
 		if (channelExists.ownerId !== user.id) {
 			return res.status(400).json({ message: "You are not the owner" });
@@ -124,7 +124,7 @@ export class ChatService {
 			},
 		});
 		if (!channelExists) {
-			return res.status(404).json({ message: "Channel not found" });
+			return res.status(204).json({ message: "Channel not found" });
 		}
 		if (channelExists.ownerId !== user.id) {
 			return res.status(400).json({ message: "You are not the owner" });
@@ -169,7 +169,7 @@ export class ChatService {
 			},
 		});
 		if (!channelExists) {
-			return res.status(404).json({ message: "Channel not found" });
+			return res.status(204).json({ message: "Channel not found" });
 		}
 		if (channelExists.state !== "PUBLIC")
 			return res.status(400).json({ message: "Invalid state" });
@@ -207,7 +207,7 @@ export class ChatService {
 			},
 		});
 		if (!channelExists) {
-			return res.status(404).json({ message: "Channel not found" });
+			return res.status(204).json({ message: "Channel not found" });
 		}
 		if (channelExists.state !== "PROTECTED")
 			return res.status(400).json({ message: "Invalid state" });
@@ -248,13 +248,13 @@ export class ChatService {
 			},
 		});
 		if (!channelExists) {
-			return res.status(404).json({ message: "Channel not found" });
+			return res.status(204).json({ message: "Channel not found" });
 		}
 		if (channelExists.state !== "PRIVATE") {
 			return res.status(400).json({ message: "Invalid state" });
 		}
 		if (!user) {
-			return res.status(404).json({ message: "User not found" });
+			return res.status(204).json({ message: "User not found" });
 		}
 		const bans = await this.prisma.ban.findMany({
 			where: {
@@ -292,7 +292,7 @@ export class ChatService {
 				},
 			});
 			if (!invite) {
-				return res.status(404).json({ message: "Invite not found" });
+				return res.status(204).json({ message: "Invite not found" });
 			}
 			await this.prisma.chatUsers.create({
 				data: {
@@ -327,7 +327,7 @@ export class ChatService {
 			},
 		});
 		if (!channelExists) {
-			return res.status(404).json({ message: "Channel not found" });
+			return res.status(204).json({ message: "Channel not found" });
 		}
 		if (channelExists.state !== "PRIVATE")
 			return res.status(400).json({ message: "Channel is not private" });
@@ -340,7 +340,7 @@ export class ChatService {
 			},
 		});
 		if (!InvitedUser) {
-			return res.status(404).json({ message: "User not found" });
+			return res.status(204).json({ message: "User not found" });
 		}
 		if (InvitedUser.id === user.id) {
 			return res
@@ -374,10 +374,10 @@ export class ChatService {
 			},
 		});
 		if (!channelExists) {
-			return res.status(404).json({ message: "Channel not found" });
+			return res.status(204).json({ message: "Channel not found" });
 		}
 		if (!user) {
-			return res.status(404).json({ message: "User not found" });
+			return res.status(204).json({ message: "User not found" });
 		}
 
 		try {
@@ -390,14 +390,14 @@ export class ChatService {
 				},
 			});
 		} catch (e) {
-			return res.status(404).json({ message: "Invite not found" });
+			return res.status(204).json({ message: "Invite not found" });
 		}
 		return res.status(200).json({ message: "Invite declined" });
 	}
 
 	async GetInvites(@Res() res: Response, @GetUser() user: any) {
 		if (!user) {
-			return res.status(404).json({ message: "User not found" });
+			return res.status(204).json({ message: "User not found" });
 		}
 		const invites = await this.prisma.inviteChannel.findMany({
 			where: {
@@ -408,7 +408,7 @@ export class ChatService {
 			},
 		});
 		if (!invites) {
-			return res.status(404).json({ message: "Invites not found" });
+			return res.status(204).json({ message: "Invites not found" });
 		}
 		return res.status(200).json(invites);
 	}
@@ -425,7 +425,7 @@ export class ChatService {
 			},
 		});
 		if (!channelExists) {
-			return res.status(404).json({ message: "Channel not found" });
+			return res.status(204).json({ message: "Channel not found" });
 		}
 		if (!username)
 			return res.status(400).json({ message: "username is required" });
@@ -436,7 +436,7 @@ export class ChatService {
 			},
 		});
 		if (!PromotedUser) {
-			return res.status(404).json({ message: "User not found" });
+			return res.status(204).json({ message: "User not found" });
 		}
 		if (user.id !== channelExists.ownerId) {
 			return res.status(400).json({ message: "You are not owner" });
@@ -468,7 +468,7 @@ export class ChatService {
 			},
 		});
 		if (!channelExists) {
-			return res.status(404).json({ message: "Channel not found" });
+			return res.status(204).json({ message: "Channel not found" });
 		}
 		if (!username)
 			return res.status(400).json({ message: "username is required" });
@@ -479,7 +479,7 @@ export class ChatService {
 			},
 		});
 		if (!DemotedUser) {
-			return res.status(404).json({ message: "User not found" });
+			return res.status(204).json({ message: "User not found" });
 		}
 		if (user.id !== channelExists.ownerId) {
 			return res.status(400).json({ message: "You are not owner" });
@@ -508,7 +508,7 @@ export class ChatService {
 			},
 		});
 		if (!channelExists) {
-			return res.status(404).json({ message: "Channel not found" });
+			return res.status(204).json({ message: "Channel not found" });
 		}
 		const admins = await this.prisma.admin.findMany({
 			where: {
@@ -519,7 +519,7 @@ export class ChatService {
 			},
 		});
 		if (!admins) {
-			return res.status(404).json({ message: "Admins not found" });
+			return res.status(204).json({ message: "Admins not found" });
 		}
 		return res.status(200).json(admins);
 	}
@@ -535,7 +535,7 @@ export class ChatService {
 			},
 		});
 		if (!channelExists) {
-			return res.status(404).json({ message: "Channel not found" });
+			return res.status(204).json({ message: "Channel not found" });
 		}
 		try {
 			await this.prisma.chatUsers.deleteMany({
@@ -562,7 +562,7 @@ export class ChatService {
 			},
 		});
 		if (!channelExists) {
-			return res.status(404).json({ message: "Channel not found" });
+			return res.status(204).json({ message: "Channel not found" });
 		}
 		const users = await this.prisma.chatUsers.findMany({
 			where: {
@@ -610,7 +610,7 @@ export class ChatService {
 			},
 		});
 		if (!userExists) {
-			return res.status(404).json({ message: "User not found" });
+			return res.status(204).json({ message: "User not found" });
 		}
 		const ban = await this.prisma.ban.findMany({
 			where: {
@@ -618,7 +618,7 @@ export class ChatService {
 			},
 		});
 		if (!ban) {
-			return res.status(404).json({ message: "Ban not found" });
+			return res.status(204).json({ message: "Ban not found" });
 		}
 		const channels = await this.prisma.channel.findMany({
 			where: {
@@ -639,7 +639,7 @@ export class ChatService {
 			},
 		});
 		if (!userExists) {
-			return res.status(404).json({ message: "User not found" });
+			return res.status(204).json({ message: "User not found" });
 		}
 		const mute = await this.prisma.mute.findMany({
 			where: {
@@ -647,7 +647,7 @@ export class ChatService {
 			},
 		});
 		if (!mute) {
-			return res.status(404).json({ message: "Mute not found" });
+			return res.status(204).json({ message: "Mute not found" });
 		}
 		const channels = await this.prisma.channel.findMany({
 			where: {
@@ -668,7 +668,7 @@ export class ChatService {
 			},
 		});
 		if (!channelExists) {
-			return res.status(404).json({ message: "Channel not found" });
+			return res.status(204).json({ message: "Channel not found" });
 		}
 		const ban = await this.prisma.ban.findMany({
 			where: {
@@ -676,7 +676,7 @@ export class ChatService {
 			},
 		});
 		if (!ban) {
-			return res.status(404).json({ message: "Ban not found" });
+			return res.status(204).json({ message: "Ban not found" });
 		}
 		const users = await this.prisma.user.findMany({
 			where: {
@@ -694,7 +694,7 @@ export class ChatService {
 			},
 		});
 		if (!channelExists) {
-			return res.status(404).json({ message: "Channel not found" });
+			return res.status(204).json({ message: "Channel not found" });
 		}
 		const mute = await this.prisma.mute.findMany({
 			where: {
@@ -702,7 +702,7 @@ export class ChatService {
 			},
 		});
 		if (!mute) {
-			return res.status(404).json({ message: "Mute not found" });
+			return res.status(204).json({ message: "Mute not found" });
 		}
 		const users = await this.prisma.user.findMany({
 			where: {
@@ -729,7 +729,7 @@ export class ChatService {
 				},
 			});
 			if (!DMs) {
-				return res.status(404).json({ message: "DMs not found" });
+				return res.status(204).json({ message: "DMs not found" });
 			}
 
 			const sender = await this.prisma.user.findMany({
@@ -774,7 +774,7 @@ export class ChatService {
 			);
 			return res.status(200).json(DMStmp);
 		} catch (e) {
-			return res.status(404).json({ message: "DMs not found" });
+			return res.status(204).json({ message: "DMs not found" });
 		}
 	}
 
@@ -790,7 +790,7 @@ export class ChatService {
 				},
 			});
 			if (!userExists) {
-				return res.status(404).json({ message: "User not found" });
+				return res.status(204).json({ message: "User not found" });
 			}
 
 			const dm = await this.prisma.directMessage.findFirst({
@@ -820,7 +820,7 @@ export class ChatService {
 				},
 			});
 			if (dm) {
-				return res.status(404).json({ message: "DM already exist" });
+				return res.status(204).json({ message: "DM already exist" });
 			}
 
 			const DM = await this.prisma.directMessage.create({
@@ -831,7 +831,7 @@ export class ChatService {
 			});
 			return res.status(200).json(DM);
 		} catch (e) {
-			return res.status(404).json({ message: "DM already exist" });
+			return res.status(204).json({ message: "DM already exist" });
 		}
 	}
 
@@ -847,7 +847,7 @@ export class ChatService {
 				},
 			});
 			if (!DM) {
-				return res.status(404).json({ message: "DM not found" });
+				return res.status(204).json({ message: "DM not found" });
 			}
 			if (DM.senderId !== user.id && DM.receiverId !== user.id) {
 				return res.status(403).json({ message: "Forbidden" });
@@ -860,7 +860,7 @@ export class ChatService {
 			});
 
 			if (!messages) {
-				return res.status(404).json({ message: "Messages not found" });
+				return res.status(204).json({ message: "Messages not found" });
 			}
 
 			const messagesAvatar = await Promise.all(
@@ -881,7 +881,7 @@ export class ChatService {
 			);
 			return res.status(200).json(messagesAvatar);
 		} catch (e) {
-			return res.status(404).json({ message: "Messages not found" });
+			return res.status(204).json({ message: "Messages not found" });
 		}
 	}
 
@@ -897,7 +897,7 @@ export class ChatService {
 				},
 			});
 			if (!channel) {
-				return res.status(404).json({ message: "Channel not found" });
+				return res.status(204).json({ message: "Channel not found" });
 			}
 			//const users = await this.prisma.chatUsers.findMany({
 			//	where: {
@@ -919,7 +919,7 @@ export class ChatService {
 			});
 
 			if (!messages) {
-				return res.status(404).json({ message: "Messages not found" });
+				return res.status(204).json({ message: "Messages not found" });
 			}
 
 			const messagesAvatar = await Promise.all(
@@ -940,7 +940,7 @@ export class ChatService {
 			);
 			return res.status(200).json(messagesAvatar);
 		} catch (e) {
-			return res.status(404).json({ message: "Messages not found" });
+			return res.status(204).json({ message: "Messages not found" });
 		}
 	}
 }
