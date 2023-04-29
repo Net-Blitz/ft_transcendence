@@ -612,7 +612,6 @@ export class QueueGateway {
 				continue ;
 			if (update)
 			{
-				
 				this.updateGroup(group); 
 			}
 			return me;
@@ -858,7 +857,7 @@ export class QueueGateway {
 			return ;
 		if (groupLeader.state !== "ONLINE")
 			return ;
-		const me: QueueObject = this.leaveGroup(client, undefined, false);
+		const me: QueueObject = this.leaveGroup(client, undefined, true);
 		if (me.login === groupParam.groupLogin)
 			this.recreateGroup(me);
 		else

@@ -1,19 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import eyePNG from './assets/eye.png';
-import crown from './assets/crown.png';
+import crownImg from './assets/crown.png';
 import beach from './assets/beachImage.jpg';
 import space from './assets/spaceImage.jpg';
 import jungle from './assets/jungleImage.jpg';
 import './Game.css';
 
-function Podium({ color, height, point, avatar, avatar2 = null, env }: any) {
+function Podium({ color, height, point, avatar, avatar2 = null, env, crown = null }: any) {
 	return (
 		<div className="game-end-podium-div">
 			{avatar ? (
 				<div>
 					{height === '60%' ? (
-						<img src={crown} className="game-end-crown" />
+						<img src={crownImg} className="game-end-crown" id={crown ? "crown-2" : "crown-1"}/>
 					) : null}
 					<img
 						src={
@@ -465,6 +465,7 @@ function Game({ socketGame, room, login, env }: any) {
 								point={gameEnd.score1}
 								avatar={gameEnd.avatar1}
 								avatar2={gameEnd.avatar2}
+								crown={true}
 								env={env}
 							/>
 							<Podium
