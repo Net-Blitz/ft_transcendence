@@ -102,15 +102,6 @@ function App(this: any) {
 						}
 					/>
 					<Route
-						path="/chat_test"
-						element={
-							<AppLayout>
-								{' '}
-								<Chat />
-							</AppLayout>
-						}
-					/>
-					<Route
 						path="/game"
 						element={<GameRoute socketQueue={socketQueue} socketGame={socketGame} reload={reload} setReload={setReload} env={env}/>}
 					/>

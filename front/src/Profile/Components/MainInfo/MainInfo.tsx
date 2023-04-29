@@ -4,10 +4,8 @@ import './MainInfo.css';
 /*	Components	*/
 import { ProfileConfig } from './ProfileConfig';
 import { ProfileQR } from './ProfileQR';
-/* Functions */
-import { fetchOrUpdateUser } from '../../../utils/redux/user';
 /*	Redux	*/
-import { useSelector, useStore } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { selectUserData } from '../../../utils/redux/selectors';
 import { SimpleToggle } from '../../SimpleToggle/SimpleToggle';
 /*	Ressources	*/
@@ -76,7 +74,6 @@ export const MainInfo = () => {
 	const [trigger, setTrigger] = useState(false);
 	const [triggerQR, setTriggerQR] = useState(false);
 	const [defaultToggle, setDefaultToggle] = useState(userData.twoFactor);
-	const store = useStore();
 
 	const handleTrigger = useCallback(() => {
 		setTrigger(!trigger);

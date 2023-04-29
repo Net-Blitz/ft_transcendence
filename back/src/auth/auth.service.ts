@@ -30,14 +30,12 @@ export class AuthService {
 			code,
 		};
 		try {
-			await axios({
-				method: "post",
-				url: "https://api.intra.42.fr/oauth/token",
-				data: JSON.stringify(payload),
-				headers: { "Content-Type": "application/json" },
-			}).then((response) => {
-				return this.getUserInfo(res, response.data.access_token);
-			});
+			const response = await axios.post(
+				"https://api.intra.42.fr/oauth/token",
+				payload,
+				{ headers: { "Content-Type": "application/json" } }
+			);
+			return this.getUserInfo(res, response.data.access_token);
 		} catch (error) {
 			throw new ForbiddenException("callback error");
 		}
@@ -45,21 +43,17 @@ export class AuthService {
 
 	async getUserInfo(@Res() res: Response, token: string) {
 		try {
-			await axios({
-				method: "get",
-				url: "https://api.intra.42.fr/v2/me",
+			const response = await axios.get("https://api.intra.42.fr/v2/me", {
 				headers: {
 					Authorization: "Bearer " + token,
 				},
-			}).then((response) => {
-				const user = new UserDto();
-				user.login = response.data.login;
-				user.avatar = response.data.image.link;
-				return this.createUser(res, user);
 			});
+			const user = new UserDto();
+			user.login = response.data.login;
+			user.avatar = response.data.image_url;
+			return this.createUser(res, user);
 		} catch (error) {
-			console.log(error)
-			throw new ForbiddenException("getUserInfo error");
+			throw new ForbiddenException("user create error");
 		}
 	}
 
