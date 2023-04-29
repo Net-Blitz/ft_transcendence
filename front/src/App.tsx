@@ -6,7 +6,6 @@ import './App.css';
 import MainPage from './MainPage/MainPage';
 import Contact from './Contact/Contact';
 import { Login, Login2fa, Config, Config2fa } from './Login/Login';
-import Chat from './Chat/Chat';
 import { Messagerie } from './Messagerie/Messagerie';
 import AppLayout from './AppLayout';
 import GameRoute from './Game/GameRoute';
@@ -16,6 +15,7 @@ import { AuthRoutes } from './utils/PrivateRoutes';
 import { useSelector } from 'react-redux';
 import GamePopUp from './Game/GamePopUp';
 import Admin from './Admin';
+import { UserProfile } from './Profile/UserProfile';
 /*	HOOKS	*/
 import { useGetUser } from './utils/hooks';
 /*	SELECTORS	*/
@@ -34,7 +34,6 @@ const NotFound = () => {
 function App(this: any) {
 	useGetUser();
 	const status = useSelector(selectUser).status;
-	const currentPath = window.location.pathname;
 	const [reload, setReload] = useState(false);
 	const [socketQueue, setSocketQueue] = useState<Socket>({} as Socket);
 	const [socketGame, setSocketGame] = useState<Socket>({} as Socket);
@@ -119,6 +118,15 @@ function App(this: any) {
 							<AppLayout>
 								{' '}
 								<Profile />
+							</AppLayout>
+						}
+					/>
+					<Route
+						path="/profile/:username"
+						element={
+							<AppLayout>
+								{' '}
+								<UserProfile />
 							</AppLayout>
 						}
 					/>

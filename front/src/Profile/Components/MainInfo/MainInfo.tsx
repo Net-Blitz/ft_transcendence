@@ -4,9 +4,6 @@ import './MainInfo.css';
 /*	Components	*/
 import { ProfileConfig } from './ProfileConfig';
 import { ProfileQR } from './ProfileQR';
-/*	Redux	*/
-import { useSelector } from 'react-redux';
-import { selectUserData } from '../../../utils/redux/selectors';
 import { SimpleToggle } from '../../SimpleToggle/SimpleToggle';
 /*	Ressources	*/
 import paint_brush from './Ressources/paint-brush.svg';
@@ -15,6 +12,7 @@ interface MainInfoProps {
 	avatar: string;
 	username: string;
 	handleTrigger: () => void;
+	userProfile: boolean;
 }
 
 interface InfoElementProps {
@@ -35,11 +33,19 @@ export const PopUp = ({ trigger, children }: PopUpProps) => {
 	return trigger ? <div className="popup">{children}</div> : <div></div>;
 };
 
-const MainElement = ({ avatar, username, handleTrigger }: MainInfoProps) => {
+const MainElement = ({
+	avatar,
+	username,
+	handleTrigger,
+	userProfile,
+}: MainInfoProps) => {
 	return (
 		<div className="main-element">
 			<div className="banner">
-				<div className="edit" onClick={handleTrigger}>
+				<div
+					className="edit"
+					onClick={handleTrigger}
+					style={{ display: userProfile ? 'none' : 'flex' }}>
 					<img src={paint_brush} alt="button-edit" />
 				</div>
 				<img src={avatar} alt="avatar" />
@@ -69,11 +75,18 @@ const InfoElement = ({
 	);
 };
 
-export const MainInfo = () => {
-	const userData = useSelector(selectUserData);
+export const MainInfo = ({
+	userProfile,
+	userData,
+}: {
+	userProfile: boolean;
+	userData: any;
+}) => {
 	const [trigger, setTrigger] = useState(false);
 	const [triggerQR, setTriggerQR] = useState(false);
 	const [defaultToggle, setDefaultToggle] = useState(userData.twoFactor);
+	const totalGames: number = userData.wins + userData.losses;
+	const winRate: number = (userData.wins / totalGames) * 100;
 
 	const handleTrigger = useCallback(() => {
 		setTrigger(!trigger);
@@ -101,14 +114,26 @@ export const MainInfo = () => {
 	return (
 		<div className="maininfo-wrapper">
 			<div className="infoMainLeft">
-				<InfoElement title="Status" content="Online" border={true} />
-				<InfoElement title="Total game" content="1976" border={true} />
-				<InfoElement title="Win" content="68%" />
+				<InfoElement
+					title="Status"
+					content={userData.state}
+					border={true}
+				/>
+				<InfoElement
+					title="Total game"
+					content={totalGames.toString()}
+					border={true}
+				/>
+				<InfoElement
+					title="WinRate"
+					content={Number.isNaN(winRate) ? '0%' : winRate.toString()}
+				/>
 			</div>
 			<MainElement
 				avatar={userData.avatar}
 				username={userData.username}
 				handleTrigger={handleTrigger}
+				userProfile={userProfile}
 			/>
 			<PopUp trigger={trigger}>
 				<ProfileConfig handleTrigger={handleTrigger} />
@@ -122,15 +147,17 @@ export const MainInfo = () => {
 				<InfoElement
 					title="Registration date"
 					content="22/02"
-					border={true}
+					border={userProfile ? false : true}
 				/>
-				<InfoElement
-					title="2FA Status"
-					content="22/02"
-					isToggle={true}
-					toggle={defaultToggle}
-					handleToggle={handleToggle}
-				/>
+				{!userProfile && (
+					<InfoElement
+						title="2FA Status"
+						content=""
+						isToggle={true}
+						toggle={defaultToggle}
+						handleToggle={handleToggle}
+					/>
+				)}
 			</div>
 			<PopUp trigger={triggerQR}>
 				<ProfileQR handleTrigger={handleTriggerQR} />
