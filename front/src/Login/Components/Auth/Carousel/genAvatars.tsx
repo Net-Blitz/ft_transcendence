@@ -35,7 +35,7 @@ export const createAvatarObject = (seed: string): AvatarProps => {
 	};
 };
 
-export const generateAvatars = (number: number) => {
+export const generateAvatars = (number: number): AvatarProps[] => {
 	let AvatarData: AvatarProps[] = [];
 	for (let i = 0; i < number; i++) {
 		let seed = generateSeed();

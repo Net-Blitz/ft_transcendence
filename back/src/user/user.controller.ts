@@ -78,8 +78,9 @@ export class UserController {
 		@GetUser() user: any,
 		@Res() res: Response,
 		@UploadedFile() file,
-		@Body("username") text: string
+		@Body("username") text: string,
+		@Body("source") source: string
 	) {
-		this.userService.UpdateUserConfig(user, res, file, text);
+		this.userService.UpdateUserConfig(user, res, file, text, source);
 	}
 }
