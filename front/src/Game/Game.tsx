@@ -56,7 +56,7 @@ function Game({ socketGame, room, login, env }: any) {
 
 	useEffect(() => {
 		socketGame.emit('gameConnection', { room: room });
-		console.log('gameConection', room);
+		// console.log('gameConection', room);
 		localStorage.removeItem('lobby-chat-storage');
 
 		const chatUl = document.querySelector('#game-playing-chat');
@@ -319,12 +319,12 @@ function Game({ socketGame, room, login, env }: any) {
 		};
 
 		const updateSpectatorFonc = (data: any) => {
-			console.log('spectatorJoin', data.spectator);
+			// console.log('spectatorJoin', data.spectator);
 			updateSpectator(data.spectator);
 		};
 
 		const getEndStatus = (data: any) => {
-			console.log('getEndStatus', data);
+			// console.log('getEndStatus', data);
 			updateGameEnd(data);
 			socketGame.off('getEndStatus');
 		};
@@ -357,7 +357,6 @@ function Game({ socketGame, room, login, env }: any) {
 	useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
 			if (event.key === 'ArrowUp') {
-				console.log('up');
 				event.preventDefault();
 				socketGame.emit('keyPress', 'UP');
 			} else if (event.key === 'ArrowDown') {
@@ -370,7 +369,6 @@ function Game({ socketGame, room, login, env }: any) {
 				event.preventDefault();
 				socketGame.emit('keyPress', 'RIGHT');
 			} else if (event.key >= '0' && event.key <= '9') {
-				console.log('quickChatMessage', event.key);
 				socketGame.emit('quickChatMessage', {
 					key: event.key,
 					room: room,

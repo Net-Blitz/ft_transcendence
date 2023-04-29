@@ -668,7 +668,7 @@ export class QueueGateway {
 	}
 
 	async handleConnection(client: Socket) { 
-		console.log("Queue Server Connection", client.id);
+		// console.log("Queue Server Connection", client.id);
 		const cookie = client.handshake.headers.cookie;
 		if (!cookie)
 			return ;
@@ -878,7 +878,7 @@ export class QueueGateway {
 		if (!invited)
 		return ;
 		const me = this.findMe(client.id);
-		console.log(me)
+		// console.log(me)
 		if (!me)
 			return ;
 		if (me.login === invitedPlayer.login)
