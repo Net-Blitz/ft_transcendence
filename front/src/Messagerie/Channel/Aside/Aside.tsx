@@ -166,7 +166,7 @@ const ChannelListElement = ({
 				onClick={() => handleSelectChannel(Channel)}>
 				<h4>{Channel.name}</h4>
 				{Channel.id === selectedChannel?.id && (
-					<button>Disconnect</button>
+					<button className="button-disconnect-channel">Leave</button>
 				)}
 				{connectedUser.id === Channel.ownerId && (
 					<ChannelButton
@@ -478,7 +478,11 @@ const UserChannelList = ({
 		fetchAll();
 		const interval = setInterval(fetchAll, 2500);
 		return () => clearInterval(interval);
-	}, [channel, userConnected]);
+	}, [channel, userConnected, setIsAdmin, setUsersList]);
+
+	useEffect(() => {
+		console.log(isAdmin);
+	}, [isAdmin]);
 
 	const handleUnban = async () => {
 		if (!selectedUser) return;
@@ -492,7 +496,7 @@ const UserChannelList = ({
 
 	return (
 		<div className="user-channel-list">
-			<BasicFrame title="In this channel" height="90%">
+			<BasicFrame title="In this channel" height="94%">
 				{usersList.map((user, index) => (
 					<UserChannelElement
 						socket={socket}
