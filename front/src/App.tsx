@@ -7,7 +7,6 @@ import MainPage from './MainPage/MainPage';
 import { Social } from './Social/Social';
 import { AddFriends } from './Social/AddFriends';
 import { Login, Login2fa, Config, Config2fa } from './Login/Login';
-import Chat from './Chat/Chat';
 import { Messagerie } from './Messagerie/Messagerie';
 import AppLayout from './AppLayout';
 import GameRoute from './Game/GameRoute';
