@@ -104,7 +104,7 @@ export class UserService {
 		try {
 			await fs.promises.writeFile(filepath, file.buffer);
 		} catch (error) {
-			console.log(error);
+			// console.log(error);
 			return res.status(400).json({ message: "Write File error" });
 		}
 		if (!user) {

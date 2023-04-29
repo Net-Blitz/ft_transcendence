@@ -44,7 +44,8 @@ const GamePopUp = ({socketQueue, setReload, reload}:any) => {
 			hidePopUp();
 			update_accept(0);
 			socketQueue.off("GamePopUpResponse");
-			setReload(!reload);
+			socketQueue.off("DeclineGameResponse");
+			setReload(9874697);
 			if (data.message === "OK")
 				navigate("/game", {state: true});
 		};
@@ -54,11 +55,13 @@ const GamePopUp = ({socketQueue, setReload, reload}:any) => {
 			{
 				showPopUp();
 				socketQueue.on("GamePopUpResponse", handleGameState);
+				socketQueue.on("DeclineGameResponse", () => {setReload(2); hidePopUp();})
 			}
 			else
 			{
 				hidePopUp();
 				socketQueue.off("GamePopUpResponse");
+				socketQueue.off("DeclineGameResponse");
 			}
 		}
 	
@@ -95,8 +98,8 @@ const GamePopUp = ({socketQueue, setReload, reload}:any) => {
 		{
 			update_accept(2);
 			socketQueue.emit("DeclineGame");
-			hidePopUp();
-			setReload(!reload);
+			
+			setReload(6965);
 		}
 	}
 

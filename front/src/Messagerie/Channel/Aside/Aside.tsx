@@ -532,10 +532,6 @@ const UserChannelList = ({
 		return () => clearInterval(interval);
 	}, [channel, userConnected]);
 
-	useEffect(() => {
-		console.log(isAdmin);
-	}, [isAdmin]);
-
 	const handleUnban = async () => {
 		if (!selectedUser) return;
 		socket?.emit('ToUnban', {
@@ -549,15 +545,19 @@ const UserChannelList = ({
 	return (
 		<div className="user-channel-list">
 			<BasicFrame title="In this channel" height="94%">
-				{usersList.map((user, index) => (
-					<UserChannelElement
-						socket={socket}
-						user={user}
-						key={index}
-						channel={channel}
-						isAdmin={isAdmin}
-					/>
-				))}
+				{usersList ? (
+					usersList.map((user, index) => (
+						<UserChannelElement
+							socket={socket}
+							user={user}
+							key={index}
+							channel={channel}
+							isAdmin={isAdmin}
+						/>
+					))
+				) : (
+					<></>
+				)}
 			</BasicFrame>
 			{(isAdmin || channel.ownerId === userConnected.id) &&
 				bansList.length > 0 && (

@@ -1,4 +1,5 @@
 import { IsString, IsNotEmpty, IsIn, IsOptional } from "class-validator";
+import { GameMode } from "src/game/dto";
 
 export class QueueDto {
 
@@ -32,17 +33,24 @@ export class QueueObject {
 	id: number;
 	login: string;
 	socketId: string;
-	mode: string;
-	avatar: string;
-	bonus1: boolean;
-	bonus2: boolean;
-	elo: number;
-	timeData: number;
 	state: QueueState;
 }
 
-export class GameMatched {
+export class QueueGroup {
 	player1: QueueObject;
-	player2: QueueObject;
+	player2: QueueObject | null;
+	player3: QueueObject | null;
+	player4: QueueObject | null;
+	mode: GameMode;
+	map: string | null;
+	timeData: number;
+}
+
+export class GameMatched {
+	group1: QueueGroup;
+	group2: QueueGroup;
+	group3: QueueGroup;
+	group4: QueueGroup;
 	time: number;
+	mode: GameMode;
 }
