@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import "./GameInvitation.css";
 
 const InvitationCard = ({login, avatar, gameInvitation, updateGameInvitation, socketQueue}:any) => {
 
@@ -18,7 +19,7 @@ const InvitationCard = ({login, avatar, gameInvitation, updateGameInvitation, so
 				<img className="game-invitation-card-avatar" src={avatar ? "http://localhost:3333/" + avatar : ""} alt="Avatar" />
 			</div>
 			<div className="game-player-card-title"><b>{login}</b> invite you !</div>
-			<button className="game-player-card-info" onClick={joinGroup}>Join</button>
+			<button className="game-invitation-button-join" onClick={joinGroup}>Join</button>
 		</div>
 		)
 	}
@@ -48,7 +49,7 @@ const GameInvitation = ({socketQueue}:any) => {
 	}, [socketQueue, updateGameInvitation, gameInvitation]);
 
 	return (
-		<div className="game-invitation-main-div">{gameInvitation.length === 0 ? "No invitation" : gameInvitation.length + " invitation"}
+		<div className="game-invitation-main-div">
 			{
 				gameInvitation.map((invitation:any, index:number) => {
 					return (
