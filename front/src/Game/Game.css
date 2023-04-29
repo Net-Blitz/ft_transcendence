@@ -328,9 +328,10 @@
 .game-end-crown {
 	all: unset;
 	position: absolute;
-	transform: rotate(33.86deg);
+	/* transform: rotate(33.86deg); */
+	/* justify-content: center; */
 	left: 50%;
-	transform: translate(-50%, -70%);
+	transform: translate(-50, -90%);
 	width: 8vw;
 	height: 5vw;
 	max-width: 100px;
