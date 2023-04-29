@@ -48,12 +48,12 @@ const FilterButton: React.FC<FilterButtonProps> = ({
 			{/* add filterButtonSelected as a classname if it is selected */}
 			<button onClick={toggleDropdown}>
 				{selectedFilter}
-				<button onClick={handleButtonClose}>
-					<img
-						src={isFilterSelected ? close : arrowDown}
-						alt={selectedFilter}
-					/>
-				</button>
+			</button>
+			<button onClick={handleButtonClose}>
+				<img
+					src={isFilterSelected ? close : arrowDown}
+					alt={selectedFilter}
+				/>
 			</button>
 			{/* if it is open : */}
 			{isOpen && (

@@ -10,6 +10,8 @@ import avatar4 from '../Ressources/avatar4.svg';
 
 //Interface
 import { DataTable, MatchesInProgressProps, Filters } from '../../types';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 //Not working
 const useWindowWidth = () => {
@@ -31,6 +33,7 @@ const useWindowWidth = () => {
 const MatchesInProgress: React.FC<MatchesInProgressProps> = ({
 	filters,
 	viewMoreButton,
+	resetFilter,
 }) => {
 	//This specifies that the MatchesInProgress variable is a React component and it expects props of the type
 	const header = [
@@ -39,61 +42,24 @@ const MatchesInProgress: React.FC<MatchesInProgressProps> = ({
 		'Date',
 		'Hour',
 		'Score',
-		'Difficulty',
 		'Map',
+		'State',
 		'Watch',
 	];
 	const headerMobile = ['Game mode', 'Team', 'Score', 'Watch'];
 	const headerMobilePart1 = ['Game mode', 'Team', 'Score', 'Map'];
-	const headerMobilePart2 = ['Date', 'Hour', 'Difficulty', 'Watch'];
+	const headerMobilePart2 = ['Date', 'Hour', 'State', 'Watch'];
 	const isMobileView = useWindowWidth() < 767;
-	const data: DataTable[] = [
-		{
-			gameMode: '1v1',
-			team: [
-				{ img: avatar1, level: 1 },
-				{ img: avatar2, level: 2 },
-				{ img: avatar3, level: 10 },
-				{ img: avatar4, level: 9 },
-			],
-			date: '20/06/2023',
-			hour: '3h38',
-			score: [3, 10],
-			difficulty: 'Hard',
-			map: 'Classic',
-			watch: 'http://localhost:8080/game',
-		},
-		{
-			gameMode: '2v2',
-			team: [
-				{ img: avatar1, level: 1 },
-				{ img: avatar2, level: 2 },
-				{ img: avatar3, level: 10 },
-				{ img: avatar4, level: 9 },
-			],
-			date: '08/06/2023',
-			hour: '3h38',
-			score: [3, 10],
-			difficulty: 'Easy',
-			map: 'Beach',
-			watch: 'http://localhost:8080/game',
-		},
-		{
-			gameMode: '1v1',
-			team: [
-				{ img: avatar1, level: 1 },
-				{ img: avatar2, level: 2 },
-				{ img: avatar3, level: 10 },
-				{ img: avatar4, level: 9 },
-			],
-			date: '01/06/2023',
-			hour: '3h38',
-			score: [3, 10],
-			difficulty: 'Easy',
-			map: 'Beach',
-			watch: 'http://localhost:8080/game',
-		},
-	];
+	const [data, updateData] = useState<DataTable[]>([]);
+	const navigate = useNavigate();
+
+	useEffect(() => {
+		axios.get('http://localhost:3333/games/all/playing')
+			.then((res) => {
+				updateData(res.data);
+				console.log("data", res.data)
+			});
+		}, [resetFilter]);
 	const parseDate = (dataString: string): Date => {
 		const [month, day, year] = dataString.split('/').map(Number);
 		return new Date(year, month - 1, day); //date is waiting for January to be 0
@@ -111,15 +77,6 @@ const MatchesInProgress: React.FC<MatchesInProgressProps> = ({
 			const mapB = b.map.toLowerCase();
 			if (mapA < mapB) return -1;
 			if (mapA > mapB) return 1;
-			return 0;
-		});
-	};
-	const sortByDifficulty = (data: DataTable[]): DataTable[] => {
-		return data.sort((a, b) => {
-			const difficultyA = a.difficulty.toLowerCase();
-			const difficultyB = b.difficulty.toLowerCase();
-			if (difficultyA < difficultyB) return -1;
-			if (difficultyA > difficultyB) return 1;
 			return 0;
 		});
 	};
@@ -146,9 +103,6 @@ const MatchesInProgress: React.FC<MatchesInProgressProps> = ({
 		if (filters.sortBy === 'map') {
 			filteredData = sortByMap(filteredData);
 		}
-		if (filters.sortBy === 'difficulty') {
-			filteredData = sortByDifficulty(filteredData);
-		}
 		return filteredData;
 	};
 	const finalData = filterAll(data, filters);
@@ -164,7 +118,7 @@ const MatchesInProgress: React.FC<MatchesInProgressProps> = ({
 					{data.team.map((teamMember, index) => (
 						<div className="teamMemberLevel" key={index}>
 							<img
-								src={teamMember.img}
+								src={"http://localhost:3333/" + teamMember.img}
 								alt={`Team member ${index + 1}`}
 							/>
 							<p>{teamMember.level}</p>
@@ -176,22 +130,22 @@ const MatchesInProgress: React.FC<MatchesInProgressProps> = ({
 				<td className="ScoreMatch">
 					<div className="teamScore">
 						{data.score.map((scoreMember, index) => (
-							<p>{scoreMember}</p>
+							<p key={index}>{scoreMember}</p>
 						))}
 					</div>
 				</td>
-				{!isMobileView && (
-					<td className="difficultyMatch">{data.difficulty}</td>
-				)}
 				{!isMobileView && <td className="mapMatch">{data.map}</td>}
 				{viewMoreButton && isMobileView && (
 					<td className="mapMatch">{data.map}</td>
+				)}
+				{!isMobileView && (
+					<td className="difficultyMatch">{data.state}</td>
 				)}
 				{!viewMoreButton && (
 					<td className="watchMatch">
 						<button
 							className="buttonMatch"
-							onClick={() => window.open(data.watch)}>
+							onClick={() => {navigate("/game", {state : {room: data.id}})}}>
 							Watch
 						</button>
 					</td>
@@ -216,7 +170,7 @@ const MatchesInProgress: React.FC<MatchesInProgressProps> = ({
 					}`}>
 					<td className="dateMatch">{data.date}</td>
 					<td className="hourMatch">{data.hour}</td>
-					<td className="difficultyMatch">{data.difficulty}</td>
+					<td className="difficultyMatch">{data.state}</td>
 					<td className="watchMatch">
 						<button
 							className="buttonMatch"

@@ -53,53 +53,7 @@ const MainPage = () => {
 		map: 'all',
 		difficulty: 'all',
 	});
-	const data: DataTable[] = [
-		{
-			gameMode: '1v1',
-			team: [
-				{ img: avatar1, level: 1 },
-				{ img: avatar2, level: 2 },
-				{ img: avatar3, level: 10 },
-				{ img: avatar4, level: 9 },
-			],
-			date: '20/06/2023',
-			hour: '3h38',
-			score: [3, 10, 28, 1],
-			difficulty: 'Hard',
-			map: 'Classic',
-			watch: 'http://localhost:8080/game',
-		},
-		{
-			gameMode: '2v2',
-			team: [
-				{ img: avatar1, level: 1 },
-				{ img: avatar2, level: 2 },
-				{ img: avatar3, level: 10 },
-				{ img: avatar4, level: 9 },
-			],
-			date: '08/06/2023',
-			hour: '3h38',
-			score: [3, 10, 28, 1],
-			difficulty: 'Easy',
-			map: 'Beach',
-			watch: 'http://localhost:8080/game',
-		},
-		{
-			gameMode: '1v1',
-			team: [
-				{ img: avatar1, level: 1 },
-				{ img: avatar2, level: 2 },
-				{ img: avatar3, level: 10 },
-				{ img: avatar4, level: 9 },
-			],
-			date: '01/06/2023',
-			hour: '3h38',
-			score: [3, 10, 28, 1],
-			difficulty: 'Easy',
-			map: 'Beach',
-			watch: 'http://localhost:8080/game',
-		},
-	];
+	const data: DataTable[] = [];
 	const hasManyMatches = data.length > 4;
 	// Mobile design
 	const [mobileFilterVisible, setmobileFilterVisible] = useState(false);
@@ -113,9 +67,7 @@ const MainPage = () => {
 				'.gameDiv'
 			) as HTMLElement;
 			if (gameDivElement) {
-				const imageLowActivy =
-					data.length * 80 + 190 < gameDivElement.offsetHeight;
-				setMainRectangleMobile(imageLowActivy);
+				setMainRectangleMobile(!hasManyMatches);
 			}
 		};
 		window.addEventListener('resize', handleResize);
@@ -123,7 +75,7 @@ const MainPage = () => {
 		return () => {
 			window.removeEventListener('resize', handleResize);
 		};
-	}, [data.length]);
+	}, [data]);
 
 	console.log('mainRectangle', mainRectangleMobile);
 	return (
@@ -180,7 +132,7 @@ const MainPage = () => {
 				<hr className="filterDivider" />
 				<FilterButton
 					label="Game Mode"
-					options={['1v1', '2v2']}
+					options={['1v1', '2v2', 'FFA']}
 					onFilter={(option) => handleFilter('gameMode', option)}
 					isOpen={openFilter === 'Game Mode'}
 					setIsOpen={() => setOpenFilter(null)}
@@ -200,21 +152,11 @@ const MainPage = () => {
 				<hr className="filterDivider" />
 				<FilterButton
 					label="Map"
-					options={['Classic', 'Beach', 'Space']}
+					options={['NORMAL', 'BEACH', 'JUNGLE', 'SPACE']}
 					onFilter={(option) => handleFilter('map', option)}
 					isOpen={openFilter === 'Map'}
 					setIsOpen={() => setOpenFilter(null)}
 					toggleDropdown={() => toggleDropdown('Map')}
-					resetFilter={resetFilter}
-				/>
-				<hr className="filterDivider" />
-				<FilterButton
-					label="Difficulty"
-					options={['Easy', 'Hard']}
-					onFilter={(option) => handleFilter('difficulty', option)}
-					isOpen={openFilter === 'Difficulty'}
-					setIsOpen={() => setOpenFilter(null)}
-					toggleDropdown={() => toggleDropdown('Difficulty')}
 					resetFilter={resetFilter}
 				/>
 			</div>
@@ -225,6 +167,7 @@ const MainPage = () => {
 				<MatchesInProgress
 					filters={filters}
 					viewMoreButton={mobileViewMoreVisible}
+					resetFilter={resetFilter}
 				/>
 				{!hasManyMatches && mainRectangleMobile && (
 					<div className="illustrationGamingActivity">

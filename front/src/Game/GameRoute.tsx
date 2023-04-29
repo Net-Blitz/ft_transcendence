@@ -11,34 +11,59 @@ const GameRoute = ({
 	socketGame,
 	reload,
 	setReload,
-	env,
+	env = { host: 'localhost', port: '3333' },
 }: any) => {
 	const [state, updateState] = useState(
 		{} as { code: number; login: string; room: number }
 	);
 	const location = useLocation();
-	const update = location.state;
+	const room = location.state?.room;
 	useEffect(() => {
-		axios
-			.get('http://' + env.host + ':' + env.port + '/queues/joinable', {
+		if (!room)
+		{
+			axios
+				.get('http://' + env.host + ':' + env.port + '/queues/joinable', {
+					withCredentials: true,
+				})
+				.then((res) => {
+					if (res.data.canJoin || reload === 2)
+						updateState({ code: 0, login: res.data.login, room: 0 });
+					else if (res.data.reason === 'searching')
+						updateState({ code: 1, login: res.data.login, room: 0 });
+					else if (res.data.reason === 'playing')
+						updateState({
+							code: 2,
+							login: res.data.login,
+							room: res.data.gameId,
+						});
+				})
+				.catch((err) => {
+					console.log(err);
+				});
+		}
+		else if (room)
+		{
+			axios.get('http://' + env.host + ':' + env.port + '/games/progress/' + room, {
 				withCredentials: true,
-			})
-			.then((res) => {
-				if (res.data.canJoin || reload === 2)
-					updateState({ code: 0, login: res.data.login, room: 0 });
-				if (res.data.reason === 'searching')
-					updateState({ code: 1, login: res.data.login, room: 0 });
-				if (res.data.reason === 'playing')
-					updateState({
-						code: 2,
-						login: res.data.login,
-						room: res.data.gameId,
-					});
-			})
-			.catch((err) => {
+				}).then((res) => {
+					if (res.data.spec || reload === 2)
+						updateState({ code: 2, login: res.data.login, room: room });
+					else if (res.data.reason === 'ended' || res.data.reason === 'notFound')
+						updateState({ code: 0, login: res.data.login, room: 0 });
+					else if (res.data.reason === 'searching')
+						updateState({ code: 1, login: res.data.login, room: 0 });
+					else if (res.data.reason === 'playing')
+						updateState({
+							code: 2,
+							login: res.data.login,
+							room: res.data.gameId,
+						});
+				}
+			).catch((err) => {
 				console.log(err);
 			});
-	}, [reload, update]);
+		}
+	}, [reload, room]);
 
 	useEffect(() => {
 		if (socketQueue && socketQueue.connected !== undefined) {
