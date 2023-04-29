@@ -45,8 +45,8 @@ const Navbar = () => {
 			activeImgSrc: chat_white,
 		},
 		{
-			content: 'Notification',
-			href: '/notification',
+			content: 'Alert',
+			href: '/Alert',
 			imgSrc: notif_blue,
 			activeImgSrc: notif_white,
 		},

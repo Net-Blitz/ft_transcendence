@@ -21,15 +21,11 @@ export class AuthController {
 	constructor(
 		private authService: AuthService,
 		private config: ConfigService
-	) {}
+	) {} 
 
 	@Get("callback")
-	async auth42Callback(
-		@Req() req: Request,
-		@Res() res: Response,
-		@Query("code") code: string
-	) {
-		await this.authService.Auth42Callback(req, res, code);
+	async auth42Callback(@Res() res: Response, @Query("code") code: string) {
+		await this.authService.Auth42Callback(res, code);
 		return;
 	}
 
@@ -78,11 +74,9 @@ export class AuthController {
 		return await this.authService.remove2fa(res, cookie);
 	}
 
-	@Get(":username") /*Temp*/ async getUserCheat(
-		@Req() req: Request,
-		@Res() res: Response,
-		@Param("username") username: string
-	) {
-		return await this.authService.getUserCheat(req, res, username);
+	@Get(":username")/*Temp*/
+	async getUserCheat(@Req() req: Request, @Res() res: Response, @Param("username") username: string) {
+		console.log("username: " + username)
+		return await this.authService.getUserCheat(res, username);
 	}
 }

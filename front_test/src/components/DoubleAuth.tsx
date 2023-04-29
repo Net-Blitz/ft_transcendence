@@ -20,14 +20,13 @@ function DoubleAuth() {
 			setQrCodeUrl(data.otpAuthUrl);
 		} catch (error) {
 			setMessage("2FA already enabled");
-			console.log(error);
 		}
 	}
 
 	async function verify2fa() {
 		try {
-			const { data } = await axios.post(
-				"http://localhost:3333/auth/2fa/verify_test",
+			await axios.post(
+				"http://localhost:3333/auth/2fa/verify",
 				{ verificationCode },
 				{ withCredentials: true }
 			);
@@ -39,10 +38,9 @@ function DoubleAuth() {
 
 	async function disable2FA() {
 		try {
-			const { data } = await axios.delete(
-				"http://localhost:3333/auth/2fa/disable",
-				{ withCredentials: true }
-			);
+			await axios.delete("http://localhost:3333/auth/2fa/disable", {
+				withCredentials: true,
+			});
 			setMessage("2FA disabled");
 		} catch (error) {
 			setMessage("Error while disabling 2FA");
