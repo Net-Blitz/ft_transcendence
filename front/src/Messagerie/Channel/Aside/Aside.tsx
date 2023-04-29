@@ -56,8 +56,13 @@ const ChannelListElement = ({
 	const [ban, setBan] = useState<any[]>([]);
 	const [ChannelPasswordTrigger, setChannelPasswordTrigger] = useState(false);
 	const [ChannelSettingsTrigger, setChannelSettingsTrigger] = useState(false);
-	const { setMessages, SaveChannel, selectedChannel, setSelectedChannel } =
-		useContext(ChannelsContext);
+	const {
+		setMessages,
+		SaveChannel,
+		selectedChannel,
+		setSelectedChannel,
+		setUsersList,
+	} = useContext(ChannelsContext);
 	const connectedUser = useSelector(selectUserData);
 
 	useEffect(() => {
@@ -94,6 +99,18 @@ const ChannelListElement = ({
 		}
 	};
 
+	const getUsersList = async () => {
+		try {
+			const response = await axios.get(
+				'http://localhost:3333/chat/channel/' + selectedChannel.name,
+				{ withCredentials: true }
+			);
+			setUsersList(response.data.users);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
 	const handleSelectChannel = async (channel: ChannelDto) => {
 		const response = await axios.get(
 			'http://localhost:3333/chat/ban/' + connectedUser.username,
@@ -106,6 +123,7 @@ const ChannelListElement = ({
 		} else if (channel?.state === 'PUBLIC') {
 			setSelectedChannel(channel);
 			getMessages();
+			getUsersList();
 			socket?.emit('join', {
 				channel: channel.name,
 				username: connectedUser.username,
@@ -119,6 +137,7 @@ const ChannelListElement = ({
 			) {
 				setSelectedChannel(channel);
 				getMessages();
+				getUsersList();
 				socket?.emit('join', {
 					channel: channel.name,
 					username: connectedUser.username,
@@ -129,6 +148,8 @@ const ChannelListElement = ({
 		} else if (channel?.state === 'PRIVATE') {
 			if (channel.ownerId === connectedUser.id) {
 				setSelectedChannel(channel);
+				getMessages();
+				getUsersList();
 				socket?.emit('join', {
 					channel: channel.name,
 					username: connectedUser.username,
@@ -139,6 +160,8 @@ const ChannelListElement = ({
 				)
 			) {
 				setSelectedChannel(channel);
+				getMessages();
+				getUsersList();
 				socket?.emit('join', {
 					channel: channel.name,
 					username: connectedUser.username,
@@ -226,6 +249,7 @@ const UserChannelElement = ({
 	const settingButton = useRef<HTMLDivElement>(null);
 	const [isMute, setIsMute] = useState<boolean>(false);
 	const [isBlocked, setIsBlocked] = useState<boolean>(false);
+	const { selectedChannel, setUsersList } = useContext(ChannelsContext);
 
 	const handleUserSettingsTrigger = useCallback(() => {
 		setUserSettingsTrigger(!userSettingsTrigger);
@@ -284,6 +308,18 @@ const UserChannelElement = ({
 
 	if (user.id === userConnected.id) return <></>;
 
+	const getUsersList = async () => {
+		try {
+			const response = await axios.get(
+				'http://localhost:3333/chat/channel/' + selectedChannel.name,
+				{ withCredentials: true }
+			);
+			setUsersList(response.data.users);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
 	const handlePromote = async () => {
 		try {
 			await axios.post(
@@ -293,6 +329,7 @@ const UserChannelElement = ({
 				},
 				{ withCredentials: true }
 			);
+			getUsersList();
 			console.log(user.username + ' has been promoted');
 		} catch (error) {
 			console.error(error);
@@ -308,6 +345,7 @@ const UserChannelElement = ({
 				},
 				{ withCredentials: true }
 			);
+			getUsersList();
 			console.log(user.username + ' has been demoted');
 		} catch (error) {
 			console.error(error);
@@ -320,6 +358,7 @@ const UserChannelElement = ({
 			channel: channel.name,
 			login: user.username,
 		});
+		getUsersList();
 		console.log(user.username + ' has been kicked');
 	};
 
@@ -329,6 +368,7 @@ const UserChannelElement = ({
 			channel: channel.name,
 			login: user.username,
 		});
+		getUsersList();
 		console.log(user.username + ' has been banned');
 	};
 
@@ -440,27 +480,12 @@ const UserChannelList = ({
 	channel: ChannelDto;
 	socket: Socket;
 }) => {
-	const [usersList, setUsersList] = useState<userInfoDto[]>([]);
-	const [isAdmin, setIsAdmin] = useState(false);
 	const [bansList, setBansList] = useState<userInfoDto[]>([]);
 	const [selectedUser, setSelectedUser] = useState<string>();
+	const { isAdmin, usersList } = useContext(ChannelsContext);
 	const userConnected = useSelector(selectUserData);
 
 	useEffect(() => {
-		if (!channel.name) return;
-		const getUsers = async () => {
-			if (!channel) return;
-			const response = await axios.get(
-				'http://localhost:3333/chat/channel/' + channel.name,
-				{ withCredentials: true }
-			);
-			setUsersList(response.data.users);
-			response.data.users.forEach((user: userInfoDto) => {
-				if (user.id === userConnected.id && user.role === 'admin') {
-					setIsAdmin(true);
-				}
-			});
-		};
 		const getBans = async () => {
 			const response = await axios.get(
 				'http://localhost:3333/chat/bans/' + channel.name,
@@ -470,15 +495,11 @@ const UserChannelList = ({
 			if (response.data.length > 0)
 				setSelectedUser(response.data[0].username);
 		};
-		const fetchAll = async () => {
-			await getUsers();
-			await getBans();
-		};
 
-		fetchAll();
-		const interval = setInterval(fetchAll, 2500);
+		getBans();
+		const interval = setInterval(getBans, 2500);
 		return () => clearInterval(interval);
-	}, [channel, userConnected, setIsAdmin, setUsersList]);
+	}, [channel, userConnected]);
 
 	useEffect(() => {
 		console.log(isAdmin);
@@ -507,18 +528,20 @@ const UserChannelList = ({
 					/>
 				))}
 			</BasicFrame>
-			{(isAdmin || channel.ownerId === userConnected.id) && bansList.length > 0 && (
-				<div className="ban-list-dropdown-channel">
-					<select onChange={(e) => setSelectedUser(e.target.value)}>
-						{bansList.map((bannedUser, index) => (
-							<option value={bannedUser.username} key={index}>
-								{bannedUser.username}
-							</option>
-						))}
-					</select>
-					<button onClick={handleUnban}>Unban</button>
-				</div>
-			)}
+			{(isAdmin || channel.ownerId === userConnected.id) &&
+				bansList.length > 0 && (
+					<div className="ban-list-dropdown-channel">
+						<select
+							onChange={(e) => setSelectedUser(e.target.value)}>
+							{bansList.map((bannedUser, index) => (
+								<option value={bannedUser.username} key={index}>
+									{bannedUser.username}
+								</option>
+							))}
+						</select>
+						<button onClick={handleUnban}>Unban</button>
+					</div>
+				)}
 		</div>
 	);
 };
