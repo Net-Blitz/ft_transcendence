@@ -54,10 +54,10 @@ export const MatchHistory = ({ userData }: { userData: any }) => {
 
 	if (isLoading && !error) return <></>;
 
-	console.log(data.GamePlayer1);
-	console.log(data.GamePlayer2);
-	console.log(data.GamePlayer3);
-	console.log(data.GamePlayer4);
+	// console.log(data.GamePlayer1);
+	// console.log(data.GamePlayer2);
+	// console.log(data.GamePlayer3);
+	// console.log(data.GamePlayer4);
 
 	const header: string[] = [
 		'Game mode',
