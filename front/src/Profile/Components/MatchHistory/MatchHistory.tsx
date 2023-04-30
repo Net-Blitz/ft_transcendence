@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 
 import { BasicFrame } from '../MiddleInfo/MiddleInfo';
 import { useAxios } from '../../../utils/hooks';
+import axios from 'axios';
+import { useParams, useSearchParams } from 'react-router-dom';
 
 interface TeamMatchProps {
 	img: string;
@@ -37,27 +39,30 @@ const useWindowWidth = () => {
 			window.removeEventListener('resize', handleResize);
 		};
 	}, []);
-	console.log('windowWidth', windowWidth);
 	return windowWidth;
 };
 
 export const MatchHistory = ({ userData }: { userData: any }) => {
 	const headerMobile = ['Game mode', 'Team', 'Score', 'XP Gained'];
 	const isMobileView = useWindowWidth() < 767;
-	const {
-		isLoading,
-		data,
-		error,
-	}: { isLoading: boolean; data: any; error: boolean } = useAxios(
-		'http://localhost:3333/users/matchs/' + userData.username
-	);
+	const [matchHistory, setMatchHistory] = useState<any[]>([]);
+	const { username } = useParams();
+	if (username) userData.username = username;
 
-	if (isLoading && !error) return <></>;
-
-	// console.log(data.GamePlayer1);
-	// console.log(data.GamePlayer2);
-	// console.log(data.GamePlayer3);
-	// console.log(data.GamePlayer4);
+	useEffect(() => {
+		const getMatchHistory = async () => {
+			try {
+				const response = await axios.get(
+					'http://localhost:3333/users/matchs/' + userData.username,
+					{ withCredentials: true }
+				);
+				setMatchHistory(response.data);
+			} catch (error) {
+				console.log(error);
+			}
+		};
+		getMatchHistory();
+	}, []);
 
 	const header: string[] = [
 		'Game mode',
@@ -71,107 +76,52 @@ export const MatchHistory = ({ userData }: { userData: any }) => {
 		'XP Gained',
 	];
 
-	//let data = [
-	//	{
-	//		gameMode: '1v1',
-	//		team: [
-	//			{ img: avatar1, level: 1 },
-	//			{ img: avatar2, level: 2 },
-	//			{ img: avatar3, level: 10 },
-	//			{ img: avatar4, level: 9 },
-	//		],
-	//		date: '02/04/2023',
-	//		hour: '3h38',
-	//		score: [3, 10],
-	//		duration: '30 min',
-	//		difficulty: 'easy',
-	//		map: 'beach',
-	//		XPgained: 1000,
-	//	},
-	//	{
-	//		gameMode: '1v1',
-	//		team: [
-	//			{ img: avatar1, level: 1 },
-	//			{ img: avatar2, level: 2 },
-	//			{ img: avatar3, level: 10 },
-	//			{ img: avatar4, level: 9 },
-	//		],
-	//		date: '02/04/2023',
-	//		hour: '3h38',
-	//		score: [3, 10],
-	//		duration: '30 min',
-	//		difficulty: 'easy',
-	//		map: 'beach',
-	//		XPgained: 1000,
-	//	},
-	//	{
-	//		gameMode: '1v1',
-	//		team: [
-	//			{ img: avatar1, level: 1 },
-	//			{ img: avatar2, level: 2 },
-	//			{ img: avatar3, level: 10 },
-	//			{ img: avatar4, level: 9 },
-	//		],
-	//		date: '02/04/2023',
-	//		hour: '3h38',
-	//		score: [3, 10],
-	//		duration: '30 min',
-	//		difficulty: 'easy',
-	//		map: 'beach',
-	//		XPgained: 1000,
-	//	},
-	//	{
-	//		gameMode: '1v1',
-	//		team: [
-	//			{ img: avatar1, level: 1 },
-	//			{ img: avatar2, level: 2 },
-	//			{ img: avatar3, level: 10 },
-	//			{ img: avatar4, level: 9 },
-	//		],
-	//		date: '02/04/2023',
-	//		hour: '3h38',
-	//		score: [3, 10],
-	//		duration: '30 min',
-	//		difficulty: 'easy',
-	//		map: 'beach',
-	//		XPgained: 1000,
-	//	},
-	//	{
-	//		gameMode: '1v1',
-	//		team: [
-	//			{ img: avatar1, level: 1 },
-	//			{ img: avatar2, level: 2 },
-	//			{ img: avatar3, level: 10 },
-	//			{ img: avatar4, level: 9 },
-	//		],
-	//		date: '02/04/2023',
-	//		hour: '3h38',
-	//		score: [3, 10],
-	//		duration: '30 min',
-	//		difficulty: 'easy',
-	//		map: 'beach',
-	//		XPgained: 1000,
-	//	},
-	//];
-	console.log('isMobileView', isMobileView);
 	const dataHistory = ({ history, index }: dataHistoryProps) => {
+		const date: Date = new Date(history.date);
+
 		return (
 			<tr key={index} className={index % 2 === 0 ? 'odd' : 'even'}>
-				<td>{history.gameMode}</td>
+				<td>
+					{history.mode === 'ONEVONE'
+						? '1v1'
+						: history.mode === 'TWOVTWO'
+						? '2v2'
+						: 'FFA'}
+				</td>
 				<td className="teamMatch">
 					{history.team.map((teamMember: any, index: number) => (
 						<TeamMatch
-							img={teamMember.img}
-							level={teamMember.level}
+							img={'http://localhost:3333/' + teamMember.avatar}
+							level={Math.floor(teamMember.experience / 1000)}
 							index={index}
 							key={index}
 						/>
 					))}
 				</td>
-				{!isMobileView && <td>{history.date}</td>}
-				{!isMobileView && <td>{history.hour}</td>}
+				{!isMobileView && (
+					<td>
+						{date.getDate() +
+							'/' +
+							date.getMonth() +
+							'/' +
+							date.getFullYear()}
+					</td>
+				)}
+				{!isMobileView && (
+					<td>{date.getHours() + ':' + date.getMinutes()}</td>
+				)}
 				<td>
-					{history.score[0]} - {history.score[1]}
+					{history.mode === 'ONEVONE'
+						? history.score1 + ' - ' + history.score2
+						: history.mode === 'TWOVTWO'
+						? history.score1 + ' - ' + history.score3
+						: history.score1 +
+						  ' - ' +
+						  history.score2 +
+						  ' - ' +
+						  history.score3 +
+						  ' - ' +
+						  history.score4}
 				</td>
 				{!isMobileView && <td>{history.duration}</td>}
 				{!isMobileView && <td>{history.difficulty}</td>}
@@ -200,9 +150,10 @@ export const MatchHistory = ({ userData }: { userData: any }) => {
 						</tr>
 					</thead>
 					<tbody>
-						{/*{data.map((history, index) =>
-							dataHistory({ history, index })
-						)}*/}
+						{matchHistory &&
+							matchHistory.map((history: any, index: number) =>
+								dataHistory({ history, index })
+							)}
 					</tbody>
 				</table>
 			</BasicFrame>

@@ -253,7 +253,167 @@ export class UserService {
 					GameAsPlayer4: true,
 				},
 			});
-			return res.status(200).json(matchs);
+			const promises1 = matchs.GameAsPlayer1.map(async (element) => {
+				const user1 = await this.prisma.user.findUnique({
+					where: {
+						id: element.user1Id,
+					},
+					select: {
+						avatar: true,
+						username: true,
+						experience: true,
+					},
+				});
+
+				const user2 = await this.prisma.user.findUnique({
+					where: {
+						id: element.user2Id,
+					},
+					select: {
+						avatar: true,
+						username: true,
+						experience: true,
+					},
+				});
+
+				element["team"] = [user1, user2];
+				return element;
+			});
+			const promises2 = matchs.GameAsPlayer2.map(async (element) => {
+				const user1 = await this.prisma.user.findUnique({
+					where: {
+						id: element.user1Id,
+					},
+					select: {
+						avatar: true,
+						username: true,
+						experience: true,
+					},
+				});
+
+				const user2 = await this.prisma.user.findUnique({
+					where: {
+						id: element.user2Id,
+					},
+					select: {
+						avatar: true,
+						username: true,
+						experience: true,
+					},
+				});
+
+				element["team"] = [user1, user2];
+				return element;
+			});
+			const promises3 = matchs.GameAsPlayer3.map(async (element) => {
+				if (element.mode === "ONEVONE") return null;
+				const user1 = await this.prisma.user.findUnique({
+					where: {
+						id: element.user1Id,
+					},
+					select: {
+						avatar: true,
+						username: true,
+						experience: true,
+					},
+				});
+
+				const user2 = await this.prisma.user.findUnique({
+					where: {
+						id: element.user2Id,
+					},
+					select: {
+						avatar: true,
+						username: true,
+						experience: true,
+					},
+				});
+
+				const user3 = await this.prisma.user.findUnique({
+					where: {
+						id: element.user3Id,
+					},
+					select: {
+						avatar: true,
+						username: true,
+						experience: true,
+					},
+				});
+
+				const user4 = await this.prisma.user.findUnique({
+					where: {
+						id: element.user4Id,
+					},
+					select: {
+						avatar: true,
+						username: true,
+						experience: true,
+					},
+				});
+
+				element["team"] = [user1, user2, user3, user4];
+				return element;
+			});
+			const promises4 = matchs.GameAsPlayer4.map(async (element) => {
+				if (element.mode === "ONEVONE") return null;
+				const user1 = await this.prisma.user.findUnique({
+					where: {
+						id: element.user1Id,
+					},
+					select: {
+						avatar: true,
+						username: true,
+						experience: true,
+					},
+				});
+
+				const user2 = await this.prisma.user.findUnique({
+					where: {
+						id: element.user2Id,
+					},
+					select: {
+						avatar: true,
+						username: true,
+						experience: true,
+					},
+				});
+
+				const user3 = await this.prisma.user.findUnique({
+					where: {
+						id: element.user3Id,
+					},
+					select: {
+						avatar: true,
+						username: true,
+						experience: true,
+					},
+				});
+
+				const user4 = await this.prisma.user.findUnique({
+					where: {
+						id: element.user4Id,
+					},
+					select: {
+						avatar: true,
+						username: true,
+						experience: true,
+					},
+				});
+
+				element["team"] = [user1, user2, user3, user4];
+				return element;
+			});
+			const result1 = await Promise.all(promises1);
+			const result2 = await Promise.all(promises2);
+			const result3 = await Promise.all(promises3);
+			const result4 = await Promise.all(promises4);
+			return res.status(200).json(
+				result1
+					.concat(result2)
+					.concat(result3)
+					.concat(result4)
+					.filter((element) => element !== null)
+			);
 		} catch (error) {
 			return res.status(204).json({ message: `User has no matchs` });
 		}
