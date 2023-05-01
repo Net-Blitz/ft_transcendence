@@ -33,8 +33,6 @@ const Beside = ({ socket }: { socket: Socket }) => {
 				setBlocked(response.data);
 			} catch (error) {}
 		};
-		fetchBlocked();
-
 		const handleMessage = (message: any) => {
 			fetchBlocked();
 			if (!blocked.find((user) => user.username === message.username))

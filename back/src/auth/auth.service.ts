@@ -71,7 +71,7 @@ export class AuthService {
 						this.config.get("HOST_T") +
 						":" +
 						this.config.get("PORT_GLOBAL") +
-						"/login/2fa?login=" +
+						"/login/2fa/" +
 						user.login
 				);
 			}
@@ -168,26 +168,30 @@ export class AuthService {
 	}
 
 	async verify2fa(@Res() res: Response, @GetUser() user: any, code: string) {
-		const verified = authenticator.verify({
-			secret: user.secret,
-			token: code,
-		});
+		try {
+			const verified = authenticator.verify({
+				secret: user.secret,
+				token: code,
+			});
 
-		if (verified) {
-			const token = await this.signToken(res, user);
-			if (user.twoFactor === false) {
-				await this.prisma.user.update({
-					where: {
-						login: user.login,
-					},
-					data: {
-						twoFactor: true,
-					},
-				});
+			if (verified) {
+				const token = await this.signToken(res, user);
+				if (user.twoFactor === false) {
+					await this.prisma.user.update({
+						where: {
+							login: user.login,
+						},
+						data: {
+							twoFactor: true,
+						},
+					});
+				}
+				return res.status(200).json(token);
+			} else {
+				return res.status(403).json({ message: "UNVALID" });
 			}
-			return res.status(200).json(token);
-		} else {
-			return res.status(400).json({ message: "UNVALID" });
+		} catch (error) {
+			throw new ForbiddenException("2FA verify error");
 		}
 	}
 

@@ -4,7 +4,7 @@ import { DmElement } from './Dm/DmElement';
 import { ChannelElement } from './Channel/ChannelElement';
 import { Socket, io } from 'socket.io-client';
 
-const MainFrame = ({
+export const MainFrame = ({
 	title,
 	children,
 }: {

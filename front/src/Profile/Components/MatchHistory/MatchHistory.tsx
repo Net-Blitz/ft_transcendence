@@ -3,15 +3,14 @@ import './MatchHistory.css';
 import { useEffect, useState } from 'react';
 
 import { BasicFrame } from '../MiddleInfo/MiddleInfo';
-/* Ressources */
-import avatar1 from '../../../MainPage/Components/Ressources/avatar1.svg';
-import avatar2 from '../../../MainPage/Components/Ressources/avatar2.svg';
-import avatar3 from '../../../MainPage/Components/Ressources/avatar3.svg';
-import avatar4 from '../../../MainPage/Components/Ressources/avatar4.svg';
+import { useAxios } from '../../../utils/hooks';
+import { useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 interface TeamMatchProps {
 	img: string;
 	level: number;
+	username: string;
 	index: number;
 }
 
@@ -20,12 +19,14 @@ interface dataHistoryProps {
 	index: number;
 }
 
-const TeamMatch = ({ img, level, index }: TeamMatchProps) => {
+const TeamMatch = ({ img, level, username, index }: TeamMatchProps) => {
 	return (
-		<div className="teamMatch ">
-			<img src={img} alt={`Team member ${index + 1}`} />
-			<p>{level}</p>
-		</div>
+		<Link to={'/profile/' + username}>
+			<div className="teamMatch">
+				<img src={img} alt={`Team member ${index + 1}`} />
+				<p>{level}</p>
+			</div>
+		</Link>
 	);
 };
 
@@ -41,139 +42,123 @@ const useWindowWidth = () => {
 			window.removeEventListener('resize', handleResize);
 		};
 	}, []);
-	console.log('windowWidth', windowWidth);
 	return windowWidth;
 };
 
-export const MatchHistory = () => {
-	const headerMobile = ['Game mode', 'Team', 'Score', 'XP Gained'];
+export const MatchHistory = ({ userData }: { userData: any }) => {
+	const headerMobile = ['Game mode', 'Team', 'Score'];
 	const isMobileView = useWindowWidth() < 767;
+	const { username } = useParams();
+	if (username) userData.username = username;
+
+	const {
+		isLoading,
+		data,
+		error,
+	}: { isLoading: boolean; data: any; error: boolean } = useAxios(
+		'http://localhost:3333/users/matchs/' + userData.username
+	);
+
+	if (isLoading && !error) return <></>;
 
 	const header: string[] = [
 		'Game mode',
 		'Team',
 		'Date',
 		'Hour',
+		'Winner',
 		'Score',
 		'Duration',
-		'Difficulty',
 		'Map',
-		'XP Gained',
 	];
 
-	let data = [
-		{
-			gameMode: '1v1',
-			team: [
-				{ img: avatar1, level: 1 },
-				{ img: avatar2, level: 2 },
-				{ img: avatar3, level: 10 },
-				{ img: avatar4, level: 9 },
-			],
-			date: '02/04/2023',
-			hour: '3h38',
-			score: [3, 10],
-			duration: '30 min',
-			difficulty: 'easy',
-			map: 'beach',
-			XPgained: 1000,
-		},
-		{
-			gameMode: '1v1',
-			team: [
-				{ img: avatar1, level: 1 },
-				{ img: avatar2, level: 2 },
-				{ img: avatar3, level: 10 },
-				{ img: avatar4, level: 9 },
-			],
-			date: '02/04/2023',
-			hour: '3h38',
-			score: [3, 10],
-			duration: '30 min',
-			difficulty: 'easy',
-			map: 'beach',
-			XPgained: 1000,
-		},
-		{
-			gameMode: '1v1',
-			team: [
-				{ img: avatar1, level: 1 },
-				{ img: avatar2, level: 2 },
-				{ img: avatar3, level: 10 },
-				{ img: avatar4, level: 9 },
-			],
-			date: '02/04/2023',
-			hour: '3h38',
-			score: [3, 10],
-			duration: '30 min',
-			difficulty: 'easy',
-			map: 'beach',
-			XPgained: 1000,
-		},
-		{
-			gameMode: '1v1',
-			team: [
-				{ img: avatar1, level: 1 },
-				{ img: avatar2, level: 2 },
-				{ img: avatar3, level: 10 },
-				{ img: avatar4, level: 9 },
-			],
-			date: '02/04/2023',
-			hour: '3h38',
-			score: [3, 10],
-			duration: '30 min',
-			difficulty: 'easy',
-			map: 'beach',
-			XPgained: 1000,
-		},
-		{
-			gameMode: '1v1',
-			team: [
-				{ img: avatar1, level: 1 },
-				{ img: avatar2, level: 2 },
-				{ img: avatar3, level: 10 },
-				{ img: avatar4, level: 9 },
-			],
-			date: '02/04/2023',
-			hour: '3h38',
-			score: [3, 10],
-			duration: '30 min',
-			difficulty: 'easy',
-			map: 'beach',
-			XPgained: 1000,
-		},
-	];
-	console.log('isMobileView', isMobileView);
 	const dataHistory = ({ history, index }: dataHistoryProps) => {
+		const date: Date = new Date(history.date);
+
 		return (
 			<tr key={index} className={index % 2 === 0 ? 'odd' : 'even'}>
-				<td>{history.gameMode}</td>
+				<td>
+					{history.mode === 'ONEVONE'
+						? '1v1'
+						: history.mode === 'TWOVTWO'
+						? '2v2'
+						: 'FFA'}
+				</td>
 				<td className="teamMatch">
 					{history.team.map((teamMember: any, index: number) => (
 						<TeamMatch
-							img={teamMember.img}
-							level={teamMember.level}
+							img={'http://localhost:3333/' + teamMember.avatar}
+							level={Math.floor(teamMember.experience / 1000)}
+							username={teamMember.username}
 							index={index}
 							key={index}
 						/>
 					))}
 				</td>
-				{!isMobileView && <td>{history.date}</td>}
-				{!isMobileView && <td>{history.hour}</td>}
+				{!isMobileView && (
+					<td>
+						{date.getDate() +
+							'/' +
+							date.getMonth() +
+							'/' +
+							date.getFullYear()}
+					</td>
+				)}
+				{!isMobileView && (
+					<td>{date.getHours() + ':' + date.getMinutes()}</td>
+				)}
+				{!isMobileView && (
+					<td className="teamMatch">
+						{history.win[0] && history.mode === 'TWOVTWO' ? (
+							history.win.map((winner: any, index: number) => (
+								<TeamMatch
+									img={
+										'http://localhost:3333/' + winner.avatar
+									}
+									level={Math.floor(winner.experience / 1000)}
+									username={winner.username}
+									index={index}
+									key={index}
+								/>
+							))
+						) : (
+							<TeamMatch
+								img={
+									'http://localhost:3333/' +
+									history.win.avatar
+								}
+								level={Math.floor(
+									history.win.experience / 1000
+								)}
+								username={history.win.username}
+								index={0}
+								key={0}
+							/>
+						)}
+					</td>
+				)}
 				<td>
-					{history.score[0]} - {history.score[1]}
+					{history.mode === 'ONEVONE'
+						? history.score1 + ' - ' + history.score2
+						: history.mode === 'TWOVTWO'
+						? history.score1 + ' - ' + history.score3
+						: history.score1 +
+						  ' - ' +
+						  history.score2 +
+						  ' - ' +
+						  history.score3 +
+						  ' - ' +
+						  history.score4}
 				</td>
 				{!isMobileView && <td>{history.duration}</td>}
-				{!isMobileView && <td>{history.difficulty}</td>}
 				{!isMobileView && <td>{history.map}</td>}
-				<td>{history.XPgained}</td>
 			</tr>
 		);
 	};
 
 	return (
 		<div className="match-history">
-			<BasicFrame title="Match History">
+			<BasicFrame title="Match History" height="100%">
 				<table className="matchesInProgress">
 					<thead>
 						<tr>
@@ -190,9 +175,10 @@ export const MatchHistory = () => {
 						</tr>
 					</thead>
 					<tbody>
-						{data.map((history, index) =>
-							dataHistory({ history, index })
-						)}
+						{data &&
+							data.map((history: any, index: number) =>
+								dataHistory({ history, index })
+							)}
 					</tbody>
 				</table>
 			</BasicFrame>

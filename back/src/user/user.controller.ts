@@ -83,4 +83,25 @@ export class UserController {
 	) {
 		this.userService.UpdateUserConfig(user, res, file, text, source);
 	}
+
+	@Get("achievement/:username")
+	async GetAchievement(
+		@Param("username") username: string,
+		@Res() res: Response
+	) {
+		return this.userService.GetAchievement(username, res);
+	}
+
+	@Get("friends/:username")
+	async GetFriends(
+		@Param("username") username: string,
+		@Res() res: Response
+	) {
+		return this.userService.GetFriends(username, res);
+	}
+
+	@Get("matchs/:username")
+	async GetMatchs(@Param("username") username: string, @Res() res: Response) {
+		return this.userService.GetMatchs(username, res);
+	}
 }

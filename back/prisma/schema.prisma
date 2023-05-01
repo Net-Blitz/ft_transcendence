@@ -19,6 +19,7 @@ model User {
     elo                  Int               @default(300)
     login                String            @unique
     experience           Int               @default(1000)
+    configAt             DateTime          @default(now())
     secret               String?
     blockByMe            Blocked[]         @relation("blockByMe")
     blockOnMe            Blocked[]         @relation("blockOnMe")
@@ -124,15 +125,16 @@ model Game {
     score3     Int       @default(0)
     score4     Int       @default(0)
     winner     Int       @default(0)
-    date       DateTime  @default(now()) 
-    user1Id Int
-    user2Id Int
-    user3Id Int
-    user4Id Int
-    user1   User @relation("player1", fields: [user1Id], references: [id])
-    user2   User @relation("player2", fields: [user2Id], references: [id])
-    user3   User @relation("player3", fields: [user3Id], references: [id])
-    user4   User @relation("player4", fields: [user4Id], references: [id])
+    date       DateTime  @default(now())
+    enddate    DateTime?
+    user1Id    Int
+    user2Id    Int
+    user3Id    Int
+    user4Id    Int
+    user1      User      @relation("player1", fields: [user1Id], references: [id])
+    user2      User      @relation("player2", fields: [user2Id], references: [id])
+    user3      User      @relation("player3", fields: [user3Id], references: [id])
+    user4      User      @relation("player4", fields: [user4Id], references: [id])
 }
 
 model Queue {
@@ -188,10 +190,10 @@ model InviteChannel {
 }
 
 model Mute {
-    A        Int
-    B        Int
-    channels Channel @relation(fields: [A], references: [id], onDelete: Cascade)
-    User     User    @relation(fields: [B], references: [id], onDelete: Cascade)
+    A          Int
+    B          Int
+    channels   Channel   @relation(fields: [A], references: [id], onDelete: Cascade)
+    User       User      @relation(fields: [B], references: [id], onDelete: Cascade)
     MutedUntil DateTime?
 
     @@unique([A, B], map: "_Mute_AB_unique")
