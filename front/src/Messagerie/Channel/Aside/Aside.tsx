@@ -29,10 +29,12 @@ export const ChannelButton = ({
 	icon,
 	onClick,
 	myRef,
+	style,
 }: {
 	icon: string;
 	onClick?: any;
 	myRef?: any;
+	style?: any;
 }) => {
 	return (
 		<>
@@ -42,6 +44,7 @@ export const ChannelButton = ({
 				alt="icon"
 				onClick={onClick}
 				ref={myRef}
+				style={style}
 			/>
 		</>
 	);
@@ -212,12 +215,20 @@ const ChannelListElement = ({
 						<ChannelButton
 							icon={invite}
 							onClick={handleChannelInviteTrigger}
+							style={{ marginLeft: 'auto', marginRight: '2px' }}
 						/>
 					)}
 				{connectedUser.id === Channel.ownerId && (
 					<ChannelButton
 						icon={settings}
 						onClick={handleChannelSettingsTrigger}
+						style={{
+							marginLeft:
+								connectedUser.id === Channel.ownerId &&
+								Channel.state === 'PRIVATE'
+									? '0px'
+									: 'auto',
+						}}
 					/>
 				)}
 			</div>

@@ -19,6 +19,7 @@ model User {
     elo                  Int               @default(300)
     login                String            @unique
     experience           Int               @default(1000)
+    configAt             DateTime          @default(now())
     secret               String?
     blockByMe            Blocked[]         @relation("blockByMe")
     blockOnMe            Blocked[]         @relation("blockOnMe")
