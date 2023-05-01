@@ -8,6 +8,7 @@ import add_blue from '../Ressources/add_blue.svg';
 
 interface FilteredUsersProps {
 	AddFriendFunction: (username: string) => Promise<void>;
+	BlockByMe: (username: string) => Promise<void>;
 	searchQuery: string;
 	users: User[];
 	friends: User[];
@@ -19,6 +20,7 @@ interface FilteredUsersProps {
 
 export const FilteredUsers: React.FC<FilteredUsersProps> = ({
 	AddFriendFunction,
+	BlockByMe,
 	searchQuery,
 	users,
 	friends,
@@ -27,8 +29,9 @@ export const FilteredUsers: React.FC<FilteredUsersProps> = ({
 	demands,
 	blocked,
 }) => {
+	console.log(BlockByMe('jojo25'));
 	const filteredUsers = users.filter(
-		(user) =>
+		(user) => 
 			user.id !== userInfo?.id &&
 			!friends.some((friend) => friend.id === user.id) &&
 			!pending.some((pending) => pending.id === user.id) &&
@@ -36,14 +39,13 @@ export const FilteredUsers: React.FC<FilteredUsersProps> = ({
 			!blocked.some((block) => block.id === user.id) &&
 			user.username.toLowerCase().includes(searchQuery.toLowerCase())
 	);
-
 	return (
 		<>
 			<div>
 				{searchQuery.length > 0 && (
 					<ul className="allFriendsSearch">
 						{filteredUsers.map((user, index) => {
-							const level = user.experience / 10000;
+							const level = user.experience / 1000;
 							return (
 								<div className="friendsInfoAll" key={index}>
 									<div className="friendsInfoNomsg">

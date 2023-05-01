@@ -22,7 +22,7 @@ export const Received = ({
 		<>
 			<ul className="allreceivedFriendsSearch">
 				{pending.map((friend, index) => {
-					const level = friend.experience / 10000;
+					const level = friend.experience / 1000;
 					return (
 						<div className="receivedFriendsInfoAll" key={index}>
 							<div className="receivedFriendsInfo">

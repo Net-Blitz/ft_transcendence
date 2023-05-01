@@ -31,7 +31,7 @@ export const MyFriends = ({
 					showBlockModal ? 'popUpBlockActive' : 'popUpBlockInactive'
 				}`}>
 				{friends.map((friend, index) => {
-					const level = friend.experience / 10000;
+					const level = friend.experience / 1000;
 					return (
 						<div className="myFriendsInfoAll" key={friend.id}>
 							<div className="firstRowMyFriends">

@@ -170,6 +170,22 @@ export const Social = () => {
 		}
 	};
 
+	const BlockByMe = async (username: string) => {
+		try {
+			const response = await axios.patch(
+				'http://localhost:3333/friend/blockbyme/' + username,
+				{},
+				{ withCredentials: true }
+			);
+			fetchUsers();
+			fetchFriends();
+			fetchBlocked();
+			console.log(response.data);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
 	return (
 		<div className="social">
 			<MainFrame title="Friends" showBlockModal={showBlockModal}>
@@ -207,6 +223,7 @@ export const Social = () => {
 					<AddFriends
 						AddFriendFunction={AddFriendFunction}
 						setNavbarStatus={setNavbarStatus}
+						BlockByMe={BlockByMe}
 						blocked={blocked}
 						users={users}
 						friends={friends}

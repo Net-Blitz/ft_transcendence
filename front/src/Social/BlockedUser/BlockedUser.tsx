@@ -21,7 +21,7 @@ export const BlockedUser = ({
 					const userBlockedInfo = users.find(
 						(user) => user.username === blocked.username
 					);
-					const level = (userBlockedInfo?.experience ?? 0) / 10000;
+					const level = (userBlockedInfo?.experience ?? 0) / 1000;
 					return (
 						<div className="receivedFriendsInfoAll" key={index}>
 							<div className="receivedFriendsInfo">
