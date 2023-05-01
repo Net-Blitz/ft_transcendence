@@ -19,10 +19,18 @@
 	margin-right: 7px;
 	float: right;
 
-	width: 20vw;
+	/*width: 20vw;
 	max-width: 156px;
 	height: min(10vw, 5vh);
 	max-height: 56px;
+	min-height: 25px;*/
+
+	width: 20vw; 
+	max-width: 300px;
+	height: 72px;
+	max-height: 5vh;
+
+	/*max-height: 56px;*/
 	min-height: 25px;
 	
 	background: #0A3D62;
@@ -298,14 +306,16 @@
 	.game-waiting-button-cancel {
 		transition: none;
 		left: 7px;
-		top: 7px;
+		top: 26px;
 		bottom: unset;
 		transform: none;
-		width: 50vw; 
-		max-width: 400px;
+		width: max(min(50vw, 25vh), 200px); 
+		max-width: 300px;
 		height: 72px;
+		max-height: 5vh;
 
-		max-height: 56px;
+		font-size: max(min(4vh, 20px), 8px);
+		/*max-height: 56px;*/
 		min-height: 25px;
 	}
 

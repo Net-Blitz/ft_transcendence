@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import eyePNG from './assets/eye.png';
 import crownImg from './assets/crown.png';
 import beach from './assets/beachImage.jpg';
@@ -7,17 +7,17 @@ import space from './assets/spaceImage.jpg';
 import jungle from './assets/jungleImage.jpg';
 import './Game.css';
 
-function Podium({ color, height, point, avatar, avatar2 = null, env, crown = null }: any) {
+function Podium({ color, height, point, avatar, avatar2 = null, crown = null }: any) {
 	return (
 		<div className="game-end-podium-div">
 			{avatar ? (
 				<div>
 					{height === '60%' ? (
-						<img src={crownImg} className="game-end-crown" id={crown ? "crown-2" : "crown-1"}/>
+						<img src={crownImg} alt="Crown" className="game-end-crown" id={crown ? "crown-2" : "crown-1"}/>
 					) : null}
 					<img
 						src={
-							'http://' + env.host + ':' + env.port + '/' + avatar
+							'http://localhost:3333/' + avatar
 						}
 						alt="a"
 						className="game-end-podium-avatar"
@@ -25,12 +25,7 @@ function Podium({ color, height, point, avatar, avatar2 = null, env, crown = nul
 					{avatar2 ? (
 						<img
 							src={
-								'http://' +
-								env.host +
-								':' +
-								env.port +
-								'/' +
-								avatar2
+								'http://localhost:3333/' + avatar2
 							}
 							alt="a"
 							className="game-end-podium-avatar"
@@ -47,7 +42,7 @@ function Podium({ color, height, point, avatar, avatar2 = null, env, crown = nul
 	);
 }
 
-function Game({ socketGame, room, login, env }: any) {
+function Game({ socketGame, room, login }: any) {
 	const [here, updateHere] = useState(true);
 	const [gameEnd, updateGameEnd] = useState({} as any);
 	const navigate = useNavigate();
@@ -55,6 +50,14 @@ function Game({ socketGame, room, login, env }: any) {
 	const [board, updateBoard] = useState(1);
 
 	useEffect(() => {
+
+		const updateSpectatorFonc = (data: any) => {
+			// console.log('spectatorJoin', data.spectator);
+			updateSpectator(data.spectator);
+		};
+
+		socketGame.off('updateSpectator');
+		socketGame.on('updateSpectator', updateSpectatorFonc);
 		socketGame.emit('gameConnection', { room: room });
 		// console.log('gameConection', room);
 		localStorage.removeItem('lobby-chat-storage');
@@ -69,6 +72,7 @@ function Game({ socketGame, room, login, env }: any) {
 	}, [room, socketGame]);
 
 	useEffect(() => {
+		if (!socketGame || socketGame.connected === undefined) return;
 		const updateGameState = (gameState: any) => {
 			let ball =
 				document.querySelector<HTMLElement>('.game-playing-ball');
@@ -96,7 +100,16 @@ function Game({ socketGame, room, login, env }: any) {
 				}
 				if (gameState.board) {
 					updateBoard(gameState.board);
-					if (gameState.board === 2) {
+					if (gameState.board === 1) {
+						if (ball && player1 && player2) {
+							if (gameState.map === 'JUNGLE' || gameState.map === 'SPACE') {
+								ball.style.backgroundColor = '#F9DA49'
+								player1.style.backgroundColor = '#F9DA49'
+								player2.style.backgroundColor = '#F9DA49'
+							}
+						}
+					}
+					else if (gameState.board === 2) {
 						player3 = document.querySelector<HTMLElement>(
 							'#game-playing-player3'
 						);
@@ -109,8 +122,9 @@ function Game({ socketGame, room, login, env }: any) {
 						score4 = document.querySelector<HTMLElement>(
 							'#game-playing-score4'
 						);
+						
 					}
-					if (gameState.board === 3) {
+					else if (gameState.board === 3) {
 						player1 = document.querySelector<HTMLElement>(
 							'#game-playing-player5'
 						);
@@ -123,6 +137,17 @@ function Game({ socketGame, room, login, env }: any) {
 						player4 = document.querySelector<HTMLElement>(
 							'#game-playing-player8'
 						);
+					}
+					if (gameState.board !== 1) {
+						if (ball && player1 && player2 && player3 && player4) {
+							if (gameState.map === 'JUNGLE' || gameState.map === 'SPACE') {
+								ball.style.backgroundColor = '#F9DA49'
+								player1.style.backgroundColor = '#F9DA49'
+								player2.style.backgroundColor = '#F9DA49'
+								player3.style.backgroundColor = '#F9DA49'
+								player4.style.backgroundColor = '#F9DA49'
+							}
+						}
 					}
 				}
 				if (ball) {
@@ -318,10 +343,7 @@ function Game({ socketGame, room, login, env }: any) {
 			}
 		};
 
-		const updateSpectatorFonc = (data: any) => {
-			// console.log('spectatorJoin', data.spectator);
-			updateSpectator(data.spectator);
-		};
+
 
 		const getEndStatus = (data: any) => {
 			// console.log('getEndStatus', data);
@@ -334,7 +356,6 @@ function Game({ socketGame, room, login, env }: any) {
 			socketGame.off('endGame');
 			socketGame.off('error');
 			socketGame.off('quickChatMessageResponse');
-			socketGame.off('updateSpectator');
 			localStorage.removeItem('game-chat-storage-room-' + room);
 		}
 		if (here === true) {
@@ -342,19 +363,18 @@ function Game({ socketGame, room, login, env }: any) {
 			socketGame.off('endGame');
 			socketGame.off('error');
 			socketGame.off('quickChatMessageResponse');
-			socketGame.off('updateSpectator');
 			socketGame.off('getEndStatus');
 			socketGame.on('gameState', updateGameState);
 			socketGame.on('endGame', endGame);
 			socketGame.on('error', errorGame);
 			socketGame.on('quickChatMessageResponse', quickChatMessageResponse);
-			socketGame.on('updateSpectator', updateSpectatorFonc);
 			socketGame.on('getEndStatus', getEndStatus);
 			socketGame.emit('getSpectator', { room: room });
 		}
-	}, [here]);
+	}, [here, room, socketGame]);
 
 	useEffect(() => {
+		if (!socketGame || socketGame.connected === undefined) return;
 		const handleKeyDown = (event: KeyboardEvent) => {
 			if (event.key === 'ArrowUp') {
 				event.preventDefault();
@@ -397,7 +417,7 @@ function Game({ socketGame, room, login, env }: any) {
 			document.removeEventListener('keydown', handleKeyDown);
 			document.removeEventListener('keyup', handleKeyUp);
 		};
-	}, []);
+	}, [room, socketGame]);
 
 	const surrend = () => {
 		socketGame.emit('surrender', { login: login, room: room });
@@ -427,21 +447,18 @@ function Game({ socketGame, room, login, env }: any) {
 								height="45%"
 								point={gameEnd.score2}
 								avatar={gameEnd.avatar2}
-								env={env}
 							/>
 							<Podium
 								color="#FFD700"
 								height="60%"
 								point={gameEnd.score1}
 								avatar={gameEnd.avatar1}
-								env={env}
 							/>
 							<Podium
 								color="#CD7F32"
 								height="30%"
 								point={gameEnd.score3}
 								avatar={gameEnd.avatar3}
-								env={env}
 							/>
 						</div>
 						{/* <img src={crown} className="game-end-crown" /> */}
@@ -457,7 +474,6 @@ function Game({ socketGame, room, login, env }: any) {
 								point={gameEnd.score2}
 								avatar={gameEnd.avatar3}
 								avatar2={gameEnd.avatar4}
-								env={env}
 							/>
 							<Podium
 								color="#FFD700"
@@ -466,14 +482,12 @@ function Game({ socketGame, room, login, env }: any) {
 								avatar={gameEnd.avatar1}
 								avatar2={gameEnd.avatar2}
 								crown={true}
-								env={env}
 							/>
 							<Podium
 								color="#CD7F32"
 								height="30%"
 								point={gameEnd.score3}
 								avatar={null}
-								env={env}
 							/>
 						</div>
 						{/* <div className="game-end-elo"></div>

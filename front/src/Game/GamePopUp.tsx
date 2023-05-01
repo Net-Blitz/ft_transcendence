@@ -68,7 +68,7 @@ const GamePopUp = ({socketQueue, setReload, reload}:any) => {
 		if (socketQueue && socketQueue.connected !== undefined)
 			socketQueue.on("GamePopUpSetup", handleGamePopUpSetup);
 	
-	}, [socketQueue]);
+	}, [socketQueue, navigate, setReload]);
 
 	/* Aniamtion manager */
 	useEffect(() => {

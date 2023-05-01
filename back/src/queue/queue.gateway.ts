@@ -703,7 +703,6 @@ export class QueueGateway {
 	}
  
 	async handleDisconnect(client: Socket) { 
-		console.log("Queue Server Disconnection", client.id);
 		this.setOffline(client);
 		this.leaveGroup(client, undefined);
 		const group = this.findMyGroup(client.id);

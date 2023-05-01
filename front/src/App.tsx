@@ -21,7 +21,6 @@ import { useGetUser } from './utils/hooks';
 import { selectUser } from './utils/redux/selectors';
 /* SOCKET */
 import { io, Socket } from 'socket.io-client';
-import { Manager } from "socket.io-client";
 import GamePopUp from './Game/GamePopUp';
 import GameInvitation from './Game/GameInvitation';
 
@@ -102,7 +101,7 @@ function App(this: any) {
 					/>
 					<Route
 						path="/game"
-						element={<GameRoute socketQueue={socketQueue} socketGame={socketGame} reload={reload} setReload={setReload} env={env}/>}
+						element={<GameRoute socketQueue={socketQueue} socketGame={socketGame} reload={reload} setReload={setReload} />}
 					/>
 					<Route
 						path="/Notification"
