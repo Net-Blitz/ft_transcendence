@@ -402,6 +402,7 @@ export class FriendService {
 				},
 				select: {
 					username: true,
+					id: true,
 				},
 			});
 			if (friends.friendwith[i].status === "BLOCKED") {
@@ -409,7 +410,7 @@ export class FriendService {
 				j++;
 			}
 		}
-		return res.status(200).json(blockedList);
+		return res.status(200).json({ blockedList });
 	}
 
 	async UserBlockThisUser(

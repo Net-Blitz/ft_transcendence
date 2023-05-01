@@ -5,7 +5,6 @@ import './App.css';
 /*	COMPONENTS	*/
 import MainPage from './MainPage/MainPage';
 import { Social } from './Social/Social';
-import { AddFriends } from './Social/AddFriends';
 import { Login, Login2fa, Config, Config2fa } from './Login/Login';
 import { Messagerie } from './Messagerie/Messagerie';
 import AppLayout from './AppLayout';
@@ -78,15 +77,6 @@ function App(this: any) {
 							<AppLayout>
 								{' '}
 								<Social />
-							</AppLayout>
-						}
-					/>
-					<Route
-						path="/addfriends"
-						element={
-							<AppLayout>
-								{' '}
-								<AddFriends />
 							</AppLayout>
 						}
 					/>
