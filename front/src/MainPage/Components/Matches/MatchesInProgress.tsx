@@ -6,6 +6,8 @@ import './MatchesInProgress.css';
 import { DataTable, MatchesInProgressProps, Filters } from '../../types';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { selectEnv } from '../../../utils/redux/selectors';
+import { useSelector } from 'react-redux';
 
 //Not working
 const useWindowWidth = () => {
@@ -46,9 +48,10 @@ const MatchesInProgress: React.FC<MatchesInProgressProps> = ({
 	const isMobileView = useWindowWidth() < 767;
 	const [data, updateData] = useState<DataTable[]>([]);
 	const navigate = useNavigate();
+	const env = useSelector(selectEnv);
 
 	useEffect(() => {
-		axios.get('http://localhost:3333/games/all/playing')
+		axios.get('http://' + env.host + ':' + env.port +'/games/all/playing')
 			.then((res) => {
 				updateData(res.data);
 				//console.log("data", res.data)
@@ -112,7 +115,7 @@ const MatchesInProgress: React.FC<MatchesInProgressProps> = ({
 					{data.team.map((teamMember, index) => (
 						<div className="teamMemberLevel" key={index}>
 							<img
-								src={"http://localhost:3333/" + teamMember.img}
+								src={'http://' + env.host + ':' + env.port +'/' + teamMember.img}
 								alt={`Team member ${index + 1}`}
 							/>
 							<p>{teamMember.level}</p>

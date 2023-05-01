@@ -6,8 +6,12 @@ import beach from './assets/beachImage.jpg';
 import space from './assets/spaceImage.jpg';
 import jungle from './assets/jungleImage.jpg';
 import './Game.css';
+import { useSelector } from 'react-redux';
+import { selectEnv } from '../utils/redux/selectors';
 
 function Podium({ color, height, point, avatar, avatar2 = null, crown = null }: any) {
+	const env = useSelector(selectEnv);
+
 	return (
 		<div className="game-end-podium-div">
 			{avatar ? (
@@ -17,7 +21,7 @@ function Podium({ color, height, point, avatar, avatar2 = null, crown = null }: 
 					) : null}
 					<img
 						src={
-							'http://localhost:3333/' + avatar
+							'http://' + env.host + ':' + env.port +'/' + avatar
 						}
 						alt="a"
 						className="game-end-podium-avatar"
@@ -25,7 +29,7 @@ function Podium({ color, height, point, avatar, avatar2 = null, crown = null }: 
 					{avatar2 ? (
 						<img
 							src={
-								'http://localhost:3333/' + avatar2
+								'http://' + env.host + ':' + env.port +'/' + avatar2
 							}
 							alt="a"
 							className="game-end-podium-avatar"

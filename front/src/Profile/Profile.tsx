@@ -8,10 +8,13 @@ import { MiddleInfo } from './Components/MiddleInfo/MiddleInfo';
 import { MatchHistory } from './Components/MatchHistory/MatchHistory';
 import { selectUserData } from '../utils/redux/selectors';
 
+import { selectEnv } from '../utils/redux/selectors';
+	
 export const Profile = () => {
 	const userConnected = useSelector(selectUserData);
+	const env = useSelector(selectEnv);
 	const handleLogout = async () => {
-		await axios.get('http://localhost:3333/users/logout', {
+		await axios.get('http://' + env.host + ':' + env.port +'/users/logout', {
 			withCredentials: true,
 		});
 		window.location.reload();

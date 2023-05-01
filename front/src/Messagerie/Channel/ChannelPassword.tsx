@@ -5,6 +5,8 @@ import axios from 'axios';
 import close from '../../Profile/Components/MainInfo/Ressources/close.svg';
 import search from '../Ressources/search.svg';
 import { inputProtectionPassword } from '../../Login/Components/Auth/Input/inputProtection';
+import { useSelector } from 'react-redux';
+import { selectEnv } from '../../utils/redux/selectors';
 
 const InputPassword = ({
 	icon,
@@ -44,6 +46,7 @@ export const ChannelPassword = ({
 	const me = document.getElementsByClassName('popup');
 	const [password, setPassword] = useState('');
 	const { SaveChannel, setSaveChannel } = useContext(ChannelsContext);
+	const env = useSelector(selectEnv);
 
 	useEffect(() => {
 		window.onclick = (event: any) => {
@@ -66,7 +69,7 @@ export const ChannelPassword = ({
 		if (!password) return;
 		try {
 			await axios.post(
-				'http://localhost:3333/chat/join/' + Channel.name,
+				'http://' + env.host + ':' + env.port +'/chat/join/' + Channel.name,
 				{ state: 'PROTECTED', password: password },
 				{ withCredentials: true }
 			);

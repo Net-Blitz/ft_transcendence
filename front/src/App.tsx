@@ -18,7 +18,7 @@ import { UserProfile } from './Profile/UserProfile';
 /*	HOOKS	*/
 import { useGetUser } from './utils/hooks';
 /*	SELECTORS	*/
-import { selectUser } from './utils/redux/selectors';
+import { selectEnv, selectUser } from './utils/redux/selectors';
 /* SOCKET */
 import { io, Socket } from 'socket.io-client';
 import GamePopUp from './Game/GamePopUp';
@@ -35,15 +35,12 @@ const NotFound = () => {
 function App(this: any) {
 	useGetUser();
 	const user = useSelector(selectUser);
+	const env = useSelector(selectEnv);
+	//const currentPath = window.location.pathname; 
 	const [reload, setReload] = useState(false);
 	const [socketQueue, setSocketQueue] = useState<Socket>({} as Socket);
 	const [socketGame, setSocketGame] = useState<Socket>({} as Socket);
-	const env = {
-		host: process.env.REACT_APP_BACK_HOST,
-		port: process.env.REACT_APP_BACK_PORT,
-	};
 	// transportOptions: { polling: { extraHeaders: { 'Access-Control-Allow-Origin': '*' } } }
-
 	useEffect(() => {
 		if (user.status === 'resolved' && user.auth) {
 			setSocketQueue(
@@ -97,7 +94,7 @@ function App(this: any) {
 						element={
 							<AppLayout>
 								{' '}
-								<Messagerie />
+								<Messagerie socketQueue={socketQueue}/>
 							</AppLayout>
 						}
 					/>

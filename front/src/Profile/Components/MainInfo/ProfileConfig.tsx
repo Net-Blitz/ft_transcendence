@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { useSelector, useStore } from 'react-redux';
-import { selectUserData } from '../../../utils/redux/selectors';
+import { selectEnv, selectUserData } from '../../../utils/redux/selectors';
 import './ProfileConfig.css';
 /*	Components	*/
 import Input from '../../../Login/Components/Auth/Input/Input';
@@ -29,12 +29,13 @@ export const ProfileConfig = ({ handleTrigger }: ProfileConfigProps) => {
 	const me = document.getElementsByClassName('popup');
 	const store = useStore();
 	const userConnected = useSelector(selectUserData);
+	const env = useSelector(selectEnv);
 
 	useEffect(() => {
 		async function fetchData() {
 			try {
 				const response = await axios.get(
-					'http://localhost:3333/users/all/pseudo',
+					'http://' + env.host + ':' + env.port +'/users/all/pseudo',
 					{
 						withCredentials: true,
 					}
@@ -77,7 +78,7 @@ export const ProfileConfig = ({ handleTrigger }: ProfileConfigProps) => {
 				formData.append('source', avatar[currentIndex].source);
 				try {
 					await axios.post(
-						'http://localhost:3333/users/updateconfig',
+						'http://' + env.host + ':' + env.port +'/users/updateconfig',
 						formData,
 						{
 							withCredentials: true,

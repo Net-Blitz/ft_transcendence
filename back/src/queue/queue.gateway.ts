@@ -160,7 +160,7 @@ export class QueueGateway {
 						if (player && !declineState)
 							player.state = QueueState.Searching;
 					}
-					if (!declineState) 
+					if (!declineState)
 					{
 						if (group.mode === "ONEVONE")
 							this.queue1v1.push(group);
@@ -867,19 +867,19 @@ export class QueueGateway {
 
 	@SubscribeMessage("InviteGroup")
 	async handleInviteGroup(@ConnectedSocket() client: Socket, @MessageBody() invitedPlayer: any) {
-		const prismaInvited = await this.prisma.user.findUnique({where: {login: invitedPlayer.login}});
+		const prismaInvited = await this.prisma.user.findUnique({where: {id: invitedPlayer.id}});
 		if (!prismaInvited)
 			return ;
 		if (prismaInvited.state !== "ONLINE")
 			return ;
-		const invited = this.findPlayer(invitedPlayer.login);
+		const invited = this.findPlayer(prismaInvited.login);
 		if (!invited)
 		return ;
 		const me = this.findMe(client.id);
 		// console.log(me)
 		if (!me)
 			return ;
-		if (me.login === invitedPlayer.login)
+		if (me.login === prismaInvited.login)
 			return ;
 		const prismaMe = await this.prisma.user.findUnique({where: {login: me.login}});
 		if (!prismaMe)

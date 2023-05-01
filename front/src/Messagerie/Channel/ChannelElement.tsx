@@ -10,7 +10,7 @@ import { Aside } from './Aside/Aside';
 import { ChannelsContext, ChannelsProvider } from './ChannelsUtils';
 import { userInfoDto } from './ChannelsUtils';
 import { useSelector } from 'react-redux';
-import { selectUserData } from '../../utils/redux/selectors';
+import { selectEnv, selectUserData } from '../../utils/redux/selectors';
 
 const Beside = ({ socket }: { socket: Socket }) => {
 	const {
@@ -22,12 +22,13 @@ const Beside = ({ socket }: { socket: Socket }) => {
 	} = useContext(ChannelsContext);
 	const [blocked, setBlocked] = useState<userInfoDto[]>([]);
 	const connectedUser = useSelector(selectUserData);
+	const env = useSelector(selectEnv);
 
 	useEffect(() => {
 		const fetchBlocked = async () => {
 			try {
 				const response = await axios.get(
-					'http://localhost:3333/friend/blocked',
+					'http://' + env.host + ':' + env.port +'/friend/blocked',
 					{ withCredentials: true }
 				);
 				setBlocked(response.data);
@@ -145,11 +146,11 @@ const Beside = ({ socket }: { socket: Socket }) => {
 	);
 };
 
-export const ChannelElement = ({ socket }: { socket: Socket }) => {
+export const ChannelElement = ({ socket, socketQueue }: { socket: Socket, socketQueue: Socket }) => {
 	return (
 		<div className="dm-element">
 			<ChannelsProvider>
-				<Aside buttonContent="New Channel" socket={socket} />
+				<Aside buttonContent="New Channel" socket={socket} socketQueue={socketQueue}/>
 				<Beside socket={socket} />
 			</ChannelsProvider>
 		</div>

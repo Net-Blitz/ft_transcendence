@@ -4,10 +4,11 @@ import { GetUser } from "src/auth/decorator";
 import { PrismaService } from "src/prisma/prisma.service";
 import * as bcrypt from "bcrypt";
 import { ChannelState } from "@prisma/client";
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class ChatService {
-	constructor(private prisma: PrismaService) {}
+	constructor(private prisma: PrismaService, private config: ConfigService) {}
 
 	async CreateChannel(
 		@Param("channel") channel: string,
@@ -762,12 +763,12 @@ export class ChatService {
 						...DM,
 						sender: {
 							...DM.sender,
-							avatar: "http://localhost:3333/" + DM.sender.avatar,
+							avatar: "http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_BACK") + "/" + DM.sender.avatar,
 						},
 						receiver: {
 							...DM.receiver,
 							avatar:
-								"http://localhost:3333/" + DM.receiver.avatar,
+								"http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_BACK") + "/" + DM.receiver.avatar,
 						},
 					};
 				})
@@ -875,7 +876,7 @@ export class ChatService {
 					});
 					return {
 						...message,
-						avatar: "http://localhost:3333/" + user.avatar,
+						avatar: "http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_BACK") + "/" + user.avatar,
 					};
 				})
 			);
@@ -934,7 +935,7 @@ export class ChatService {
 					});
 					return {
 						...message,
-						avatar: "http://localhost:3333/" + user.avatar,
+						avatar: "http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_BACK") + "/" + user.avatar,
 					};
 				})
 			);
