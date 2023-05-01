@@ -51,11 +51,11 @@ export class FriendService {
 		@Param("username") username: string,
 		@Res() res: Response,
 		@GetUser() user: any
-	) {
-		const friend = await this.prisma.user.findUnique({
-			where: {
-				username: username,
-			},
+		) {
+			const friend = await this.prisma.user.findUnique({
+				where: {
+					username: username,
+				},
 		});
 		if (!user) {
 			return res.status(204).json({ message: "User not found" });
@@ -63,7 +63,7 @@ export class FriendService {
 		if (!friend) {
 			return res.status(204).json({ message: "Friend not found" });
 		}
-
+		
 		try {
 			await this.prisma.friendsRelation.delete({
 				where: {
@@ -271,6 +271,7 @@ export class FriendService {
 				},
 				data: {
 					status: "BLOCKED",
+					fromId: user.id,
 				},
 			});
 			await this.prisma.friendsRelation.update({
@@ -282,6 +283,7 @@ export class FriendService {
 				},
 				data: {
 					status: "BLOCKED",
+					fromId: user.id,
 				},
 			});
 			await this.prisma.directMessage.deleteMany({
@@ -304,6 +306,7 @@ export class FriendService {
 					friendId: user.id,
 					friendwithId: friend.id,
 					status: "BLOCKED",
+					fromId: user.id,
 				},
 			});
 			await this.prisma.friendsRelation.create({
@@ -312,6 +315,7 @@ export class FriendService {
 
 					friendwithId: user.id,
 					status: "BLOCKED",
+					fromId: user.id,
 				},
 			});
 			await this.prisma.directMessage.deleteMany({
@@ -351,6 +355,19 @@ export class FriendService {
 		}
 
 		try {
+			const relation = await this.prisma.friendsRelation.findUnique({
+				where: {
+					friendId_friendwithId: {
+						friendId: user.id,
+						friendwithId: friend.id,
+					},
+				},
+			});
+			if (relation.status !== "BLOCKED" || relation.fromId !== user.id) {
+				return res
+					.status(400)
+					.json({ message: "You can't unblock this user" });
+			}
 			await this.prisma.friendsRelation.delete({
 				where: {
 					friendId_friendwithId: {
@@ -405,7 +422,10 @@ export class FriendService {
 					id: true,
 				},
 			});
-			if (friends.friendwith[i].status === "BLOCKED") {
+			if (
+				friends.friendwith[i].status === "BLOCKED" &&
+				friends.friendwith[i].fromId === user.id
+			) {
 				blockedList[j] = friend;
 				j++;
 			}

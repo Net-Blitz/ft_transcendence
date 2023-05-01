@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './FilteredUsers.css';
 import { Link } from 'react-router-dom';
 import { User } from '../types';
@@ -7,6 +7,7 @@ import { User } from '../types';
 import add_blue from '../Ressources/add_blue.svg';
 import { selectEnv } from '../../utils/redux/selectors';
 import { useSelector } from 'react-redux';
+import axios from 'axios';
 
 interface FilteredUsersProps {
 	AddFriendFunction: (username: string) => Promise<void>;
@@ -29,23 +30,50 @@ export const FilteredUsers: React.FC<FilteredUsersProps> = ({
 	demands,
 	blocked,
 }) => {
-	const filteredUsers = users.filter(
-		(user) =>
+	const [isBlocked, setIsBlocked] = useState<Map<number, boolean>>(new Map());
+
+	const checkBlockedStatus = async (username: string, userId: number) => {
+		try {
+			const response = await axios.get(
+				'http://localhost:3333/friend/blockbyme/' + username,
+				{
+					withCredentials: true,
+				}
+			);
+			setIsBlocked((prevIsBlocked) =>
+				new Map(prevIsBlocked).set(userId, response.data.isBlocked)
+			);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+	useEffect(() => {
+		users.forEach((user) => {
+			if (!isBlocked.has(user.id)) {
+				// console.log(user.username, checkBlockedStatus(user.username, user.id));
+				checkBlockedStatus(user.username, user.id);
+			}
+		});
+	}, [users]);
+	const filteredUsers = users.filter((user) => {
+		return (
 			user.id !== userInfo?.id &&
 			!friends.some((friend) => friend.id === user.id) &&
 			!pending.some((pending) => pending.id === user.id) &&
 			!demands.some((demand) => demand.id === user.id) &&
 			!blocked.some((block) => block.id === user.id) &&
+			!isBlocked.get(user.id) &&
 			user.username.toLowerCase().includes(searchQuery.toLowerCase())
 	);
 	const env = useSelector(selectEnv);
+	});
 	return (
 		<>
 			<div>
 				{searchQuery.length > 0 && (
 					<ul className="allFriendsSearch">
 						{filteredUsers.map((user, index) => {
-							const level = user.experience / 10000;
+							const level = user.experience / 1000;
 							return (
 								<div className="friendsInfoAll" key={index}>
 									<div className="friendsInfoNomsg">

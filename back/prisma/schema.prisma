@@ -21,8 +21,6 @@ model User {
     experience           Int               @default(1000)
     configAt             DateTime          @default(now())
     secret               String?
-    blockByMe            Blocked[]         @relation("blockByMe")
-    blockOnMe            Blocked[]         @relation("blockOnMe")
     friend               FriendsRelation[] @relation("friend")
     friendwith           FriendsRelation[] @relation("friendwith")
     GameAsPlayer1        Game[]            @relation("player1")
@@ -57,17 +55,9 @@ model FriendsRelation {
     status       String @default("PENDING")
     friend       User   @relation("friend", fields: [friendId], references: [id])
     friendwith   User   @relation("friendwith", fields: [friendwithId], references: [id])
+    fromId Int?
 
     @@id([friendId, friendwithId])
-}
-
-model Blocked {
-    blockByMeId Int
-    blockOnMeId Int
-    blockByMe   User @relation("blockByMe", fields: [blockByMeId], references: [id])
-    blockOnMe   User @relation("blockOnMe", fields: [blockOnMeId], references: [id])
-
-    @@id([blockByMeId, blockOnMeId])
 }
 
 model DirectMessage {

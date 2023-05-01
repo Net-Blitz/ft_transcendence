@@ -12,7 +12,6 @@ export const BlockedPopUp = ({
 	friendBlockedUsername,
 	setShowBlockModal,
 }: BlockedPopUpProps) => {
-	console.log('friendBlockedUsername', friendBlockedUsername);
 	return (
 		<div className="blockedPopup">
 			<div className="blockedPopupTxt">
