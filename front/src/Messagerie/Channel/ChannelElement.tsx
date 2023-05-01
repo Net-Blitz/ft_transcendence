@@ -147,11 +147,11 @@ const Beside = ({ socket }: { socket: Socket }) => {
 	);
 };
 
-export const ChannelElement = ({ socket }: { socket: Socket }) => {
+export const ChannelElement = ({ socket, socketQueue }: { socket: Socket, socketQueue: Socket }) => {
 	return (
 		<div className="dm-element">
 			<ChannelsProvider>
-				<Aside buttonContent="New Channel" socket={socket} />
+				<Aside buttonContent="New Channel" socket={socket} socketQueue={socketQueue}/>
 				<Beside socket={socket} />
 			</ChannelsProvider>
 		</div>

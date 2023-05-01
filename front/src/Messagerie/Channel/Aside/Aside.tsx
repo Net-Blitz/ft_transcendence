@@ -265,11 +265,13 @@ const UserChannelElement = ({
 	channel,
 	isAdmin,
 	socket,
+	socketQueue,
 }: {
 	user: userInfoDto;
 	channel: ChannelDto;
 	isAdmin: boolean;
 	socket: Socket;
+	socketQueue: Socket;
 }) => {
 	const userConnected = useSelector(selectUserData);
 	const userIsAdmin = channel.ownerId === user.id || user.role === 'admin';
@@ -450,6 +452,10 @@ const UserChannelElement = ({
 		}
 	};
 
+	const handleInviteGame = () => {
+		socketQueue?.emit('InviteGroup', {id: user.id});
+	};
+
 	return (
 		<div className="user-channel-list-element">
 			<img
@@ -465,7 +471,7 @@ const UserChannelElement = ({
 				{user.username}{' '}
 			</h4>
 			<div className="user-channel-list-buttons">
-				<ChannelButton icon={controller} />
+				<ChannelButton icon={controller} onClick={handleInviteGame}/>
 				<ChannelButton icon={profile} />
 				{(channel.ownerId === userConnected.id ||
 					(user.role !== 'admin' && isAdmin === true)) && (
@@ -506,9 +512,11 @@ const UserChannelElement = ({
 const UserChannelList = ({
 	channel,
 	socket,
+	socketQueue,
 }: {
 	channel: ChannelDto;
 	socket: Socket;
+	socketQueue: Socket;
 }) => {
 	const [bansList, setBansList] = useState<userInfoDto[]>([]);
 	const [selectedUser, setSelectedUser] = useState<string>();
@@ -549,6 +557,7 @@ const UserChannelList = ({
 					usersList.map((user, index) => (
 						<UserChannelElement
 							socket={socket}
+							socketQueue={socketQueue}
 							user={user}
 							key={index}
 							channel={channel}
@@ -580,9 +589,11 @@ const UserChannelList = ({
 export const Aside = ({
 	buttonContent,
 	socket,
+	socketQueue,
 }: {
 	buttonContent: string;
 	socket: Socket;
+	socketQueue: Socket;
 }) => {
 	const [newDmTrigger, setNewDmTrigger] = useState(false);
 	const { selectedChannel } = useContext(ChannelsContext);
@@ -605,7 +616,7 @@ export const Aside = ({
 					</PopUp>
 				</div>
 			</div>
-			<UserChannelList channel={selectedChannel} socket={socket} />{' '}
+			<UserChannelList channel={selectedChannel} socket={socket} socketQueue={socketQueue} />{' '}
 		</div>
 	);
 };

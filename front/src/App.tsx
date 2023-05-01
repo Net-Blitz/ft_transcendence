@@ -95,7 +95,7 @@ function App(this: any) {
 						element={
 							<AppLayout>
 								{' '}
-								<Messagerie />
+								<Messagerie socketQueue={socketQueue}/>
 							</AppLayout>
 						}
 					/>

@@ -43,7 +43,7 @@ const Navbar = ({ navbarStatus, setNavbarStatus }: NavbarProps) => {
 	);
 };
 
-export const Messagerie = () => {
+export const Messagerie = ({socketQueue} : {socketQueue: Socket}) => {
 	const [navbarStatus, setNavbarStatus] = useState('channel');
 	const [socket, setSocket] = useState<Socket>();
 
@@ -68,7 +68,7 @@ export const Messagerie = () => {
 				{navbarStatus === 'privateMessage' ? (
 					<DmElement socket={socket} />
 				) : (
-					<ChannelElement socket={socket} />
+					<ChannelElement socket={socket} socketQueue={socketQueue} />
 				)}
 			</MainFrame>
 		</div>
