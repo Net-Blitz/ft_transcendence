@@ -99,7 +99,7 @@
 	padding: 0;
 	justify-content: space-around;
 	/* max-height: 75vh; */
-	overflow: scroll;
+	overflow: auto;
 }
 
 .myFriendsButton{
@@ -139,9 +139,9 @@
 	width: 100%;
 }
 .friends{
-	margin-top: 18px;
+	/* margin-top: 18px; */
     background-color: transparent;
-    overflow: scroll;
+    /* overflow: scroll; */
 	height: 94vh;
 }
 
