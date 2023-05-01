@@ -763,12 +763,23 @@ export class ChatService {
 						...DM,
 						sender: {
 							...DM.sender,
-							avatar: "http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_BACK") + "/" + DM.sender.avatar,
+							avatar:
+								"http://" +
+								this.config.get("HOST_T") +
+								":" +
+								this.config.get("PORT_BACK") +
+								"/" +
+								DM.sender.avatar,
 						},
 						receiver: {
 							...DM.receiver,
 							avatar:
-								"http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_BACK") + "/" + DM.receiver.avatar,
+								"http://" +
+								this.config.get("HOST_T") +
+								":" +
+								this.config.get("PORT_BACK") +
+								"/" +
+								DM.receiver.avatar,
 						},
 					};
 				})
@@ -876,7 +887,13 @@ export class ChatService {
 					});
 					return {
 						...message,
-						avatar: "http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_BACK") + "/" + user.avatar,
+						avatar:
+							"http://" +
+							this.config.get("HOST_T") +
+							":" +
+							this.config.get("PORT_BACK") +
+							"/" +
+							user.avatar,
 					};
 				})
 			);
@@ -935,7 +952,13 @@ export class ChatService {
 					});
 					return {
 						...message,
-						avatar: "http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_BACK") + "/" + user.avatar,
+						avatar:
+							"http://" +
+							this.config.get("HOST_T") +
+							":" +
+							this.config.get("PORT_BACK") +
+							"/" +
+							user.avatar,
 					};
 				})
 			);

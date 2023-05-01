@@ -527,7 +527,7 @@ const UserChannelElement = ({
 				<ChannelButton icon={controller} onClick={handleInviteGame} />
 				<ChannelButton icon={profile} onClick={handleNavigateProfile} />
 				{(channel.ownerId === userConnected.id ||
-					(user.role !== 'admin' && isAdmin === true)) && (
+					(user.role === 'user' && isAdmin === true)) && (
 					<ChannelButton
 						icon={settings}
 						onClick={handleUserSettingsTrigger}
@@ -538,12 +538,14 @@ const UserChannelElement = ({
 					className="dropdown-settings-user-channel"
 					style={{ display: userSettingsTrigger ? 'block' : 'none' }}
 					ref={dropdown}>
-					{user.role === 'user' && (
-						<p onClick={handlePromote}>Op this user</p>
-					)}
-					{user.role === 'owner' && (
-						<p onClick={handleDemote}>Demote this user</p>
-					)}
+					{channel.ownerId === userConnected.id &&
+						user.role === 'user' && (
+							<p onClick={handlePromote}>Op this user</p>
+						)}
+					{channel.ownerId === userConnected.id &&
+						user.role === 'admin' && (
+							<p onClick={handleDemote}>Demote this user</p>
+						)}
 					{!isMute ? (
 						<p onClick={handleMute}>Mute this user</p>
 					) : (
