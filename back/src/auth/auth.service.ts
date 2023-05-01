@@ -71,7 +71,7 @@ export class AuthService {
 						this.config.get("HOST_T") +
 						":" +
 						this.config.get("PORT_GLOBAL") +
-						"/login/2fa?login=" +
+						"/login/2fa/" +
 						user.login
 				);
 			}
