@@ -35,7 +35,8 @@ html, body{
 	font-size: 36px;
 	text-align: center;
 	color:#0A3D62;
-	padding-top: 16px;
+	padding: 16px 0 37px 0;
+	margin:0;
 }
 
 .filterMobileUp{

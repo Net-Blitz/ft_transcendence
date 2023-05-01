@@ -1,3 +1,5 @@
+import { Socket } from "socket.io-client";
+
 export interface FilterButtonProps {
 	label: string;
 	options: string[];
@@ -14,9 +16,10 @@ export interface DataTable {
 	date: string;
 	hour: string;
 	score: number[];
-	difficulty: string;
 	map: string;
+	state: string;
 	watch: string;
+	id: number;
 }
 
 export interface MatchesInProgressProps {
@@ -28,6 +31,7 @@ export interface MatchesInProgressProps {
 		difficulty: string;
 	};
 	viewMoreButton: boolean;
+	resetFilter: boolean;
 }
 
 export type Filters = {

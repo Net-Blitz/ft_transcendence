@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Req } from '@nestjs/common';
 import { GameService } from './game.service';
-import { GetCookie } from 'src/auth/decorator';
+import { GetCookie, GetUser } from 'src/auth/decorator';
 
 @Controller("games")
 export class GameController {
@@ -24,5 +24,11 @@ export class GameController {
 	@Get()
 	async getGames() {
 		return this.gameService.getGames();
+	}
+
+	@Get("progress/:id")
+	async canIJoinQueue(@GetUser("login") userLogin: string, @Param("id", ParseIntPipe) gameId: number) {
+		// console.log("userLogin", userLogin);
+		return this.gameService.checkCanSpec(userLogin, gameId);
 	}
 }

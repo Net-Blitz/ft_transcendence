@@ -34,7 +34,12 @@ export const GetUser = createParamDecorator(
 		try {
 			if (jwt.verify(token, process.env.JWT_SECRET)) {
 				const user = await axios.get(
-					"http://" + config.get("HOST_T") + ":" + config.get("PORT_BACK") + "/users/login/" + userCookie.login,
+					"http://" +
+						config.get("HOST_T") +
+						":" +
+						config.get("PORT_BACK") +
+						"/users/login/" +
+						userCookie.login,
 					{
 						withCredentials: true,
 						headers: { Cookie: "jwt=" + token },

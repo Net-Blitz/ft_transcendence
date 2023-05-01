@@ -5,9 +5,7 @@ import './App.css';
 /*	COMPONENTS	*/
 import MainPage from './MainPage/MainPage';
 import { Social } from './Social/Social';
-import { AddFriends } from './Social/AddFriends';
 import { Login, Login2fa, Config, Config2fa } from './Login/Login';
-import Chat from './Chat/Chat';
 import { Messagerie } from './Messagerie/Messagerie';
 import AppLayout from './AppLayout';
 import GameRoute from './Game/GameRoute';
@@ -22,7 +20,6 @@ import { useGetUser } from './utils/hooks';
 import { selectUser } from './utils/redux/selectors';
 /* SOCKET */
 import { io, Socket } from 'socket.io-client';
-import { Manager } from "socket.io-client";
 import GamePopUp from './Game/GamePopUp';
 import GameInvitation from './Game/GameInvitation';
 
@@ -43,10 +40,10 @@ function App(this: any) {
 	const [socketGame, setSocketGame] = useState<Socket>({} as Socket);
 	const env = {host: process.env.REACT_APP_BACK_HOST, port: process.env.REACT_APP_BACK_PORT}
 	// transportOptions: { polling: { extraHeaders: { 'Access-Control-Allow-Origin': '*' } } }
-	
+
 	useEffect(() => {
 		if (user.status === 'resolved' && user.auth)
-		{				
+		{
 			setSocketQueue(io("http://" + env.host + ":" + env.port + "/queue", {transports: ['websocket'], withCredentials: true}));
 			setSocketGame(io("http://" + env.host + ":" + env.port + "/game", {transports: ['websocket'], withCredentials: true}));
 		}
@@ -84,15 +81,6 @@ function App(this: any) {
 						}
 					/>
 					<Route
-						path="/addfriends"
-						element={
-							<AppLayout>
-								{' '}
-								<AddFriends />
-							</AppLayout>
-						}
-					/>
-					<Route
 						path="/chat"
 						element={
 							<AppLayout>
@@ -103,7 +91,7 @@ function App(this: any) {
 					/>
 					<Route
 						path="/game"
-						element={<GameRoute socketQueue={socketQueue} socketGame={socketGame} reload={reload} setReload={setReload} env={env}/>}
+						element={<GameRoute socketQueue={socketQueue} socketGame={socketGame} reload={reload} setReload={setReload} />}
 					/>
 					<Route
 						path="/Notification"

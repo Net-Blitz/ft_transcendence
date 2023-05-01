@@ -612,7 +612,6 @@ export class QueueGateway {
 				continue ;
 			if (update)
 			{
-				
 				this.updateGroup(group); 
 			}
 			return me;
@@ -668,7 +667,7 @@ export class QueueGateway {
 	}
 
 	async handleConnection(client: Socket) { 
-		console.log("Queue Server Connection", client.id);
+		// console.log("Queue Server Connection", client.id);
 		const cookie = client.handshake.headers.cookie;
 		if (!cookie)
 			return ;
@@ -704,7 +703,6 @@ export class QueueGateway {
 	}
  
 	async handleDisconnect(client: Socket) { 
-		console.log("Queue Server Disconnection", client.id);
 		this.setOffline(client);
 		this.leaveGroup(client, undefined);
 		const group = this.findMyGroup(client.id);
@@ -858,7 +856,7 @@ export class QueueGateway {
 			return ;
 		if (groupLeader.state !== "ONLINE")
 			return ;
-		const me: QueueObject = this.leaveGroup(client, undefined, false);
+		const me: QueueObject = this.leaveGroup(client, undefined, true);
 		if (me.login === groupParam.groupLogin)
 			this.recreateGroup(me);
 		else
@@ -878,7 +876,7 @@ export class QueueGateway {
 		if (!invited)
 		return ;
 		const me = this.findMe(client.id);
-		console.log(me)
+		// console.log(me)
 		if (!me)
 			return ;
 		if (me.login === invitedPlayer.login)

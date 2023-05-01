@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import "./LobbyCreation.css"
-import { BasicFrame } from '../Profile/Components/MiddleInfo/MiddleInfo';
 
 
 const PlayerCard = ({playerInfo}:any) => {
@@ -11,7 +10,7 @@ const PlayerCard = ({playerInfo}:any) => {
 			</div>
 			<div className="game-player-card-title">
 				<div>Pseudo</div>
-				<div>Lvl.</div>
+				<div className="game-player-card-lvl">Lvl.</div>
 				<div>Status</div>
 			</div>
 			<div className="game-player-card-info">
@@ -32,15 +31,17 @@ return (<div className="game-creation-frame">
 	)
 }
 
-const LobbyCreation = ({socketQueue, reload, setReload, login}:any) => {
+const LobbyCreation = ({socketQueue, reload, setReload}:any) => {
 	const [players, setPlayers] = useState<any>([]);
 
 	useEffect (() =>{
+		if (!socketQueue || socketQueue.connected === undefined) return
+		socketQueue.off("ConnectToQueueResponse")
 		socketQueue.on("ConnectToQueueResponse", (data:any) => {
 			setReload(357169)
 		})
-		socketQueue.emit("GetMyGroup") // update pour toi tous seul quand connection
-	}, [reload]);
+		socketQueue.emit("GetMyGroup")
+	}, [reload, socketQueue, setReload]);
 
 	useEffect (() => {
 		const updateGroup = (data:any) => {
@@ -74,7 +75,6 @@ const LobbyCreation = ({socketQueue, reload, setReload, login}:any) => {
 			else if (data.map === "BEACH") but_beach?.classList.replace("game-creation-button-unclicked", "game-creation-button-clicked")
 			else if (data.map === "JUNGLE") but_jungle?.classList.replace("game-creation-button-unclicked", "game-creation-button-clicked")
 			else if (data.map === "SPACE") but_space?.classList.replace("game-creation-button-unclicked", "game-creation-button-clicked")
-			console.log(data)
 		}
 		socketQueue.off("UpdateGroupResponse")
 		socketQueue.on("UpdateGroupResponse", updateGroup)
@@ -85,15 +85,14 @@ const LobbyCreation = ({socketQueue, reload, setReload, login}:any) => {
 	const joinQueue = () => {
 		
 		socketQueue.emit("ConnectToQueue"); // -> appuie sur le bouton plutot
-		console.log("join queue")
 	} 
 
-	const joinGroup = () => {
-		socketQueue.emit("JoinGroup", {groupLogin: "lgiband"}); // -> appuie sur le bouton plutot
-	}
-	const inviteGroup = () => {
-		socketQueue.emit("InviteGroup", {login: "lgiband"}); // -> appuie sur le bouton plutot
-	}
+	//const joinGroup = () => {
+	//	socketQueue.emit("JoinGroup", {groupLogin: "lgiband"}); // -> appuie sur le bouton plutot
+	//}
+	//const inviteGroup = () => {
+	//	socketQueue.emit("InviteGroup", {login: "lgiband"}); // -> appuie sur le bouton plutot
+	//}
 
 
 	const leaveGroup = () => {
@@ -138,9 +137,9 @@ const LobbyCreation = ({socketQueue, reload, setReload, login}:any) => {
 				<button className="game-creation-button" onClick={leaveGroup}>Leave Lobby</button>
 				<button className="game-creation-button"  onClick={joinQueue}>Start Game</button>
 			</div>
-			<button onClick={joinGroup}>joinGroup</button>
+			{/*<button onClick={joinGroup}>joinGroup</button>
 			<button onClick={inviteGroup}>inviteGroup</button>
-			{/* <button>joinQueue</button>
+			<button>joinQueue</button>
 			<button onClick={leaveGroup}>leaveGroup</button>
 			<select name="oui" id="oui" onChange={updateMode}>
 				<option value="ONEVONE">1v1</option>

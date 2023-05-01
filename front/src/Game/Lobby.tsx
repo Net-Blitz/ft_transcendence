@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 import "./Lobby.css"
-import axios from "axios";
 
 const LobbyBox = ({children}:any) => {
 	return (
@@ -10,13 +8,13 @@ const LobbyBox = ({children}:any) => {
 		</div>
 )}
 
-const PlayerInLobby = ({player, env}:any) => {
+const PlayerInLobby = ({player}:any) => {
 	return (
 		player !== undefined && player !== null ?
 		<div className="game-waiting-player">
 			<div className="game-waiting-player-avatar-underdiv">
 				
-				<img className="game-waiting-player-avatar" src={player.avatar ? 'http://' + env.host + ":" + env.port + '/' + player.avatar : ""} alt="Avatar" />
+				<img className="game-waiting-player-avatar" src={player.avatar ? 'http://localhost:3333/' + player.avatar : ""} alt="Avatar" />
 			</div>
 			<div className="game-waiting-player-name">{player.login}</div>
 			<div className="game-waiting-player-rank">{player.elo} LP</div>
@@ -126,7 +124,7 @@ const LobbyChat = ({socketQueue}:any) => {
 	)
 }
 
-function Lobby({socketQueue, login, setReload, reload, env}:any) {
+function Lobby({socketQueue, login, setReload, reload}:any) {
 	const [player1, setPlayer1] = useState(undefined);
 	const [player2, setPlayer2] = useState(undefined);
 	const [player3, setPlayer3] = useState(undefined);
@@ -147,7 +145,6 @@ function Lobby({socketQueue, login, setReload, reload, env}:any) {
 	
 		const DisconnectFromQueueResponse = (data:any) => {
 			setReload(22654563);
-			console.log("discofromqueue")
 			socketQueue.off("DisconnectFromQueueResponse")
 		}
 
@@ -156,7 +153,7 @@ function Lobby({socketQueue, login, setReload, reload, env}:any) {
 		socketQueue.emit("imInQueue", {login: login});
 		socketQueue.off("DisconnectFromQueueResponse")
 		socketQueue.on("DisconnectFromQueueResponse", DisconnectFromQueueResponse);
-	}, [socketQueue]);
+	}, [socketQueue, login, setReload]);
 
 
 	const handleLeave = () => {
@@ -174,9 +171,9 @@ function Lobby({socketQueue, login, setReload, reload, env}:any) {
 				<LobbyTimer socketQueue={socketQueue} />
 
 				<div className="game-waiting-players">
-					<PlayerInLobby player={player1} env={env}/>
-					<PlayerInLobby player={player2} env={env}/>
-					<PlayerInLobby player={player3} env={env}/>
+					<PlayerInLobby player={player1}/>
+					<PlayerInLobby player={player2}/>
+					<PlayerInLobby player={player3}/>
 				</div>
 
 				<LobbyChat socketQueue={socketQueue} />
