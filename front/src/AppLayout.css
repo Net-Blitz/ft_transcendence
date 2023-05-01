@@ -1,10 +1,11 @@
-/* * {
-	outline: 1px solid red;
-  } */
-
-.app-layout {
-	display: flex;
+* {
+	/* outline: 1px solid red; */
+	box-sizing: border-box;
 }
+
+/* .app-layout {
+	display: flex;
+} */
 
 .app-content {
 	flex: 1;

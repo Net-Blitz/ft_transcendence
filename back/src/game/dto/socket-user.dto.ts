@@ -4,8 +4,10 @@ export class SocketUser {
 	login: string;
 	socketId: string;
 	roomName: string;
-	state: string; // 'player1' | 'player2' | 'spectator'
+	state: string; 
 	up: number;
 	down: number;
+	left: number;
+	right: number;
 	surrender: boolean;
 }

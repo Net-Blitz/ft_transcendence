@@ -24,7 +24,7 @@ export const Received = ({
 				{pending.map((friend, index) => {
 					const level = friend.experience / 10000;
 					return (
-						<div className="receivedFriendsInfoAll">
+						<div className="receivedFriendsInfoAll" key={index}>
 							<div className="receivedFriendsInfo">
 								<Link
 									to={'/profile/' + friend.username}

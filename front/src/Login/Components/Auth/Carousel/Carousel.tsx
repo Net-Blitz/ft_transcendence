@@ -89,7 +89,7 @@ const Carousel = ({
 	const handleRefresh = () => {
 		let newAvatar = generateAvatars(12);
 		for (let i = 0; i < avatar.length; i++) {
-			if (avatar[i].source === 'imported')
+			if (avatar[i].source === 'imported' || avatar[i].source === 'set')
 				newAvatar.splice(i, 0, avatar[i]);
 		}
 		setAvatar(newAvatar);

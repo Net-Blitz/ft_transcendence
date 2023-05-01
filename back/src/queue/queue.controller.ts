@@ -10,6 +10,7 @@ export class QueueController {
 
 	@Get("joinable")
 	async canIJoinQueue(@GetUser("login") userLogin: string) {
+		// console.log("userLogin", userLogin);
 		return this.queueService.checkPermission(userLogin);
 	}
 

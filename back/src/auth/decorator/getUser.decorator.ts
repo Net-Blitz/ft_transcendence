@@ -29,9 +29,7 @@ export const GetUser = createParamDecorator(
 		const config = new ConfigService();
 		const request = ctx.switchToHttp().getRequest();
 		const token = request.cookies.jwt;
-		if (!token) {
-			throw new ForbiddenException("No token provided");
-		}
+		if (!token) return null;
 		const userCookie: CookieDto = JSON.parse(atob(token.split(".")[1]));
 		try {
 			if (jwt.verify(token, process.env.JWT_SECRET)) {

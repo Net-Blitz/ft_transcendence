@@ -4,6 +4,7 @@ import {
 	Delete,
 	Get,
 	Param,
+	Patch,
 	Post,
 	Res,
 } from "@nestjs/common";
@@ -33,6 +34,34 @@ export class ChatController {
 		else if (state === "PROTECTED")
 			return await this.chatService.CreateProtectedChannel(
 				channel,
+				password,
+				res,
+				user
+			);
+		else return res.status(400).json({ message: "Invalid channel state" });
+	}
+
+	@Patch("edit/:channel")
+	async EditChannel(
+		@Param("channel") channel: string,
+		@Body("name") name: string,
+		@Body("state") state: string,
+		@Body("password") password: string,
+		@Res() res: Response,
+		@GetUser() user: any
+	) {
+		if (state === "PUBLIC" || state === "PRIVATE")
+			return await this.chatService.EditChannel(
+				channel,
+				name,
+				state,
+				res,
+				user
+			);
+		else if (state === "PROTECTED")
+			return await this.chatService.EditProtectedChannel(
+				channel,
+				name,
 				password,
 				res,
 				user
@@ -157,10 +186,17 @@ export class ChatController {
 	async getBan(@Param("username") username: string, @Res() res: Response) {
 		return await this.chatService.getBan(username, res);
 	}
-
+	@Get("mute/:username")
+	async getMute(@Param("username") username: string, @Res() res: Response) {
+		return await this.chatService.getMute(username, res);
+	}
 	@Get("bans/:channel")
 	async getBans(@Param("channel") channel: string, @Res() res: Response) {
 		return await this.chatService.getBans(channel, res);
+	}
+	@Get("mutes/:channel")
+	async getMutes(@Param("channel") channel: string, @Res() res: Response) {
+		return await this.chatService.getMutes(channel, res);
 	}
 
 	@Get("dm")
@@ -184,5 +220,14 @@ export class ChatController {
 		@GetUser() user: any
 	) {
 		return await this.chatService.getDMMessages(id, res, user);
+	}
+
+	@Get("channel/messages/:id")
+	async getChannelMessages(
+		@Param("id") id: string,
+		@Res() res: Response,
+		@GetUser() user: any
+	) {
+		return await this.chatService.getChannelMessages(id, res, user);
 	}
 }

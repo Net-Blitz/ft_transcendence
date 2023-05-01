@@ -18,10 +18,10 @@ export class FriendService {
 			},
 		});
 		if (!user) {
-			return res.status(404).json({ message: "User not found" });
+			return res.status(204).json({ message: "User not found" });
 		}
 		if (!friend) {
-			return res.status(404).json({ message: "Friend not found" });
+			return res.status(204).json({ message: "Friend not found" });
 		}
 		if (user.id === friend.id) {
 			return res.status(400).json({ message: "You can't add yourself" });
@@ -58,10 +58,10 @@ export class FriendService {
 			},
 		});
 		if (!user) {
-			return res.status(404).json({ message: "User not found" });
+			return res.status(204).json({ message: "User not found" });
 		}
 		if (!friend) {
-			return res.status(404).json({ message: "Friend not found" });
+			return res.status(204).json({ message: "Friend not found" });
 		}
 
 		try {
@@ -99,10 +99,10 @@ export class FriendService {
 			},
 		});
 		if (!user) {
-			return res.status(404).json({ message: "User not found" });
+			return res.status(204).json({ message: "User not found" });
 		}
 		if (!friend) {
-			return res.status(404).json({ message: "Friend not found" });
+			return res.status(204).json({ message: "Friend not found" });
 		}
 
 		try {
@@ -168,10 +168,10 @@ export class FriendService {
 			},
 		});
 		if (!user) {
-			return res.status(404).json({ message: "User not found" });
+			return res.status(204).json({ message: "User not found" });
 		}
 		if (!friend) {
-			return res.status(404).json({ message: "Friend not found" });
+			return res.status(204).json({ message: "Friend not found" });
 		}
 
 		try {
@@ -202,7 +202,7 @@ export class FriendService {
 
 	async GetFriends(@Res() res: Response, @GetUser() user: any) {
 		if (!user) {
-			return res.status(404).json({ message: "User not found" });
+			return res.status(204).json({ message: "User not found" });
 		}
 
 		const friends = await this.prisma.user.findUnique({
@@ -215,7 +215,7 @@ export class FriendService {
 		});
 
 		if (!friends) {
-			return res.status(404).json({ message: "friends not found" });
+			return res.status(204).json({ message: "friends not found" });
 		}
 
 		const friendsList = [];
@@ -255,10 +255,10 @@ export class FriendService {
 			},
 		});
 		if (!user) {
-			return res.status(404).json({ message: "User not found" });
+			return res.status(204).json({ message: "User not found" });
 		}
 		if (!friend) {
-			return res.status(404).json({ message: "Friend not found" });
+			return res.status(204).json({ message: "Friend not found" });
 		}
 
 		try {
@@ -344,10 +344,10 @@ export class FriendService {
 			},
 		});
 		if (!user) {
-			return res.status(404).json({ message: "User not found" });
+			return res.status(204).json({ message: "User not found" });
 		}
 		if (!friend) {
-			return res.status(404).json({ message: "Friend not found" });
+			return res.status(204).json({ message: "Friend not found" });
 		}
 
 		try {
@@ -377,7 +377,7 @@ export class FriendService {
 
 	async GetBlockedUsers(@Res() res: Response, @GetUser() user: any) {
 		if (!user) {
-			return res.status(404).json({ message: "User not found" });
+			return res.status(204).json({ message: "User not found" });
 		}
 
 		const friends = await this.prisma.user.findUnique({
@@ -390,7 +390,7 @@ export class FriendService {
 		});
 
 		if (!friends) {
-			return res.status(404).json({ message: "friends not found" });
+			return res.status(204).json({ message: "friends not found" });
 		}
 
 		const blockedList = [];
@@ -424,10 +424,10 @@ export class FriendService {
 			},
 		});
 		if (!user) {
-			return res.status(404).json({ message: "User not found" });
+			return res.status(204).json({ message: "User not found" });
 		}
 		if (!friend) {
-			return res.status(404).json({ message: "Friend not found" });
+			return res.status(204).json({ message: "Friend not found" });
 		}
 		try {
 			const relation = await this.prisma.friendsRelation.findUnique({

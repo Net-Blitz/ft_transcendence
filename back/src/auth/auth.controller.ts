@@ -77,15 +77,6 @@ export class AuthController {
 		return await this.authService.remove2fa(res, cookie);
 	}
 
-	@Get(":username") /*Temp*/ async getUserCheat(
-		@Req() req: Request,
-		@Res() res: Response,
-		@Param("username") username: string
-	) {
-		console.log("username: " + username);
-		return await this.authService.getUserCheat(res, username);
-	}
-
 	@Post("admin/create")
 	@UseInterceptors(FileInterceptor("file"))
 	async createUser(

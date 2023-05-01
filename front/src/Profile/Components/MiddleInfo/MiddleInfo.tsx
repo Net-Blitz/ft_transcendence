@@ -12,7 +12,7 @@ interface BasicFrameProps {
 }
 
 export const BasicFrame = ({
-	height = '260px',
+	height = '100%',
 	width = '100%',
 	title,
 	children,

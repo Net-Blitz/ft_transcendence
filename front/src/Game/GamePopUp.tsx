@@ -45,7 +45,7 @@ const GamePopUp = ({socketQueue, setReload, reload}:any) => {
 			update_accept(0);
 			socketQueue.off("GamePopUpResponse");
 			socketQueue.off("DeclineGameResponse");
-			setReload(!reload);
+			setReload(9874697);
 			if (data.message === "OK")
 				navigate("/game", {state: true});
 		};
@@ -68,7 +68,7 @@ const GamePopUp = ({socketQueue, setReload, reload}:any) => {
 		if (socketQueue && socketQueue.connected !== undefined)
 			socketQueue.on("GamePopUpSetup", handleGamePopUpSetup);
 	
-	}, [socketQueue]);
+	}, [socketQueue, navigate, setReload]);
 
 	/* Aniamtion manager */
 	useEffect(() => {
@@ -99,7 +99,7 @@ const GamePopUp = ({socketQueue, setReload, reload}:any) => {
 			update_accept(2);
 			socketQueue.emit("DeclineGame");
 			
-			setReload(!reload);
+			setReload(6965);
 		}
 	}
 
