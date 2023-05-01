@@ -6,6 +6,8 @@ import { BasicFrame } from '../MiddleInfo/MiddleInfo';
 import { useAxios } from '../../../utils/hooks';
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import { selectEnv } from '../../../utils/redux/selectors';
+import { useSelector } from 'react-redux';
 
 interface TeamMatchProps {
 	img: string;
@@ -49,6 +51,7 @@ export const MatchHistory = ({ userData }: { userData: any }) => {
 	const headerMobile = ['Game mode', 'Team', 'Score'];
 	const isMobileView = useWindowWidth() < 767;
 	const { username } = useParams();
+	const env = useSelector(selectEnv);
 	if (username) userData.username = username;
 
 	const {
@@ -56,7 +59,7 @@ export const MatchHistory = ({ userData }: { userData: any }) => {
 		data,
 		error,
 	}: { isLoading: boolean; data: any; error: boolean } = useAxios(
-		'http://localhost:3333/users/matchs/' + userData.username
+		'http://' + env.host + ':' + env.port + '/users/matchs/' + userData.username
 	);
 
 	if (isLoading && !error) return <></>;
@@ -87,7 +90,7 @@ export const MatchHistory = ({ userData }: { userData: any }) => {
 				<td className="teamMatch">
 					{history.team.map((teamMember: any, index: number) => (
 						<TeamMatch
-							img={'http://localhost:3333/' + teamMember.avatar}
+							img={'http://' + env.host + ':' + env.port + '/' + teamMember.avatar}
 							level={Math.floor(teamMember.experience / 1000)}
 							username={teamMember.username}
 							index={index}
@@ -113,7 +116,7 @@ export const MatchHistory = ({ userData }: { userData: any }) => {
 							history.win.map((winner: any, index: number) => (
 								<TeamMatch
 									img={
-										'http://localhost:3333/' + winner.avatar
+										'http://' + env.host + ':' + env.port + '/' + winner.avatar
 									}
 									level={Math.floor(winner.experience / 1000)}
 									username={winner.username}
@@ -124,7 +127,7 @@ export const MatchHistory = ({ userData }: { userData: any }) => {
 						) : (
 							<TeamMatch
 								img={
-									'http://localhost:3333/' +
+									'http://' + env.host + ':' + env.port + '/' +
 									history.win.avatar
 								}
 								level={Math.floor(

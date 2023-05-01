@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import QRCodeSVG from 'qrcode.react';
 import axios from 'axios';
-import { useStore } from 'react-redux';
+import { useSelector, useStore } from 'react-redux';
 import './ProfileQR.css';
 /* Components */
 import Input from '../../../Login/Components/Auth/Input/Input';
@@ -12,6 +12,7 @@ import { inputProtectionQR } from '../../../Login/Components/Auth/Input/inputPro
 /* Ressources */
 import closeQR from './Ressources/closeQR.svg';
 import padlock from './Ressources/padlock.svg';
+import { selectEnv } from '../../../utils/redux/selectors';
 
 interface ProfileQRProps {
 	handleTrigger: () => void;
@@ -27,6 +28,7 @@ export const ProfileQR = ({ handleTrigger }: ProfileQRProps) => {
 	const [inputError, setInputError] = useState('');
 	const [code, setCode] = useState(false);
 	const store = useStore();
+	const env = useSelector(selectEnv);
 
 	useEffect(() => {
 		window.onclick = (event: any) => {
@@ -41,7 +43,7 @@ export const ProfileQR = ({ handleTrigger }: ProfileQRProps) => {
 		async function fetchQR() {
 			try {
 				const { data } = await axios.post(
-					'http://localhost:3333/auth/2fa/setup',
+					'http://' + env.host + ':' + env.port +'/auth/2fa/setup',
 					{},
 					{
 						withCredentials: true,
@@ -66,7 +68,7 @@ export const ProfileQR = ({ handleTrigger }: ProfileQRProps) => {
 			if (error === '') {
 				try {
 					await axios.post(
-						'http://localhost:3333/auth/2fa/verify',
+						'http://' + env.host + ':' + env.port +'/auth/2fa/verify',
 						{
 							inputKey,
 						},

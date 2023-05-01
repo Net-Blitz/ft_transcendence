@@ -3,6 +3,8 @@ import './Messagerie.css';
 import { DmElement } from './Dm/DmElement';
 import { ChannelElement } from './Channel/ChannelElement';
 import { Socket, io } from 'socket.io-client';
+import { selectEnv } from '../utils/redux/selectors';
+import { useSelector } from 'react-redux';
 
 export const MainFrame = ({
 	title,
@@ -43,12 +45,13 @@ const Navbar = ({ navbarStatus, setNavbarStatus }: NavbarProps) => {
 	);
 };
 
-export const Messagerie = () => {
+export const Messagerie = ({socketQueue} : {socketQueue: Socket}) => {
 	const [navbarStatus, setNavbarStatus] = useState('channel');
 	const [socket, setSocket] = useState<Socket>();
+	const env = useSelector(selectEnv);
 
 	useEffect(() => {
-		const newSocket = io('http://localhost:3334');
+		const newSocket = io('http://' + env.host + ':' + env.port + '/chat', {transports: ['websocket'], withCredentials: true});
 		setSocket(newSocket);
 
 		return () => {
@@ -68,7 +71,7 @@ export const Messagerie = () => {
 				{navbarStatus === 'privateMessage' ? (
 					<DmElement socket={socket} />
 				) : (
-					<ChannelElement socket={socket} />
+					<ChannelElement socket={socket} socketQueue={socketQueue} />
 				)}
 			</MainFrame>
 		</div>

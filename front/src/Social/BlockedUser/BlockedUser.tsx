@@ -2,6 +2,8 @@ import { User } from '../types';
 import { Link } from 'react-router-dom';
 //Ressources
 import cancel_blue from '../Ressources/cancel_blue.svg';
+import { selectEnv } from '../../utils/redux/selectors';
+import { useSelector } from 'react-redux';
 
 interface BlockedUserProps {
 	blocked: User[];
@@ -14,6 +16,7 @@ export const BlockedUser = ({
 	users,
 	UnBlockFriend,
 }: BlockedUserProps) => {
+	const env = useSelector(selectEnv);
 	return (
 		<>
 			<ul className="allreceivedFriendsSearch">
@@ -21,7 +24,7 @@ export const BlockedUser = ({
 					const userBlockedInfo = users.find(
 						(user) => user.username === blocked.username
 					);
-					const level = (userBlockedInfo?.experience ?? 0) / 10000;
+					const level = (userBlockedInfo?.experience ?? 0) / 1000;
 					return (
 						<div className="receivedFriendsInfoAll" key={index}>
 							<div className="receivedFriendsInfo">
@@ -30,7 +33,7 @@ export const BlockedUser = ({
 									className="customLink">
 									<img
 										className="receivedImgUser"
-										src={`http://localhost:3333/${userBlockedInfo?.avatar}`}
+										src={`http://${env.host}:${env.port}/${userBlockedInfo?.avatar}`}
 										alt="avatar"
 									/>
 									<div className="receivedFriendsInfoTxt">

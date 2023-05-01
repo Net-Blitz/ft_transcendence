@@ -12,17 +12,19 @@ import GameRoute from './Game/GameRoute';
 import Notification from './Notification/Notification';
 import { Profile } from './Profile/Profile';
 import { AuthRoutes } from './utils/PrivateRoutes';
-import { useSelector } from 'react-redux';
+import { useSelector, useStore } from 'react-redux';
 import Admin from './Admin';
 import { UserProfile } from './Profile/UserProfile';
 /*	HOOKS	*/
 import { useGetUser } from './utils/hooks';
 /*	SELECTORS	*/
-import { selectUser } from './utils/redux/selectors';
+import { selectEnv, selectUser } from './utils/redux/selectors';
 /* SOCKET */
 import { io, Socket } from 'socket.io-client';
 import GamePopUp from './Game/GamePopUp';
 import GameInvitation from './Game/GameInvitation';
+import { fetchOrUpdateUser } from './utils/redux/user';
+import { createAction } from '@reduxjs/toolkit';
 
 const NotFound = () => {
 	return (
@@ -34,15 +36,13 @@ const NotFound = () => {
 
 function App(this: any) {
 	useGetUser();
+	const store = useStore();
 	const user = useSelector(selectUser);
+	const env = useSelector(selectEnv);
+	//const currentPath = window.location.pathname; 
 	const [reload, setReload] = useState(false);
 	const [socketQueue, setSocketQueue] = useState<Socket>({} as Socket);
 	const [socketGame, setSocketGame] = useState<Socket>({} as Socket);
-	const env = {
-		host: process.env.REACT_APP_BACK_HOST,
-		port: process.env.REACT_APP_BACK_PORT,
-	};
-	// transportOptions: { polling: { extraHeaders: { 'Access-Control-Allow-Origin': '*' } } }
 
 	useEffect(() => {
 		if (user.status === 'resolved' && user.auth) {
@@ -60,6 +60,7 @@ function App(this: any) {
 			);
 		}
 	}, [user, env.host, env.port]);
+
 	if (user.status !== 'resolved' && user.status !== 'notAuth')
 		return <div></div>;
 	return (
@@ -97,7 +98,7 @@ function App(this: any) {
 						element={
 							<AppLayout>
 								{' '}
-								<Messagerie />
+								<Messagerie socketQueue={socketQueue}/>
 							</AppLayout>
 						}
 					/>

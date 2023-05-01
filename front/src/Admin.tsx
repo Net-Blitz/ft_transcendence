@@ -6,6 +6,8 @@ import {
 	AvatarProps,
 } from './Login/Components/Auth/Carousel/genAvatars';
 import axios from 'axios';
+import { useSelector } from 'react-redux';
+import { selectEnv } from './utils/redux/selectors';
 
 const generatePseudo = () => {
 	const chars = 'abcdefghijklmnopqrstuvwxyz';
@@ -19,6 +21,7 @@ const generatePseudo = () => {
 const Admin = () => {
 	const avatar = createAvatarObject(uuidv4());
 	const pseudo = generatePseudo();
+	const env = useSelector(selectEnv);
 
 	const handleCLick = () => {
 		console.log(generatePseudo());
@@ -26,7 +29,7 @@ const Admin = () => {
 			const formData = new FormData();
 			formData.append('username', pseudo);
 			formData.append('file', avatar.file);
-			axios.post('http://localhost:3333/auth/admin/create', formData, {
+			axios.post('http://' + env.host + ':' + env.port +'/auth/admin/create', formData, {
 				withCredentials: true,
 			});
 		} catch (error) {

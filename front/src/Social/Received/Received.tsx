@@ -6,6 +6,8 @@ import './Received.css';
 //Ressources
 import cancel_blue from '../Ressources/cancel_blue.svg';
 import check_blue from '../Ressources/check_blue.svg';
+import { selectEnv } from '../../utils/redux/selectors';
+import { useSelector } from 'react-redux';
 
 interface ReceivedProps {
 	AcceptFriend: (username: string) => Promise<void>;
@@ -18,6 +20,7 @@ export const Received = ({
 	DeclineFriend,
 	pending,
 }: ReceivedProps) => {
+	const env = useSelector(selectEnv);
 	return (
 		<>
 			<ul className="allreceivedFriendsSearch">
@@ -31,7 +34,7 @@ export const Received = ({
 									className="customLink">
 									<img
 										className="receivedImgUser"
-										src={`http://localhost:3333/${friend.avatar}`}
+										src={`http://${env.host}:${env.port}/${friend.avatar}`}
 										alt="avatar"
 									/>
 									<div className="receivedFriendsInfoTxt">

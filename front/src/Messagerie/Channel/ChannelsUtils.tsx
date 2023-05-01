@@ -1,7 +1,7 @@
 import { ReactNode, createContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
-import { selectUserData } from '../../utils/redux/selectors';
+import { selectEnv, selectUserData } from '../../utils/redux/selectors';
 
 export interface ChannelDto {
 	id: number;
@@ -65,12 +65,13 @@ export const ChannelsProvider = ({ children }: { children: ReactNode }) => {
 	const [usersList, setUsersList] = useState<userInfoDto[]>([]);
 	const [isAdmin, setIsAdmin] = useState(false);
 	const userConnected = useSelector(selectUserData);
+	const env = useSelector(selectEnv);
 
 	useEffect(() => {
 		const fetchChats = async () => {
 			try {
 				const Channels = await axios.get<ChannelDto[]>(
-					'http://localhost:3333/chat/channels',
+					'http://' + env.host + ':' + env.port +'/chat/channels',
 					{ withCredentials: true }
 				);
 				setChannelList(Channels.data);
@@ -82,7 +83,7 @@ export const ChannelsProvider = ({ children }: { children: ReactNode }) => {
 			if (!selectedChannel.name) return;
 			try {
 				const response = await axios.get(
-					'http://localhost:3333/chat/channel/' +
+					'http://' + env.host + ':' + env.port +'/chat/channel/' +
 						selectedChannel.name,
 					{ withCredentials: true }
 				);
