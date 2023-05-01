@@ -3,6 +3,8 @@ import './Friends.css';
 import { BasicFrame } from '../../MiddleInfo';
 import { useAxios } from '../../../../../utils/hooks';
 import { useNavigate } from 'react-router-dom';
+import { selectEnv } from '../../../../../utils/redux/selectors';
+import { useSelector } from 'react-redux';
 
 interface FriendProps {
 	avatar: string;
@@ -29,12 +31,13 @@ const Friend = ({ avatar, username, level }: FriendProps) => {
 };
 
 export const Friends = ({ userData }: { userData: any }) => {
+	const env = useSelector(selectEnv);
 	const {
 		isLoading,
 		data,
 		error,
 	}: { isLoading: boolean; data: any; error: boolean } = useAxios(
-		'http://localhost:3333/users/friends/' + userData.username
+		'http://' + env.host + ':' + env.port + '/users/friends/' + userData.username
 	);
 
 	if (isLoading && !error) return <></>;
@@ -48,7 +51,7 @@ export const Friends = ({ userData }: { userData: any }) => {
 							<Friend
 								key={index}
 								avatar={
-									'http://localhost:3333/' + friend.avatar
+									'http://' + env.host + ':' + env.port + '/' + friend.avatar
 								}
 								username={friend.username}
 								level={Math.floor(friend.experience / 1000)}

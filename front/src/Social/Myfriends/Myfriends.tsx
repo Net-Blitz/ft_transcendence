@@ -8,6 +8,8 @@ import './Myfriends.css';
 import block_blue from '../Ressources/block_blue.svg';
 import game_blue from '../Ressources/game_blue.svg';
 import cancel_blue from '../Ressources/cancel_blue.svg';
+import { selectEnv } from '../../utils/redux/selectors';
+import { useSelector } from 'react-redux';
 
 interface MyFriendsProps {
 	RemoveFriend: (username: string) => Promise<void>;
@@ -24,6 +26,7 @@ export const MyFriends = ({
 	setShowBlockModal,
 }: MyFriendsProps) => {
 	const [friendBlockedUsername, setfriendBlockedUsername] = useState('');
+	const env = useSelector(selectEnv);
 	return (
 		<>
 			<ul
@@ -41,7 +44,7 @@ export const MyFriends = ({
 										className="customLink">
 										<img
 											className="myFriendsImgUser"
-											src={`http://localhost:3333/${friend.avatar}`}
+											src={`http://${env.host}:${env.port}/${friend.avatar}`}
 											alt="avatar"
 										/>
 										<div className="myFriendsInfoTxt">

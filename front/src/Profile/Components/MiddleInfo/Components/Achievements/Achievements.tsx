@@ -9,6 +9,8 @@ import achievement4 from './Ressources/achievement4.png';
 import achievement5 from './Ressources/achievement5.png';
 import achievement6 from './Ressources/achievement6.png';
 import { useAxios } from '../../../../../utils/hooks';
+import { selectEnv } from '../../../../../utils/redux/selectors';
+import { useSelector } from 'react-redux';
 
 interface AchievementProps {
 	img: string;
@@ -32,12 +34,13 @@ const Achievement = ({ img, title, description, lock }: AchievementProps) => {
 };
 
 export const Achievements = ({ userData }: { userData: any }) => {
+	const env = useSelector(selectEnv);
 	const {
 		isLoading,
 		data,
 		error,
 	}: { isLoading: boolean; data: any; error: boolean } = useAxios(
-		'http://localhost:3333/users/achievement/' + userData.username
+		'http://' + env.host + ':' + env.port + '/users/achievement/' + userData.username
 	);
 
 	const checkAchievement = (id: number) => {

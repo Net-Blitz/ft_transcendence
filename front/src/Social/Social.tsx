@@ -7,6 +7,8 @@ import { Demands } from './Demands/Demands';
 import { BlockedUser } from './BlockedUser/BlockedUser';
 import { User, MainFrame, Navbar } from './types';
 import axios from 'axios';
+import { selectEnv } from '../utils/redux/selectors';
+import { useSelector } from 'react-redux';
 
 export const Social = () => {
 	const [userInfo, setUserInfo] = useState<User>();
@@ -17,11 +19,12 @@ export const Social = () => {
 	const [blocked, setBlocked] = useState<User[]>([]);
 	const [showBlockModal, setShowBlockModal] = useState(false);
 	const [navbarStatus, setNavbarStatus] = useState('Myfriends');
+	const env = useSelector(selectEnv);
 
 	const fetchUsers = async () => {
 		try {
 			const response = await axios.get<User[]>(
-				'http://localhost:3333/users/login',
+				'http://' + env.host + ':' + env.port + '/users/login',
 				{ withCredentials: true }
 			);
 			setUsers(response.data);
@@ -32,7 +35,7 @@ export const Social = () => {
 	const fetchFriends = async () => {
 		try {
 			const response = await axios.get(
-				'http://localhost:3333/friend/friends',
+				'http://' + env.host + ':' + env.port + '/friend/friends',
 				{ withCredentials: true }
 			);
 			setFriends(response.data.friendsList);
@@ -46,7 +49,7 @@ export const Social = () => {
 	const fetchBlocked = async () => {
 		try {
 			const response = await axios.get(
-				'http://localhost:3333/friend/blocked',
+				'http://' + env.host + ':' + env.port + '/friend/blocked',
 				{ withCredentials: true }
 			);
 			setBlocked(response.data.blockedList);
@@ -57,7 +60,7 @@ export const Social = () => {
 
 	useEffect(() => {
 		const fetchData = async () => {
-			const response = await axios.get('http://localhost:3333/users/me', {
+			const response = await axios.get('http://' + env.host + ':' + env.port + '/users/me', {
 				withCredentials: true,
 			});
 			setUserInfo(response.data);
@@ -74,7 +77,7 @@ export const Social = () => {
 	const AddFriendFunction = async (username: string) => {
 		try {
 			const response = await axios.post(
-				'http://localhost:3333/friend/add/' + username,
+				'http://' + env.host + ':' + env.port + '/friend/add/' + username,
 				{},
 				{ withCredentials: true }
 			);
@@ -91,7 +94,7 @@ export const Social = () => {
 		console.log(username);
 		try {
 			const response = await axios.post(
-				'http://localhost:3333/friend/block/' + username,
+				'http://' + env.host + ':' + env.port + '/friend/block/' + username,
 				{},
 				{ withCredentials: true }
 			);
@@ -108,7 +111,7 @@ export const Social = () => {
 		console.log(username);
 		try {
 			const response = await axios.post(
-				'http://localhost:3333/friend/unblock/' + username,
+				'http://' + env.host + ':' + env.port + '/friend/unblock/' + username,
 				{},
 				{ withCredentials: true }
 			);
@@ -124,7 +127,7 @@ export const Social = () => {
 	const RemoveFriend = async (username: string) => {
 		try {
 			const response = await axios.post(
-				'http://localhost:3333/friend/remove/' + username,
+				'http://' + env.host + ':' + env.port + '/friend/remove/' + username,
 				{},
 				{ withCredentials: true }
 			);
@@ -141,7 +144,7 @@ export const Social = () => {
 		console.log('Accept username', username);
 		try {
 			const response = await axios.patch(
-				'http://localhost:3333/friend/accept/' + username,
+				'http://' + env.host + ':' + env.port + '/friend/accept/' + username,
 				{},
 				{ withCredentials: true }
 			);
@@ -157,7 +160,7 @@ export const Social = () => {
 	const DeclineFriend = async (username: string) => {
 		try {
 			const response = await axios.patch(
-				'http://localhost:3333/friend/decline/' + username,
+				'http://' + env.host + ':' + env.port + '/friend/decline/' + username,
 				{},
 				{ withCredentials: true }
 			);

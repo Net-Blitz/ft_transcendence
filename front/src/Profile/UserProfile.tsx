@@ -7,21 +7,24 @@ import { MainFrame } from '../Messagerie/Messagerie';
 import { MainInfo } from './Components/MainInfo/MainInfo';
 import { MiddleInfo } from './Components/MiddleInfo/MiddleInfo';
 import { MatchHistory } from './Components/MatchHistory/MatchHistory';
+import { selectEnv } from '../utils/redux/selectors';
+import { useSelector } from 'react-redux';
 
 export const UserProfile = () => {
 	const { username } = useParams();
 	const [user, setUser] = useState({});
+	const env = useSelector(selectEnv);
 
 	const {
 		isLoading,
 		data,
 		error,
 	}: { isLoading: boolean; data: any; error: boolean } = useAxios(
-		'http://localhost:3333/users/username/' + username
+		'http://' + env.host + ':' + env.port + '/users/username/' + username
 	);
 
 	useEffect(() => {
-		if (data) data.avatar = 'http://localhost:3333/' + data.avatar;
+		if (data) data.avatar = 'http://' + env.host + ':' + env.port + '/' + data.avatar;
 		setUser(data);
 	}, [data]);
 

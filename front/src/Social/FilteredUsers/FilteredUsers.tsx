@@ -5,6 +5,8 @@ import { User } from '../types';
 
 //Ressources
 import add_blue from '../Ressources/add_blue.svg';
+import { selectEnv } from '../../utils/redux/selectors';
+import { useSelector } from 'react-redux';
 
 interface FilteredUsersProps {
 	AddFriendFunction: (username: string) => Promise<void>;
@@ -36,7 +38,7 @@ export const FilteredUsers: React.FC<FilteredUsersProps> = ({
 			!blocked.some((block) => block.id === user.id) &&
 			user.username.toLowerCase().includes(searchQuery.toLowerCase())
 	);
-
+	const env = useSelector(selectEnv);
 	return (
 		<>
 			<div>
@@ -52,7 +54,7 @@ export const FilteredUsers: React.FC<FilteredUsersProps> = ({
 											to={'/profile/' + user.username}>
 											<img
 												className="imgUser"
-												src={`http://localhost:3333/${user.avatar}`}
+												src={`http://${env.host}:${env.port}/${user.avatar}`}
 												alt="username avatar"
 											/>
 											<div className="friendsInfoTxt">

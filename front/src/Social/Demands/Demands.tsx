@@ -1,11 +1,15 @@
+import { env } from 'yargs';
 import { User } from '../types';
 import { Link } from 'react-router-dom';
+import { selectEnv } from '../../utils/redux/selectors';
+import { useSelector } from 'react-redux';
 
 interface DemandsProps {
 	demands: User[];
 }
 
 export const Demands = ({ demands }: DemandsProps) => {
+	const env = useSelector(selectEnv);
 	return (
 		<>
 			<ul className="allreceivedFriendsSearch">
@@ -19,7 +23,7 @@ export const Demands = ({ demands }: DemandsProps) => {
 									className="customLink">
 									<img
 										className="receivedImgUser"
-										src={`http://localhost:3333/${friend.avatar}`}
+										src={`http://${env.host}:${env.port}/${friend.avatar}`}
 										alt="avatar"
 									/>
 									<div className="receivedFriendsInfoTxt">
