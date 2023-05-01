@@ -686,7 +686,7 @@ export class QueueGateway {
 			return ;
 		if (prismaUser.state !== "PLAYING")
 			await this.prisma.user.update({where: {id: prismaUser.id}, data: {state: "ONLINE"}});
-		client.emit("stateUpdate", 63523)
+		client.emit("stateUpdate", 63523);
 		return ;
 	}
 
@@ -1097,5 +1097,4 @@ export class QueueGateway {
 		}
 		client.emit("UpdateGroupResponse", {players: allPlayers, mode: group.mode, map: group.map});
 	}
-
 }

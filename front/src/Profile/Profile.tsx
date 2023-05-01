@@ -1,5 +1,4 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useStore } from 'react-redux';
 import axios from 'axios';
 import './Profile.css';
 /*	Components	*/
@@ -9,6 +8,9 @@ import { MatchHistory } from './Components/MatchHistory/MatchHistory';
 import { selectUserData } from '../utils/redux/selectors';
 
 import { selectEnv } from '../utils/redux/selectors';
+import { useGetUser } from '../utils/hooks';
+import { useEffect } from 'react';
+import { fetchOrUpdateUser } from '../utils/redux/user';
 	
 export const Profile = () => {
 	const userConnected = useSelector(selectUserData);
@@ -19,7 +21,7 @@ export const Profile = () => {
 		});
 		window.location.reload();
 	};
-
+	
 	return (
 		<div className="profile-wrapper">
 			<h1>My Profile</h1>
