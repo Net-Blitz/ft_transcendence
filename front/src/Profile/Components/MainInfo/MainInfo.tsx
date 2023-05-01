@@ -148,7 +148,7 @@ export const MainInfo = ({
 				/>
 				<InfoElement
 					title="Registration date"
-					content="22/02"
+					content={new Date(userData.configAt).toLocaleDateString()}
 					border={userProfile ? false : true}
 				/>
 				{!userProfile && (
