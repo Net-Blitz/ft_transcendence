@@ -6,6 +6,8 @@ import close from '../../Profile/Components/MainInfo/Ressources/close.svg';
 import search from '../Ressources/search.svg';
 import { useSelector } from 'react-redux';
 import { selectUserData } from '../../utils/redux/selectors';
+/* Ressources */
+import check from '../Ressources/check.svg';
 
 export const Invite = ({ socket }: { socket: Socket }) => {
 	const [Invites, setInvites] = useState<any[]>([]);
@@ -88,17 +90,21 @@ export const Invite = ({ socket }: { socket: Socket }) => {
 					className="dm-list-element"
 					style={{ justifyContent: 'space-around' }}
 					key={index}>
-					<h4>You are intive to {invite.channels.name}</h4>
-					<span
-						style={{ color: '#fdfad0' }}
-						className="chat-accept-invite"
-						onClick={() => JoinPrivateChannel(invite.channels)}>
-						&#10003;
-					</span>
-					<img
-						src={close}
-						alt="decline invite"
-						onClick={() => DeclineInvite(invite.channels)}></img>
+					<h4>Join {invite.channels.name} ?</h4>
+					<div>
+						<img
+							src={check}
+							alt="accept invite"
+							onClick={() =>
+								JoinPrivateChannel(invite.channels)
+							}></img>
+						<img
+							src={close}
+							alt="decline invite"
+							onClick={() =>
+								DeclineInvite(invite.channels)
+							}></img>
+					</div>
 				</div>
 			))}
 		</>
