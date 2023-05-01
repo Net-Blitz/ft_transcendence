@@ -907,18 +907,18 @@ export class GameGateway {
 			return ;
 
 		this.server.to("game-" + data.room).emit("quickChatMessageResponse", {login: sockUser.login, message: parseInt(data.key)});
-	}
+	} 
 
 	@SubscribeMessage("getSpectator")
 	HanldeGetSpectator(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
 		const sockUser : SocketUser = this.ConnectedSockets.find(x => x.socketId === client.id);
 		if (sockUser === null)
 			return ;
-		
+
 		const game = this.GamePlaying.find(x => x.room === data.room);
 		if (game === undefined)
 			return ;
-		
+
 		client.emit("updateSpectator", {spectator: game.specList.length});
 	}
 }
