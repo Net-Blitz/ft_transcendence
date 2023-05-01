@@ -9,11 +9,12 @@ import { Server, Socket } from "socket.io";
 import { MessageDto } from "./dto";
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
-@WebSocketGateway(3334, { cors: "*" })
+@WebSocketGateway({namespace:"chat", cors: {origin: "*"}})
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
-	constructor(private readonly prisma: PrismaService) {}
+	constructor(private readonly prisma: PrismaService, private readonly config: ConfigService) {}
 	@WebSocketServer() server: Server;
 
 	private connectedClients: Map<
@@ -52,7 +53,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					content: `${username} has left the channel`,
 					channel: channel,
 					createdAt: new Date(),
-					avatar: "http://localhost:3333/" + userExists.avatar,
+					avatar: "http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_BACK") + "/" + userExists.avatar,
 				});
 
 				await this.prisma.chatUsers.deleteMany({
@@ -100,7 +101,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				username: "Server",
 				content: `${username} has joinned the channel`,
 				channel: channel,
-				avatar: "http://localhost:3333/" + userExists.avatar,
+				avatar: "http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_BACK") + "/" + userExists.avatar,
 				createdAt: new Date(),
 			});
 		} catch (e) {}
@@ -161,7 +162,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				}
 			}
 
-			message["avatar"] = "http://localhost:3333/" + userExists.avatar;
+			message["avatar"] = "http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_BACK") + "/" + userExists.avatar;
 			message["createdAt"] = new Date();
 			console.log(channel, ": ", username, ": ", message.content);
 			this.server.to(channel).emit("chat", message);
@@ -244,7 +245,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					sender,
 					receiver,
 					DMid,
-					avatar: "http://localhost:3333/" + senderUser.avatar,
+					avatar: "http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_BACK") + "/" + senderUser.avatar,
 					createdAt: new Date(),
 				});
 			}

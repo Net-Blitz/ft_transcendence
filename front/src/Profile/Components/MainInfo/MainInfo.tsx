@@ -6,7 +6,7 @@ import { ProfileConfig } from './ProfileConfig';
 import { ProfileQR } from './ProfileQR';
 /*	Redux	*/
 import { useSelector } from 'react-redux';
-import { selectUserData } from '../../../utils/redux/selectors';
+import { selectEnv, selectUserData } from '../../../utils/redux/selectors';
 import { SimpleToggle } from '../../SimpleToggle/SimpleToggle';
 /*	Ressources	*/
 import paint_brush from './Ressources/paint-brush.svg';
@@ -74,6 +74,7 @@ export const MainInfo = () => {
 	const [trigger, setTrigger] = useState(false);
 	const [triggerQR, setTriggerQR] = useState(false);
 	const [defaultToggle, setDefaultToggle] = useState(userData.twoFactor);
+	const env = useSelector(selectEnv);
 
 	const handleTrigger = useCallback(() => {
 		setTrigger(!trigger);
@@ -88,7 +89,7 @@ export const MainInfo = () => {
 			setTriggerQR(true);
 		} else {
 			try {
-				await axios.delete('http://localhost:3333/auth/2fa/disable', {
+				await axios.delete('http://' + env.host + ':' + env.port +'/auth/2fa/disable', {
 					withCredentials: true,
 				});
 				setDefaultToggle(false);

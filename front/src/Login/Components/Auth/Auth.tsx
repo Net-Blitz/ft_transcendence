@@ -18,7 +18,7 @@ import Toggle from './Toggle/Toggle';
 import QRCode from './QRCode/QrCode';
 /*	SELECTORS	*/
 import { useSelector, useStore } from 'react-redux';
-import { selectUserData, selectUserAuth } from '../../../utils/redux/selectors';
+import { selectUserData, selectUserAuth, selectEnv } from '../../../utils/redux/selectors';
 /*	FUNCTIONS	*/
 import {
 	inputProtectionPseudo,
@@ -41,7 +41,7 @@ export const AuthStart = () => {
 			<Button
 				content="Login with 42"
 				bottom={false}
-				href="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-f157f9462f604eede6bbea3f75533e279c51636777b283bfe57dfcb391784532&redirect_uri=http%3A%2F%2Flocalhost%3A3333%2Fauth%2Fcallback&response_type=code"
+				href="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-d5cdcc47ce45e3c769f2cb13e87ab75731cca27c43d93f1353595fceb48986ac&redirect_uri=http%3A%2F%2Fe2r2p9%3A3333%2Fauth%2Fcallback&response_type=code"
 				absolut={true}
 			/>
 		</div>
@@ -54,6 +54,7 @@ export const Auth2fa = () => {
 	const navigate = useNavigate();
 	const store = useStore();
 	const isAuth = useSelector(selectUserAuth);
+	const env = useSelector(selectEnv);
 
 	const handleClick2fa = useCallback(async () => {
 		const inputKey: string | undefined =
@@ -65,7 +66,7 @@ export const Auth2fa = () => {
 			if (error === '') {
 				try {
 					const response = await axios.post(
-						'http://localhost:3333/auth/2fa/verifylogin',
+						'http://' + env.host + ':' + env.port +'/auth/2fa/verifylogin',
 						{ inputKey, login },
 						{
 							withCredentials: true,
@@ -111,12 +112,13 @@ export const AuthConfig = () => {
 	const [avatar, setAvatar] = useState(generateAvatars(12));
 	const navigate = useNavigate();
 	const store = useStore();
+	const env = useSelector(selectEnv);
 
 	useEffect(() => {
 		async function fetchData() {
 			try {
 				const response = await axios.get(
-					'http://localhost:3333/users/all/pseudo',
+					'http://' + env.host + ':' + env.port +'/users/all/pseudo',
 					{
 						withCredentials: true,
 					}
@@ -143,7 +145,7 @@ export const AuthConfig = () => {
 				formData.append('file', avatar[currentIndex].file);
 				try {
 					await axios.post(
-						'http://localhost:3333/users/config',
+						'http://' + env.host + ':' + env.port +'/users/config',
 						formData,
 						{
 							withCredentials: true,
@@ -198,6 +200,7 @@ export const Auth2faConfig = () => {
 	const [inputError, setInputError] = useState('');
 	const store = useStore();
 	const twoFactor = useSelector(selectUserData).twoFactor;
+	const env = useSelector(selectEnv); 
 
 	const handleClick2fa = useCallback(async () => {
 		const inputKey: string | undefined =
@@ -209,7 +212,7 @@ export const Auth2faConfig = () => {
 			if (error === '') {
 				try {
 					await axios.post(
-						'http://localhost:3333/auth/2fa/verify',
+						'http://' + env.host + ':' + env.port +'/auth/2fa/verify',
 						{ inputKey },
 						{
 							withCredentials: true,

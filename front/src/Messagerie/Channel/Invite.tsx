@@ -5,19 +5,20 @@ import { Socket } from 'socket.io-client';
 import close from '../../Profile/Components/MainInfo/Ressources/close.svg';
 import search from '../Ressources/search.svg';
 import { useSelector } from 'react-redux';
-import { selectUserData } from '../../utils/redux/selectors';
+import { selectEnv, selectUserData } from '../../utils/redux/selectors';
 
 export const Invite = ({ socket }: { socket: Socket }) => {
 	const [Invites, setInvites] = useState<any[]>([]);
 	const { SaveChannel, setSaveChannel, setMessages, setSelectedChannel } =
 		useContext(ChannelsContext);
 	const connectedUser = useSelector(selectUserData);
+	const env = useSelector(selectEnv);
 
 	useEffect(() => {
 		const fetchInvites = async () => {
 			try {
 				const response = await axios.get(
-					'http://localhost:3333/chat/invites',
+					'http://' + env.host + ':' + env.port +'/chat/invites',
 					{ withCredentials: true }
 				);
 				setInvites(response.data);
@@ -34,7 +35,7 @@ export const Invite = ({ socket }: { socket: Socket }) => {
 		if (Channel.id === 0) return;
 		try {
 			const response = await axios.get(
-				'http://localhost:3333/chat/channel/messages/' + Channel.id,
+				'http://' + env.host + ':' + env.port +'/chat/channel/messages/' + Channel.id,
 				{ withCredentials: true }
 			);
 			response.data.map((message: any) => {
@@ -54,7 +55,7 @@ export const Invite = ({ socket }: { socket: Socket }) => {
 	const JoinPrivateChannel = async (Channel: ChannelDto) => {
 		try {
 			await axios.post(
-				'http://localhost:3333/chat/join/' + Channel.name,
+				'http://' + env.host + ':' + env.port +'/chat/join/' + Channel.name,
 				{ state: 'PRIVATE' },
 				{ withCredentials: true }
 			);
@@ -72,7 +73,7 @@ export const Invite = ({ socket }: { socket: Socket }) => {
 
 	const DeclineInvite = async (Channel: ChannelDto) => {
 		try {
-			axios.delete('http://localhost:3333/chat/decline/' + Channel.name, {
+			axios.delete('http://' + env.host + ':' + env.port +'/chat/decline/' + Channel.name, {
 				withCredentials: true,
 			});
 		} catch (error) {
@@ -120,12 +121,13 @@ const InputFlat = ({
 	const [searchResults, setSearchResults] = useState<userInfoDto[]>([]);
 	const [users, setUsers] = useState<userInfoDto[]>([]);
 	const connectedUser = useSelector(selectUserData);
+	const env = useSelector(selectEnv);
 
 	useEffect(() => {
 		const FetchUsers = async () => {
 			try {
 				const response = await axios.get(
-					'http://localhost:3333/users/login',
+					'http://' + env.host + ':' + env.port +'/users/login',
 					{ withCredentials: true }
 				);
 				const users = response.data.filter(
@@ -196,6 +198,7 @@ export const InviteChannel = ({
 }) => {
 	const me = document.getElementsByClassName('popup');
 	const [selectedUser, setSelectedUser] = useState('');
+	const env = useSelector(selectEnv);
 
 	useEffect(() => {
 		window.onclick = (event: any) => {
@@ -209,7 +212,7 @@ export const InviteChannel = ({
 		if (!Channel) return;
 		try {
 			await axios.post(
-				'http://localhost:3333/chat/invite/' + Channel.name,
+				'http://' + env.host + ':' + env.port +'/chat/invite/' + Channel.name,
 				{ username: selectedUser },
 				{ withCredentials: true }
 			);

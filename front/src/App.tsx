@@ -40,9 +40,7 @@ function App(this: any) {
 	const [reload, setReload] = useState(false);
 	const [socketQueue, setSocketQueue] = useState<Socket>({} as Socket);
 	const [socketGame, setSocketGame] = useState<Socket>({} as Socket);
-	//const env = {host: process.env.REACT_APP_BACK_HOST, port: process.env.REACT_APP_BACK_PORT}
 	// transportOptions: { polling: { extraHeaders: { 'Access-Control-Allow-Origin': '*' } } }
-	console.log(env)
 	useEffect(() => {
 		if (user.status === 'resolved' && user.auth)
 		{

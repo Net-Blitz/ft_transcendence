@@ -11,6 +11,8 @@ import close from '../../Profile/Components/MainInfo/Ressources/close.svg';
 import search from '../Ressources/search.svg';
 import block from '../Ressources/block.svg';
 import controller from '../Ressources/controller.svg';
+import { selectEnv } from '../../utils/redux/selectors';
+import { useSelector } from 'react-redux';
 
 const InputFlat = ({
 	icon,
@@ -28,12 +30,13 @@ const InputFlat = ({
 	const [searchTerm, setSearchTerm] = useState('');
 	const [searchResults, setSearchResults] = useState<userInfoDto[]>([]);
 	const [users, setUsers] = useState<userInfoDto[]>([]);
+	const env = useSelector(selectEnv);
 
 	useEffect(() => {
 		const FetchUsers = async () => {
 			try {
 				const response = await axios.get(
-					'http://localhost:3333/users/login',
+					'http://' + env.host + ':' + env.port +'/users/login',
 					{ withCredentials: true }
 				);
 				const users = response.data.filter(
@@ -104,6 +107,7 @@ const NewDm = ({
 	const me = document.getElementsByClassName('popup');
 	const [blocked, setBlocked] = useState<userInfoDto[]>([]);
 	const [selectedUser, setSelectedUser] = useState('');
+	const env = useSelector(selectEnv);
 
 	useEffect(() => {
 		window.onclick = (event: any) => {
@@ -117,7 +121,7 @@ const NewDm = ({
 		const FetchBlocked = async () => {
 			try {
 				const response = await axios.get(
-					'http://localhost:3333/friend/blocked',
+					'http://' + env.host + ':' + env.port +'/friend/blocked',
 					{ withCredentials: true }
 				);
 				setBlocked(response.data);
@@ -136,7 +140,7 @@ const NewDm = ({
 		}
 		try {
 			await axios.post(
-				'http://localhost:3333/chat/dm/create',
+				'http://' + env.host + ':' + env.port +'/chat/dm/create',
 				{ username },
 				{ withCredentials: true }
 			);
@@ -185,10 +189,12 @@ const DmListElement = ({
 	const user: userInfoDto =
 		userInfo?.id === DM.senderId ? DM.receiver : DM.sender;
 
+	const env = useSelector(selectEnv);
+
 	const handleBlock = async (username: string) => {
 		try {
 			await axios.post(
-				'http://localhost:3333/friend/block/' + username,
+				'http://' + env.host + ':' + env.port +'/friend/block/' + username,
 				{},
 				{ withCredentials: true }
 			);
@@ -316,13 +322,14 @@ interface Props {
 
 const Beside = ({ socket, DM, userInfo }: Props) => {
 	const [messages, setMessages] = useState<any[]>([]);
+	const env = useSelector(selectEnv);
 
 	useEffect(() => {
 		if (!DM) return;
 		const getMessages = async () => {
 			try {
 				const reponse = await axios.get(
-					'http://localhost:3333/chat/dm/messages/' + DM.id,
+					'http://' + env.host + ':' + env.port +'/chat/dm/messages/' + DM.id,
 					{ withCredentials: true }
 				);
 				reponse.data.map((message: any) => {
@@ -362,7 +369,7 @@ const Beside = ({ socket, DM, userInfo }: Props) => {
 			sender: userInfo?.id,
 			receiver,
 		});
-		message.avatar = 'http://localhost:3333/' + userInfo?.avatar;
+		message.avatar = 'http://' + env.host + ':' + env.port +'/' + userInfo?.avatar;
 		message.createdAt = new Date();
 		setMessages((messages) => [message, ...messages]);
 	};
@@ -450,10 +457,11 @@ export const DmElement = ({ socket }: { socket: Socket }) => {
 	const [userInfo, setUserInfo] = useState<userInfoDto>();
 	const [DMList, setDMList] = useState<DirectMessageDto[]>([]);
 	const [selectedDM, setSelectedDM] = useState<DirectMessageDto>();
+	const env = useSelector(selectEnv);
 
 	useEffect(() => {
 		const fetchData = async () => {
-			const response = await axios.get('http://localhost:3333/users/me', {
+			const response = await axios.get('http://' + env.host + ':' + env.port +'/users/me', {
 				withCredentials: true,
 			});
 			setUserInfo(response.data);
@@ -462,7 +470,7 @@ export const DmElement = ({ socket }: { socket: Socket }) => {
 		const fetchChats = async () => {
 			try {
 				const DMS = await axios.get<DirectMessageDto[]>(
-					'http://localhost:3333/chat/dm',
+					'http://' + env.host + ':' + env.port +'/chat/dm',
 					{ withCredentials: true }
 				);
 				setDMList(DMS.data);

@@ -22,7 +22,7 @@ import settings from '../../Ressources/settings.svg';
 import profile from '../../Ressources/profile.svg';
 import invite from '../../Ressources/invite.svg';
 import { useSelector } from 'react-redux';
-import { selectUserData } from '../../../utils/redux/selectors';
+import { selectEnv, selectUserData } from '../../../utils/redux/selectors';
 import { Invite, InviteChannel } from '../Invite';
 
 export const ChannelButton = ({
@@ -66,12 +66,13 @@ const ChannelListElement = ({
 		setUsersList,
 	} = useContext(ChannelsContext);
 	const connectedUser = useSelector(selectUserData);
+	const env = useSelector(selectEnv);
 
 	useEffect(() => {
 		const getBan = async () => {
 			try {
 				const response = await axios.get(
-					'http://localhost:3333/chat/ban/' + connectedUser.username,
+					'http://' + env.host + ':' + env.port +'/chat/ban/' + connectedUser.username,
 					{ withCredentials: true }
 				);
 				setBan(response.data);
@@ -85,7 +86,7 @@ const ChannelListElement = ({
 		if (Channel.id === 0) return;
 		try {
 			const response = await axios.get(
-				'http://localhost:3333/chat/channel/messages/' + Channel.id,
+				'http://' + env.host + ':' + env.port +'/chat/channel/messages/' + Channel.id,
 				{ withCredentials: true }
 			);
 			response.data.map((message: any) => {
@@ -106,7 +107,7 @@ const ChannelListElement = ({
 		if (!selectedChannel.name) return;
 		try {
 			const response = await axios.get(
-				'http://localhost:3333/chat/channel/' + selectedChannel.name,
+				'http://' + env.host + ':' + env.port +'/chat/channel/' + selectedChannel.name,
 				{ withCredentials: true }
 			);
 			setUsersList(response.data.users);
@@ -117,7 +118,7 @@ const ChannelListElement = ({
 
 	const handleSelectChannel = async (channel: ChannelDto) => {
 		const response = await axios.get(
-			'http://localhost:3333/chat/ban/' + connectedUser.username,
+			'http://' + env.host + ':' + env.port +'/chat/ban/' + connectedUser.username,
 			{ withCredentials: true }
 		);
 		setBan(response.data);
@@ -281,6 +282,7 @@ const UserChannelElement = ({
 	const [isMute, setIsMute] = useState<boolean>(false);
 	const [isBlocked, setIsBlocked] = useState<boolean>(false);
 	const { selectedChannel, setUsersList } = useContext(ChannelsContext);
+	const env = useSelector(selectEnv);
 
 	const handleUserSettingsTrigger = useCallback(() => {
 		setUserSettingsTrigger(!userSettingsTrigger);
@@ -303,7 +305,7 @@ const UserChannelElement = ({
 		const getMute = async () => {
 			try {
 				const response = await axios.get(
-					'http://localhost:3333/chat/mutes/' + channel.name,
+					'http://' + env.host + ':' + env.port +'/chat/mutes/' + channel.name,
 					{ withCredentials: true }
 				);
 				const mute = response.data;
@@ -319,7 +321,7 @@ const UserChannelElement = ({
 		const getBlock = async () => {
 			try {
 				const response = await axios.get(
-					'http://localhost:3333/friend/blockbyme/' + user.username,
+					'http://' + env.host + ':' + env.port +'/friend/blockbyme/' + user.username,
 					{ withCredentials: true }
 				);
 				setIsBlocked(response.data.isBlocked);
@@ -343,7 +345,7 @@ const UserChannelElement = ({
 		if (!selectedChannel.name) return;
 		try {
 			const response = await axios.get(
-				'http://localhost:3333/chat/channel/' + selectedChannel.name,
+				'http://' + env.host + ':' + env.port +'/chat/channel/' + selectedChannel.name,
 				{ withCredentials: true }
 			);
 			setUsersList(response.data.users);
@@ -355,7 +357,7 @@ const UserChannelElement = ({
 	const handlePromote = async () => {
 		try {
 			await axios.post(
-				'http://localhost:3333/chat/admin/promote/' + channel.name,
+				'http://' + env.host + ':' + env.port +'/chat/admin/promote/' + channel.name,
 				{
 					username: user.username,
 				},
@@ -371,7 +373,7 @@ const UserChannelElement = ({
 	const handleDemote = async () => {
 		try {
 			await axios.post(
-				'http://localhost:3333/chat/admin/demote/' + channel.name,
+				'http://' + env.host + ':' + env.port +'/chat/admin/demote/' + channel.name,
 				{
 					username: user.username,
 				},
@@ -427,7 +429,7 @@ const UserChannelElement = ({
 	const handleBlock = async () => {
 		try {
 			await axios.post(
-				'http://localhost:3333/friend/block/' + user.username,
+				'http://' + env.host + ':' + env.port +'/friend/block/' + user.username,
 				{},
 				{ withCredentials: true }
 			);
@@ -441,7 +443,7 @@ const UserChannelElement = ({
 	const handleUnblock = async () => {
 		try {
 			await axios.post(
-				'http://localhost:3333/friend/unblock/' + user.username,
+				'http://' + env.host + ':' + env.port +'/friend/unblock/' + user.username,
 				{},
 				{ withCredentials: true }
 			);
@@ -464,7 +466,7 @@ const UserChannelElement = ({
 						? 'dm-list-element-avatar admin-avatar'
 						: 'dm-list-element-avatar'
 				}
-				src={'http://localhost:3333/' + user.avatar}
+				src={'http://' + env.host + ':' + env.port +'/' + user.avatar}
 				alt=""
 			/>
 			<h4 className={userIsAdmin ? 'admin' : undefined}>
@@ -522,12 +524,13 @@ const UserChannelList = ({
 	const [selectedUser, setSelectedUser] = useState<string>();
 	const { isAdmin, usersList } = useContext(ChannelsContext);
 	const userConnected = useSelector(selectUserData);
+	const env = useSelector(selectEnv);
 
 	useEffect(() => {
 		const getBans = async () => {
 			if (!channel.name) return;
 			const response = await axios.get(
-				'http://localhost:3333/chat/bans/' + channel.name,
+				'http://' + env.host + ':' + env.port +'/chat/bans/' + channel.name,
 				{ withCredentials: true }
 			);
 			setBansList(response.data);

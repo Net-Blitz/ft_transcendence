@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import "./GameInvitation.css";
+import { selectEnv } from "../utils/redux/selectors";
+import { useSelector } from "react-redux";
 
 const InvitationCard = ({login, avatar, gameInvitation, updateGameInvitation, socketQueue}:any) => {
+
+	const env = useSelector(selectEnv);
 
 	const removeTarget = (e:any) => {
 		updateGameInvitation(gameInvitation.filter((invitation:any) => invitation.login !== login));
@@ -12,11 +16,12 @@ const InvitationCard = ({login, avatar, gameInvitation, updateGameInvitation, so
 		socketQueue.emit("JoinGroup", {groupLogin: login}); // -> appuie sur le bouton plutot
 	}
 
+	
 	return (
 		<div className="game-invitation-card">
 			<button className="game-invitation-close" onClick={removeTarget}>x</button>
 			<div className="game-invitation-card-avatar-underdiv">
-				<img className="game-invitation-card-avatar" src={avatar ? "http://localhost:3333/" + avatar : ""} alt="Avatar" />
+				<img className="game-invitation-card-avatar" src={avatar ? "http://" + env.host + ":" + env.port +"/" + avatar : ""} alt="Avatar" />
 			</div>
 			<div className="game-player-card-title"><b>{login}</b> invite you !</div>
 			<button className="game-invitation-button-join" onClick={joinGroup}>Join</button>

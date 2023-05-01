@@ -5,10 +5,13 @@ import './Profile.css';
 import { MainInfo } from './Components/MainInfo/MainInfo';
 import { MiddleInfo } from './Components/MiddleInfo/MiddleInfo';
 import { MatchHistory } from './Components/MatchHistory/MatchHistory';
+import { selectEnv } from '../utils/redux/selectors';
+import { useSelector } from 'react-redux';
 
 export const Profile = () => {
+	const env = useSelector(selectEnv);
 	const handleLogout = async () => {
-		await axios.get('http://localhost:3333/users/logout', {
+		await axios.get('http://' + env.host + ':' + env.port +'/users/logout', {
 			withCredentials: true,
 		});
 		window.location.reload();

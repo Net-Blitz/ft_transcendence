@@ -9,6 +9,8 @@ import {
 	inputProtectionChannel,
 	inputProtectionPassword,
 } from '../../../Login/Components/Auth/Input/inputProtection';
+import { selectEnv } from '../../../utils/redux/selectors';
+import { useSelector } from 'react-redux';
 // import search from '../../Ressources/search.svg';
 
 export const InputChannel = ({
@@ -64,6 +66,7 @@ export const NewChannel = ({
 	const [name, setName] = useState('');
 	const [password, setPassword] = useState('');
 	const { setChannelList } = useContext(ChannelsContext);
+	const env = useSelector(selectEnv);
 
 	useEffect(() => {
 		window.onclick = (event: any) => {
@@ -96,7 +99,7 @@ export const NewChannel = ({
 					break;
 			}
 			await axios.post(
-				'http://localhost:3333/chat/create/' + name,
+				'http://' + env.host + ':' + env.port +'/chat/create/' + name,
 				{ state, password },
 				{ withCredentials: true }
 			);
@@ -104,7 +107,7 @@ export const NewChannel = ({
 			setPassword('');
 			handleNewDmTrigger();
 			const Channels = await axios.get<ChannelDto[]>(
-				'http://localhost:3333/chat/channels',
+				'http://' + env.host + ':' + env.port +'/chat/channels',
 				{ withCredentials: true }
 			);
 			setChannelList(Channels.data);
@@ -172,6 +175,7 @@ export const UpdateChannel = ({
 	const [name, setName] = useState('');
 	const [password, setPassword] = useState('');
 	const { selectedChannel, setChannelList } = useContext(ChannelsContext);
+	const env = useSelector(selectEnv);
 
 	useEffect(() => {
 		window.onclick = (event: any) => {
@@ -212,7 +216,7 @@ export const UpdateChannel = ({
 					break;
 			}
 			await axios.patch(
-				'http://localhost:3333/chat/edit/' + selectedChannel.name,
+				'http://' + env.host + ':' + env.port +'/chat/edit/' + selectedChannel.name,
 				{ name, state, password },
 				{ withCredentials: true }
 			);
@@ -220,7 +224,7 @@ export const UpdateChannel = ({
 			setPassword('');
 			handleNewDmTrigger();
 			const Channels = await axios.get<ChannelDto[]>(
-				'http://localhost:3333/chat/channels',
+				'http://' + env.host + ':' + env.port +'/chat/channels',
 				{ withCredentials: true }
 			);
 			setChannelList(Channels.data);

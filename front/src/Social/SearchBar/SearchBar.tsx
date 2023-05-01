@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FilteredUsers } from '../FilteredUsers/FilteredUsers';
+import { selectEnv } from '../../utils/redux/selectors';
+import { useSelector } from 'react-redux';
 
 interface userDataInt {
 	username: string;
@@ -15,14 +17,15 @@ export const SearchBar = () => {
 	>([]);
 	const [searchQuery, setSearchQuery] = useState('');
 	const [filteredUsers, setFilteredUsers] = useState<userDataInt[]>([]);
+	const env = useSelector(selectEnv);
 
 	//fetch all users
 	useEffect(() => {
 		async function fetchUsers() {
 			try {
 				const response = await axios.get(
-					'http://localhost:3333/users/all/pseudo',
-					// http://localhost:3333/users/username/jojo25
+					'http://' + env.host + ':' + env.port +'/users/all/pseudo',
+					// http://' + env.host + ':' + env.port +'/users/username/jojo25
 					{
 						withCredentials: true,
 					}
@@ -56,7 +59,7 @@ export const SearchBar = () => {
 			for (const user of filteredUsername) {
 				try {
 					const response = await axios.get(
-						`http://localhost:3333/users/username/${user.username}`,
+						`http://${env.host}:${env.port}/users/username/${user.username}`,
 						{
 							withCredentials: true,
 						}

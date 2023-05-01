@@ -115,7 +115,10 @@ export class GameService {
 			const date = game.date.toISOString().split("T")[0].split("-");
 			const hour = game.date.toISOString().split("T")[1].split(".")[0].split(":");
 			ret.push({gameMode: game.mode === "ONEVONE" ? "1v1" : game.mode === "TWOVTWO" ? "2v2" : "FFA",
-				team: [
+				team: game.mode === "ONEVONE" ? [
+					{img: players.user1.avatar, level: Math.floor(players.user1.experience / 1000)},
+					{img: players.user2.avatar, level: Math.floor(players.user2.experience / 1000)},
+				] : [
 					{img: players.user1.avatar, level: Math.floor(players.user1.experience / 1000)},
 					{img: players.user2.avatar, level: Math.floor(players.user2.experience / 1000)},
 					{img: players.user3.avatar, level: Math.floor(players.user3.experience / 1000)},
