@@ -277,6 +277,13 @@ export class UserService {
 				});
 
 				element["team"] = [user1, user2];
+				const winner = element.score1 > element.score2 ? user1 : user2;
+				element["win"] = winner;
+				const diff = element.enddate.getTime() - element.date.getTime();
+				const seconds = Math.floor(diff / 1000);
+				const minutes = Math.floor(seconds / 60);
+				element["duration"] =
+					(minutes % 60) + "m" + (seconds % 60) + "s";
 				return element;
 			});
 			const promises2 = matchs.GameAsPlayer2.map(async (element) => {
@@ -303,6 +310,13 @@ export class UserService {
 				});
 
 				element["team"] = [user1, user2];
+				const winner = element.score1 > element.score2 ? user1 : user2;
+				element["win"] = winner;
+				const diff = element.enddate.getTime() - element.date.getTime();
+				const seconds = Math.floor(diff / 1000);
+				const minutes = Math.floor(seconds / 60);
+				element["duration"] =
+					(minutes % 60) + "m" + (seconds % 60) + "s";
 				return element;
 			});
 			const promises3 = matchs.GameAsPlayer3.map(async (element) => {
@@ -352,6 +366,28 @@ export class UserService {
 				});
 
 				element["team"] = [user1, user2, user3, user4];
+				if (element.mode === "TWOVTWO") {
+					const winner =
+						element.score1 > element.score3
+							? [user1, user2]
+							: [user3, user4];
+					element["win"] = winner;
+				} else if (element.mode === "FREEFORALL") {
+					const winner =
+						element.score1 > element.score2
+							? user1
+							: element.score2 > element.score3
+							? user2
+							: element.score3 > element.score4
+							? user3
+							: user4;
+					element["win"] = winner;
+				}
+				const diff = element.enddate.getTime() - element.date.getTime();
+				const seconds = Math.floor(diff / 1000);
+				const minutes = Math.floor(seconds / 60);
+				element["duration"] =
+					(minutes % 60) + "m" + (seconds % 60) + "s";
 				return element;
 			});
 			const promises4 = matchs.GameAsPlayer4.map(async (element) => {
@@ -401,6 +437,28 @@ export class UserService {
 				});
 
 				element["team"] = [user1, user2, user3, user4];
+				if (element.mode === "TWOVTWO") {
+					const winner =
+						element.score1 > element.score3
+							? [user1, user2]
+							: [user3, user4];
+					element["win"] = winner;
+				} else if (element.mode === "FREEFORALL") {
+					const winner =
+						element.score1 > element.score2
+							? user1
+							: element.score2 > element.score3
+							? user2
+							: element.score3 > element.score4
+							? user3
+							: user4;
+					element["win"] = winner;
+				}
+				const diff = element.enddate.getTime() - element.date.getTime();
+				const seconds = Math.floor(diff / 1000);
+				const minutes = Math.floor(seconds / 60);
+				element["duration"] =
+					(minutes % 60) + "m" + (seconds % 60) + "s";
 				return element;
 			});
 			const result1 = await Promise.all(promises1);

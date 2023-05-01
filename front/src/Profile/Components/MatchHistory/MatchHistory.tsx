@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { BasicFrame } from '../MiddleInfo/MiddleInfo';
 import { useAxios } from '../../../utils/hooks';
-import axios from 'axios';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 interface TeamMatchProps {
 	img: string;
@@ -43,37 +42,30 @@ const useWindowWidth = () => {
 };
 
 export const MatchHistory = ({ userData }: { userData: any }) => {
-	const headerMobile = ['Game mode', 'Team', 'Score', 'XP Gained'];
+	const headerMobile = ['Game mode', 'Team', 'Score'];
 	const isMobileView = useWindowWidth() < 767;
-	const [matchHistory, setMatchHistory] = useState<any[]>([]);
 	const { username } = useParams();
 	if (username) userData.username = username;
 
-	useEffect(() => {
-		const getMatchHistory = async () => {
-			try {
-				const response = await axios.get(
-					'http://localhost:3333/users/matchs/' + userData.username,
-					{ withCredentials: true }
-				);
-				setMatchHistory(response.data);
-			} catch (error) {
-				console.log(error);
-			}
-		};
-		getMatchHistory();
-	}, []);
+	const {
+		isLoading,
+		data,
+		error,
+	}: { isLoading: boolean; data: any; error: boolean } = useAxios(
+		'http://localhost:3333/users/matchs/' + userData.username
+	);
+
+	if (isLoading && !error) return <></>;
 
 	const header: string[] = [
 		'Game mode',
 		'Team',
 		'Date',
 		'Hour',
+		'Winner',
 		'Score',
 		'Duration',
-		'Difficulty',
 		'Map',
-		'XP Gained',
 	];
 
 	const dataHistory = ({ history, index }: dataHistoryProps) => {
@@ -110,6 +102,34 @@ export const MatchHistory = ({ userData }: { userData: any }) => {
 				{!isMobileView && (
 					<td>{date.getHours() + ':' + date.getMinutes()}</td>
 				)}
+				{!isMobileView && (
+					<td className="teamMatch">
+						{history.mode === 'TWOVTWO' ? (
+							history.win.map((winner: any, index: number) => (
+								<TeamMatch
+									img={
+										'http://localhost:3333/' + winner.avatar
+									}
+									level={Math.floor(winner.experience / 1000)}
+									index={index}
+									key={index}
+								/>
+							))
+						) : (
+							<TeamMatch
+								img={
+									'http://localhost:3333/' +
+									history.win.avatar
+								}
+								level={Math.floor(
+									history.win.experience / 1000
+								)}
+								index={0}
+								key={0}
+							/>
+						)}
+					</td>
+				)}
 				<td>
 					{history.mode === 'ONEVONE'
 						? history.score1 + ' - ' + history.score2
@@ -124,9 +144,7 @@ export const MatchHistory = ({ userData }: { userData: any }) => {
 						  history.score4}
 				</td>
 				{!isMobileView && <td>{history.duration}</td>}
-				{!isMobileView && <td>{history.difficulty}</td>}
 				{!isMobileView && <td>{history.map}</td>}
-				<td>{history.XPgained}</td>
 			</tr>
 		);
 	};
@@ -150,8 +168,8 @@ export const MatchHistory = ({ userData }: { userData: any }) => {
 						</tr>
 					</thead>
 					<tbody>
-						{matchHistory &&
-							matchHistory.map((history: any, index: number) =>
+						{data &&
+							data.map((history: any, index: number) =>
 								dataHistory({ history, index })
 							)}
 					</tbody>
