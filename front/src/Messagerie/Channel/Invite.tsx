@@ -20,7 +20,7 @@ export const Invite = ({ socket }: { socket: Socket }) => {
 		const fetchInvites = async () => {
 			try {
 				const response = await axios.get(
-					'http://' + env.host + ':' + env.port +'/chat/invites',
+					'http://' + env.host + ':' + env.port + '/chat/invites',
 					{ withCredentials: true }
 				);
 				setInvites(response.data);
@@ -31,13 +31,18 @@ export const Invite = ({ socket }: { socket: Socket }) => {
 		fetchInvites();
 		const interval = setInterval(fetchInvites, 2500);
 		return () => clearInterval(interval);
-	}, []);
+	}, [env.host, env.port]);
 
 	const getMessages = async (Channel: ChannelDto) => {
 		if (Channel.id === 0) return;
 		try {
 			const response = await axios.get(
-				'http://' + env.host + ':' + env.port +'/chat/channel/messages/' + Channel.id,
+				'http://' +
+					env.host +
+					':' +
+					env.port +
+					'/chat/channel/messages/' +
+					Channel.id,
 				{ withCredentials: true }
 			);
 			response.data.map((message: any) => {
@@ -57,7 +62,12 @@ export const Invite = ({ socket }: { socket: Socket }) => {
 	const JoinPrivateChannel = async (Channel: ChannelDto) => {
 		try {
 			await axios.post(
-				'http://' + env.host + ':' + env.port +'/chat/join/' + Channel.name,
+				'http://' +
+					env.host +
+					':' +
+					env.port +
+					'/chat/join/' +
+					Channel.name,
 				{ state: 'PRIVATE' },
 				{ withCredentials: true }
 			);
@@ -75,9 +85,17 @@ export const Invite = ({ socket }: { socket: Socket }) => {
 
 	const DeclineInvite = async (Channel: ChannelDto) => {
 		try {
-			axios.delete('http://' + env.host + ':' + env.port +'/chat/decline/' + Channel.name, {
-				withCredentials: true,
-			});
+			axios.delete(
+				'http://' +
+					env.host +
+					':' +
+					env.port +
+					'/chat/decline/' +
+					Channel.name,
+				{
+					withCredentials: true,
+				}
+			);
 		} catch (error) {
 			console.error(error);
 		}
@@ -133,7 +151,7 @@ const InputFlat = ({
 		const FetchUsers = async () => {
 			try {
 				const response = await axios.get(
-					'http://' + env.host + ':' + env.port +'/users/login',
+					'http://' + env.host + ':' + env.port + '/users/login',
 					{ withCredentials: true }
 				);
 				const users = response.data.filter(
@@ -148,7 +166,7 @@ const InputFlat = ({
 		};
 
 		FetchUsers();
-	}, [connectedUser, setSelectedUser]);
+	}, [connectedUser, env.host, env.port, setSelectedUser]);
 
 	useEffect(() => {
 		const searchUsers = (searchTerm: string) => {
@@ -218,7 +236,12 @@ export const InviteChannel = ({
 		if (!Channel) return;
 		try {
 			await axios.post(
-				'http://' + env.host + ':' + env.port +'/chat/invite/' + Channel.name,
+				'http://' +
+					env.host +
+					':' +
+					env.port +
+					'/chat/invite/' +
+					Channel.name,
 				{ username: selectedUser },
 				{ withCredentials: true }
 			);

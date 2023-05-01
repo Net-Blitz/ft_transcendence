@@ -75,6 +75,8 @@ const Beside = ({ socket }: { socket: Socket }) => {
 		socket,
 		connectedUser.username,
 		setUsersList,
+		env.host,
+		env.port,
 	]);
 
 	const sendMessage = (message: any) => {

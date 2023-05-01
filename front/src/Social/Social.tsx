@@ -60,9 +60,12 @@ export const Social = () => {
 
 	useEffect(() => {
 		const fetchData = async () => {
-			const response = await axios.get('http://' + env.host + ':' + env.port + '/users/me', {
-				withCredentials: true,
-			});
+			const response = await axios.get(
+				'http://' + env.host + ':' + env.port + '/users/me',
+				{
+					withCredentials: true,
+				}
+			);
 			setUserInfo(response.data);
 		};
 
@@ -72,12 +75,17 @@ export const Social = () => {
 		fetchBlocked();
 		const interval = setInterval(fetchFriends, 5000);
 		return () => clearInterval(interval);
-	}, []);
+	}, [env.host, env.port, fetchBlocked, fetchFriends, fetchUsers]);
 
 	const AddFriendFunction = async (username: string) => {
 		try {
 			const response = await axios.post(
-				'http://' + env.host + ':' + env.port + '/friend/add/' + username,
+				'http://' +
+					env.host +
+					':' +
+					env.port +
+					'/friend/add/' +
+					username,
 				{},
 				{ withCredentials: true }
 			);
@@ -94,7 +102,12 @@ export const Social = () => {
 		console.log(username);
 		try {
 			const response = await axios.post(
-				'http://' + env.host + ':' + env.port + '/friend/block/' + username,
+				'http://' +
+					env.host +
+					':' +
+					env.port +
+					'/friend/block/' +
+					username,
 				{},
 				{ withCredentials: true }
 			);
@@ -111,7 +124,12 @@ export const Social = () => {
 		console.log(username);
 		try {
 			const response = await axios.post(
-				'http://' + env.host + ':' + env.port + '/friend/unblock/' + username,
+				'http://' +
+					env.host +
+					':' +
+					env.port +
+					'/friend/unblock/' +
+					username,
 				{},
 				{ withCredentials: true }
 			);
@@ -127,7 +145,12 @@ export const Social = () => {
 	const RemoveFriend = async (username: string) => {
 		try {
 			const response = await axios.post(
-				'http://' + env.host + ':' + env.port + '/friend/remove/' + username,
+				'http://' +
+					env.host +
+					':' +
+					env.port +
+					'/friend/remove/' +
+					username,
 				{},
 				{ withCredentials: true }
 			);
@@ -144,7 +167,12 @@ export const Social = () => {
 		console.log('Accept username', username);
 		try {
 			const response = await axios.patch(
-				'http://' + env.host + ':' + env.port + '/friend/accept/' + username,
+				'http://' +
+					env.host +
+					':' +
+					env.port +
+					'/friend/accept/' +
+					username,
 				{},
 				{ withCredentials: true }
 			);
@@ -160,7 +188,12 @@ export const Social = () => {
 	const DeclineFriend = async (username: string) => {
 		try {
 			const response = await axios.patch(
-				'http://' + env.host + ':' + env.port + '/friend/decline/' + username,
+				'http://' +
+					env.host +
+					':' +
+					env.port +
+					'/friend/decline/' +
+					username,
 				{},
 				{ withCredentials: true }
 			);

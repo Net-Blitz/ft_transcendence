@@ -56,7 +56,7 @@ export const ProfileQR = ({ handleTrigger }: ProfileQRProps) => {
 			}
 		}
 		fetchQR();
-	}, []);
+	}, [env.host, env.port]);
 
 	const handleClick = async () => {
 		const inputKey: string | undefined =

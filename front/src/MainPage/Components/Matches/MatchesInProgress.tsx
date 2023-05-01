@@ -56,7 +56,7 @@ const MatchesInProgress: React.FC<MatchesInProgressProps> = ({
 				updateData(res.data);
 				//console.log("data", res.data)
 			});
-		}, [resetFilter]);
+		}, [env.host, env.port, resetFilter]);
 	const parseDate = (dataString: string): Date => {
 		const [month, day, year] = dataString.split('/').map(Number);
 		return new Date(year, month - 1, day); //date is waiting for January to be 0

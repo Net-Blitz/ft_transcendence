@@ -26,7 +26,7 @@ export const UserProfile = () => {
 	useEffect(() => {
 		if (data) data.avatar = 'http://' + env.host + ':' + env.port + '/' + data.avatar;
 		setUser(data);
-	}, [data]);
+	}, [data, env.host, env.port]);
 
 	if (isLoading && !error) return <div></div>;
 

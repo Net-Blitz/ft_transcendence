@@ -65,7 +65,7 @@ const GameRoute = ({
 				console.log(err);
 			});
 		}
-	}, [reload, room]);
+	}, [env.host, env.port, reload, room]);
 
 	useEffect(() => {
 		if (socketQueue && socketQueue.connected !== undefined) {

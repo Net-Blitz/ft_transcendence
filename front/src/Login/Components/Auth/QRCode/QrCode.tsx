@@ -25,7 +25,7 @@ const QrCode = () => {
 			}
 		}
 		fetchQR();
-	}, []);
+	}, [env.host, env.port]);
 
 	return (
 		<div className="qrcode-wrapper">

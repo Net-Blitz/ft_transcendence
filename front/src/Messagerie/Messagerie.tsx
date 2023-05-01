@@ -57,7 +57,7 @@ export const Messagerie = ({socketQueue} : {socketQueue: Socket}) => {
 		return () => {
 			newSocket.disconnect();
 		};
-	}, []);
+	}, [env.host, env.port]);
 
 	if (!socket) return <div>Loading...</div>;
 

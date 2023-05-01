@@ -50,7 +50,7 @@ const InputFlat = ({
 		};
 
 		FetchUsers();
-	}, [userInfo, setSelectedUser]);
+	}, [userInfo, setSelectedUser, env.host, env.port]);
 
 	useEffect(() => {
 		const searchUsers = (searchTerm: string) => {
@@ -130,7 +130,7 @@ const NewDm = ({
 			}
 		};
 		FetchBlocked();
-	}, []);
+	}, [env.host, env.port]);
 
 	const handleCreateDM = async (username: string) => {
 		if (username === '') return;
@@ -357,7 +357,7 @@ const Beside = ({ socket, DM, userInfo }: Props) => {
 		return () => {
 			socket?.off('DM');
 		};
-	}, [DM, socket, userInfo?.id, userInfo?.username]);
+	}, [DM, env.host, env.port, socket, userInfo?.id, userInfo?.username]);
 
 	const sendMessage = (message: any) => {
 		if (!message.content || !DM) return;
@@ -475,7 +475,7 @@ export const DmElement = ({ socket }: { socket: Socket }) => {
 		fetchChats();
 		const interval = setInterval(fetchChats, 5000);
 		return () => clearInterval(interval);
-	}, [userInfo?.username]);
+	}, [env.host, env.port, userInfo.username]);
 
 	return (
 		<div className="dm-element">

@@ -112,12 +112,7 @@ export const ChannelsProvider = ({ children }: { children: ReactNode }) => {
 		fetchAll();
 		const interval = setInterval(fetchAll, 2500);
 		return () => clearInterval(interval);
-	}, [
-		selectedChannel.name,
-		selectedChannel.ownerId,
-		setChannelList,
-		userConnected.id,
-	]);
+	}, [env.host, env.port, selectedChannel.name, selectedChannel.ownerId, setChannelList, userConnected.id]);
 
 	return (
 		<ChannelsContext.Provider

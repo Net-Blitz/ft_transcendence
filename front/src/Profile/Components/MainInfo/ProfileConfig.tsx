@@ -62,7 +62,7 @@ export const ProfileConfig = ({ handleTrigger }: ProfileConfigProps) => {
 		if (inputPseudo) {
 			inputPseudo.value = userConnected.username;
 		}
-	}, [userConnected]);
+	}, [env.host, env.port, userConnected]);
 
 	const handleClick = useCallback(async () => {
 		const inputPseudo: string | undefined =
@@ -92,7 +92,7 @@ export const ProfileConfig = ({ handleTrigger }: ProfileConfigProps) => {
 				}
 			} else setInputError(error);
 		} else setInputError('Please enter a pseudo');
-	}, [avatar, currentIndex, usernames, store]);
+	}, [usernames, avatar, currentIndex, env.host, env.port, store]);
 
 	useEffect(() => {
 		window.onclick = (event: any) => {

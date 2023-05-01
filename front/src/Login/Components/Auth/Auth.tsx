@@ -18,7 +18,11 @@ import Toggle from './Toggle/Toggle';
 import QRCode from './QRCode/QrCode';
 /*	SELECTORS	*/
 import { useSelector, useStore } from 'react-redux';
-import { selectUserData, selectUserAuth, selectEnv } from '../../../utils/redux/selectors';
+import {
+	selectUserData,
+	selectUserAuth,
+	selectEnv,
+} from '../../../utils/redux/selectors';
 /*	FUNCTIONS	*/
 import {
 	inputProtectionPseudo,
@@ -66,7 +70,11 @@ export const Auth2fa = () => {
 			if (error === '') {
 				try {
 					const response = await axios.post(
-						'http://' + env.host + ':' + env.port +'/auth/2fa/verifylogin',
+						'http://' +
+							env.host +
+							':' +
+							env.port +
+							'/auth/2fa/verifylogin',
 						{ inputKey, login },
 						{
 							withCredentials: true,
@@ -80,7 +88,7 @@ export const Auth2fa = () => {
 				}
 			} else setInputError(error);
 		} else setInputError('Please enter a key');
-	}, [navigate, login, store]);
+	}, [env.host, env.port, login, store, navigate]);
 
 	if (isAuth) return <Navigate to="/" />;
 
@@ -118,7 +126,7 @@ export const AuthConfig = () => {
 		async function fetchData() {
 			try {
 				const response = await axios.get(
-					'http://' + env.host + ':' + env.port +'/users/all/pseudo',
+					'http://' + env.host + ':' + env.port + '/users/all/pseudo',
 					{
 						withCredentials: true,
 					}
@@ -130,7 +138,7 @@ export const AuthConfig = () => {
 			}
 		}
 		fetchData();
-	}, []);
+	}, [env.host, env.port]);
 
 	const handleClick = useCallback(async () => {
 		const inputPseudo: string | undefined =
@@ -145,7 +153,7 @@ export const AuthConfig = () => {
 				formData.append('file', avatar[currentIndex].file);
 				try {
 					await axios.post(
-						'http://' + env.host + ':' + env.port +'/users/config',
+						'http://' + env.host + ':' + env.port + '/users/config',
 						formData,
 						{
 							withCredentials: true,
@@ -158,7 +166,7 @@ export const AuthConfig = () => {
 				}
 			} else setInputError(error);
 		} else setInputError('Please enter a pseudo');
-	}, [usernames, currentIndex, avatar, navigate, store]);
+	}, [usernames, avatar, currentIndex, env.host, env.port, store, navigate]);
 
 	if (isConfig === true) return <Navigate to="/" replace />;
 
@@ -200,7 +208,7 @@ export const Auth2faConfig = () => {
 	const [inputError, setInputError] = useState('');
 	const store = useStore();
 	const twoFactor = useSelector(selectUserData).twoFactor;
-	const env = useSelector(selectEnv); 
+	const env = useSelector(selectEnv);
 
 	const handleClick2fa = useCallback(async () => {
 		const inputKey: string | undefined =
@@ -212,7 +220,11 @@ export const Auth2faConfig = () => {
 			if (error === '') {
 				try {
 					await axios.post(
-						'http://' + env.host + ':' + env.port +'/auth/2fa/verify',
+						'http://' +
+							env.host +
+							':' +
+							env.port +
+							'/auth/2fa/verify',
 						{ inputKey },
 						{
 							withCredentials: true,
@@ -225,7 +237,7 @@ export const Auth2faConfig = () => {
 				}
 			} else setInputError(error);
 		} else setInputError('Please enter a key');
-	}, [navigate, store]);
+	}, [env.host, env.port, navigate, store]);
 
 	if ((!state && inputError === '') || twoFactor === true) {
 		return <Navigate to="/" replace />;

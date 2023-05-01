@@ -1,10 +1,7 @@
 import React from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import './Admin.css';
-import {
-	createAvatarObject,
-	AvatarProps,
-} from './Login/Components/Auth/Carousel/genAvatars';
+import { createAvatarObject } from './Login/Components/Auth/Carousel/genAvatars';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { selectEnv } from './utils/redux/selectors';
@@ -29,9 +26,13 @@ const Admin = () => {
 			const formData = new FormData();
 			formData.append('username', pseudo);
 			formData.append('file', avatar.file);
-			axios.post('http://' + env.host + ':' + env.port +'/auth/admin/create', formData, {
-				withCredentials: true,
-			});
+			axios.post(
+				'http://' + env.host + ':' + env.port + '/auth/admin/create',
+				formData,
+				{
+					withCredentials: true,
+				}
+			);
 		} catch (error) {
 			console.log(error);
 		}

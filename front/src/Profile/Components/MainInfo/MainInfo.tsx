@@ -113,7 +113,7 @@ export const MainInfo = ({
 				console.log(error);
 			}
 		}
-	}, [defaultToggle]);
+	}, [defaultToggle, env.host, env.port]);
 
 	return (
 		<div className="maininfo-wrapper">
