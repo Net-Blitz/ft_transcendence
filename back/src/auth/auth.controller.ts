@@ -56,11 +56,11 @@ export class AuthController {
 
 	@Post("2fa/verify")
 	async verify2fa(
-		@GetUser() user: any,
 		@Res() res: Response,
+		@GetUser() user: any,
 		@Body("inputKey") key: string
 	) {
-		return await this.authService.verify2fa(user, res, key);
+		return await this.authService.verify2fa(res, user, key);
 	}
 
 	@Post("2fa/verifylogin")
