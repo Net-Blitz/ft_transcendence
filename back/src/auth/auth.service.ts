@@ -225,16 +225,6 @@ export class AuthService {
 		return res.status(200).json({ message: "OK" });
 	}
 
-	async getUserCheat(res: Response, username: string) {
-		const user = await this.prisma.user.findUnique({
-			where: { username },
-		});
-		if (user) {
-			return await this.signToken(res, user);
-		}
-		return user;
-	}
-
 	async adminCreateUser(
 		@Res() res: Response,
 		@Body("username") username: string,
