@@ -9,7 +9,6 @@ import './AddFriends.css';
 
 interface AddFriendsProps {
 	AddFriendFunction: (username: string) => Promise<void>;
-	BlockByMe: (username: string) => Promise<void>;
 	users: User[];
 	friends: User[];
 	userInfo: User | undefined;
@@ -22,7 +21,6 @@ interface AddFriendsProps {
 export const AddFriends = ({
 	AddFriendFunction,
 	setNavbarStatus,
-	BlockByMe,
 	users,
 	friends,
 	userInfo,
@@ -52,7 +50,6 @@ export const AddFriends = ({
 				)}
 				<FilteredUsers
 					AddFriendFunction={AddFriendFunction}
-					BlockByMe={BlockByMe}
 					searchQuery={searchQuery}
 					users={users}
 					blocked={blocked}
