@@ -4,6 +4,9 @@ import './MainInfo.css';
 /*	Components	*/
 import { ProfileConfig } from './ProfileConfig';
 import { ProfileQR } from './ProfileQR';
+/*	Redux	*/
+import { useSelector } from 'react-redux';
+import { selectEnv } from '../../../utils/redux/selectors';
 import { SimpleToggle } from '../../SimpleToggle/SimpleToggle';
 /*	Ressources	*/
 import paint_brush from './Ressources/paint-brush.svg';
@@ -87,6 +90,7 @@ export const MainInfo = ({
 	const [defaultToggle, setDefaultToggle] = useState(userData.twoFactor);
 	const totalGames: number = userData.wins + userData.losses;
 	const winRate: number = (userData.wins / totalGames) * 100;
+	const env = useSelector(selectEnv);
 
 	const handleTrigger = useCallback(() => {
 		setTrigger(!trigger);
@@ -101,7 +105,7 @@ export const MainInfo = ({
 			setTriggerQR(true);
 		} else {
 			try {
-				await axios.delete('http://localhost:3333/auth/2fa/disable', {
+				await axios.delete('http://' + env.host + ':' + env.port +'/auth/2fa/disable', {
 					withCredentials: true,
 				});
 				setDefaultToggle(false);

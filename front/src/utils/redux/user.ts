@@ -16,10 +16,14 @@ const userStatus = createAction<any>('user/status');
 const userFetching = createAction('user/fetching');
 const userResolved = createAction<any>('user/resolved');
 const userRejected = createAction<any>('user/rejected');
+const env = {
+	host: process.env.REACT_APP_BACK_HOST,
+	port: process.env.REACT_APP_BACK_PORT,
+}
 
 export async function fetchOrUpdateUser(store: any) {
 	try {
-		const response = await axios.get('http://localhost:3333/auth/verify', {
+		const response = await axios.get('http://' + env.host + ':' + env.port +'/auth/verify', {
 			withCredentials: true,
 		});
 		const data = response.data;
@@ -38,10 +42,10 @@ export async function fetchOrUpdateUser(store: any) {
 	}
 	store.dispatch(userFetching());
 	try {
-		const response = await axios.get('http://localhost:3333/users/me', {
+		const response = await axios.get('http://' + env.host + ':' + env.port +'/users/me', {
 			withCredentials: true,
 		});
-		response.data.avatar = `http://localhost:3333/${response.data.avatar}`;
+		response.data.avatar = `http://${env.host}:${env.port}/${response.data.avatar}`;
 		const data = response.data;
 		store.dispatch(userResolved(data));
 	} catch (error) {

@@ -2,15 +2,18 @@ import React, { useEffect, useState } from 'react';
 import QRCodeSVG from 'qrcode.react';
 import axios from 'axios';
 import './QrCode.css';
+import { selectEnv } from '../../../../utils/redux/selectors';
+import { useSelector } from 'react-redux';
 
 const QrCode = () => {
 	const [qrCodeUrl, setQrCodeUrl] = useState('');
+	const env = useSelector(selectEnv);
 
 	useEffect(() => {
 		async function fetchQR() {
 			try {
 				const { data } = await axios.post(
-					'http://localhost:3333/auth/2fa/setup',
+					'http://' + env.host + ':' + env.port +'/auth/2fa/setup',
 					{},
 					{
 						withCredentials: true,

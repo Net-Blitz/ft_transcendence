@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import "./Lobby.css"
+import { selectEnv } from "../utils/redux/selectors";
+import { useSelector } from "react-redux";
 
 const LobbyBox = ({children}:any) => {
 	return (
@@ -9,12 +11,14 @@ const LobbyBox = ({children}:any) => {
 )}
 
 const PlayerInLobby = ({player}:any) => {
+	const env = useSelector(selectEnv);
+
 	return (
 		player !== undefined && player !== null ?
 		<div className="game-waiting-player">
 			<div className="game-waiting-player-avatar-underdiv">
 				
-				<img className="game-waiting-player-avatar" src={player.avatar ? 'http://localhost:3333/' + player.avatar : ""} alt="Avatar" />
+				<img className="game-waiting-player-avatar" src={player.avatar ? 'http://' + env.host + ':' + env.port +'/' + player.avatar : ""} alt="Avatar" />
 			</div>
 			<div className="game-waiting-player-name">{player.login}</div>
 			<div className="game-waiting-player-rank">{player.elo} LP</div>

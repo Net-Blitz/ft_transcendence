@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
 import "./LobbyCreation.css"
+import { useSelector } from "react-redux";
+import { selectEnv } from "../utils/redux/selectors";
 
 
 const PlayerCard = ({playerInfo}:any) => {
+	const env = useSelector(selectEnv);
+
 	return (
 		<div className="game-creation-player-card">
 			<div className="game-player-card-avatar-underdiv">
-				<img className="game-player-card-avatar" src={playerInfo.avatar ? "http://localhost:3333/" + playerInfo.avatar : ""} alt="Avatar" />
+				<img className="game-player-card-avatar" src={playerInfo.avatar ? "http://" + env.host + ":" + env.port +"/" + playerInfo.avatar : ""} alt="Avatar" />
 			</div>
 			<div className="game-player-card-title">
 				<div>Pseudo</div>
