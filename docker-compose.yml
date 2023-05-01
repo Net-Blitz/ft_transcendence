@@ -41,7 +41,6 @@ services:
         ports:
             - "5555:5555"
             - "3333:3333"
-            - "3334:3334"
 
     dev-db:
         container_name: dev-db
