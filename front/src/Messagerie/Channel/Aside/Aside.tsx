@@ -24,6 +24,7 @@ import invite from '../../Ressources/invite.svg';
 import { useSelector } from 'react-redux';
 import { selectUserData } from '../../../utils/redux/selectors';
 import { Invite, InviteChannel } from '../Invite';
+import { useNavigate } from 'react-router-dom';
 
 export const ChannelButton = ({
 	icon,
@@ -290,6 +291,7 @@ const UserChannelElement = ({
 	const [isMute, setIsMute] = useState<boolean>(false);
 	const [isBlocked, setIsBlocked] = useState<boolean>(false);
 	const { selectedChannel, setUsersList } = useContext(ChannelsContext);
+	const navigate = useNavigate();
 
 	const handleUserSettingsTrigger = useCallback(() => {
 		setUserSettingsTrigger(!userSettingsTrigger);
@@ -477,7 +479,10 @@ const UserChannelElement = ({
 			</h4>
 			<div className="user-channel-list-buttons">
 				<ChannelButton icon={controller} />
-				<ChannelButton icon={profile} />
+				<ChannelButton
+					icon={profile}
+					onClick={navigate('/profile/' + user.username)}
+				/>
 				{(channel.ownerId === userConnected.id ||
 					(user.role !== 'admin' && isAdmin === true)) && (
 					<ChannelButton

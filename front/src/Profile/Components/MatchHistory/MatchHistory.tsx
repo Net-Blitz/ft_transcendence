@@ -5,10 +5,12 @@ import { useEffect, useState } from 'react';
 import { BasicFrame } from '../MiddleInfo/MiddleInfo';
 import { useAxios } from '../../../utils/hooks';
 import { useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 interface TeamMatchProps {
 	img: string;
 	level: number;
+	username: string;
 	index: number;
 }
 
@@ -17,12 +19,14 @@ interface dataHistoryProps {
 	index: number;
 }
 
-const TeamMatch = ({ img, level, index }: TeamMatchProps) => {
+const TeamMatch = ({ img, level, username, index }: TeamMatchProps) => {
 	return (
-		<div className="teamMatch ">
-			<img src={img} alt={`Team member ${index + 1}`} />
-			<p>{level}</p>
-		</div>
+		<Link to={'/profile/' + username}>
+			<div className="teamMatch">
+				<img src={img} alt={`Team member ${index + 1}`} />
+				<p>{level}</p>
+			</div>
+		</Link>
 	);
 };
 
@@ -85,6 +89,7 @@ export const MatchHistory = ({ userData }: { userData: any }) => {
 						<TeamMatch
 							img={'http://localhost:3333/' + teamMember.avatar}
 							level={Math.floor(teamMember.experience / 1000)}
+							username={teamMember.username}
 							index={index}
 							key={index}
 						/>
@@ -104,13 +109,14 @@ export const MatchHistory = ({ userData }: { userData: any }) => {
 				)}
 				{!isMobileView && (
 					<td className="teamMatch">
-						{history.mode === 'TWOVTWO' ? (
+						{history.win[0] && history.mode === 'TWOVTWO' ? (
 							history.win.map((winner: any, index: number) => (
 								<TeamMatch
 									img={
 										'http://localhost:3333/' + winner.avatar
 									}
 									level={Math.floor(winner.experience / 1000)}
+									username={winner.username}
 									index={index}
 									key={index}
 								/>
@@ -124,6 +130,7 @@ export const MatchHistory = ({ userData }: { userData: any }) => {
 								level={Math.floor(
 									history.win.experience / 1000
 								)}
+								username={history.win.username}
 								index={0}
 								key={0}
 							/>
