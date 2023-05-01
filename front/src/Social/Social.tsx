@@ -171,7 +171,7 @@ export const Social = () => {
 	};
 
 	return (
-		<div className="friends">
+		<div className="social">
 			<MainFrame title="Friends" showBlockModal={showBlockModal}>
 				{navbarStatus !== 'AddFriends' && (
 					<Navbar

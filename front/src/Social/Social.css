@@ -4,14 +4,14 @@
 }
 
 /*	NAVBAR */
-.friends .navbar {
+.social .navbar {
 	display: flex;
 	margin-top: 37px;
 	justify-content: space-between;
 	align-self: center;
 }
 
-.friends .navbar button {
+.social .navbar button {
 	all: unset;
 	border-radius: 5px;
 	text-align: center;
@@ -24,21 +24,21 @@
 	height: 30px;
 }
 
-.friends .navbar .navbarLeft {
+.social .navbar .navbarLeft {
 	display: flex;
   }
 
 
-.friends .navbar :not(:first-child) {
+.social .navbar :not(:first-child) {
 	margin-left: 15px;
 }
 
-.friends .navbar .inactive {
+.social .navbar .inactive {
 	color: #0A3D62;
 }
 
-.friends .navbar .active, 
-.friends .navbar .addFriends {
+.social .navbar .active, 
+.social .navbar .addFriends {
 	background-color: #0A3D62;
 	color: #FFFDE4;
 }
@@ -60,7 +60,7 @@
 	/* .friends .navbar button {
 		height: 50px;
 	} */
-	.friends .navbar :not(:first-child)
+	.social .navbar :not(:first-child)
 	{
 		margin-left: 0;
 	}

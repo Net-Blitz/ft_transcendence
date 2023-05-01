@@ -138,7 +138,7 @@
 	margin-top:20px;
 	width: 100%;
 }
-.friends{
+.social{
 	/* margin-top: 18px; */
     background-color: transparent;
     /* overflow: scroll; */
@@ -148,7 +148,7 @@
 
 /* Ipad */
 @media screen and (min-width: 768px) and (max-width: 1020px) {
-	.friends{
+	.social{
 		height: 86vh;
 	}
 	
@@ -196,7 +196,7 @@
 		margin-left:0;
 		margin-top: 5px;
 	}
-	.friends{
+	.social{
 		height: 82vh;
 	}
 	.myFriendsInfoAll{
