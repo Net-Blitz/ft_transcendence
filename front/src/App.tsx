@@ -14,6 +14,7 @@ import { Profile } from './Profile/Profile';
 import { AuthRoutes } from './utils/PrivateRoutes';
 import { useSelector } from 'react-redux';
 import Admin from './Admin';
+import { UserProfile } from './Profile/UserProfile';
 /*	HOOKS	*/
 import { useGetUser } from './utils/hooks';
 /*	SELECTORS	*/
@@ -34,22 +35,33 @@ const NotFound = () => {
 function App(this: any) {
 	useGetUser();
 	const user = useSelector(selectUser);
-	const currentPath = window.location.pathname;
 	const [reload, setReload] = useState(false);
 	const [socketQueue, setSocketQueue] = useState<Socket>({} as Socket);
 	const [socketGame, setSocketGame] = useState<Socket>({} as Socket);
-	const env = {host: process.env.REACT_APP_BACK_HOST, port: process.env.REACT_APP_BACK_PORT}
+	const env = {
+		host: process.env.REACT_APP_BACK_HOST,
+		port: process.env.REACT_APP_BACK_PORT,
+	};
 	// transportOptions: { polling: { extraHeaders: { 'Access-Control-Allow-Origin': '*' } } }
 
 	useEffect(() => {
-		if (user.status === 'resolved' && user.auth)
-		{
-			setSocketQueue(io("http://" + env.host + ":" + env.port + "/queue", {transports: ['websocket'], withCredentials: true}));
-			setSocketGame(io("http://" + env.host + ":" + env.port + "/game", {transports: ['websocket'], withCredentials: true}));
+		if (user.status === 'resolved' && user.auth) {
+			setSocketQueue(
+				io('http://' + env.host + ':' + env.port + '/queue', {
+					transports: ['websocket'],
+					withCredentials: true,
+				})
+			);
+			setSocketGame(
+				io('http://' + env.host + ':' + env.port + '/game', {
+					transports: ['websocket'],
+					withCredentials: true,
+				})
+			);
 		}
-	}, [user]);
-	// console.log("ENV", env, process.env);
-	if (user.status !== 'resolved' && user.status !== 'notAuth') return <div></div>;
+	}, [user, env.host, env.port]);
+	if (user.status !== 'resolved' && user.status !== 'notAuth')
+		return <div></div>;
 	return (
 		<div>
 			<GamePopUp
@@ -91,7 +103,15 @@ function App(this: any) {
 					/>
 					<Route
 						path="/game"
-						element={<GameRoute socketQueue={socketQueue} socketGame={socketGame} reload={reload} setReload={setReload} />}
+						element={
+							<GameRoute
+								socketQueue={socketQueue}
+								socketGame={socketGame}
+								reload={reload}
+								setReload={setReload}
+								env={env}
+							/>
+						}
 					/>
 					<Route
 						path="/Notification"
@@ -108,6 +128,15 @@ function App(this: any) {
 							<AppLayout>
 								{' '}
 								<Profile />
+							</AppLayout>
+						}
+					/>
+					<Route
+						path="/profile/:username"
+						element={
+							<AppLayout>
+								{' '}
+								<UserProfile />
 							</AppLayout>
 						}
 					/>

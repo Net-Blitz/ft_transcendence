@@ -24,15 +24,18 @@ import invite from '../../Ressources/invite.svg';
 import { useSelector } from 'react-redux';
 import { selectUserData } from '../../../utils/redux/selectors';
 import { Invite, InviteChannel } from '../Invite';
+import { useNavigate } from 'react-router-dom';
 
 export const ChannelButton = ({
 	icon,
 	onClick,
 	myRef,
+	style,
 }: {
 	icon: string;
 	onClick?: any;
 	myRef?: any;
+	style?: any;
 }) => {
 	return (
 		<>
@@ -42,6 +45,7 @@ export const ChannelButton = ({
 				alt="icon"
 				onClick={onClick}
 				ref={myRef}
+				style={style}
 			/>
 		</>
 	);
@@ -212,12 +216,20 @@ const ChannelListElement = ({
 						<ChannelButton
 							icon={invite}
 							onClick={handleChannelInviteTrigger}
+							style={{ marginLeft: 'auto', marginRight: '2px' }}
 						/>
 					)}
 				{connectedUser.id === Channel.ownerId && (
 					<ChannelButton
 						icon={settings}
 						onClick={handleChannelSettingsTrigger}
+						style={{
+							marginLeft:
+								connectedUser.id === Channel.ownerId &&
+								Channel.state === 'PRIVATE'
+									? '0px'
+									: 'auto',
+						}}
 					/>
 				)}
 			</div>
@@ -279,6 +291,7 @@ const UserChannelElement = ({
 	const [isMute, setIsMute] = useState<boolean>(false);
 	const [isBlocked, setIsBlocked] = useState<boolean>(false);
 	const { selectedChannel, setUsersList } = useContext(ChannelsContext);
+	const navigate = useNavigate();
 
 	const handleUserSettingsTrigger = useCallback(() => {
 		setUserSettingsTrigger(!userSettingsTrigger);
@@ -450,6 +463,10 @@ const UserChannelElement = ({
 		}
 	};
 
+	const handleNavigateProfile = () => {
+		navigate('/profile/' + user.username);
+	};
+
 	return (
 		<div className="user-channel-list-element">
 			<img
@@ -466,7 +483,7 @@ const UserChannelElement = ({
 			</h4>
 			<div className="user-channel-list-buttons">
 				<ChannelButton icon={controller} />
-				<ChannelButton icon={profile} />
+				<ChannelButton icon={profile} onClick={handleNavigateProfile} />
 				{(channel.ownerId === userConnected.id ||
 					(user.role !== 'admin' && isAdmin === true)) && (
 					<ChannelButton
@@ -528,7 +545,7 @@ const UserChannelList = ({
 		};
 
 		getBans();
-		const interval = setInterval(getBans, 2500);
+		const interval = setInterval(getBans, 5000);
 		return () => clearInterval(interval);
 	}, [channel, userConnected]);
 

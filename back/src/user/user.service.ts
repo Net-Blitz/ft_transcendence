@@ -171,4 +171,309 @@ export class UserService {
 			return res.status(200).json(updatedUser);
 		}
 	}
+
+	async GetAchievement(
+		@Param("username") username: string,
+		@Res() res: Response
+	) {
+		try {
+			if (!username) {
+				return res.status(204).json({ message: `User not found` });
+			}
+			const achievements = await this.prisma.user.findUnique({
+				where: {
+					username,
+				},
+				select: {
+					achievements: true,
+				},
+			});
+			return res.status(200).json(achievements);
+		} catch (error) {
+			return res.status(204).json({ message: `User has no achievement` });
+		}
+	}
+
+	async GetFriends(
+		@Param("username") username: string,
+		@Res() res: Response
+	) {
+		try {
+			if (!username) {
+				return res.status(204).json({ message: "User not found" });
+			}
+
+			const friends = await this.prisma.user.findUnique({
+				where: {
+					username,
+				},
+				include: {
+					friendwith: true,
+				},
+			});
+
+			if (!friends) {
+				return res.status(204).json({ message: "friends not found" });
+			}
+
+			const friendsList = [];
+			let j = 0;
+			for (let i = 0; i < friends.friendwith.length; i++) {
+				const friend = await this.prisma.user.findUnique({
+					where: {
+						id: friends.friendwith[i].friendId,
+					},
+				});
+				if (friends.friendwith[i].status === "ACCEPTED") {
+					friendsList[j] = friend;
+					j++;
+				}
+			}
+			return res.status(200).json({
+				friends: friendsList,
+			});
+		} catch (error) {
+			return res.status(204).json({ message: `User has no friends` });
+		}
+	}
+
+	async GetMatchs(@Param("username") username: string, @Res() res: Response) {
+		try {
+			if (!username) {
+				return res.status(204).json({ message: `User not found` });
+			}
+			const matchs = await this.prisma.user.findUnique({
+				where: {
+					username,
+				},
+				select: {
+					GameAsPlayer1: true,
+					GameAsPlayer2: true,
+					GameAsPlayer3: true,
+					GameAsPlayer4: true,
+				},
+			});
+			const promises1 = matchs.GameAsPlayer1.map(async (element) => {
+				const user1 = await this.prisma.user.findUnique({
+					where: {
+						id: element.user1Id,
+					},
+					select: {
+						avatar: true,
+						username: true,
+						experience: true,
+					},
+				});
+
+				const user2 = await this.prisma.user.findUnique({
+					where: {
+						id: element.user2Id,
+					},
+					select: {
+						avatar: true,
+						username: true,
+						experience: true,
+					},
+				});
+
+				element["team"] = [user1, user2];
+				const winner = element.score1 > element.score2 ? user1 : user2;
+				element["win"] = winner;
+				const diff = element.enddate.getTime() - element.date.getTime();
+				const seconds = Math.floor(diff / 1000);
+				const minutes = Math.floor(seconds / 60);
+				element["duration"] =
+					(minutes % 60) + "m" + (seconds % 60) + "s";
+				return element;
+			});
+			const promises2 = matchs.GameAsPlayer2.map(async (element) => {
+				const user1 = await this.prisma.user.findUnique({
+					where: {
+						id: element.user1Id,
+					},
+					select: {
+						avatar: true,
+						username: true,
+						experience: true,
+					},
+				});
+
+				const user2 = await this.prisma.user.findUnique({
+					where: {
+						id: element.user2Id,
+					},
+					select: {
+						avatar: true,
+						username: true,
+						experience: true,
+					},
+				});
+
+				element["team"] = [user1, user2];
+				const winner = element.score1 > element.score2 ? user1 : user2;
+				element["win"] = winner;
+				const diff = element.enddate.getTime() - element.date.getTime();
+				const seconds = Math.floor(diff / 1000);
+				const minutes = Math.floor(seconds / 60);
+				element["duration"] =
+					(minutes % 60) + "m" + (seconds % 60) + "s";
+				return element;
+			});
+			const promises3 = matchs.GameAsPlayer3.map(async (element) => {
+				if (element.mode === "ONEVONE") return null;
+				const user1 = await this.prisma.user.findUnique({
+					where: {
+						id: element.user1Id,
+					},
+					select: {
+						avatar: true,
+						username: true,
+						experience: true,
+					},
+				});
+
+				const user2 = await this.prisma.user.findUnique({
+					where: {
+						id: element.user2Id,
+					},
+					select: {
+						avatar: true,
+						username: true,
+						experience: true,
+					},
+				});
+
+				const user3 = await this.prisma.user.findUnique({
+					where: {
+						id: element.user3Id,
+					},
+					select: {
+						avatar: true,
+						username: true,
+						experience: true,
+					},
+				});
+
+				const user4 = await this.prisma.user.findUnique({
+					where: {
+						id: element.user4Id,
+					},
+					select: {
+						avatar: true,
+						username: true,
+						experience: true,
+					},
+				});
+
+				element["team"] = [user1, user2, user3, user4];
+				if (element.mode === "TWOVTWO") {
+					const winner =
+						element.score1 > element.score3
+							? [user1, user2]
+							: [user3, user4];
+					element["win"] = winner;
+				} else if (element.mode === "FREEFORALL") {
+					const winner =
+						element.score1 > element.score2
+							? user1
+							: element.score2 > element.score3
+							? user2
+							: element.score3 > element.score4
+							? user3
+							: user4;
+					element["win"] = winner;
+				}
+				const diff = element.enddate.getTime() - element.date.getTime();
+				const seconds = Math.floor(diff / 1000);
+				const minutes = Math.floor(seconds / 60);
+				element["duration"] =
+					(minutes % 60) + "m" + (seconds % 60) + "s";
+				return element;
+			});
+			const promises4 = matchs.GameAsPlayer4.map(async (element) => {
+				if (element.mode === "ONEVONE") return null;
+				const user1 = await this.prisma.user.findUnique({
+					where: {
+						id: element.user1Id,
+					},
+					select: {
+						avatar: true,
+						username: true,
+						experience: true,
+					},
+				});
+
+				const user2 = await this.prisma.user.findUnique({
+					where: {
+						id: element.user2Id,
+					},
+					select: {
+						avatar: true,
+						username: true,
+						experience: true,
+					},
+				});
+
+				const user3 = await this.prisma.user.findUnique({
+					where: {
+						id: element.user3Id,
+					},
+					select: {
+						avatar: true,
+						username: true,
+						experience: true,
+					},
+				});
+
+				const user4 = await this.prisma.user.findUnique({
+					where: {
+						id: element.user4Id,
+					},
+					select: {
+						avatar: true,
+						username: true,
+						experience: true,
+					},
+				});
+
+				element["team"] = [user1, user2, user3, user4];
+				if (element.mode === "TWOVTWO") {
+					const winner =
+						element.score1 > element.score3
+							? [user1, user2]
+							: [user3, user4];
+					element["win"] = winner;
+				} else if (element.mode === "FREEFORALL") {
+					const winner =
+						element.score1 > element.score2
+							? user1
+							: element.score2 > element.score3
+							? user2
+							: element.score3 > element.score4
+							? user3
+							: user4;
+					element["win"] = winner;
+				}
+				const diff = element.enddate.getTime() - element.date.getTime();
+				const seconds = Math.floor(diff / 1000);
+				const minutes = Math.floor(seconds / 60);
+				element["duration"] =
+					(minutes % 60) + "m" + (seconds % 60) + "s";
+				return element;
+			});
+			const result1 = await Promise.all(promises1);
+			const result2 = await Promise.all(promises2);
+			const result3 = await Promise.all(promises3);
+			const result4 = await Promise.all(promises4);
+			return res.status(200).json(
+				result1
+					.concat(result2)
+					.concat(result3)
+					.concat(result4)
+					.filter((element) => element !== null)
+			);
+		} catch (error) {
+			return res.status(204).json({ message: `User has no matchs` });
+		}
+	}
 }

@@ -7,8 +7,10 @@ import './DonutLevel.css';
 
 Chart.register(CategoryScale);
 
-export const DonutLevel = () => {
-	const percentageValue = 25;
+export const DonutLevel = ({ userData }: { userData: any }) => {
+	const xp = userData.experience % 1000;
+	const percentageValue = Math.floor((xp / 1000) * 100);
+	const level = Math.floor(userData.experience / 1000);
 	const data = {
 		datasets: [
 			{
@@ -39,7 +41,7 @@ export const DonutLevel = () => {
 	return (
 		<div className="donutlevel-wrapper">
 			<div className="level-wrapper">
-				Lvl. <span>3</span>
+				Lvl. <span>{level.toString()}</span>
 			</div>
 			<div className="doughnut-wrapper">
 				<div className="d-percentage">
@@ -48,7 +50,7 @@ export const DonutLevel = () => {
 				<Doughnut data={data} options={options} />
 			</div>
 			<div className="progression-wrapper">
-				<span>81</span> / 325
+				<span>{xp.toString()}</span> / 1000
 			</div>
 		</div>
 	);

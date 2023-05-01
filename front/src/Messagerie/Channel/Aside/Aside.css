@@ -186,3 +186,26 @@
 	padding: 0 5px 0 5px;
 	cursor: pointer;
 }
+
+/* INVITE TO CHANNEL */
+.content-dm-aside > .dm-list-element {
+	display: flex;
+	align-items: center;
+	height: 37px;
+	border-bottom: 0.3px solid #fdfad0;
+}
+
+.content-dm-aside > .dm-list-element h4 {
+	margin: 0 0 0 11px;
+	font-family: 'Poppins', sans-serif;
+	font-style: normal;
+	font-weight: 300;
+	font-size: 12px;
+	color: #fdfad0;
+}
+
+.content-dm-aside > .dm-list-element img {
+	height: 10px;
+	width: 10px;
+	margin-left: 10px;
+}
