@@ -463,6 +463,10 @@ const UserChannelElement = ({
 		}
 	};
 
+	const handleNavigateProfile = () => {
+		navigate('/profile/' + user.username);
+	};
+
 	return (
 		<div className="user-channel-list-element">
 			<img
@@ -479,10 +483,7 @@ const UserChannelElement = ({
 			</h4>
 			<div className="user-channel-list-buttons">
 				<ChannelButton icon={controller} />
-				<ChannelButton
-					icon={profile}
-					onClick={navigate('/profile/' + user.username)}
-				/>
+				<ChannelButton icon={profile} onClick={handleNavigateProfile} />
 				{(channel.ownerId === userConnected.id ||
 					(user.role !== 'admin' && isAdmin === true)) && (
 					<ChannelButton
@@ -544,7 +545,7 @@ const UserChannelList = ({
 		};
 
 		getBans();
-		const interval = setInterval(getBans, 2500);
+		const interval = setInterval(getBans, 5000);
 		return () => clearInterval(interval);
 	}, [channel, userConnected]);
 

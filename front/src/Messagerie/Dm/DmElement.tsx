@@ -11,6 +11,8 @@ import close from '../../Profile/Components/MainInfo/Ressources/close.svg';
 import search from '../Ressources/search.svg';
 import block from '../Ressources/block.svg';
 import controller from '../Ressources/controller.svg';
+import { useSelector } from 'react-redux';
+import { selectUserData } from '../../utils/redux/selectors';
 
 const InputFlat = ({
 	icon,
@@ -447,18 +449,11 @@ export interface userInfoDto {
 }
 
 export const DmElement = ({ socket }: { socket: Socket }) => {
-	const [userInfo, setUserInfo] = useState<userInfoDto>();
+	const userInfo = useSelector(selectUserData);
 	const [DMList, setDMList] = useState<DirectMessageDto[]>([]);
 	const [selectedDM, setSelectedDM] = useState<DirectMessageDto>();
 
 	useEffect(() => {
-		const fetchData = async () => {
-			const response = await axios.get('http://localhost:3333/users/me', {
-				withCredentials: true,
-			});
-			setUserInfo(response.data);
-		};
-
 		const fetchChats = async () => {
 			try {
 				const DMS = await axios.get<DirectMessageDto[]>(
@@ -471,7 +466,6 @@ export const DmElement = ({ socket }: { socket: Socket }) => {
 			}
 		};
 
-		fetchData();
 		fetchChats();
 		const interval = setInterval(fetchChats, 5000);
 		return () => clearInterval(interval);
