@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useEffect, useContext } from 'react';
 import axios from 'axios';
 import { Socket } from 'socket.io-client';
 import '../Dm/DmElement.css';
@@ -8,7 +8,6 @@ import { BasicFrame } from '../../Profile/Components/MiddleInfo/MiddleInfo';
 import { Aside } from './Aside/Aside';
 /* Interfaces */
 import { ChannelsContext, ChannelsProvider } from './ChannelsUtils';
-import { userInfoDto } from './ChannelsUtils';
 import { useSelector } from 'react-redux';
 import { selectUserData } from '../../utils/redux/selectors';
 
@@ -20,23 +19,16 @@ const Beside = ({ socket }: { socket: Socket }) => {
 		setSelectedChannel,
 		setUsersList,
 	} = useContext(ChannelsContext);
-	const [blocked, setBlocked] = useState<userInfoDto[]>([]);
 	const connectedUser = useSelector(selectUserData);
 
 	useEffect(() => {
-		const fetchBlocked = async () => {
-			try {
-				const response = await axios.get(
-					'http://localhost:3333/friend/blocked',
-					{ withCredentials: true }
-				);
-				setBlocked(response.data);
-			} catch (error) {}
-		};
-		const handleMessage = (message: any) => {
-			fetchBlocked();
-			if (!blocked.find((user) => user.username === message.username))
-				setMessages([message, ...messages]);
+		const handleMessage = async (message: any) => {
+			const reponse = await axios.get(
+				'http://localhost:3333/friend/blockbyme/' + message.username,
+				{ withCredentials: true }
+			);
+			if (reponse.data.isBlocked === true) return;
+			setMessages((messages) => [message, ...messages]);
 		};
 
 		socket?.on('chat', handleMessage);
@@ -71,7 +63,6 @@ const Beside = ({ socket }: { socket: Socket }) => {
 		};
 	}, [
 		selectedChannel,
-		blocked,
 		messages,
 		setMessages,
 		setSelectedChannel,

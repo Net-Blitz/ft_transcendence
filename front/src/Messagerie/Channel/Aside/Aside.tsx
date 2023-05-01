@@ -125,7 +125,7 @@ const ChannelListElement = ({
 			{ withCredentials: true }
 		);
 		setBan(response.data);
-		if (ban.find((ban: any) => ban.name === channel.name)) {
+		if (response.data.find((ban: any) => ban.name === channel.name)) {
 			console.log('You are banned from this channel');
 			return;
 		} else if (channel?.state === 'PUBLIC') {
