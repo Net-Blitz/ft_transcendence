@@ -11,10 +11,6 @@ import MatchesInProgress from './Components/Matches/MatchesInProgress';
 import refresh from './Components/Ressources/refresh.svg';
 import personSad from './Components/Ressources/personSad.svg';
 import filterButtonSVG from './Components/Ressources/filter_blue.svg';
-import avatar1 from './Components/Ressources/avatar1.svg';
-import avatar2 from './Components/Ressources/avatar2.svg';
-import avatar3 from './Components/Ressources/avatar3.svg';
-import avatar4 from './Components/Ressources/avatar4.svg';
 
 //Interface
 import { DataTable, Filters } from './types';
@@ -75,9 +71,9 @@ const MainPage = () => {
 		return () => {
 			window.removeEventListener('resize', handleResize);
 		};
-	}, [data]);
+	}, [hasManyMatches, data.length]);
 
-	console.log('mainRectangle', mainRectangleMobile);
+	//console.log('mainRectangle', mainRectangleMobile);
 	return (
 		<div className="rectNoMsg">
 			<p className="mainTitle">Games in progress</p>

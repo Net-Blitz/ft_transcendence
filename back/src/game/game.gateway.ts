@@ -659,8 +659,9 @@ export class GameGateway {
 
 		if (sockUser != null)
 		{
+			client.leave(sockUser.roomName);
 			if (sockUser.state === "spectator")
-				this.removeSpecToRoom(parseInt(sockUser.roomName.split("game-")[0]), sockUser.login);
+				this.removeSpecToRoom(parseInt(sockUser.roomName.replace("game-", "")), sockUser.login);
 			if (sockUser.roomName !== "game-" + room)
 			{
 				sockUser.roomName = "game-" + room;
@@ -701,7 +702,6 @@ export class GameGateway {
 		}
 		
 		this.setupUserSocket(client, userCheck.user, userCheck.game, userCheck.login, userCheck.room);
-		// console.log("data", data);
 		if (userCheck.game.state === "CREATING")// || userCheck.game.state === "PLAYING")
 		{
 			if(userCheck.game.mode === "ONEVONE")
@@ -750,7 +750,6 @@ export class GameGateway {
 	}
  
 	async handleConnection(client: Socket) {
-		console.log("Game Server Connection", client.id);
 
 		
 		return ;
@@ -779,7 +778,7 @@ export class GameGateway {
 			client.leave(sockUser.roomName);
 			//this.server.to(client.id).socketsLeave(sockUser.roomName);
 			if (sockUser.state === "spectator")
-				this.removeSpecToRoom(parseInt(sockUser.roomName.split("game-")[0]), sockUser.login);
+				this.removeSpecToRoom(parseInt(sockUser.roomName.replace("game-", "")), sockUser.login);
 			this.ConnectedSockets.splice(this.ConnectedSockets.findIndex(x => x.socketId === client.id), 1);
 		}
 	}
@@ -907,7 +906,6 @@ export class GameGateway {
 		if (game === null || game.state === "ENDED" || (game.user1Id !== sockUser.prismaId && game.user2Id !== sockUser.prismaId && game.user3Id !== sockUser.prismaId && game.user4Id !== sockUser.prismaId))
 			return ;
 
-		console.log("quickChatMessageResponse")
 		this.server.to("game-" + data.room).emit("quickChatMessageResponse", {login: sockUser.login, message: parseInt(data.key)});
 	}
 

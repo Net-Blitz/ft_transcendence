@@ -2,12 +2,6 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 import './MatchesInProgress.css';
 
-//Ressources
-import avatar1 from '../Ressources/avatar1.svg';
-import avatar2 from '../Ressources/avatar2.svg';
-import avatar3 from '../Ressources/avatar3.svg';
-import avatar4 from '../Ressources/avatar4.svg';
-
 //Interface
 import { DataTable, MatchesInProgressProps, Filters } from '../../types';
 import axios from 'axios';
@@ -26,7 +20,7 @@ const useWindowWidth = () => {
 			window.removeEventListener('resize', handleResize);
 		};
 	}, []);
-	console.log('windowWidth', windowWidth);
+	//console.log('windowWidth', windowWidth);
 	return windowWidth;
 };
 
@@ -57,7 +51,7 @@ const MatchesInProgress: React.FC<MatchesInProgressProps> = ({
 		axios.get('http://localhost:3333/games/all/playing')
 			.then((res) => {
 				updateData(res.data);
-				console.log("data", res.data)
+				//console.log("data", res.data)
 			});
 		}, [resetFilter]);
 	const parseDate = (dataString: string): Date => {
@@ -106,9 +100,9 @@ const MatchesInProgress: React.FC<MatchesInProgressProps> = ({
 		return filteredData;
 	};
 	const finalData = filterAll(data, filters);
-	console.log('isMobileView', isMobileView);
+	//console.log('isMobileView', isMobileView);
 	const dataGame = (data: DataTable, index: number) => (
-		<>
+		<tbody key={index}>
 			<tr
 				className={`${index % 2 === 0 ? 'odd' : 'even'} ${
 					viewMoreButton ? 'viewMoreActive' : 'viewMoreInactive'
@@ -192,7 +186,7 @@ const MatchesInProgress: React.FC<MatchesInProgressProps> = ({
 					))}
 				</tr>
 			)}
-		</>
+		</tbody>
 	);
 
 	return (
@@ -215,7 +209,7 @@ const MatchesInProgress: React.FC<MatchesInProgressProps> = ({
 						))}
 				</tr>
 			</thead>
-			<tbody>{finalData.map(dataGame)}</tbody>
+			{finalData.map(dataGame)}
 		</table>
 	);
 };
