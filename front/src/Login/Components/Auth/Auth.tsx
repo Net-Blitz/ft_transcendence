@@ -121,6 +121,7 @@ export const AuthConfig = () => {
 	const navigate = useNavigate();
 	const store = useStore();
 	const env = useSelector(selectEnv);
+	const userConnected = useSelector(selectUserData);
 
 	useEffect(() => {
 		async function fetchData() {
@@ -132,6 +133,13 @@ export const AuthConfig = () => {
 					}
 				);
 				const usernames = response.data;
+				for (let i = 0; i < usernames.length; i++) {
+					if (usernames[i].username === userConnected.username) {
+						usernames.splice(i, 1);
+						break;
+					}
+				}
+				console.log(usernames);
 				setUsernames(usernames);
 			} catch (error) {
 				console.error(error);
