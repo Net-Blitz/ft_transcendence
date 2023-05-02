@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 
 /*	COMPONENTS	*/
@@ -26,7 +26,7 @@ import GameInvitation from './Game/GameInvitation';
 const NotFound = () => {
 	return (
 		<div>
-			<h1>404 NOT FOUND</h1>
+			<Navigate to="/" replace />
 		</div>
 	);
 };
