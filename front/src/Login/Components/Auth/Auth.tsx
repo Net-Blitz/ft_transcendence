@@ -139,7 +139,6 @@ export const AuthConfig = () => {
 						break;
 					}
 				}
-				console.log(usernames);
 				setUsernames(usernames);
 			} catch (error) {
 				console.error(error);

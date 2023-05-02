@@ -3,12 +3,12 @@ import { User } from '../types';
 import { BlockedPopUp } from '../BlockedPopUp/BlockedPopUp';
 import { Link } from 'react-router-dom';
 import './Myfriends.css';
-
+import { Socket } from 'socket.io-client';
 //Ressources
 import block_blue from '../Ressources/block_blue.svg';
 import game_blue from '../Ressources/game_blue.svg';
 import cancel_blue from '../Ressources/cancel_blue.svg';
-import { selectEnv } from '../../utils/redux/selectors';
+import { selectEnv, selectUserData } from '../../utils/redux/selectors';
 import { useSelector } from 'react-redux';
 
 interface MyFriendsProps {
@@ -17,6 +17,7 @@ interface MyFriendsProps {
 	friends: User[];
 	showBlockModal: boolean;
 	setShowBlockModal: React.Dispatch<React.SetStateAction<boolean>>;
+	socketQueue: Socket;
 }
 export const MyFriends = ({
 	RemoveFriend,
@@ -24,9 +25,16 @@ export const MyFriends = ({
 	BlockFriend,
 	showBlockModal,
 	setShowBlockModal,
+	socketQueue,
 }: MyFriendsProps) => {
 	const [friendBlockedUsername, setfriendBlockedUsername] = useState('');
 	const env = useSelector(selectEnv);
+	const user = useSelector(selectUserData);
+
+	const handleGameInvite = ({id}:any) => {
+		socketQueue?.emit('InviteGroup', { id: id });
+	}
+
 	return (
 		<>
 			<ul
@@ -66,7 +74,7 @@ export const MyFriends = ({
 									</Link>
 								</div>
 								<div className="myFriendsButton">
-									<button className="myFriendsadd playGameButton">
+									<button className="myFriendsadd playGameButton" onClick={() => handleGameInvite(friend)}>
 										<img
 											className={
 												friend.state.toLowerCase() ===

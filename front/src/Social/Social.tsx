@@ -10,7 +10,7 @@ import axios from 'axios';
 import { selectEnv } from '../utils/redux/selectors';
 import { useSelector } from 'react-redux';
 
-export const Social = () => {
+export const Social = ({socketQueue}:any) => {
 	const [userInfo, setUserInfo] = useState<User>();
 	const [users, setUsers] = useState<User[]>([]);
 	const [friends, setFriends] = useState<User[]>([]);
@@ -92,14 +92,14 @@ export const Social = () => {
 			fetchUsers();
 			fetchBlocked();
 			fetchFriends();
-			console.log(response.data);
+			//console.log(response.data);
 		} catch (error) {
 			console.error(error);
 		}
 	};
 
 	const BlockFriend = async (username: string) => {
-		console.log(username);
+		//console.log(username);
 		try {
 			const response = await axios.post(
 				'http://' +
@@ -114,14 +114,14 @@ export const Social = () => {
 			fetchUsers();
 			fetchBlocked();
 			fetchFriends();
-			console.log(response.data);
+			//console.log(response.data);
 		} catch (error) {
 			console.error(error);
 		}
 	};
 
 	const UnBlockFriend = async (username: string) => {
-		console.log(username);
+		//console.log(username);
 		try {
 			const response = await axios.post(
 				'http://' +
@@ -136,7 +136,7 @@ export const Social = () => {
 			fetchUsers();
 			fetchBlocked();
 			fetchFriends();
-			console.log(response.data);
+			//console.log(response.data);
 		} catch (error) {
 			console.error(error);
 		}
@@ -157,14 +157,14 @@ export const Social = () => {
 			fetchUsers();
 			fetchBlocked();
 			fetchFriends();
-			console.log(response.data);
+			//console.log(response.data);
 		} catch (error) {
 			console.error(error);
 		}
 	};
 
 	const AcceptFriend = async (username: string) => {
-		console.log('Accept username', username);
+		//console.log('Accept username', username);
 		try {
 			const response = await axios.patch(
 				'http://' +
@@ -179,7 +179,7 @@ export const Social = () => {
 			fetchUsers();
 			fetchFriends();
 			fetchBlocked();
-			console.log(response.data);
+			//console.log(response.data);
 		} catch (error) {
 			console.error(error);
 		}
@@ -200,7 +200,7 @@ export const Social = () => {
 			fetchUsers();
 			fetchFriends();
 			fetchBlocked();
-			console.log(response.data);
+			//console.log(response.data);
 		} catch (error) {
 			console.error(error);
 		}
@@ -237,6 +237,7 @@ export const Social = () => {
 						BlockFriend={BlockFriend}
 						showBlockModal={showBlockModal}
 						setShowBlockModal={setShowBlockModal}
+						socketQueue={socketQueue}
 					/>
 				)}
 				{navbarStatus === 'AddFriends' && (

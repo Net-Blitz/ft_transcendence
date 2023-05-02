@@ -135,7 +135,6 @@ const NewDm = ({
 	const handleCreateDM = async (username: string) => {
 		if (username === '') return;
 		if (blocked[0] && blocked.find((user) => user.username === username)) {
-			console.log('user blocked');
 			return;
 		}
 		try {
@@ -178,6 +177,7 @@ const DmListElement = ({
 	userInfo,
 	selectedDM,
 	setSelectedDM,
+	socketQueue,
 }: {
 	DM: DirectMessageDto;
 	userInfo: userInfoDto | undefined;
@@ -185,6 +185,7 @@ const DmListElement = ({
 	setSelectedDM: React.Dispatch<
 		React.SetStateAction<DirectMessageDto | undefined>
 	>;
+	socketQueue: Socket;
 }) => {
 	const user: userInfoDto =
 		userInfo?.id === DM.senderId ? DM.receiver : DM.sender;
@@ -203,14 +204,15 @@ const DmListElement = ({
 				{},
 				{ withCredentials: true }
 			);
-			console.log('You have block ' + username);
+			//console.log('You have block ' + username);
 		} catch (error) {
 			console.log(error);
 		}
 	};
 
-	const handleInvite = async (username: string) => {
-		console.log('You invited ' + username);
+	const handleInvite = async (id: number) => {
+		//console.log('You invited ' + username);
+		socketQueue?.emit('InviteGroup', { id: id });
 	};
 
 	return (
@@ -224,7 +226,7 @@ const DmListElement = ({
 			<div className="dm-list-buttons">
 				<div
 					className="buttons-wrapper"
-					onClick={() => handleInvite(user.username)}>
+					onClick={() => handleInvite(user.id)}>
 					<img
 						className="dm-list-element-controller"
 						src={controller}
@@ -250,6 +252,7 @@ const DmList = ({
 	userInfo,
 	selectedDM,
 	setSelectedDM,
+	socketQueue,
 }: {
 	DMList: DirectMessageDto[];
 	userInfo: userInfoDto | undefined;
@@ -257,6 +260,7 @@ const DmList = ({
 	setSelectedDM: React.Dispatch<
 		React.SetStateAction<DirectMessageDto | undefined>
 	>;
+	socketQueue: Socket;
 }) => {
 	return (
 		<div className="dm-list">
@@ -268,6 +272,7 @@ const DmList = ({
 						userInfo={userInfo}
 						selectedDM={selectedDM}
 						setSelectedDM={setSelectedDM}
+						socketQueue={socketQueue}
 					/>
 				);
 			})}
@@ -281,6 +286,7 @@ const Aside = ({
 	userInfo,
 	selectedDM,
 	setSelectedDM,
+	socketQueue,
 }: {
 	buttonContent: string;
 	DMList: DirectMessageDto[];
@@ -289,6 +295,7 @@ const Aside = ({
 	setSelectedDM: React.Dispatch<
 		React.SetStateAction<DirectMessageDto | undefined>
 	>;
+	socketQueue: Socket;
 }) => {
 	const [newDmTrigger, setNewDmTrigger] = useState(false);
 
@@ -307,6 +314,7 @@ const Aside = ({
 					userInfo={userInfo}
 					selectedDM={selectedDM}
 					setSelectedDM={setSelectedDM}
+					socketQueue={socketQueue}
 				/>
 				<PopUp trigger={newDmTrigger}>
 					<NewDm
@@ -463,7 +471,7 @@ export interface userInfoDto {
 	avatar: string;
 }
 
-export const DmElement = ({ socket }: { socket: Socket }) => {
+export const DmElement = ({ socket, socketQueue }: { socket: Socket, socketQueue: Socket }) => {
 	const userInfo = useSelector(selectUserData);
 	const [DMList, setDMList] = useState<DirectMessageDto[]>([]);
 	const [selectedDM, setSelectedDM] = useState<DirectMessageDto>();
@@ -495,6 +503,7 @@ export const DmElement = ({ socket }: { socket: Socket }) => {
 				userInfo={userInfo}
 				selectedDM={selectedDM}
 				setSelectedDM={setSelectedDM}
+				socketQueue={socketQueue}
 			/>
 			<Beside socket={socket} DM={selectedDM} userInfo={userInfo} />
 		</div>
