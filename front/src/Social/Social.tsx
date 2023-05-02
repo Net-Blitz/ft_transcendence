@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './Social.css';
 import { AddFriends } from './AddFriends/AddFriends';
 import { Received } from './Received/Received';
@@ -21,7 +21,7 @@ export const Social = () => {
 	const [navbarStatus, setNavbarStatus] = useState('Myfriends');
 	const env = useSelector(selectEnv);
 
-	const fetchUsers = async () => {
+	const fetchUsers = useCallback(async () => {
 		try {
 			const response = await axios.get<User[]>(
 				'http://' + env.host + ':' + env.port + '/users/login',
@@ -31,8 +31,8 @@ export const Social = () => {
 		} catch (error) {
 			console.error(error);
 		}
-	};
-	const fetchFriends = async () => {
+	}, [env.host, env.port]);
+	const fetchFriends = useCallback(async () => {
 		try {
 			const response = await axios.get(
 				'http://' + env.host + ':' + env.port + '/friend/friends',
@@ -44,9 +44,9 @@ export const Social = () => {
 		} catch (error) {
 			console.error(error);
 		}
-	};
+	}, [env.host, env.port]);
 
-	const fetchBlocked = async () => {
+	const fetchBlocked = useCallback(async () => {
 		try {
 			const response = await axios.get(
 				'http://' + env.host + ':' + env.port + '/friend/blocked',
@@ -56,7 +56,7 @@ export const Social = () => {
 		} catch (error) {
 			console.error(error);
 		}
-	};
+	}, [env.port, env.host]);
 
 	useEffect(() => {
 		const fetchData = async () => {

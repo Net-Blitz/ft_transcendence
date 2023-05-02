@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import './FilteredUsers.css';
 import { Link } from 'react-router-dom';
 import { User } from '../types';
@@ -33,21 +33,29 @@ export const FilteredUsers: React.FC<FilteredUsersProps> = ({
 	const env = useSelector(selectEnv);
 	const [isBlocked, setIsBlocked] = useState<Map<number, boolean>>(new Map());
 
-	const checkBlockedStatus = async (username: string, userId: number) => {
-		try {
-			const response = await axios.get(
-				'http://' + env.host + ':' + env.port + '/blockbyme/' + username,
-				{
-					withCredentials: true,
-				}
-			);
-			setIsBlocked((prevIsBlocked) =>
-				new Map(prevIsBlocked).set(userId, response.data.isBlocked)
-			);
-		} catch (error) {
-			console.log(error);
-		}
-	};
+	const checkBlockedStatus = useCallback(
+		async (username: string, userId: number) => {
+			try {
+				const response = await axios.get(
+					'http://' +
+						env.host +
+						':' +
+						env.port +
+						'/friend/blockbyme/' +
+						username,
+					{
+						withCredentials: true,
+					}
+				);
+				setIsBlocked((prevIsBlocked) =>
+					new Map(prevIsBlocked).set(userId, response.data.isBlocked)
+				);
+			} catch (error) {
+				console.log(error);
+			}
+		},
+		[env.host, env.port]
+	);
 	useEffect(() => {
 		users.forEach((user) => {
 			if (!isBlocked.has(user.id)) {
@@ -55,7 +63,7 @@ export const FilteredUsers: React.FC<FilteredUsersProps> = ({
 				checkBlockedStatus(user.username, user.id);
 			}
 		});
-	}, [users]);
+	}, [users, checkBlockedStatus, isBlocked]);
 	const filteredUsers = users.filter((user) => {
 		return (
 			user.id !== userInfo?.id &&
@@ -65,7 +73,7 @@ export const FilteredUsers: React.FC<FilteredUsersProps> = ({
 			!blocked.some((block) => block.id === user.id) &&
 			!isBlocked.get(user.id) &&
 			user.username.toLowerCase().includes(searchQuery.toLowerCase())
-	);
+		);
 	});
 	return (
 		<>
