@@ -127,7 +127,7 @@ const ChannelListElement = ({
 				{ withCredentials: true }
 			);
 			if (response.data.find((ban: any) => ban.name === channel.name)) {
-				console.log('You are banned from this channel');
+				//console.log('You are banned from this channel');
 				return;
 			} else if (channel?.state === 'PUBLIC') {
 				setSelectedChannel(channel);
@@ -177,7 +177,7 @@ const ChannelListElement = ({
 						username: connectedUser.username,
 					});
 				} else {
-					console.log("You don't have access to this channel");
+					//console.log("You don't have access to this channel");
 				}
 			}
 		} catch (error) {
@@ -321,41 +321,43 @@ const UserChannelElement = ({
 
 	useEffect(() => {
 		const getMute = async () => {
-			try {
-				const response = await axios.get(
-					'http://' +
-						env.host +
-						':' +
-						env.port +
-						'/chat/mutes/' +
-						channel.name,
-					{ withCredentials: true }
-				);
-				const mute = response.data;
-				mute.forEach((mutedUser: any) => {
-					if (mutedUser.username === user.username) {
-						setIsMute(true);
-					}
-				});
-			} catch (error) {
-				console.log(error);
-			}
+			if (!channel.name)
+				try {
+					const response = await axios.get(
+						'http://' +
+							env.host +
+							':' +
+							env.port +
+							'/chat/mutes/' +
+							channel.name,
+						{ withCredentials: true }
+					);
+					const mute = response.data;
+					mute.forEach((mutedUser: any) => {
+						if (mutedUser.username === user.username) {
+							setIsMute(true);
+						}
+					});
+				} catch (error) {
+					console.log(error);
+				}
 		};
 		const getBlock = async () => {
-			try {
-				const response = await axios.get(
-					'http://' +
-						env.host +
-						':' +
-						env.port +
-						'/friend/blockbyme/' +
-						user.username,
-					{ withCredentials: true }
-				);
-				setIsBlocked(response.data.isBlocked);
-			} catch (error) {
-				console.error(error);
-			}
+			if (!user.username)
+				try {
+					const response = await axios.get(
+						'http://' +
+							env.host +
+							':' +
+							env.port +
+							'/friend/blockbyme/' +
+							user.username,
+						{ withCredentials: true }
+					);
+					setIsBlocked(response.data.isBlocked);
+				} catch (error) {
+					console.error(error);
+				}
 		};
 		const fetchAll = async () => {
 			getMute();
@@ -388,6 +390,7 @@ const UserChannelElement = ({
 	};
 
 	const handlePromote = async () => {
+		if (!channel.name) return;
 		try {
 			await axios.post(
 				'http://' +
@@ -409,6 +412,7 @@ const UserChannelElement = ({
 	};
 
 	const handleDemote = async () => {
+		if (!channel.name) return;
 		try {
 			await axios.post(
 				'http://' +
@@ -470,6 +474,7 @@ const UserChannelElement = ({
 	};
 
 	const handleBlock = async () => {
+		if (!user.username) return;
 		try {
 			await axios.post(
 				'http://' +
@@ -489,6 +494,7 @@ const UserChannelElement = ({
 	};
 
 	const handleUnblock = async () => {
+		if (!user.username) return;
 		try {
 			await axios.post(
 				'http://' +

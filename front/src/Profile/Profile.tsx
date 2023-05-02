@@ -1,4 +1,4 @@
-import { useSelector, useStore } from 'react-redux';
+import { useSelector } from 'react-redux';
 import axios from 'axios';
 import './Profile.css';
 /*	Components	*/
@@ -8,18 +8,20 @@ import { MatchHistory } from './Components/MatchHistory/MatchHistory';
 import { selectUserData } from '../utils/redux/selectors';
 
 import { selectEnv } from '../utils/redux/selectors';
-import { useAxios, useGetUser } from '../utils/hooks';
+import { useAxios } from '../utils/hooks';
 import { useEffect, useState } from 'react';
-import { fetchOrUpdateUser } from '../utils/redux/user';
-	
-export const Profile = ({socketQueue}:any) => {
+
+export const Profile = ({ socketQueue }: any) => {
 	const userConnected = useSelector(selectUserData);
 	const env = useSelector(selectEnv);
 	const [user, setUser] = useState({} as any);
 	const handleLogout = async () => {
-		await axios.get('http://' + env.host + ':' + env.port +'/users/logout', {
-			withCredentials: true,
-		});
+		await axios.get(
+			'http://' + env.host + ':' + env.port + '/users/logout',
+			{
+				withCredentials: true,
+			}
+		);
 		window.location.reload();
 	};
 
@@ -28,21 +30,26 @@ export const Profile = ({socketQueue}:any) => {
 		data,
 		error,
 	}: { isLoading: boolean; data: any; error: boolean } = useAxios(
-		'http://' + env.host + ':' + env.port + '/users/username/' + userConnected.username
+		'http://' +
+			env.host +
+			':' +
+			env.port +
+			'/users/username/' +
+			userConnected.username
 	);
 
 	useEffect(() => {
 		if (data) data.avatar = userConnected.avatar;
-		if (data) data.state = "ONLINE";
+		if (data) data.state = 'ONLINE';
 		if (data) data.twoFactor = userConnected.twoFactor;
 		setUser(data);
 	}, [data, env.host, env.port]);
 
-	const updateMyStateResponse = (response:any) => {
+	const updateMyStateResponse = (response: any) => {
 		if (data && response) {
-			setUser((user:any) => ({...user, state: response.state}));
+			setUser((user: any) => ({ ...user, state: response.state }));
 		}
-	}
+	};
 
 	useEffect(() => {
 		if (socketQueue && socketQueue.connected !== undefined) {
@@ -50,7 +57,7 @@ export const Profile = ({socketQueue}:any) => {
 			socketQueue.on('updateMyStateResponse', updateMyStateResponse);
 			socketQueue.emit('updateMyState');
 		}
-		}, [socketQueue]);
+	}, [socketQueue]);
 
 	if (isLoading && !error) return <div></div>;
 

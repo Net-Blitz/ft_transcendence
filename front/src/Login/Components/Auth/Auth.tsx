@@ -45,7 +45,11 @@ export const AuthStart = () => {
 			<Button
 				content="Login with 42"
 				bottom={false}
-				href={process.env.REACT_APP_CONNECTION ? process.env.REACT_APP_CONNECTION : ''}
+				href={
+					process.env.REACT_APP_CONNECTION
+						? process.env.REACT_APP_CONNECTION
+						: ''
+				}
 				absolut={true}
 			/>
 		</div>
@@ -103,7 +107,7 @@ export const Auth2fa = () => {
 			/>
 			<Button
 				onClick={handleClick2fa}
-				content="Login with 42"
+				content="Login"
 				bottom={false}
 				absolut={true}
 				href=""

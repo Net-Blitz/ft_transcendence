@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Navigate } from 'react-router-dom';
 import { useParams } from 'react-router';
 import { useAxios } from '../utils/hooks';
 import './UserProfile.css';
@@ -28,9 +29,13 @@ export const UserProfile = () => {
 	);
 
 	useEffect(() => {
-		if (data) data.avatar = 'http://' + env.host + ':' + env.port + '/' + data.avatar;
+		if (data)
+			data.avatar =
+				'http://' + env.host + ':' + env.port + '/' + data.avatar;
 		setUser(data);
 	}, [data, env.host, env.port]);
+
+	if (!data) return <Navigate to="/" replace />;
 
 	if (isLoading && !error) return <div></div>;
 

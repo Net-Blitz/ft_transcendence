@@ -1,4 +1,3 @@
-import { env } from 'yargs';
 import { User } from '../types';
 import { Link } from 'react-router-dom';
 import { selectEnv } from '../../utils/redux/selectors';
