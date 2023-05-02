@@ -22,7 +22,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	private connectedClients: Map<
 		string,
-		{ channel: string; username: string }
+		{ channel: string; username: string; socket: Socket }
 	> = new Map();
 
 	private DMs: Map<string, Socket> = new Map();
@@ -32,19 +32,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	async handleDisconnect(client: Socket) {
+		console.log("Client disconnected: " + client.id);
 		const connectedClient = this.connectedClients.get(client.id);
 		if (connectedClient) {
 			const { channel, username } = connectedClient;
-			console.log("Client disconnected: ", username, " from ", channel);
 			this.connectedClients.delete(client.id);
 
 			try {
-				const channelExists = await this.prisma.channel.findUnique({
-					where: {
-						name: channel,
-					},
-				});
-
 				const userExists = await this.prisma.user.findUnique({
 					where: {
 						username: username,
@@ -67,14 +61,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 				await this.prisma.chatUsers.deleteMany({
 					where: {
-						A: channelExists.id,
 						B: userExists.id,
 					},
 				});
 			} catch (e) {}
-		}
-		if (this.DMs.get(client.id)) {
-			this.DMs.delete(client.id);
 		}
 	}
 
@@ -84,7 +74,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		data: { channel: string; username: string }
 	) {
 		const { channel, username } = data;
-		this.connectedClients.set(client.id, { channel, username });
+		this.connectedClients.set(client.id, {
+			channel,
+			username,
+			socket: client,
+		});
 		client.join(channel);
 
 		try {
@@ -337,6 +331,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 						B: kickedUser.id,
 					},
 				});
+				await this.prisma.admin.deleteMany({
+					where: {
+						A: channelExists.id,
+						B: kickedUser.id,
+					},
+				});
 				this.server
 					.to(channel)
 					.emit("kick", { username: data.login, channel: channel });
@@ -403,6 +403,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					username + " banned " + data.login + " from " + channel
 				);
 				await this.prisma.chatUsers.deleteMany({
+					where: {
+						A: channelExists.id,
+						B: userExists.id,
+					},
+				});
+				await this.prisma.admin.deleteMany({
 					where: {
 						A: channelExists.id,
 						B: userExists.id,
@@ -619,5 +625,35 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		data: { channel: string; newChannelName: string; newState: string }
 	) {
 		this.server.to(data.channel).emit("ChannelUpdate", data);
+	}
+
+	@SubscribeMessage("leave")
+	async handleLeave(client: Socket, data: { channel: string }) {
+		const connectedClient = this.connectedClients.get(client.id);
+		if (!connectedClient) {
+			return;
+		}
+		const { channel, username } = connectedClient;
+		const userExists = await this.prisma.user.findUnique({
+			where: {
+				username: username,
+			},
+		});
+		console.log("leave", data);
+		client.leave(channel);
+		this.server.to(channel).emit("leave", data);
+		this.server.to(channel).emit("chat", {
+			username: "Server",
+			content: `${username} has left the channel`,
+			channel: channel,
+			createdAt: new Date(),
+			avatar:
+				"http://" +
+				this.config.get("HOST_T") +
+				":" +
+				this.config.get("PORT_BACK") +
+				"/" +
+				userExists.avatar,
+		});
 	}
 }

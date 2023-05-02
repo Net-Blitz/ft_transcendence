@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 
 /*	COMPONENTS	*/
@@ -26,7 +26,7 @@ import GameInvitation from './Game/GameInvitation';
 const NotFound = () => {
 	return (
 		<div>
-			<h1>404 NOT FOUND</h1>
+			<Navigate to="/" replace />
 		</div>
 	);
 };
@@ -35,7 +35,7 @@ function App(this: any) {
 	useGetUser();
 	const user = useSelector(selectUser);
 	const env = useSelector(selectEnv);
-	//const currentPath = window.location.pathname; 
+	//const currentPath = window.location.pathname;
 	const [reload, setReload] = useState(false);
 	const [socketQueue, setSocketQueue] = useState<Socket>({} as Socket);
 	const [socketGame, setSocketGame] = useState<Socket>({} as Socket);
@@ -94,7 +94,7 @@ function App(this: any) {
 						element={
 							<AppLayout>
 								{' '}
-								<Messagerie socketQueue={socketQueue}/>
+								<Messagerie socketQueue={socketQueue} />
 							</AppLayout>
 						}
 					/>
@@ -124,7 +124,7 @@ function App(this: any) {
 						element={
 							<AppLayout>
 								{' '}
-								<Profile socketQueue={socketQueue}/>
+								<Profile socketQueue={socketQueue} />
 							</AppLayout>
 						}
 					/>

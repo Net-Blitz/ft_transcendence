@@ -10,7 +10,7 @@ import axios from 'axios';
 import { selectEnv } from '../utils/redux/selectors';
 import { useSelector } from 'react-redux';
 
-export const Social = ({socketQueue}:any) => {
+export const Social = ({ socketQueue }: any) => {
 	const [userInfo, setUserInfo] = useState<User>();
 	const [users, setUsers] = useState<User[]>([]);
 	const [friends, setFriends] = useState<User[]>([]);
@@ -79,7 +79,7 @@ export const Social = ({socketQueue}:any) => {
 
 	const AddFriendFunction = async (username: string) => {
 		try {
-			const response = await axios.post(
+			await axios.post(
 				'http://' +
 					env.host +
 					':' +
@@ -92,16 +92,14 @@ export const Social = ({socketQueue}:any) => {
 			fetchUsers();
 			fetchBlocked();
 			fetchFriends();
-			//console.log(response.data);
 		} catch (error) {
 			console.error(error);
 		}
 	};
 
 	const BlockFriend = async (username: string) => {
-		//console.log(username);
 		try {
-			const response = await axios.post(
+			await axios.post(
 				'http://' +
 					env.host +
 					':' +
@@ -114,16 +112,14 @@ export const Social = ({socketQueue}:any) => {
 			fetchUsers();
 			fetchBlocked();
 			fetchFriends();
-			//console.log(response.data);
 		} catch (error) {
 			console.error(error);
 		}
 	};
 
 	const UnBlockFriend = async (username: string) => {
-		//console.log(username);
 		try {
-			const response = await axios.post(
+			await axios.post(
 				'http://' +
 					env.host +
 					':' +
@@ -136,7 +132,6 @@ export const Social = ({socketQueue}:any) => {
 			fetchUsers();
 			fetchBlocked();
 			fetchFriends();
-			//console.log(response.data);
 		} catch (error) {
 			console.error(error);
 		}
@@ -144,7 +139,7 @@ export const Social = ({socketQueue}:any) => {
 
 	const RemoveFriend = async (username: string) => {
 		try {
-			const response = await axios.post(
+			await axios.post(
 				'http://' +
 					env.host +
 					':' +
@@ -157,16 +152,14 @@ export const Social = ({socketQueue}:any) => {
 			fetchUsers();
 			fetchBlocked();
 			fetchFriends();
-			//console.log(response.data);
 		} catch (error) {
 			console.error(error);
 		}
 	};
 
 	const AcceptFriend = async (username: string) => {
-		//console.log('Accept username', username);
 		try {
-			const response = await axios.patch(
+			await axios.patch(
 				'http://' +
 					env.host +
 					':' +
@@ -179,7 +172,6 @@ export const Social = ({socketQueue}:any) => {
 			fetchUsers();
 			fetchFriends();
 			fetchBlocked();
-			//console.log(response.data);
 		} catch (error) {
 			console.error(error);
 		}
@@ -187,7 +179,7 @@ export const Social = ({socketQueue}:any) => {
 
 	const DeclineFriend = async (username: string) => {
 		try {
-			const response = await axios.patch(
+			await axios.patch(
 				'http://' +
 					env.host +
 					':' +
@@ -200,7 +192,6 @@ export const Social = ({socketQueue}:any) => {
 			fetchUsers();
 			fetchFriends();
 			fetchBlocked();
-			//console.log(response.data);
 		} catch (error) {
 			console.error(error);
 		}
