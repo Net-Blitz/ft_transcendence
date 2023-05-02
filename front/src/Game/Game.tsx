@@ -8,6 +8,7 @@ import jungle from './assets/jungleImage.jpg';
 import './Game.css';
 import { useSelector } from 'react-redux';
 import { selectEnv } from '../utils/redux/selectors';
+import axios from 'axios';
 
 function Podium({ color, height, point, avatar, avatar2 = null, crown = null }: any) {
 	const env = useSelector(selectEnv);
@@ -52,6 +53,19 @@ function Game({ socketGame, room, login }: any) {
 	const navigate = useNavigate();
 	const [spectator, updateSpectator] = useState(0);
 	const [board, updateBoard] = useState(1);
+	const [isSpec, updateIsSPec] = useState(true);
+	const env = useSelector(selectEnv);
+
+	useEffect(() => {
+		axios.get('http://' + env.host + ':' + env.port + '/games/spec/' + room, {
+			withCredentials: true,
+			}).then((res) => {
+				if (res.data.isSpec !== undefined) {
+					updateIsSPec(res.data.isSpec);
+				}
+			}
+		);
+	}, [updateIsSPec, isSpec, room]);
 
 	useEffect(() => {
 
@@ -59,6 +73,7 @@ function Game({ socketGame, room, login }: any) {
 			// console.log('spectatorJoin', data.spectator);
 			updateSpectator(data.spectator);
 		};
+
 
 		socketGame.off('updateSpectator');
 		socketGame.on('updateSpectator', updateSpectatorFonc);
@@ -431,6 +446,7 @@ function Game({ socketGame, room, login }: any) {
 		navigate('/');
 	};
 
+	console.log(isSpec, 'isSpec')
 	return (
 		<div className="game-playing-parent">
 			<div className="game-playing-top">
@@ -587,7 +603,7 @@ function Game({ socketGame, room, login }: any) {
 					</div>
 				</div>
 			)}
-			{here ? (
+			{here && isSpec === false ? (
 				<button
 					className="game-playing-button-surrend"
 					onClick={surrend}>

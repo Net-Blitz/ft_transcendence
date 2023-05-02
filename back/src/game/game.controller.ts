@@ -5,6 +5,11 @@ import { GetCookie, GetUser } from 'src/auth/decorator';
 @Controller("games")
 export class GameController {
 	constructor(private gameService: GameService) {}
+
+	@Get()
+	async getGames() {
+		return this.gameService.getGames();
+	}
 	
 	@Get("connect")
 	async connectToGame(@GetCookie("login") userLogin: string) {
@@ -21,14 +26,14 @@ export class GameController {
 		return this.gameService.getGames(state);
 	}
 
-	@Get()
-	async getGames() {
-		return this.gameService.getGames();
-	}
-
 	@Get("progress/:id")
 	async canIJoinQueue(@GetUser("login") userLogin: string, @Param("id", ParseIntPipe) gameId: number) {
 		// console.log("userLogin", userLogin);
 		return this.gameService.checkCanSpec(userLogin, gameId);
+	}
+
+	@Get("spec/:id")
+	async amISpec(@GetUser() user: any, @Param("id", ParseIntPipe) gameId: number) {
+		return this.gameService.amISpec(user, gameId);
 	}
 }
