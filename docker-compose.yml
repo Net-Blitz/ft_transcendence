@@ -25,6 +25,7 @@ services:
             - ${FRONT}Volume:/app/
         networks:
             - transcenet
+        restart: always
 
     back:
         container_name: back
@@ -41,6 +42,7 @@ services:
         ports:
             - "5555:5555"
             - "3333:3333"
+        restart: always
 
     dev-db:
         container_name: dev-db
