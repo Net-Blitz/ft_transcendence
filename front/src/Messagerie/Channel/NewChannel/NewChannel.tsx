@@ -11,6 +11,7 @@ import {
 } from '../../../Login/Components/Auth/Input/inputProtection';
 import { selectEnv } from '../../../utils/redux/selectors';
 import { useSelector } from 'react-redux';
+import { Socket } from 'socket.io-client';
 // import search from '../../Ressources/search.svg';
 
 export const InputChannel = ({
@@ -99,7 +100,7 @@ export const NewChannel = ({
 					break;
 			}
 			await axios.post(
-				'http://' + env.host + ':' + env.port +'/chat/create/' + name,
+				'http://' + env.host + ':' + env.port + '/chat/create/' + name,
 				{ state, password },
 				{ withCredentials: true }
 			);
@@ -107,7 +108,7 @@ export const NewChannel = ({
 			setPassword('');
 			handleNewDmTrigger();
 			const Channels = await axios.get<ChannelDto[]>(
-				'http://' + env.host + ':' + env.port +'/chat/channels',
+				'http://' + env.host + ':' + env.port + '/chat/channels',
 				{ withCredentials: true }
 			);
 			setChannelList(Channels.data);
@@ -166,8 +167,10 @@ export const NewChannel = ({
 };
 
 export const UpdateChannel = ({
+	socket,
 	handleNewDmTrigger,
 }: {
+	socket: Socket;
 	handleNewDmTrigger: () => void;
 }) => {
 	const me = document.getElementsByClassName('popup');
@@ -216,15 +219,25 @@ export const UpdateChannel = ({
 					break;
 			}
 			await axios.patch(
-				'http://' + env.host + ':' + env.port +'/chat/edit/' + selectedChannel.name,
+				'http://' +
+					env.host +
+					':' +
+					env.port +
+					'/chat/edit/' +
+					selectedChannel.name,
 				{ name, state, password },
 				{ withCredentials: true }
 			);
+			socket?.emit('ChannelUpdate', {
+				channel: selectedChannel.name,
+				newChannelName: name,
+				newState: state,
+			});
 			setName('');
 			setPassword('');
 			handleNewDmTrigger();
 			const Channels = await axios.get<ChannelDto[]>(
-				'http://' + env.host + ':' + env.port +'/chat/channels',
+				'http://' + env.host + ':' + env.port + '/chat/channels',
 				{ withCredentials: true }
 			);
 			setChannelList(Channels.data);

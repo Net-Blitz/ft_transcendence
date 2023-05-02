@@ -116,33 +116,20 @@ const ChannelListElement = ({
 	};
 
 	const handleSelectChannel = async (channel: ChannelDto) => {
-		const response = await axios.get(
-			'http://' +
-				env.host +
-				':' +
-				env.port +
-				'/chat/ban/' +
-				connectedUser.username,
-			{ withCredentials: true }
-		);
-		if (response.data.find((ban: any) => ban.name === channel.name)) {
-			console.log('You are banned from this channel');
-			return;
-		} else if (channel?.state === 'PUBLIC') {
-			setSelectedChannel(channel);
-			getMessages();
-			getUsersList();
-			socket?.emit('join', {
-				channel: channel.name,
-				username: connectedUser.username,
-			});
-		} else if (channel?.state === 'PROTECTED') {
-			if (
-				SaveChannel.find(
-					(savechannel) => savechannel.name === channel.name
-				) ||
-				connectedUser.id === channel.ownerId
-			) {
+		try {
+			const response = await axios.get(
+				'http://' +
+					env.host +
+					':' +
+					env.port +
+					'/chat/ban/' +
+					connectedUser.username,
+				{ withCredentials: true }
+			);
+			if (response.data.find((ban: any) => ban.name === channel.name)) {
+				console.log('You are banned from this channel');
+				return;
+			} else if (channel?.state === 'PUBLIC') {
 				setSelectedChannel(channel);
 				getMessages();
 				getUsersList();
@@ -150,33 +137,51 @@ const ChannelListElement = ({
 					channel: channel.name,
 					username: connectedUser.username,
 				});
-			} else {
-				handleChannelPasswordTrigger();
+			} else if (channel?.state === 'PROTECTED') {
+				if (
+					SaveChannel.find(
+						(savechannel) => savechannel.name === channel.name
+					) ||
+					connectedUser.id === channel.ownerId
+				) {
+					setSelectedChannel(channel);
+					getMessages();
+					getUsersList();
+					socket?.emit('join', {
+						channel: channel.name,
+						username: connectedUser.username,
+					});
+				} else {
+					handleChannelPasswordTrigger();
+				}
+			} else if (channel.state === 'PRIVATE') {
+				if (!channel.ownerId) return;
+				if (channel.ownerId === connectedUser.id) {
+					setSelectedChannel(channel);
+					getMessages();
+					getUsersList();
+					socket?.emit('join', {
+						channel: channel.name,
+						username: connectedUser.username,
+					});
+				} else if (
+					SaveChannel.find(
+						(savechannel) => savechannel.name === channel.name
+					)
+				) {
+					setSelectedChannel(channel);
+					getMessages();
+					getUsersList();
+					socket?.emit('join', {
+						channel: channel.name,
+						username: connectedUser.username,
+					});
+				} else {
+					console.log("You don't have access to this channel");
+				}
 			}
-		} else if (channel?.state === 'PRIVATE') {
-			if (channel.ownerId === connectedUser.id) {
-				setSelectedChannel(channel);
-				getMessages();
-				getUsersList();
-				socket?.emit('join', {
-					channel: channel.name,
-					username: connectedUser.username,
-				});
-			} else if (
-				SaveChannel.find(
-					(savechannel) => savechannel.name === channel.name
-				)
-			) {
-				setSelectedChannel(channel);
-				getMessages();
-				getUsersList();
-				socket?.emit('join', {
-					channel: channel.name,
-					username: connectedUser.username,
-				});
-			} else {
-				console.log("You don't have access to this channel");
-			}
+		} catch (error) {
+			//console.log(error);
 		}
 	};
 
@@ -235,6 +240,7 @@ const ChannelListElement = ({
 			</div>
 			<PopUp trigger={ChannelSettingsTrigger}>
 				<UpdateChannel
+					socket={socket}
 					handleNewDmTrigger={handleChannelSettingsTrigger}
 				/>
 			</PopUp>

@@ -37,6 +37,17 @@ const Beside = ({ socket }: { socket: Socket }) => {
 			setMessages((messages) => [message, ...messages]);
 		};
 
+		socket?.on('ChannelUpdate', (data: any) => {
+			if (data?.channel === selectedChannel.name) {
+				let newChannel = selectedChannel;
+				newChannel.name = data.newChannelName;
+				setSelectedChannel(newChannel);
+				socket?.emit('join', {
+					channel: newChannel.name,
+					username: connectedUser.username,
+				});
+			}
+		});
 		socket?.on('chat', handleMessage);
 		socket?.on('kick', (data: any) => {
 			if (data?.username === connectedUser.username) {
@@ -63,6 +74,7 @@ const Beside = ({ socket }: { socket: Socket }) => {
 			}
 		});
 		return () => {
+			socket?.off('ChannelUpdate');
 			socket?.off('chat', handleMessage);
 			socket?.off('kick');
 			socket?.off('ban');

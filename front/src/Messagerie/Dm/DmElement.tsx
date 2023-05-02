@@ -36,7 +36,7 @@ const InputFlat = ({
 		const FetchUsers = async () => {
 			try {
 				const response = await axios.get(
-					'http://' + env.host + ':' + env.port +'/users/login',
+					'http://' + env.host + ':' + env.port + '/users/login',
 					{ withCredentials: true }
 				);
 				const users = response.data.filter(
@@ -121,7 +121,7 @@ const NewDm = ({
 		const FetchBlocked = async () => {
 			try {
 				const response = await axios.get(
-					'http://' + env.host + ':' + env.port +'/friend/blocked',
+					'http://' + env.host + ':' + env.port + '/friend/blocked',
 					{ withCredentials: true }
 				);
 				setBlocked(response.data);
@@ -134,13 +134,13 @@ const NewDm = ({
 
 	const handleCreateDM = async (username: string) => {
 		if (username === '') return;
-		if (blocked?.find((user) => user.username === username)) {
+		if (blocked[0] && blocked.find((user) => user.username === username)) {
 			console.log('user blocked');
 			return;
 		}
 		try {
 			await axios.post(
-				'http://' + env.host + ':' + env.port +'/chat/dm/create',
+				'http://' + env.host + ':' + env.port + '/chat/dm/create',
 				{ username },
 				{ withCredentials: true }
 			);
@@ -194,7 +194,12 @@ const DmListElement = ({
 	const handleBlock = async (username: string) => {
 		try {
 			await axios.post(
-				'http://' + env.host + ':' + env.port +'/friend/block/' + username,
+				'http://' +
+					env.host +
+					':' +
+					env.port +
+					'/friend/block/' +
+					username,
 				{},
 				{ withCredentials: true }
 			);
@@ -329,7 +334,12 @@ const Beside = ({ socket, DM, userInfo }: Props) => {
 		const getMessages = async () => {
 			try {
 				const reponse = await axios.get(
-					'http://' + env.host + ':' + env.port +'/chat/dm/messages/' + DM.id,
+					'http://' +
+						env.host +
+						':' +
+						env.port +
+						'/chat/dm/messages/' +
+						DM.id,
 					{ withCredentials: true }
 				);
 				reponse.data.map((message: any) => {
@@ -369,7 +379,7 @@ const Beside = ({ socket, DM, userInfo }: Props) => {
 			sender: userInfo?.id,
 			receiver,
 		});
-		message.avatar = 'http://' + env.host + ':' + env.port +'/' + userInfo?.avatar;
+		message.avatar = userInfo?.avatar;
 		message.createdAt = new Date();
 		setMessages((messages) => [message, ...messages]);
 	};
@@ -463,7 +473,7 @@ export const DmElement = ({ socket }: { socket: Socket }) => {
 		const fetchChats = async () => {
 			try {
 				const DMS = await axios.get<DirectMessageDto[]>(
-					'http://' + env.host + ':' + env.port +'/chat/dm',
+					'http://' + env.host + ':' + env.port + '/chat/dm',
 					{ withCredentials: true }
 				);
 				setDMList(DMS.data);

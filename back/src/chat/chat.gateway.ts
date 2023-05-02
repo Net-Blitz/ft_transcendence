@@ -12,9 +12,12 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { ConfigService } from "@nestjs/config";
 
 @Injectable()
-@WebSocketGateway({namespace:"chat", cors: {origin: "*"}})
+@WebSocketGateway({ namespace: "chat", cors: { origin: "*" } })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
-	constructor(private readonly prisma: PrismaService, private readonly config: ConfigService) {}
+	constructor(
+		private readonly prisma: PrismaService,
+		private readonly config: ConfigService
+	) {}
 	@WebSocketServer() server: Server;
 
 	private connectedClients: Map<
@@ -53,7 +56,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					content: `${username} has left the channel`,
 					channel: channel,
 					createdAt: new Date(),
-					avatar: "http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_BACK") + "/" + userExists.avatar,
+					avatar:
+						"http://" +
+						this.config.get("HOST_T") +
+						":" +
+						this.config.get("PORT_BACK") +
+						"/" +
+						userExists.avatar,
 				});
 
 				await this.prisma.chatUsers.deleteMany({
@@ -101,7 +110,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				username: "Server",
 				content: `${username} has joined the channel`,
 				channel: channel,
-				avatar: "http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_BACK") + "/" + userExists.avatar,
+				avatar:
+					"http://" +
+					this.config.get("HOST_T") +
+					":" +
+					this.config.get("PORT_BACK") +
+					"/" +
+					userExists.avatar,
 				createdAt: new Date(),
 			});
 		} catch (e) {}
@@ -162,7 +177,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				}
 			}
 
-			message["avatar"] = "http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_BACK") + "/" + userExists.avatar;
+			message["avatar"] =
+				"http://" +
+				this.config.get("HOST_T") +
+				":" +
+				this.config.get("PORT_BACK") +
+				"/" +
+				userExists.avatar;
 			message["createdAt"] = new Date();
 			console.log(channel, ": ", username, ": ", message.content);
 			this.server.to(channel).emit("chat", message);
@@ -245,7 +266,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					sender,
 					receiver,
 					DMid,
-					avatar: "http://" + this.config.get("HOST_T") + ":" + this.config.get("PORT_BACK") + "/" + senderUser.avatar,
+					avatar:
+						"http://" +
+						this.config.get("HOST_T") +
+						":" +
+						this.config.get("PORT_BACK") +
+						"/" +
+						senderUser.avatar,
 					createdAt: new Date(),
 				});
 			}
@@ -584,5 +611,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		} catch (e) {
 			console.log(e);
 		}
+	}
+
+	@SubscribeMessage("ChannelUpdate")
+	async handleChannelUpdate(
+		client: Socket,
+		data: { channel: string; newChannelName: string; newState: string }
+	) {
+		this.server.to(data.channel).emit("ChannelUpdate", data);
 	}
 }
