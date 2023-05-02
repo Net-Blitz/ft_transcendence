@@ -72,7 +72,7 @@ export const Messagerie = ({ socketQueue }: { socketQueue: Socket }) => {
 					setNavbarStatus={setNavbarStatus}
 				/>
 				{navbarStatus === 'privateMessage' ? (
-					<DmElement socket={socket} />
+					<DmElement socket={socket} socketQueue={socketQueue} />
 				) : (
 					<ChannelElement socket={socket} socketQueue={socketQueue} />
 				)}

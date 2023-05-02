@@ -89,7 +89,7 @@ function App(this: any) {
 						element={
 							<AppLayout>
 								{' '}
-								<Social />
+								<Social socketQueue={socketQueue} />
 							</AppLayout>
 						}
 					/>
@@ -145,7 +145,6 @@ function App(this: any) {
 				<Route path="/login" element={<Login />} />
 				<Route path="/login/2fa/:login" element={<Login2fa />} />
 				<Route path="*" element={<NotFound />} />
-				<Route path="/admin" element={<Admin />} />
 			</Routes>
 		</div>
 	);

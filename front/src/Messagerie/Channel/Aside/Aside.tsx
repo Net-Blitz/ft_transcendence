@@ -402,7 +402,7 @@ const UserChannelElement = ({
 				{ withCredentials: true }
 			);
 			getUsersList();
-			console.log(user.username + ' has been promoted');
+			//console.log(user.username + ' has been promoted');
 		} catch (error) {
 			console.error(error);
 		}
@@ -423,7 +423,7 @@ const UserChannelElement = ({
 				{ withCredentials: true }
 			);
 			getUsersList();
-			console.log(user.username + ' has been demoted');
+			//console.log(user.username + ' has been demoted');
 		} catch (error) {
 			console.error(error);
 		}
@@ -436,7 +436,7 @@ const UserChannelElement = ({
 			login: user.username,
 		});
 		getUsersList();
-		console.log(user.username + ' has been kicked');
+		//console.log(user.username + ' has been kicked');
 	};
 
 	const handleBan = async () => {
@@ -446,7 +446,7 @@ const UserChannelElement = ({
 			login: user.username,
 		});
 		getUsersList();
-		console.log(user.username + ' has been banned');
+		//console.log(user.username + ' has been banned');
 	};
 
 	const handleMute = async () => {
@@ -456,7 +456,7 @@ const UserChannelElement = ({
 			login: user.username,
 		});
 		setIsMute(true);
-		console.log(user.username + ' has been muted');
+		//console.log(user.username + ' has been muted');
 	};
 
 	const handleUnmute = async () => {
@@ -466,7 +466,7 @@ const UserChannelElement = ({
 			login: user.username,
 		});
 		setIsMute(false);
-		console.log(user.username + ' has been unmuted');
+		//console.log(user.username + ' has been unmuted');
 	};
 
 	const handleBlock = async () => {
@@ -482,7 +482,7 @@ const UserChannelElement = ({
 				{ withCredentials: true }
 			);
 			setIsBlocked(true);
-			console.log(user.username + ' has been blocked');
+			//console.log(user.username + ' has been blocked');
 		} catch (error) {
 			console.error(error);
 		}
@@ -501,7 +501,7 @@ const UserChannelElement = ({
 				{ withCredentials: true }
 			);
 			setIsBlocked(false);
-			console.log(user.username + ' has been unblocked');
+			//console.log(user.username + ' has been unblocked');
 		} catch (error) {
 			console.error(error);
 		}
@@ -614,7 +614,7 @@ const UserChannelList = ({
 			channel: channel.name,
 			login: selectedUser,
 		});
-		console.log(selectedUser + ' has been unbanned');
+		//console.log(selectedUser + ' has been unbanned');
 	};
 
 	return (

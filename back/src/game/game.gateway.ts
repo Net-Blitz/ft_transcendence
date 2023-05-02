@@ -890,11 +890,15 @@ export class GameGateway {
 		);
 
 		if (sockUser != null) {
+			if (sockUser.roomName !== "game-" + room)
+				client.leave(sockUser.roomName);
 			if (sockUser.state === "spectator")
+			{
 				this.removeSpecToRoom(
 					parseInt(sockUser.roomName.split("game-")[0]),
 					sockUser.login
-				);
+					);
+			}
 			if (sockUser.roomName !== "game-" + room) {
 				sockUser.roomName = "game-" + room;
 				sockUser.state = state;
@@ -1064,10 +1068,13 @@ export class GameGateway {
 			client.leave(sockUser.roomName);
 			//this.server.to(client.id).socketsLeave(sockUser.roomName);
 			if (sockUser.state === "spectator")
+			{
 				this.removeSpecToRoom(
 					parseInt(sockUser.roomName.split("game-")[0]),
 					sockUser.login
 				);
+				client.leave(sockUser.roomName);
+			}
 			this.ConnectedSockets.splice(
 				this.ConnectedSockets.findIndex(
 					(x) => x.socketId === client.id
@@ -1268,7 +1275,7 @@ export class GameGateway {
 		)
 			return;
 
-		console.log("quickChatMessageResponse");
+		//console.log("quickChatMessageResponse");
 		this.server.to("game-" + data.room).emit("quickChatMessageResponse", {
 			login: sockUser.login,
 			message: parseInt(data.key),

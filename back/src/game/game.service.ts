@@ -216,7 +216,7 @@ export class GameService {
 			return {isSpec: true};
 		if (game.state === "ENDED")
 			return {isSpec: true};
-		console.log(game.user1Id, game.user2Id, game.user3Id, game.user4Id, user.id)
+		//console.log(game.user1Id, game.user2Id, game.user3Id, game.user4Id, user.id)
 		if (game.user1Id === user.id || game.user2Id === user.id || game.user3Id === user.id || game.user4Id === user.id)
 			return {isSpec: false};
 		return {isSpec: true};

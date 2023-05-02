@@ -446,7 +446,6 @@ function Game({ socketGame, room, login }: any) {
 		navigate('/');
 	};
 
-	console.log(isSpec, 'isSpec')
 	return (
 		<div className="game-playing-parent">
 			<div className="game-playing-top">

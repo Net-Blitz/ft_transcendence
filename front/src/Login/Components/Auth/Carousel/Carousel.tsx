@@ -59,7 +59,6 @@ const Carousel = ({
 
 	const handleChange = (event: any) => {
 		const file = event.target.files[0];
-		console.log(file.name, file.type, file.size);
 		if (file) {
 			const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
 			const allowedSize = 2 * 1024 * 1024;
@@ -67,7 +66,6 @@ const Carousel = ({
 				const img = new Image();
 				img.src = URL.createObjectURL(file);
 				img.onload = () => {
-					console.log(img);
 					if (img.width > 400 || img.height > 400)
 						alert('Image too big (max 400x400)');
 					else {
