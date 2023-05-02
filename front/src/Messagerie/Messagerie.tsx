@@ -45,13 +45,16 @@ const Navbar = ({ navbarStatus, setNavbarStatus }: NavbarProps) => {
 	);
 };
 
-export const Messagerie = ({socketQueue} : {socketQueue: Socket}) => {
-	const [navbarStatus, setNavbarStatus] = useState('channel');
+export const Messagerie = ({ socketQueue }: { socketQueue: Socket }) => {
+	const [navbarStatus, setNavbarStatus] = useState('privateMessage');
 	const [socket, setSocket] = useState<Socket>();
 	const env = useSelector(selectEnv);
 
 	useEffect(() => {
-		const newSocket = io('http://' + env.host + ':' + env.port + '/chat', {transports: ['websocket'], withCredentials: true});
+		const newSocket = io('http://' + env.host + ':' + env.port + '/chat', {
+			transports: ['websocket'],
+			withCredentials: true,
+		});
 		setSocket(newSocket);
 
 		return () => {

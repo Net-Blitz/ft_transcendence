@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { User } from '../types';
 import { BlockedPopUp } from '../BlockedPopUp/BlockedPopUp';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './Myfriends.css';
 
 //Ressources
@@ -27,6 +28,26 @@ export const MyFriends = ({
 }: MyFriendsProps) => {
 	const [friendBlockedUsername, setfriendBlockedUsername] = useState('');
 	const env = useSelector(selectEnv);
+	const navigate = useNavigate();
+
+	const handleNavigateProfile = (friendUsername: string) => {
+		navigate('/profile/' + friendUsername);
+	};
+
+	const handleCreateDM = async (username: string) => {
+		if (username === '') return;
+		try {
+			await axios.post(
+				'http://' + env.host + ':' + env.port + '/chat/dm/create',
+				{ username },
+				{ withCredentials: true }
+			);
+		} catch (error) {
+			console.log(error);
+		}
+		navigate('/chat/');
+	};
+
 	return (
 		<>
 			<ul
@@ -108,10 +129,20 @@ export const MyFriends = ({
 							</div>
 							<div className="secondRowMyFriends">
 								<div className="chatProfileButtonMyFriends">
-									<button className="profileButtonMyFriend">
+									<button
+										className="profileButtonMyFriend"
+										onClick={() =>
+											handleNavigateProfile(
+												friend.username
+											)
+										}>
 										View Profile
 									</button>
-									<button className="chatButtonMyFriend">
+									<button
+										className="chatButtonMyFriend"
+										onClick={() =>
+											handleCreateDM(friend.username)
+										}>
 										Chat
 									</button>
 								</div>
