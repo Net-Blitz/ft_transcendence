@@ -40,7 +40,12 @@ export const Achievements = ({ userData }: { userData: any }) => {
 		data,
 		error,
 	}: { isLoading: boolean; data: any; error: boolean } = useAxios(
-		'http://' + env.host + ':' + env.port + '/users/achievement/' + userData.username
+		'http://' +
+			env.host +
+			':' +
+			env.port +
+			'/users/achievement/' +
+			userData.username
 	);
 
 	const checkAchievement = (id: number) => {
@@ -86,7 +91,7 @@ export const Achievements = ({ userData }: { userData: any }) => {
 				<Achievement
 					img={achievement5}
 					title="Experienced"
-					description="Win a game"
+					description="Win 10 games"
 					lock={checkAchievement(5) ? false : true}
 				/>
 				<Achievement
