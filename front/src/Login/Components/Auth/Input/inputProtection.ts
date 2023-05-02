@@ -4,7 +4,7 @@ export const inputProtectionPseudo = (
 ): string => {
 	const regexLetters = /^[a-zA-Z0-9_]+$/;
 	if (!regexLetters.test(input)) return 'Bad characters';
-	const regexLenght = /^.{3,7}$/;
+	const regexLenght = /^.{1,7}$/;
 	if (!regexLenght.test(input)) return 'Bad length';
 	for (let i = 0; i < usernames.length; i++) {
 		if (usernames[i].username === input) return 'Username already taken';
@@ -21,7 +21,7 @@ export const inputProtectionQR = (input: string): string => {
 export const inputProtectionChannel = (input: string): boolean => {
 	const regexChannel = /^[a-zA-Z]+$/;
 	if (!regexChannel.test(input)) return false;
-	const regexLenght = /^.{3,8}$/;
+	const regexLenght = /^.{1,8}$/;
 	if (!regexLenght.test(input)) return false;
 	return true;
 };
@@ -29,7 +29,7 @@ export const inputProtectionChannel = (input: string): boolean => {
 export const inputProtectionPassword = (input: string): boolean => {
 	const regexChannel = /^[a-zA-Z0-9_]+$/;
 	if (!regexChannel.test(input)) return false;
-	const regexLenght = /^.{3,20}$/;
+	const regexLenght = /^.{1,20}$/;
 	if (!regexLenght.test(input)) return false;
 	return true;
 };

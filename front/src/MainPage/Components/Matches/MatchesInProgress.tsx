@@ -51,12 +51,18 @@ const MatchesInProgress: React.FC<MatchesInProgressProps> = ({
 	const env = useSelector(selectEnv);
 
 	useEffect(() => {
-		axios.get('http://' + env.host + ':' + env.port +'/games/all/playing')
+		axios
+			.get('http://' + env.host + ':' + env.port + '/games/all/playing', {
+				withCredentials: true,
+			})
 			.then((res) => {
 				updateData(res.data);
-				//console.log("data", res.data)
+			})
+			.catch((err) => {
+				console.log(err);
 			});
-		}, [env.host, env.port, resetFilter]);
+	}, [env.host, env.port, resetFilter]);
+
 	const parseDate = (dataString: string): Date => {
 		const [month, day, year] = dataString.split('/').map(Number);
 		return new Date(year, month - 1, day); //date is waiting for January to be 0
@@ -115,7 +121,14 @@ const MatchesInProgress: React.FC<MatchesInProgressProps> = ({
 					{data.team.map((teamMember, index) => (
 						<div className="teamMemberLevel" key={index}>
 							<img
-								src={'http://' + env.host + ':' + env.port +'/' + teamMember.img}
+								src={
+									'http://' +
+									env.host +
+									':' +
+									env.port +
+									'/' +
+									teamMember.img
+								}
 								alt={`Team member ${index + 1}`}
 							/>
 							<p>{teamMember.level}</p>
@@ -142,7 +155,9 @@ const MatchesInProgress: React.FC<MatchesInProgressProps> = ({
 					<td className="watchMatch">
 						<button
 							className="buttonMatch"
-							onClick={() => {navigate("/game", {state : {room: data.id}})}}>
+							onClick={() => {
+								navigate('/game', { state: { room: data.id } });
+							}}>
 							Watch
 						</button>
 					</td>

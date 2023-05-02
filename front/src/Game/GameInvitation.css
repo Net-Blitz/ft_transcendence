@@ -39,6 +39,12 @@
 	background-color: #EFEDD2;
 }
 
+.game-invitation-card-avatar {
+	height: 20px;
+	width: 20px;
+	margin: 5px;
+}
+
 .game-invitation-button-join {
 	border: unset;
 	border-radius: 5px;

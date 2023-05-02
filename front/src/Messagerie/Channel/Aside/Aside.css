@@ -170,7 +170,7 @@
     box-shadow: none;
     color: #0a3d62;
     font-size: 12px;
-    padding: 8px 24px 8px 10px;
+    /* padding: 8px 24px 8px 10px; */
 	width: 80px;
 	background-color: #FDFAD0;
 }

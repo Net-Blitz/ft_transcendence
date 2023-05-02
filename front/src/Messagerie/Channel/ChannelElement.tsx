@@ -71,6 +71,9 @@ const Beside = ({ socket }: { socket: Socket }) => {
 				});
 				setMessages([]);
 				setUsersList([]);
+				socket?.emit('leave', {
+					channel: selectedChannel.name,
+				});
 			}
 		});
 		return () => {
