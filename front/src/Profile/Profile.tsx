@@ -8,20 +8,52 @@ import { MatchHistory } from './Components/MatchHistory/MatchHistory';
 import { selectUserData } from '../utils/redux/selectors';
 
 import { selectEnv } from '../utils/redux/selectors';
-import { useGetUser } from '../utils/hooks';
-import { useEffect } from 'react';
+import { useAxios, useGetUser } from '../utils/hooks';
+import { useEffect, useState } from 'react';
 import { fetchOrUpdateUser } from '../utils/redux/user';
 	
-export const Profile = () => {
+export const Profile = ({socketQueue}:any) => {
 	const userConnected = useSelector(selectUserData);
 	const env = useSelector(selectEnv);
+	const [user, setUser] = useState({} as any);
 	const handleLogout = async () => {
 		await axios.get('http://' + env.host + ':' + env.port +'/users/logout', {
 			withCredentials: true,
 		});
 		window.location.reload();
 	};
-	
+
+	const {
+		isLoading,
+		data,
+		error,
+	}: { isLoading: boolean; data: any; error: boolean } = useAxios(
+		'http://' + env.host + ':' + env.port + '/users/username/' + userConnected.username
+	);
+
+	useEffect(() => {
+		if (data) data.avatar = userConnected.avatar;
+		if (data) data.state = "ONLINE";
+		if (data) data.twoFactor = userConnected.twoFactor;
+		setUser(data);
+	}, [data, env.host, env.port]);
+
+	const updateMyStateResponse = (response:any) => {
+		if (data && response) {
+			setUser((user:any) => ({...user, state: response.state}));
+		}
+	}
+
+	useEffect(() => {
+		if (socketQueue && socketQueue.connected !== undefined) {
+			socketQueue.off('updateMyStateResponse');
+			socketQueue.on('updateMyStateResponse', updateMyStateResponse);
+			socketQueue.emit('updateMyState');
+		}
+		}, [socketQueue]);
+
+	if (isLoading && !error) return <div></div>;
+
 	return (
 		<div className="profile-wrapper">
 			<h1>My Profile</h1>
@@ -29,9 +61,9 @@ export const Profile = () => {
 				Logout
 			</button>
 			<div className="main-wrapper">
-				<MainInfo userProfile={false} userData={userConnected} />
-				<MiddleInfo userData={userConnected} />
-				<MatchHistory userData={userConnected} />
+				<MainInfo userProfile={false} userData={user} />
+				<MiddleInfo userData={user} />
+				<MatchHistory userData={user} />
 			</div>
 		</div>
 	);
