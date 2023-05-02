@@ -71,7 +71,7 @@ export const ChannelsProvider = ({ children }: { children: ReactNode }) => {
 		const fetchChats = async () => {
 			try {
 				const Channels = await axios.get<ChannelDto[]>(
-					'http://' + env.host + ':' + env.port +'/chat/channels',
+					'http://' + env.host + ':' + env.port + '/chat/channels',
 					{ withCredentials: true }
 				);
 				setChannelList(Channels.data);
@@ -83,7 +83,11 @@ export const ChannelsProvider = ({ children }: { children: ReactNode }) => {
 			if (!selectedChannel.name) return;
 			try {
 				const response = await axios.get(
-					'http://' + env.host + ':' + env.port +'/chat/channel/' +
+					'http://' +
+						env.host +
+						':' +
+						env.port +
+						'/chat/channel/' +
 						selectedChannel.name,
 					{ withCredentials: true }
 				);
@@ -91,7 +95,7 @@ export const ChannelsProvider = ({ children }: { children: ReactNode }) => {
 				setIsAdmin(false);
 				if (selectedChannel.ownerId === userConnected.id) {
 					setIsAdmin(true);
-				} else {
+				} else if (response.data.users) {
 					response.data.users.forEach((user: userInfoDto) => {
 						if (
 							user.id === userConnected.id &&
@@ -112,7 +116,14 @@ export const ChannelsProvider = ({ children }: { children: ReactNode }) => {
 		fetchAll();
 		const interval = setInterval(fetchAll, 2500);
 		return () => clearInterval(interval);
-	}, [env.host, env.port, selectedChannel.name, selectedChannel.ownerId, setChannelList, userConnected.id]);
+	}, [
+		env.host,
+		env.port,
+		selectedChannel.name,
+		selectedChannel.ownerId,
+		setChannelList,
+		userConnected.id,
+	]);
 
 	return (
 		<ChannelsContext.Provider
