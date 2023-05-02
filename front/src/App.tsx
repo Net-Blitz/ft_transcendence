@@ -35,7 +35,7 @@ function App(this: any) {
 	useGetUser();
 	const user = useSelector(selectUser);
 	const env = useSelector(selectEnv);
-	//const currentPath = window.location.pathname; 
+	//const currentPath = window.location.pathname;
 	const [reload, setReload] = useState(false);
 	const [socketQueue, setSocketQueue] = useState<Socket>({} as Socket);
 	const [socketGame, setSocketGame] = useState<Socket>({} as Socket);
@@ -94,7 +94,7 @@ function App(this: any) {
 						element={
 							<AppLayout>
 								{' '}
-								<Messagerie socketQueue={socketQueue}/>
+								<Messagerie socketQueue={socketQueue} />
 							</AppLayout>
 						}
 					/>
@@ -124,7 +124,7 @@ function App(this: any) {
 						element={
 							<AppLayout>
 								{' '}
-								<Profile socketQueue={socketQueue}/>
+								<Profile socketQueue={socketQueue} />
 							</AppLayout>
 						}
 					/>
