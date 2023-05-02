@@ -323,7 +323,8 @@
 /* Ipad */
 @media screen and (max-width: 1020px) {
     .game-creation-background {
-		height: fit-content;
+		height: max-content;
 		min-height: 88vh;
+		padding-bottom: 75px;
 	}
 }

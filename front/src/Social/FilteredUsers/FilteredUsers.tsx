@@ -30,12 +30,13 @@ export const FilteredUsers: React.FC<FilteredUsersProps> = ({
 	demands,
 	blocked,
 }) => {
+	const env = useSelector(selectEnv);
 	const [isBlocked, setIsBlocked] = useState<Map<number, boolean>>(new Map());
 
 	const checkBlockedStatus = async (username: string, userId: number) => {
 		try {
 			const response = await axios.get(
-				'http://localhost:3333/friend/blockbyme/' + username,
+				'http://' + env.host + ':' + env.port + '/blockbyme/' + username,
 				{
 					withCredentials: true,
 				}
@@ -65,7 +66,6 @@ export const FilteredUsers: React.FC<FilteredUsersProps> = ({
 			!isBlocked.get(user.id) &&
 			user.username.toLowerCase().includes(searchQuery.toLowerCase())
 	);
-	const env = useSelector(selectEnv);
 	});
 	return (
 		<>

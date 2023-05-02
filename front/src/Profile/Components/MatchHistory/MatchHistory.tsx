@@ -66,7 +66,7 @@ export const MatchHistory = ({ userData }: { userData: any }) => {
 
 	const header: string[] = [
 		'Game mode',
-		'Team',
+		'Players',
 		'Date',
 		'Hour',
 		'Winner',
@@ -79,83 +79,81 @@ export const MatchHistory = ({ userData }: { userData: any }) => {
 		const date: Date = new Date(history.date);
 
 		return (
-			<tr key={index} className={index % 2 === 0 ? 'odd' : 'even'}>
-				<td>
-					{history.mode === 'ONEVONE'
-						? '1v1'
-						: history.mode === 'TWOVTWO'
-						? '2v2'
-						: 'FFA'}
-				</td>
-				<td className="teamMatch">
-					{history.team.map((teamMember: any, index: number) => (
-						<TeamMatch
-							img={'http://' + env.host + ':' + env.port + '/' + teamMember.avatar}
-							level={Math.floor(teamMember.experience / 1000)}
-							username={teamMember.username}
-							index={index}
-							key={index}
-						/>
-					))}
-				</td>
-				{!isMobileView && (
+			<tbody key={index}>
+				<tr key={index} className={index % 2 === 0 ? 'odd' : 'even'}>
 					<td>
-						{date.getDate() +
-							'/' +
-							date.getMonth() +
-							'/' +
-							date.getFullYear()}
+						{history.mode === 'ONEVONE'
+							? '1v1'
+							: history.mode === 'TWOVTWO'
+							? '2v2'
+							: 'FFA'}
 					</td>
-				)}
-				{!isMobileView && (
-					<td>{date.getHours() + ':' + date.getMinutes()}</td>
-				)}
-				{!isMobileView && (
 					<td className="teamMatch">
-						{history.win[0] && history.mode === 'TWOVTWO' ? (
-							history.win.map((winner: any, index: number) => (
+						{history.team.map((teamMember: any, index: number) => (
+							<TeamMatch
+								img={'http://' + env.host + ':' + env.port + '/' + teamMember.avatar}
+								level={Math.floor(teamMember.experience / 1000)}
+								username={teamMember.username}
+								index={index}
+								key={index}
+							/>
+						))}
+					</td>
+					{!isMobileView && (
+						<td>
+							{date.toLocaleDateString('FR-fr')}
+						</td>
+					)}
+					{!isMobileView && (
+						<td>{date.getHours() + ':' + (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes())}</td>
+					)}
+					{!isMobileView && (
+						<td className="teamMatch">
+							{history.win[0] && history.mode === 'TWOVTWO' ? (
+								history.win.map((winner: any, index: number) => (
+									<TeamMatch
+										img={
+											'http://' + env.host + ':' + env.port + '/' + winner.avatar
+										}
+										level={Math.floor(winner.experience / 1000)}
+										username={winner.username}
+										index={index}
+										key={index}
+									/>
+								))
+							) : (
 								<TeamMatch
 									img={
-										'http://' + env.host + ':' + env.port + '/' + winner.avatar
+										'http://' + env.host + ':' + env.port + '/' +
+										history.win.avatar
 									}
-									level={Math.floor(winner.experience / 1000)}
-									username={winner.username}
-									index={index}
-									key={index}
+									level={Math.floor(
+										history.win.experience / 1000
+									)}
+									username={history.win.username}
+									index={0}
+									key={0}
 								/>
-							))
-						) : (
-							<TeamMatch
-								img={
-									'http://' + env.host + ':' + env.port + '/' +
-									history.win.avatar
-								}
-								level={Math.floor(
-									history.win.experience / 1000
-								)}
-								username={history.win.username}
-								index={0}
-								key={0}
-							/>
-						)}
+							)}
+						</td>
+					)}
+					<td>
+						{history.mode === 'ONEVONE'
+							? history.score1 + ' - ' + history.score2
+							: history.mode === 'TWOVTWO'
+							? history.score1 + ' - ' + history.score3
+							: history.score1 +
+							' - ' +
+							history.score2 +
+							' - ' +
+							history.score3 +
+							' - ' +
+							history.score4}
 					</td>
-				)}
-				<td>
-					{history.mode === 'ONEVONE'
-						? history.score1 + ' - ' + history.score2
-						: history.mode === 'TWOVTWO'
-						? history.score1 + ' - ' + history.score3
-						: history.score1 +
-						  ' - ' +
-						  history.score2 +
-						  ' - ' +
-						  history.score3 +
-						  ' - ' +
-						  history.score4}
-				</td>
-				{!isMobileView && <td>{history.duration}</td>}
-				{!isMobileView && <td>{history.map}</td>}
-			</tr>
+					{!isMobileView && <td>{history.duration}</td>}
+					{!isMobileView && <td>{history.map}</td>}
+				</tr>
+			</tbody>
 		);
 	};
 
@@ -177,12 +175,10 @@ export const MatchHistory = ({ userData }: { userData: any }) => {
 								))}
 						</tr>
 					</thead>
-					<tbody>
-						{data &&
-							data.map((history: any, index: number) =>
-								dataHistory({ history, index })
-							)}
-					</tbody>
+					{data &&
+						data.map((history: any, index: number) =>
+							dataHistory({ history, index })
+						)}
 				</table>
 			</BasicFrame>
 		</div>

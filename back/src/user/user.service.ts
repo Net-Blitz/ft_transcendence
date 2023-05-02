@@ -276,8 +276,46 @@ export class UserService {
 					},
 				});
 
-				element["team"] = [user1, user2];
-				const winner = element.score1 > element.score2 ? user1 : user2;
+				let user3 : any;
+				let user4 : any;
+
+				if (element.user3Id) {
+					user3 = await this.prisma.user.findUnique({
+						where: {
+							id: element.user3Id,
+						},
+						select: {
+							avatar: true,
+							username: true,
+							experience: true,
+						},
+					});
+				}
+
+				if (element.user4Id) {
+					user4 = await this.prisma.user.findUnique({
+						where: {
+							id: element.user4Id,
+						},
+						select: {
+							avatar: true,
+							username: true,
+							experience: true,
+						},
+					});
+				}
+
+				if (user3 && user4 && element.mode !== "ONEVONE")
+					element["team"] = [user1, user2, user3, user4];
+				else
+					element["team"] = [user1, user2];
+				let winner : any;
+				if (element.mode === "ONEVONE")
+					winner = element.winner === element.user1Id ? user1 : user2;
+				else if (element.mode === "TWOVTWO")
+					winner = element.winner === element.user1Id ? [user1, user2] : [user3, user4];
+				else if (element.mode === "FREEFORALL")
+					winner = element.winner === element.user1Id ? user1 : element.winner === element.user2Id ? user2 : element.winner === element.user3Id ? user3 : user4;
 				element["win"] = winner;
 				const diff = element.enddate.getTime() - element.date.getTime();
 				const seconds = Math.floor(diff / 1000);
@@ -308,9 +346,46 @@ export class UserService {
 						experience: true,
 					},
 				});
+				let user3 : any;
+				let user4 : any;
 
-				element["team"] = [user1, user2];
-				const winner = element.score1 > element.score2 ? user1 : user2;
+				if (element.user3Id) {
+					user3 = await this.prisma.user.findUnique({
+						where: {
+							id: element.user3Id,
+						},
+						select: {
+							avatar: true,
+							username: true,
+							experience: true,
+						},
+					});
+				}
+
+				if (element.user4Id) {
+					user4 = await this.prisma.user.findUnique({
+						where: {
+							id: element.user4Id,
+						},
+						select: {
+							avatar: true,
+							username: true,
+							experience: true,
+						},
+					});
+				}
+
+				if (user3 && user4 && element.mode !== "ONEVONE")
+					element["team"] = [user1, user2, user3, user4];
+				else
+					element["team"] = [user1, user2];
+				let winner : any;
+				if (element.mode === "ONEVONE")
+					winner = element.winner === element.user1Id ? user1 : user2;
+				else if (element.mode === "TWOVTWO")
+					winner = element.winner === element.user1Id ? [user1, user2] : [user3, user4];
+				else if (element.mode === "FREEFORALL")
+					winner = element.winner === element.user1Id ? user1 : element.winner === element.user2Id ? user2 : element.winner === element.user3Id ? user3 : user4;
 				element["win"] = winner;
 				const diff = element.enddate.getTime() - element.date.getTime();
 				const seconds = Math.floor(diff / 1000);
@@ -368,17 +443,17 @@ export class UserService {
 				element["team"] = [user1, user2, user3, user4];
 				if (element.mode === "TWOVTWO") {
 					const winner =
-						element.score1 > element.score3
+						element.winner === element.user1Id
 							? [user1, user2]
 							: [user3, user4];
 					element["win"] = winner;
 				} else if (element.mode === "FREEFORALL") {
 					const winner =
-						element.score1 > element.score2
+						element.winner === element.user1Id
 							? user1
-							: element.score2 > element.score3
+							: element.winner === element.user2Id
 							? user2
-							: element.score3 > element.score4
+							: element.winner === element.user3Id
 							? user3
 							: user4;
 					element["win"] = winner;
@@ -439,19 +514,19 @@ export class UserService {
 				element["team"] = [user1, user2, user3, user4];
 				if (element.mode === "TWOVTWO") {
 					const winner =
-						element.score1 > element.score3
+						element.winner === element.user1Id
 							? [user1, user2]
 							: [user3, user4];
 					element["win"] = winner;
 				} else if (element.mode === "FREEFORALL") {
 					const winner =
-						element.score1 > element.score2
-							? user1
-							: element.score2 > element.score3
-							? user2
-							: element.score3 > element.score4
-							? user3
-							: user4;
+					element.winner === element.user1Id
+						? user1
+						: element.winner === element.user2Id
+						? user2
+						: element.winner === element.user3Id
+						? user3
+						: user4;
 					element["win"] = winner;
 				}
 				const diff = element.enddate.getTime() - element.date.getTime();
@@ -470,7 +545,9 @@ export class UserService {
 					.concat(result2)
 					.concat(result3)
 					.concat(result4)
-					.filter((element) => element !== null)
+					.filter((element) => element !== null).sort((a, b) => {
+						return b.date.getTime() - a.date.getTime();
+					})
 			);
 		} catch (error) {
 			return res.status(204).json({ message: `User has no matchs` });
