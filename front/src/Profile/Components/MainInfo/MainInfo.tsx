@@ -89,7 +89,7 @@ export const MainInfo = ({
 	const [triggerQR, setTriggerQR] = useState(false);
 	const [defaultToggle, setDefaultToggle] = useState(userData.twoFactor);
 	const totalGames: number = userData.wins + userData.losses;
-	const winRate: any = ((userData.wins / totalGames) * 100).toFixed(2);
+	const winRate: any = totalGames !== 0 ? ((userData.wins / totalGames) * 100).toFixed(2) : 0;
 	const env = useSelector(selectEnv);
 
 	const handleTrigger = useCallback(() => {
