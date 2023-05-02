@@ -35,12 +35,18 @@ export const ProfileConfig = ({ handleTrigger }: ProfileConfigProps) => {
 		async function fetchData() {
 			try {
 				const response = await axios.get(
-					'http://' + env.host + ':' + env.port +'/users/all/pseudo',
+					'http://' + env.host + ':' + env.port + '/users/all/pseudo',
 					{
 						withCredentials: true,
 					}
 				);
 				const usernames = response.data;
+				for (let i = 0; i < usernames.length; i++) {
+					if (usernames[i].username === userConnected.username) {
+						usernames.splice(i, 1);
+						break;
+					}
+				}
 				setUsernames(usernames);
 			} catch (error) {
 				console.error(error);
@@ -78,7 +84,11 @@ export const ProfileConfig = ({ handleTrigger }: ProfileConfigProps) => {
 				formData.append('source', avatar[currentIndex].source);
 				try {
 					await axios.post(
-						'http://' + env.host + ':' + env.port +'/users/updateconfig',
+						'http://' +
+							env.host +
+							':' +
+							env.port +
+							'/users/updateconfig',
 						formData,
 						{
 							withCredentials: true,
