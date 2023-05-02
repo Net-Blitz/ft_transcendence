@@ -207,4 +207,18 @@ export class GameService {
 			return ({spec: false, reason: "ended", login: userLogin});
 		return ({spec: true, login: userLogin});
 	}
+
+	async amISpec(user: any, gameId: number) {
+		const game = await this.prisma.game.findFirst({
+			where: {id: gameId}
+		});
+		if (!game)
+			return {isSpec: true};
+		if (game.state === "ENDED")
+			return {isSpec: true};
+		console.log(game.user1Id, game.user2Id, game.user3Id, game.user4Id, user.id)
+		if (game.user1Id === user.id || game.user2Id === user.id || game.user3Id === user.id || game.user4Id === user.id)
+			return {isSpec: false};
+		return {isSpec: true};
+	}
 }

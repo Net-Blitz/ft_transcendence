@@ -7,14 +7,18 @@ import { MainFrame } from '../Messagerie/Messagerie';
 import { MainInfo } from './Components/MainInfo/MainInfo';
 import { MiddleInfo } from './Components/MiddleInfo/MiddleInfo';
 import { MatchHistory } from './Components/MatchHistory/MatchHistory';
-import { selectEnv } from '../utils/redux/selectors';
+import { selectEnv, selectUserData } from '../utils/redux/selectors';
 import { useSelector } from 'react-redux';
 
 export const UserProfile = () => {
 	const { username } = useParams();
 	const [user, setUser] = useState({});
 	const env = useSelector(selectEnv);
+	const me = useSelector(selectUserData);
 
+	if (username === me.username) {
+		window.location.href = '/profile';
+	}
 	const {
 		isLoading,
 		data,

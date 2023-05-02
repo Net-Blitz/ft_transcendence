@@ -44,7 +44,7 @@
 	font-size: 11px;
 	color: #0a3d62;
 	cursor: pointer;
-	position: fixed;
+	position: absolute;
 	right: 5%;
 }
 
