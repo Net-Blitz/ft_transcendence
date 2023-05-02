@@ -25,7 +25,7 @@ services:
             - ${FRONT}Volume:/app/
         networks:
             - transcenet
-        restart: always
+        #restart: always
 
     back:
         container_name: back
@@ -61,13 +61,6 @@ volumes:
         driver_opts:
             type: 'none'
             device: '$PWD/front'
-            o: bind
-
-    front_testVolume:
-        driver: local
-        driver_opts:
-            type: 'none'
-            device: '$PWD/front_test'
             o: bind
 
     backVolume:
