@@ -9,7 +9,7 @@ import { Socket } from 'socket.io-client';
 import block_blue from '../Ressources/block_blue.svg';
 import game_blue from '../Ressources/game_blue.svg';
 import cancel_blue from '../Ressources/cancel_blue.svg';
-import { selectEnv, selectUserData } from '../../utils/redux/selectors';
+import { selectEnv } from '../../utils/redux/selectors';
 import { useSelector } from 'react-redux';
 
 interface MyFriendsProps {

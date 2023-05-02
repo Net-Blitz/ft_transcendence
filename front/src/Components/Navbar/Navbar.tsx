@@ -40,6 +40,7 @@ const NavbarButton: React.FC<NavButtonProps> = ({
 				<img
 					src={isMatchingPath ? button.activeImgSrc : button.imgSrc}
 					alt={button.content}
+					style={{ height: '40px', width: '40px' }}
 				/>
 			</div>
 			<p>{userData.username}</p>
