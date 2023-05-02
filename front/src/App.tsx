@@ -128,7 +128,7 @@ function App(this: any) {
 						element={
 							<AppLayout>
 								{' '}
-								<Profile />
+								<Profile socketQueue={socketQueue}/>
 							</AppLayout>
 						}
 					/>

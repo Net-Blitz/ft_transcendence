@@ -1097,4 +1097,26 @@ export class QueueGateway {
 		}
 		client.emit("UpdateGroupResponse", {players: allPlayers, mode: group.mode, map: group.map});
 	}
+
+	@SubscribeMessage("updateMyState")
+	async handleUpdateMyState(@ConnectedSocket() client: Socket) {
+		const me = this.findMe(client.id);
+		if (!me)
+			return ;
+		const prismaMe = await this.prisma.user.findFirst({
+			where: {login: me.login},
+		});
+		if (!prismaMe)
+			return ;
+		if (prismaMe.state !== "OFFLINE")
+			client.emit("updateMyStateResponse", {state: prismaMe.state});
+		else
+		{
+			this.prisma.user.update({
+				where: {login: me.login},
+				data: {state: "ONLINE"}
+			});
+			client.emit("updateMyStateResponse", {state: "ONLINE"});
+		}
+	}
 }

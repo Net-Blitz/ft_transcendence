@@ -89,7 +89,7 @@ export const MainInfo = ({
 	const [triggerQR, setTriggerQR] = useState(false);
 	const [defaultToggle, setDefaultToggle] = useState(userData.twoFactor);
 	const totalGames: number = userData.wins + userData.losses;
-	const winRate: number = (userData.wins / totalGames) * 100;
+	const winRate: any = ((userData.wins / totalGames) * 100).toFixed(2);
 	const env = useSelector(selectEnv);
 
 	const handleTrigger = useCallback(() => {
@@ -152,7 +152,7 @@ export const MainInfo = ({
 				/>
 				<InfoElement
 					title="Registration date"
-					content={new Date(userData.configAt).toLocaleDateString()}
+					content={new Date(userData.configAt).toLocaleDateString('FR-fr')}
 					border={userProfile ? false : true}
 				/>
 				{!userProfile && (

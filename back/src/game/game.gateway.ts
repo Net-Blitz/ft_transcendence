@@ -356,6 +356,7 @@ export class GameGateway {
 		winnerScore: number,
 		loserScore: number
 	) {
+		console.log("winner: ", winner.login, "loser: ", loser.login);
 		if (winnerScore === 10 && loserScore === 0) {
 			await this.prisma.achievements.update({
 				where: { id: 1 },
@@ -374,13 +375,13 @@ export class GameGateway {
 				data: { users: { connect: { id: winner.id } } },
 			});
 		}
-		if (winner.wins === 1) {
+		if (winner.wins >= 1 && winner.wins <= 10) {
 			await this.prisma.achievements.update({
 				where: { id: 4 },
 				data: { users: { connect: { id: winner.id } } },
 			});
 		}
-		if (winner.wins === 10) {
+		if (winner.wins >= 10 && winner.wins <= 20) {
 			await this.prisma.achievements.update({
 				where: { id: 5 },
 				data: { users: { connect: { id: winner.id } } },
@@ -545,8 +546,11 @@ export class GameGateway {
 		let player2 = await this.prisma.user.findUnique({
 			where: { id: game.user2Id },
 		});
+		let gameAfter = await this.prisma.game.findUnique({
+			where: { id: room },
+		});
 		if (player1 && player2) {
-			if (game.user1Id === player1.id)
+			if (gameAfter.winner === player1.id)
 				await this.updateAchievements(
 					player1,
 					player2,
