@@ -127,7 +127,7 @@ const ChannelListElement = ({
 				{ withCredentials: true }
 			);
 			if (response.data.find((ban: any) => ban.name === channel.name)) {
-				console.log('You are banned from this channel');
+				//console.log('You are banned from this channel');
 				return;
 			} else if (channel?.state === 'PUBLIC') {
 				setSelectedChannel(channel);
@@ -177,7 +177,7 @@ const ChannelListElement = ({
 						username: connectedUser.username,
 					});
 				} else {
-					console.log("You don't have access to this channel");
+					//console.log("You don't have access to this channel");
 				}
 			}
 		} catch (error) {
