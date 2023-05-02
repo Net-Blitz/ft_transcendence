@@ -12,8 +12,7 @@ import GameRoute from './Game/GameRoute';
 import Notification from './Notification/Notification';
 import { Profile } from './Profile/Profile';
 import { AuthRoutes } from './utils/PrivateRoutes';
-import { useSelector, useStore } from 'react-redux';
-import Admin from './Admin';
+import { useSelector } from 'react-redux';
 import { UserProfile } from './Profile/UserProfile';
 /*	HOOKS	*/
 import { useGetUser } from './utils/hooks';
@@ -23,8 +22,6 @@ import { selectEnv, selectUser } from './utils/redux/selectors';
 import { io, Socket } from 'socket.io-client';
 import GamePopUp from './Game/GamePopUp';
 import GameInvitation from './Game/GameInvitation';
-import { fetchOrUpdateUser } from './utils/redux/user';
-import { createAction } from '@reduxjs/toolkit';
 
 const NotFound = () => {
 	return (
@@ -36,7 +33,6 @@ const NotFound = () => {
 
 function App(this: any) {
 	useGetUser();
-	const store = useStore();
 	const user = useSelector(selectUser);
 	const env = useSelector(selectEnv);
 	//const currentPath = window.location.pathname; 
