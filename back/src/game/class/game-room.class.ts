@@ -597,7 +597,10 @@ export class GameRoomFFA {
 
 		this.accelerate();
 		let angle = (Math.PI - (1 * Math.PI / 2) * percent) - (Math.PI / 2);
-		// console.log("angle: " + angle)
+		if (angle > Math.PI)
+			angle -= 2 * Math.PI;
+		else if (angle < -Math.PI)
+			angle += 2 * Math.PI;
 		return angle;
 	}
 	
@@ -606,7 +609,10 @@ export class GameRoomFFA {
 		
 		this.accelerate();
 		let angle = ((1 * Math.PI / 2) * percent) - (Math.PI / 2)
-		// console.log("angle: " + angle)
+		if (angle > Math.PI)
+			angle -= 2 * Math.PI;
+		else if (angle < -Math.PI)
+			angle += 2 * Math.PI;
 		return angle;
 	}
 
