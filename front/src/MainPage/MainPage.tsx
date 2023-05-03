@@ -73,7 +73,6 @@ const MainPage = () => {
 		};
 	}, [hasManyMatches, data.length]);
 
-	//console.log('mainRectangle', mainRectangleMobile);
 	return (
 		<div className="rectNoMsg">
 			<p className="mainTitle">Games in progress</p>
@@ -135,7 +134,7 @@ const MainPage = () => {
 					toggleDropdown={() => toggleDropdown('Game Mode')}
 					resetFilter={resetFilter}
 				/>
-				{/*<hr className="filterDivider" />
+				{/* <hr className="filterDivider" />
 				<FilterButton
 					label="Friends"
 					options={['Only my friends', 'Everyone']}
@@ -144,7 +143,7 @@ const MainPage = () => {
 					setIsOpen={() => setOpenFilter(null)}
 					toggleDropdown={() => toggleDropdown('Friends')}
 					resetFilter={resetFilter}
-				/>*/}
+				/> */}
 				<hr className="filterDivider" />
 				<FilterButton
 					label="Map"
