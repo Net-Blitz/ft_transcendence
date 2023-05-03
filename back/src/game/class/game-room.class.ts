@@ -205,7 +205,7 @@ export class GameRoom {
 
 	checkEndGame() {
 		if ((this.player1.score >= 10 || this.player2.score >= 10) && Math.abs(this.player1.score - this.player2.score) >= 2)
-			return {state: true, mode: "normal"} /* TEMP */ //return true;
+			return {state: true, mode: "normal"}
 		return {state: false, mode: "none"}
 	} 
 }
@@ -438,7 +438,7 @@ export class GameRoom2V2 {
 
 	checkEndGame() {
 		if ((this.player1.score >= 10 || this.player3.score >= 10) && Math.abs(this.player1.score - this.player3.score) >= 2)
-			return {state: true, mode: "normal"} /* TEMP */ //return true;
+			return {state: true, mode: "normal"}
 		return {state: false, mode: "none"}
 	} 
 }
@@ -803,7 +803,7 @@ export class GameRoomFFA {
 		if (this.player4.score <= 0)
 			count++;
 		if (count >= 3)
-			return {state: true, mode: "normal"} /* TEMP */ //return true;
+			return {state: true, mode: "normal"}
 		return {state: false, mode: "none"}
 	} 
 }

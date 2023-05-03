@@ -9,7 +9,6 @@ import { useNavigate } from 'react-router-dom';
 import { selectEnv } from '../../../utils/redux/selectors';
 import { useSelector } from 'react-redux';
 
-//Not working
 const useWindowWidth = () => {
 	const [windowWidth, setwindowWidth] = useState(window.innerWidth);
 	useEffect(() => {
