@@ -205,7 +205,7 @@ export class GameRoom {
 
 	checkEndGame() {
 		if ((this.player1.score >= 10 || this.player2.score >= 10) && Math.abs(this.player1.score - this.player2.score) >= 2)
-			return {state: true, mode: "normal"} /* TEMP */ //return true;
+			return {state: true, mode: "normal"}
 		return {state: false, mode: "none"}
 	} 
 }
@@ -438,7 +438,7 @@ export class GameRoom2V2 {
 
 	checkEndGame() {
 		if ((this.player1.score >= 10 || this.player3.score >= 10) && Math.abs(this.player1.score - this.player3.score) >= 2)
-			return {state: true, mode: "normal"} /* TEMP */ //return true;
+			return {state: true, mode: "normal"}
 		return {state: false, mode: "none"}
 	} 
 }
@@ -514,8 +514,8 @@ export class GameRoomFFA {
 	}
 	
 	accelerate() {
-		this.ball.speed_x *= 1.00;
-		this.ball.speed_y *= 1.00;
+		this.ball.speed_x *= 1.02;
+		this.ball.speed_y *= 1.02;
 	}
 
 	updatePlayerPosition(player: SocketUser) {
@@ -582,14 +582,24 @@ export class GameRoomFFA {
 		let percent = (y - this.player1.y) / this.player1.size;
 
 		this.accelerate();
-		return ((1 * Math.PI / 2) * percent);
+		let angle = (1 * Math.PI / 2) * percent;
+		if (angle > Math.PI)
+			angle -= 2 * Math.PI;
+		else if (angle < -Math.PI)
+			angle += 2 * Math.PI;
+		return (angle);
 	}
 	
 	private getBallDirectionBounceLeft(y: number) {
 		let percent = (y - this.player2.y) / this.player2.size;
 		
 		this.accelerate();
-		return (Math.PI - (1 * Math.PI / 2) * percent)
+		let angle = (Math.PI - (1 * Math.PI / 2) * percent);
+		if (angle > Math.PI)
+			angle -= 2 * Math.PI;
+		else if (angle < -Math.PI)
+			angle += 2 * Math.PI;
+		return (angle)
 	}
 
 	private getBallDirectionBounceBottom(x: number) {
@@ -597,7 +607,11 @@ export class GameRoomFFA {
 
 		this.accelerate();
 		let angle = (Math.PI - (1 * Math.PI / 2) * percent) - (Math.PI / 2);
-		// console.log("angle: " + angle)
+		if (angle > Math.PI)
+			angle -= 2 * Math.PI;
+		else if (angle < -Math.PI)
+			angle += 2 * Math.PI;
+		console.log(angle)
 		return angle;
 	}
 	
@@ -606,7 +620,11 @@ export class GameRoomFFA {
 		
 		this.accelerate();
 		let angle = ((1 * Math.PI / 2) * percent) - (Math.PI / 2)
-		// console.log("angle: " + angle)
+		if (angle > Math.PI)
+			angle -= 2 * Math.PI;
+		else if (angle < -Math.PI)
+			angle += 2 * Math.PI;
+		console.log(angle)
 		return angle;
 	}
 
@@ -785,7 +803,7 @@ export class GameRoomFFA {
 		if (this.player4.score <= 0)
 			count++;
 		if (count >= 3)
-			return {state: true, mode: "normal"} /* TEMP */ //return true;
+			return {state: true, mode: "normal"}
 		return {state: false, mode: "none"}
 	} 
 }
